@@ -13,22 +13,24 @@
 <body <?php body_class(); ?>>
   <div id="page" class="hfeed site">
     <header id="masthead" class="site-header" role="banner">
-      <div class="container-fluid">
+      <div class="container-fluid container--navigation">
         <div class="row gf-top-bar">
-          <?php dynamic_sidebar('gf-header-row-1') ?>
+          <div class="gf-top-bar__container">
+            <?php dynamic_sidebar('gf-header-row-1') ?>
+          </div>
         </div>
         <div class="row gf-primary-navigation">
-          <div class="col-3 logo-column">
+          <div class="col-3 gf-logo">
             <div class="gf-logo-wrapper">
               <?php dynamic_sidebar('gf-header-row-2-col-1') ?>
             </div>
           </div>
-          <div class="col-7">
+          <div class="col-5 gf-search">
             <div class="gf-search-wrapper">
               <?php get_search_form()?>
             </div>
           </div>
-          <div class="col-2">
+          <div class="col-4 gf-navigation">
             <div class="gf-navigation-wrapper">
               <?php dynamic_sidebar('gf-header-row-2-col-3')?>
             </div>
