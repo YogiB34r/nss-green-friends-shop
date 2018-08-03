@@ -91,9 +91,9 @@ function gf_cart_shortcode()
 {
     global $woocommerce ?>
     <a class="gf-header-cart" href="<?php echo wc_get_cart_url(); ?>" title="<?php _e('Cart View', 'green-friends'); ?>">
-      <p class="">
-        <?php _e('Cart', 'green-friends'); ?> (<?php echo sprintf(_n('%d', '%d', $woocommerce->cart->cart_contents_count, 'woothemes'),
-            $woocommerce->cart->cart_contents_count);?>)</p>
+      <p class="gf-header-cart__title">
+        <i class="fas fa-shopping-cart"></i> <span class="shopping-cart__count"><?php echo sprintf(_n('%d', '%d', $woocommerce->cart->cart_contents_count, 'woothemes'),
+            $woocommerce->cart->cart_contents_count);?></span>Vaša korpa</p>
     </a>
     <?php
 }
@@ -131,10 +131,9 @@ function gf_category_megamenu_shortcode() {
                     'parent'   => $child_product_cat->term_id
                 );
                 $child_child_product_cats = get_terms( $child_child_args );
-                echo '<div style="width: 30%; position: relative; float: left;">
-                        <li class="dropdown-submenu child_parent">
-                          <a tabindex="-1" href="'.get_term_link($child_product_cat->term_id).'">'.$child_product_cat->name.'</a>
-                        </li>
+                echo '<li class="dropdown-submenu child_parent">
+                        <a tabindex="-1" href="'.get_term_link($child_product_cat->term_id).'">'.$child_product_cat->name.'</a>
+                      </li>
 	                      <ul>';
                 foreach ($child_child_product_cats as $child_child_product_cat) {
                     echo '
@@ -142,7 +141,7 @@ function gf_category_megamenu_shortcode() {
                         <a tabindex="-1" href="'.get_term_link($child_child_product_cat->term_id).'">'.$child_child_product_cat->name.'</a>
                       </li>';
                 }
-                echo '</ul></div>';
+                echo '</ul>';
             }
             echo '</ul>
       </li>

@@ -1,5 +1,5 @@
 <div class="row">
-    <div class="col-3">
+    <div class="col-3 list-unstyled gf-sidebar">
         <?php dynamic_sidebar('gf-category-sidebar')?>
     </div>
     <div class="col-9">

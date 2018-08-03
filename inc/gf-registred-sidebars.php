@@ -73,6 +73,7 @@ function gf_register_sidebars() {
             'name'          => __('Left sidebar', ''.$theme->get('TextDomain').''),
             'id'            => 'gf-left-sidebar',
             'description'   => 'Left sidebar',
+
         ),
         array(
             'name'          => __('Category Sidebar', ''.$theme->get('TextDomain').''),
