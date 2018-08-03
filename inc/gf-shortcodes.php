@@ -115,37 +115,38 @@ function gf_category_megamenu_shortcode() {
     foreach ($product_cat as $parent_product_cat) {
         if($parent_product_cat->name != 'Slider'):
             echo '
-            <ul class="gf-vnavigation">
-              <li class="dropdown-submenu dropdown-submenu-item"><a tabindex="-1" href="'.get_term_link($parent_product_cat->term_id).'">'.$parent_product_cat->name.'</a>
-            <ul class="dropdown-menu child" style="width: 750px;">';
+            <ul class="gf-navigation">
+              <li class="category-item">
+                <a tabindex="-1" href="'.get_term_link($parent_product_cat->term_id).'">'.$parent_product_cat->name.'</a>
+                <div class="mega-menu row z-depth-1 primary-color-dark" aria-labelledby="navbarDropdownMenuLink2">
+                  <div class="row mega-menu__row">';
             $child_args = array(
                 'taxonomy' => 'product_cat',
                 'hide_empty' => false,
                 'parent'   => $parent_product_cat->term_id
             );
             $child_product_cats = get_terms( $child_args );
-            foreach ($child_product_cats as $child_product_cat)
-            {
+
+            foreach ($child_product_cats as $child_product_cat) {
                 $child_child_args = array('taxonomy' => 'product_cat',
                     'hide_empty' => false,
                     'parent'   => $child_product_cat->term_id
                 );
                 $child_child_product_cats = get_terms( $child_child_args );
-                echo '<li class="dropdown-submenu child_parent">
-                        <a tabindex="-1" href="'.get_term_link($child_product_cat->term_id).'">'.$child_product_cat->name.'</a>
-                      </li>
-	                      <ul>';
+                echo '<div class="col-md-3 col-xl-3 sub-menu">
+                        <ol class="list-unstyled ml-4 mr-md-0 mr-4">
+                          <li class="sub-category-title text-uppercase mt-sm">
+                            <a class="menu-item" href="'.get_term_link($child_product_cat->term_id).'">'.$child_product_cat->name.'</a>
+                          </li>';
                 foreach ($child_child_product_cats as $child_child_product_cat) {
-                    echo '
-                      <li>
-                        <a tabindex="-1" href="'.get_term_link($child_child_product_cat->term_id).'">'.$child_child_product_cat->name.'</a>
-                      </li>';
+                    echo '<li class="sub-sub-category-title text-uppercase">
+                            <a class="sub-menu-item" href="'.get_term_link($child_child_product_cat->term_id).'">'.$child_child_product_cat->name.'</a>
+                          </li>';
                 }
-                echo '</ul>';
+                echo '</ol>
+                    </div>';
             }
-            echo '</ul>
-      </li>
-    </ul>';
+            echo '</div></div></li></ul>';
         endif;
     }
     echo '</div>
