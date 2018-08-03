@@ -14,7 +14,7 @@ function gf_cart_display_seller_info()
     echo '<div class="gf-seller-info">
            <p>Prodavac: 
                 <span class="gf-seller-info-title">Non Stop Shop</span>
-                <img src="http://via.placeholder.com/60x50" alt="Non Stop Shop">
+                <img src="https://nss-devel.ha.rs/wp-content/uploads/2018/06/NonStopShop-logo-okacen1-copy.png" alt="Non Stop Shop">
            </p>
           </div>';
 }
