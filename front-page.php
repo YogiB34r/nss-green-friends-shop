@@ -3,11 +3,12 @@
 <div class="row">
   <div class="col-3 gf-sidebar gf-left-sidebar">
     <div class="gf-left-sidebar-wrapper">
+      <div class="gf-wrapper-before"></div>
       <?php dynamic_sidebar('gf-left-sidebar'); ?>
     </div>
   </div>
-  <div class="col-9">
-    <div class="row list-unstyled">
+  <div class="gf-content-wrapper col-md-9 col-sm-12">
+    <div class="gf-row row list-unstyled">
       <?php dynamic_sidebar('gf-homepage-row-1'); ?>
       <div class="dropdown-menua mega-menu row z-depth-1 primary-color-dark" aria-labelledby="navbarDropdownMenuLink2">
         <div class="row mega-menu__row">
@@ -50,10 +51,10 @@
         </div>
       </div>
     </div>
-    <div class="row list-unstyled">
+    <div class="gf-row row list-unstyled">
       <?php dynamic_sidebar('gf-homepage-row-2'); ?>
     </div>
-    <div class="row list-unstyled">
+    <div class="gf-row row list-unstyled">
       <?php dynamic_sidebar('gf-homepage-row-3'); ?>
     </div>
   </div>

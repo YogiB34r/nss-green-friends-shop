@@ -107,8 +107,7 @@ function gf_category_megamenu_shortcode() {
     );
     $product_cat = get_terms( $args );
     echo
-    '<div class="gf-wrapper-before"></div>
-      <div id="gf-wrapper">
+    '<div id="gf-wrapper">
 	     <div class="gf-sidebar">
 		     <div class="gf-toggle"><i class="fa fa-bars"></i></div>
 		       <div class="gf-navblock">';
