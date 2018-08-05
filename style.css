@@ -266,8 +266,7 @@ img.gf-header-logo {
   margin-bottom: 20px;
 }
 
-.gf-text-title,
-.gf-inner-navigation__link {
+.gf-text-title, .gf-inner-navigation__link {
   color: #1d1d1d;
   font-size: 18px;
   font-weight: 600;
@@ -294,6 +293,143 @@ img.gf-header-logo {
 }
 
 /* woocommerce overrides */
+
+.woocommerce .woocommerce-breadcrumb {
+  padding: 30px 20px;
+  color: #1d1d1d;
+}
+
+.woocommerce .woocommerce-breadcrumb a {
+  color: #666;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.woocommerce .woocommerce-breadcrumb a:hover {
+  color: #f45411;
+}
+
+h1.product_title.entry-title {
+  font-size: 2.617924em;
+  line-height: 1.214;
+  letter-spacing: -1px;
+  margin: 0 0 1em;
+}
+
+.woocommerce .products ul,
+.woocommerce ul.products {
+  margin: 20px 0;
+}
+
+.woocommerce ul.products li.product .woocommerce-loop-category__title,
+.woocommerce ul.products li.product .woocommerce-loop-product__title {
+  color: #515151;
+}
+
+.woocommerce ul.products li.product .woocommerce-loop-category__title,
+.woocommerce ul.products li.product .woocommerce-loop-product__title,
+.woocommerce ul.products li.product p.price,
+.woocommerce ul.products li.product span.price,
+.woocommerce ul.products li.product h3, .woocommerce ul.products li.product .button {
+  text-align: center;
+}
+
+.woocommerce div.product p.price,
+.woocommerce div.product span.price {
+  margin: 1.41575em 0 1.41575em;
+  font-size: 26px;
+  color: #f45411;
+}
+
+.woocommerce ul.products li.product .price {
+  color: #c92722;
+  text-align: center;
+  font-weight: 600;
+  font-size: 18px;
+  margin: 20px 0;
+}
+
+.woocommerce ul.products li.product .price:first-child {
+  color: #e8e8e8;
+  text-align: center;
+}
+
+.woocommerce ul.products li.product .button {
+  display: block;
+  width: 70%;
+  margin: 0 auto;
+  color: #515151;
+  background: #fafafa;
+  border: solid 2px #e8e8e8;
+  border-radius: 4px;
+  transition: 0.2s all;
+}
+
+.woocommerce ul.products li.product .button:hover {
+  color: #f45411;
+}
+
+.woocommerce #content div.product div.summary p, .woocommerce div.product div.summary p, .woocommerce-page #content div.product div.summary p, .woocommerce-page div.product div.summary p, .saved-sale {
+  margin-bottom: 20px;
+}
+
+.woocommerce div.product form.cart {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+}
+
+.woocommerce #content div.product form.cart div.quantity, .woocommerce div.product form.cart div.quantity, .woocommerce-page #content div.product form.cart div.quantity, .woocommerce-page div.product form.cart div.quantity {
+  margin-right: 20px;
+}
+
+.woocommerce #content div.product form.cart div.quantity input, .woocommerce div.product form.cart div.quantity input, .woocommerce-page #content div.product form.cart div.quantity input, .woocommerce-page div.product form.cart div.quantity input {
+  padding: 10px 3px;
+  border: solid 1px #f45411;
+  border-radius: 4px;
+  color: #f45411;
+}
+
+.woocommerce div.product form.cart .button {
+  background: url(http://greenfriends.local/wp-content/uploads/2018/08/btn_add_to_cart.png) no-repeat 6px center;
+  border: 0;
+  min-height: 78px;
+  min-width: 175px;
+  color: transparent;
+}
+
+.woocommerce-tabs.wc-tabs-wrapper {
+  margin-bottom: 45px;
+  border-bottom: solid 1px #d9d9d9;
+}
+
+.woocommerce div.product .woocommerce-tabs .panel {
+  border: solid 1px #d9d9d9;
+  border-top: none;
+  border-bottom: none;
+  padding: 30px;
+}
+
+.panel p {
+  line-height: 20px;
+}
+
+.panel h2, .panel h3 {
+  margin-bottom: 20px;
+}
+
+.panel p, .panel li, .panel span {
+  margin-bottom: 15px;
+}
+
+.panel a {
+  color: #f45411;
+}
+
+.comment-form-rating {
+  margin: 15px 0;
+}
 
 .woocommerce .widget_price_filter .price_slider_wrapper .ui-widget-content {
   background: linear-gradient(120deg, rgba(244, 84, 17, 0.5) 0%, rgba(197, 38, 28, 0.5) 100%) !important;
@@ -676,7 +812,7 @@ body.home .gf-footer-newsletter {
   }
 }
 
-@media only screen and (max-width: 767px) and (min-width: 576px)  {
+@media only screen and (max-width: 767px) and (min-width: 576px) {
   .gf-inner-navigation__link {
     font-size: 16px;
   }
