@@ -531,3 +531,7 @@ form.form-wppp-select {
 .widget_gf_product_slider_widget{
     width: 100%;
 }
+.gf-slider-row img {
+    width: 100%;
+    height: auto;
+}
