@@ -20,7 +20,7 @@ if (have_posts()):
             </header>
             <!-- .entry-header -->
 
-            <div class="entry-content">
+            <div class="gf-entry-content">
               <?php
                 the_content();
                 wp_link_pages(array(

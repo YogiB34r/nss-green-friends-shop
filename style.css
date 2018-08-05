@@ -98,7 +98,7 @@ body.logged-in .site-header {
   padding: 0;
 }
 
-.gf-header-logo {
+img.gf-header-logo {
   width: 100%;
   height: auto;
   min-width: 102px;
@@ -231,6 +231,66 @@ body.logged-in .site-header {
 
 .gf-page-header__breadcrumb {
   margin-bottom: 20px;
+}
+
+.gf-entry-content {
+  padding: 30px 20px;
+}
+
+.gf-subtitle {
+  font-size: 30px;
+  color: #f45411;
+  margin: 20px 0 10px;
+}
+
+.gf-inner-navigation__row {
+  margin-bottom: 20px;
+}
+
+.gf-inner-navigation {
+  padding: 20px 15px;
+  margin-bottom: 20px;
+}
+
+.gf-inner-navigation__img {
+  vertical-align: text-bottom;
+}
+
+.gf-inner-navigation__link {
+  margin-left: 10px;
+}
+
+.gf-text-module {
+  padding: 20px 15px;
+  background: #f4f4f4;
+  margin-bottom: 20px;
+}
+
+.gf-text-title,
+.gf-inner-navigation__link {
+  color: #1d1d1d;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.gf-divider {
+  border-top: solid 1px rgba(0, 0, 0, 0.1);
+  margin: 20px 0;
+}
+
+.gf-text {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 20px;
+  line-height: 1.3;
+}
+
+.gf-mail-link {
+  color: #f45411;
+}
+
+.gf-text-module__footer {
+  text-align: right;
 }
 
 /* woocommerce overrides */
@@ -508,7 +568,7 @@ body.logged-in .site-header {
   border-top: solid 30px #627aad;
 }
 
-.widget#text-3 {
+.widget#text-5 {
   border-top: solid 30px #ff9b00;
 }
 
@@ -604,13 +664,32 @@ body.home .gf-footer-newsletter {
   .gf-sidebar {
     display: none;
   }
-
+  .gf-inner-navigation__row {
+    margin-bottom: 0;
+  }
   .gf-footer-section {
     text-align: center;
     margin-bottom: 20px;
   }
-  
   .gf-footer-images li {
     margin: 0;
+  }
+}
+
+@media only screen and (max-width: 767px) and (min-width: 576px)  {
+  .gf-inner-navigation__link {
+    font-size: 16px;
+  }
+}
+
+@media only screen and (max-width: 576px) {
+  .gf-main-content-container {
+    width: 95%;
+  }
+  .gf-entry-content {
+    padding: 30px 0;
+  }
+  .gf-inner-navigation__link {
+    font-size: 14px;
   }
 }
