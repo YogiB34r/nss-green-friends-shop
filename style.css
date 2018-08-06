@@ -384,7 +384,11 @@ h1.product_title.entry-title {
   margin-right: 20px;
 }
 
-.woocommerce #content div.product form.cart div.quantity input, .woocommerce div.product form.cart div.quantity input, .woocommerce-page #content div.product form.cart div.quantity input, .woocommerce-page div.product form.cart div.quantity input {
+.woocommerce #content div.product form.cart div.quantity input,
+.woocommerce div.product form.cart div.quantity input,
+.woocommerce-page #content div.product form.cart div.quantity input,
+.woocommerce-page div.product form.cart div.quantity input.qty,
+.woocommerce .quantity .qty {
   padding: 10px 3px;
   border: solid 1px #f45411;
   border-radius: 4px;
@@ -429,6 +433,16 @@ h1.product_title.entry-title {
 
 .comment-form-rating {
   margin: 15px 0;
+}
+
+.gf-seller-info {
+  margin-bottom: 20px;
+}
+
+.woocommerce .gf-seller-info img, .woocommerce-page .gf-seller-info img {
+  height: auto;
+  max-width: 59px;
+  vertical-align: middle;
 }
 
 .woocommerce .widget_price_filter .price_slider_wrapper .ui-widget-content {
@@ -494,6 +508,10 @@ h1.product_title.entry-title {
 
 .gf-sidebar .widget_gf_social_icons_widget ul li {
   display: block;
+}
+
+.widget_gf_social_icons_widget h2.widgettitle {
+  margin: 20px 0;
 }
 
 #gf-cont {
@@ -663,6 +681,7 @@ h1.product_title.entry-title {
 
 .gf-sidebar .widget {
   padding: 10px;
+  list-style: none;
 }
 
 .gf-sidebar .widget h3 {
@@ -833,6 +852,7 @@ body.home .gf-footer-newsletter {
 .widget_gf_product_slider_widget{
     width: 100%;
 }
+
 .gf-slider-row img {
     width: 100%;
     height: auto;
