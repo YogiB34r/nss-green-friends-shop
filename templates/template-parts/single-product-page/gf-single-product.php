@@ -1,7 +1,9 @@
 <div class="row">
     <div class="col-3 list-unstyled gf-sidebar">
-      <div class="gf-wrapper-before"></div>
-      <?php dynamic_sidebar('gf-category-sidebar')?>
+      <div class="gf-left-sidebar-wrapper">
+        <div class="gf-wrapper-before"></div>
+        <?php dynamic_sidebar('gf-category-sidebar')?>
+      </div>
     </div>
     <div class="gf-content-wrapper col-md-9 col-sm-12">
         <?php
