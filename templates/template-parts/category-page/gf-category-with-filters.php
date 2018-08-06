@@ -1,8 +1,9 @@
 <div class="row">
     <div class="col-3 list-unstyled gf-sidebar">
-        <?php dynamic_sidebar('gf-category-sidebar')?>
+      <div class="gf-wrapper-before"></div>
+      <?php dynamic_sidebar('gf-category-sidebar')?>
     </div>
-    <div class="col-9">
+    <div class="gf-content-wrapper col-md-9 col-sm-12">
         <?php
         /**
          * The Template for displaying product archives, including the main shop page which is a post type archive
@@ -114,12 +115,3 @@
         ;?>
     </div>
 </div>
-
-
-
-
-
-
-
-
-

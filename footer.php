@@ -7,17 +7,17 @@
 <footer id="colophon" class="site-footer" role="contentinfo">
   <div class="container-fluid">
     <div class="gf-main-content-container">
-      <div class="row list-unstyled">
-        <div class="col">
+      <div class="row list-unstyled gf-footer justify-content-between">
+        <div class="col-xs-12 col-md-3 gf-footer-section gf-footer-newsletter">
           <?php dynamic_sidebar('gf-footer-row-1-column-1'); ?>
         </div>
-        <div class="col">
+        <div class="col-xs-12 col-md-3 gf-footer-section">
           <?php dynamic_sidebar('gf-footer-row-1-column-2'); ?>
         </div>
-        <div class="col">
+        <div class="col-xs-12 col-md-3 gf-footer-section">
           <?php dynamic_sidebar('gf-footer-row-1-column-3'); ?>
         </div>
-        <div class="col">
+        <div class="col-xs-12 col-md-3 gf-footer-section">
           <?php dynamic_sidebar('gf-footer-row-1-column-4'); ?>
         </div>
       </div>
@@ -29,7 +29,7 @@
           <?php dynamic_sidebar('gf-footer-row-2-column-2'); ?>
         </div>
       </div>
-      <div class="row list-unstyled">
+      <div class="row list-unstyled gf-footer gf-footer-images-wrapper">
         <div class="gf-footer-images">
           <?php dynamic_sidebar('gf-footer-row-3-column-1') ?>
         </div>
