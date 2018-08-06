@@ -445,6 +445,10 @@ h1.product_title.entry-title {
   vertical-align: middle;
 }
 
+.woocommerce-account .woocommerce-MyAccount-navigation {
+  margin-bottom: 40px;
+}
+
 .woocommerce-MyAccount-navigation-link {
   padding: 5px 10px;
 }
@@ -471,6 +475,28 @@ h1.product_title.entry-title {
 
 .woocommerce-Address-title.title h3 {
   margin: 20px 0 10px;
+}
+
+.woocommerce-address-fields,
+.woocommerce fieldset,
+.woocommerce-Button {
+  margin: 20px 0;
+}
+
+.woocommerce form .form-row label,
+.woocommerce-input-wrapper {
+  width: 100%;
+}
+
+.woocommerce-input-wrapper input,
+.woocommerce-Input {
+  border: solid 1px #666;
+  border-radius: 2px;
+  padding: 10px 11px;
+}
+
+.woocommerce form p {
+  text-align: center;
 }
 
 .woocommerce .widget_price_filter .price_slider_wrapper .ui-widget-content {
@@ -843,18 +869,31 @@ body.home .gf-footer-newsletter {
 
 /* media queries */
 
+
+@media only screen and (max-width: 1200px) and (min-width: 767px) {
+  .woocommerce-account .woocommerce-MyAccount-navigation {
+    width: 100%;
+  }
+  .woocommerce-account .woocommerce-MyAccount-content {
+    float: unset;
+    width: 100%;
+    margin: 0 auto;
+  }
+}
+
 @media only screen and (max-width: 767px) {
   .gf-sidebar {
     display: none;
   }
 
-  .woocommerce-MyAccount-content {
+  .woocommerce-account .woocommerce-MyAccount-content {
     margin-top: 40px;
   }
 
   .gf-inner-navigation__row {
     margin-bottom: 0;
   }
+
   .gf-footer-section {
     text-align: center;
     margin-bottom: 20px;
