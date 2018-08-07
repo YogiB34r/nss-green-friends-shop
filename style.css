@@ -260,6 +260,13 @@ img.gf-header-logo {
   margin-left: 10px;
 }
 
+/* product slider */
+
+.gf-slider-row img {
+  width: 100%;
+  height: auto;
+}
+
 .gf-text-module {
   padding: 20px 15px;
   background: #f4f4f4;
