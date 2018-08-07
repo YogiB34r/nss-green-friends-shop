@@ -57,7 +57,6 @@ function gf_check_for_second_level_categories()
 }
 
 add_action('woocommerce_archive_description', 'gf_display_categories_on_archive_page', 15);
-
 function gf_display_categories_on_archive_page()
 {
     $categories = get_terms([
@@ -93,3 +92,6 @@ function gf_display_categories_on_archive_page()
     echo '</div>';
 
 }
+
+remove_action('woocommerce_after_shop_loop', 'woocommerce_pagination', 10);
+add_action('woocommerce_before_shop_loop', 'woocommerce_pagination', 30);
