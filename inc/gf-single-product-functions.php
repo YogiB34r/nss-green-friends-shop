@@ -145,4 +145,4 @@ function woo_new_product_tab_content() {
 }
 
 
-
+remove_action( 'woocommerce_after_single_variation','woocommerce_single_product_summary', 20 );

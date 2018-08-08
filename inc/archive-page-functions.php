@@ -42,7 +42,7 @@ function gf_check_for_second_level_categories()
     foreach ($categories as $category) {
         // Only output if the parent_id is a TOP level id
         if (in_array($category->parent, $top_level_ids)) {
-            $slugArray[]= $category->slug;
+            $slugArray[] = $category->slug;
         }
     }
     foreach ($slugArray as $slug) {
@@ -55,3 +55,43 @@ function gf_check_for_second_level_categories()
     }
     return $resault;
 }
+
+add_action('woocommerce_archive_description', 'gf_display_categories_on_archive_page', 15);
+function gf_display_categories_on_archive_page()
+{
+    $categories = get_terms([
+        'taxonomy' => get_queried_object()->taxonomy,
+        'parent' => get_queried_object_id(),
+    ]);
+
+    echo '<div class="row">';
+
+    foreach ($categories as $category) {
+        $child_args = array(
+            'taxonomy' => 'product_cat',
+            'hide_empty' => false,
+            'parent' => $category->term_id
+        );
+        $child_cats = get_terms($child_args);
+        echo '<div class="col-3">
+
+                <a href="' . get_term_link($category) . '">' . $category->name . '</a>
+                <ul>';
+
+        foreach ($child_cats as $child_cat) {
+            echo '<li>
+                     <a href="' . get_term_link($child_cat) . '">' . $child_cat->name . '</a>
+                  </li>';
+        }
+
+
+        echo '</ul>
+              </div>';
+    }
+
+    echo '</div>';
+
+}
+
+remove_action('woocommerce_after_shop_loop', 'woocommerce_pagination', 10);
+add_action('woocommerce_before_shop_loop', 'woocommerce_pagination', 30);
