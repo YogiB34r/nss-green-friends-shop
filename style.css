@@ -241,6 +241,11 @@ img.gf-header-logo {
   padding: 30px 20px;
 }
 
+.woocommerce form p,
+.gf-entry-content p {
+  text-align: left;
+}
+
 .gf-subtitle {
   font-size: 30px;
   color: #f45411;
@@ -345,8 +350,18 @@ h1.product_title.entry-title {
   color: #f45411;
 }
 
+.price del .woocommerce-Price-amount,
+.price del {
+  color: #c2c2c4;
+}
+
+.price .woocommerce-Price-amount,
+.price ins {
+  color: #ee100b;
+}
+
 .woocommerce ul.products li.product .price {
-  color: #c92722;
+  color: #ee100b;
   text-align: center;
   font-weight: 600;
   font-size: 18px;
@@ -363,7 +378,9 @@ h1.product_title.entry-title {
   display: block;
   width: 70%;
   margin: 0 auto;
-  padding: .618em 1em;
+  font-size: 13px;
+  text-transform: uppercase;
+  padding: .718em .2em;
   color: #515151;
   background: #fafafa;
   border: solid 2px #e8e8e8;
@@ -373,9 +390,13 @@ h1.product_title.entry-title {
 }
 
 .add_to_cart_button {
-  padding: .318em .6em;
+  padding: .718em .2em;
   width: 100%;
   margin: 10px auto;
+}
+
+.add_to_cart_button:hover {
+  color: #f45411;
 }
 
 .woocommerce ul.products li.product .button:hover {
@@ -391,6 +412,10 @@ h1.product_title.entry-title {
   align-items: center;
   justify-content: space-between;
   padding: 20px;
+}
+
+.woocommerce-variation-description {
+  display: none;
 }
 
 .woocommerce #content div.product form.cart div.quantity, .woocommerce div.product form.cart div.quantity, .woocommerce-page #content div.product form.cart div.quantity, .woocommerce-page div.product form.cart div.quantity {
@@ -446,6 +471,10 @@ h1.product_title.entry-title {
 
 .comment-form-rating {
   margin: 15px 0;
+}
+
+.woocommerce .comment-form-rating .stars {
+  text-align: left;
 }
 
 .gf-seller-info {
@@ -508,8 +537,13 @@ h1.product_title.entry-title {
   padding: 10px 11px;
 }
 
-.woocommerce form p {
+.gf-sidebar .woocommerce form p {
   text-align: center;
+}
+
+.widget_layered_nav,
+.widget_price_filter {
+  margin: 20px 0;
 }
 
 .woocommerce .widget_price_filter .price_slider_wrapper .ui-widget-content {
@@ -525,6 +559,75 @@ h1.product_title.entry-title {
   border: solid 2px #7c1009;
   height: 1.2em;
   width: 1.2em;
+}
+
+.woocommerce .widget_price_filter .price_slider_amount .button {
+  float: unset;
+}
+
+.woocommerce .widget_price_filter .price_slider_amount {
+  text-align: center;
+  display: block;
+  text-align: center;
+}
+
+/* woocommerce custom aditional style */
+
+.woocommerce-products-header__title {
+  padding-left: 20px;
+}
+
+.gf-category-expander {
+  overflow: hidden;
+  border: solid 1px #e2e2e2;
+  border-radius: 9px;
+  margin-bottom: 20px;
+  margin: 20px 0 20px 20px;
+  transition: height 0.4s;
+}
+
+
+.gf-category-expander__col {
+  padding: 20px;
+}
+
+.gf-expander__subcategory-list {
+  display: none;
+}
+
+.gf-category-expander__col li {
+  margin-bottom: 10px;
+}
+
+.gf-category-expander__col ul {
+  margin-top: 10px;
+}
+
+.gf-category-expander__col__category,
+.gf-category-expander__col__subcategory {
+  color: #f45411;
+}
+
+.gf-category-expander__col__category {
+  font-weight: 600;
+}
+
+.gf-category-expander__col__subcategory {
+  font-weight: 500;
+}
+
+.gf-category-expander__footer {
+  text-align: center;
+  width: 100%;
+}
+
+.gf-category-expander__footer .fas {
+  color: #f45411;
+  font-size: 25px;
+}
+
+.gf-category-expander__footer .fas:hover {
+  cursor: pointer;
 }
 
 /* sidebar */
@@ -757,6 +860,16 @@ h1.product_title.entry-title {
 
 .gf-sidebar .widget h4 {
   font-size: 18px;
+  margin: 10px 0;
+}
+
+.gf-sidebar .cartInfoSubTitle,
+.gf-sidebar .cartinfoText {
+  margin: 10px 0;
+}
+
+.gf-sidebar .cartInfoSubTitle img {
+  vertical-align: top;
 }
 
 .gf-sidebar .widget .woocommerce-loop-product__title {
@@ -784,6 +897,12 @@ h1.product_title.entry-title {
 .gf-sidebar .widget .add_to_cart_button:hover, .gf-sidebar .widget .button:hover {
   color: #fafafa;
   background: #f45411;
+}
+
+.woocommerce button.button.alt.disabled,
+.woocommerce button.button.alt.disabled:hover {
+  background-color: transparent;
+  color: transparent;
 }
 
 .widget_gf_social_icons_widget {
@@ -881,7 +1000,6 @@ body.home .gf-footer-newsletter {
 }
 
 /* media queries */
-
 
 @media only screen and (max-width: 1200px) and (min-width: 767px) {
   .woocommerce-account .woocommerce-MyAccount-navigation {
