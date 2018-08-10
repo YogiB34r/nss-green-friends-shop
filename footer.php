@@ -1,4 +1,3 @@
-
 </div>
 <!-- gf main content container -->
 </div>

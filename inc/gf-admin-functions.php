@@ -1,4 +1,3 @@
-
 <?php
 add_action('woocommerce_admin_order_totals_after_tax', 'custom_admin_order_totals_after_tax', 10, 1 );
 function custom_admin_order_totals_after_tax( $orderid ) {
@@ -32,13 +31,13 @@ function custom_admin_order_totals_after_tax( $orderid ) {
         $order->set_shipping_total(0);
     }
 
-//    if ($price > 0 && $order->get_shipping_total() == 0) {
+    if ($price > 0 && $order->get_shipping_total() == 0) {
     $shipping = new WC_Order_Item_Shipping();
     $shipping->set_total($price);
     $order->add_item($shipping);
     $order->set_shipping_total($price);
     $order->save();
-//    }
+    }
 }
 
 ?>

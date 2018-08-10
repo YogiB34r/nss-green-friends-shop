@@ -1,5 +1,3 @@
-
-
 <?php
 
 add_action('woocommerce_before_cart_table', 'gf_cart_display_tax_notice', 10);
