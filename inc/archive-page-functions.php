@@ -65,6 +65,7 @@ function gf_display_categories_on_archive_page()
             'taxonomy' => get_queried_object()->taxonomy,
             'parent' => get_queried_object_id(),
         ]);
+
         echo '<div class="row gf-category-expander">';
         foreach ($categories as $category) {
             $child_args = array(
@@ -76,6 +77,7 @@ function gf_display_categories_on_archive_page()
             echo '<div class="col-3 gf-category-expander__col">
                 <a class="gf-category-expander__col__category" href="' . get_term_link($category) . '">' . $category->name . '</a>
                 <ul class="gf-expander__subcategory-list">';
+
             foreach ($child_cats as $child_cat) {
                 echo '<li>
                      <a class="gf-category-expander__col__subcategory" href="' . get_term_link($child_cat) . '">' . $child_cat->name . '</a>
@@ -84,8 +86,20 @@ function gf_display_categories_on_archive_page()
             echo '</ul>
               </div>';
         }
-        echo '<div class="gf-category-expander__footer"><span class="fas fa-angle-down"></span></div>
-    </div>';
+        $args = array(
+            'taxonomy' => 'product_cat',
+            'childless' => 1,
+            'hidde_empty' => false
+        );
+        $childless_cats = get_terms($args);
+        $childless_cats_ids = [];
+        foreach ($childless_cats as $cat){
+            $childless_cats_ids[] = $cat->term_id;
+        }
+        if(!in_array(get_queried_object_id(), $childless_cats_ids)){
+            echo '<div class="gf-category-expander__footer"><span class="fas fa-angle-down"></span></div>';
+        }
+    echo '</div>';
     }
 }
 
