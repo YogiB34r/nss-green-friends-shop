@@ -104,7 +104,7 @@ function woo_new_product_tab( $tabs ) {
 
 }
 function woo_new_product_tab_content() {
-    $podrska = esc_url( get_permalink( get_page_by_title( 'podrška' ) ) );
+    $podrska = esc_url( get_permalink( get_page_by_title( 'support' ) ) );
     $link = __( 'ovde', 'nonstopshop' );
     $nacni_placanja = __( 'Detaljnije o načinima plaćanja', 'nonstopshop' );
 
@@ -124,7 +124,7 @@ function woo_new_product_tab_content() {
 		<h3 class='reset footerTitle2' id='delivery'>Vreme isporuke proizvoda i troškovi dostave</h3>
 		<p class='defaultText'>
 			Dostava se obavlja kurirskom službom i dodatno se naplaćuje.<br> Cenovnik troškova dostave možete videti
-			<a href='". $podrska ."#dostava' target='_blank' class='defaultLink3'>
+			<a href='". $podrska ."#troskovi_dostave' target='_blank' class='defaultLink3'>
 				". $link ."
 			</a>.<br> Isporuka se vrši na teritoriji Srbije bez Kosova. <br> Okvirno vreme uručenja proizvoda = Vreme pripreme pošiljke: 3 - 5 dana radnih + Vreme dostave: 1 radni dan.
 			<a title='Zašto?' class='moreInfoShipping' href='#'></a>
@@ -137,7 +137,7 @@ function woo_new_product_tab_content() {
 			<li>Uplatnicom na šalteru (virmanom)</li>
 			<li>E-Banking</li>
 		</ul>
-		<a href='". $podrska ."' target='_blank' class='defaultLink3'>
+		<a href='". $podrska ."#nacini_placanja' target='_blank' class='defaultLink3'>
 			". $nacni_placanja ."
 		</a>
 	</div>
