@@ -100,29 +100,28 @@ function gf_cart_shortcode()
 
 // Category sidebar
 function gf_category_megamenu_shortcode() {
-    $args = array(
-        'taxonomy' => 'product_cat',
-        'hide_empty' => false,
-        'parent'   => 0
-    );
-    $product_cat = get_terms( $args );
+    $product_cat = get_option('filter_fields_order');
+    $number_of_categories = esc_attr(get_option('number_of_categories_in_sidebar'));
+    $i = 0;
     echo
     '<div id="gf-wrapper">
 	     <div class="gf-sidebar">
 		     <div class="gf-toggle"><i class="fa fa-bars"></i></div>
 		       <div class="gf-navblock">';
     foreach ($product_cat as $parent_product_cat) {
-        if($parent_product_cat->name != 'Slider'):
+        if($parent_product_cat['name'] != 'Gf-slider' && $parent_product_cat['name'] != 'Uncategorized'):
             echo '
-            <ul class="gf-navigation">
-              <li class="category-item">
-                <a tabindex="-1" href="'.get_term_link($parent_product_cat->term_id).'">'.$parent_product_cat->name.'</a>
+            <ul class="gf-navigation">';
+                $i++;
+                if($i <= $number_of_categories){
+            echo  '<li class="category-item">
+                <a tabindex="-1" href="'.get_term_link((int)$parent_product_cat['term_id']).'">'.$parent_product_cat['name'].'</a>
                 <div class="mega-menu row z-depth-1 primary-color-dark" aria-labelledby="navbarDropdownMenuLink2">
                   <div class="row mega-menu__row">';
             $child_args = array(
                 'taxonomy' => 'product_cat',
                 'hide_empty' => false,
-                'parent'   => $parent_product_cat->term_id
+                'parent'   => $parent_product_cat['term_id']
             );
             $child_product_cats = get_terms( $child_args );
 
@@ -145,7 +144,7 @@ function gf_category_megamenu_shortcode() {
                 echo '</ol>
                     </div>';
             }
-            echo '</div></div></li></ul>';
+            echo '</div></div></li>'; }; echo '</ul>';
         endif;
     }
     echo '</div>
