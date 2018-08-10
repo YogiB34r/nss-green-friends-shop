@@ -1,3 +1,5 @@
+
+
 <?php
 
 add_action('woocommerce_before_single_product', 'woocommerce_breadcrumb', 10);

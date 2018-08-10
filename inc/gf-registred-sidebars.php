@@ -1,3 +1,5 @@
+
+
 <?php
 add_action( 'widgets_init', 'gf_register_sidebars' );
 function gf_register_sidebars() {

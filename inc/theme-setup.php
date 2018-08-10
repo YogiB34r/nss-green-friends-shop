@@ -1,3 +1,5 @@
+
+
 <?php
 add_action('after_theme_setup', 'gf_theme_setup');
 

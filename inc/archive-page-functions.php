@@ -1,3 +1,5 @@
+
+
 <?php
 function gf_check_if_slug_is_in_url_and_product_count()
 {
@@ -55,6 +57,7 @@ function gf_check_for_second_level_categories()
     }
     return $resault;
 }
+
 
 add_action('woocommerce_archive_description', 'gf_display_categories_on_archive_page', 15);
 function gf_display_categories_on_archive_page()

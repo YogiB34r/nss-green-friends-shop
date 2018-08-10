@@ -1,3 +1,6 @@
+
+
+
 <?php
 add_shortcode('gf-footer-credits', 'gf_footer_credits_shortcode');
 function gf_footer_credits_shortcode()
