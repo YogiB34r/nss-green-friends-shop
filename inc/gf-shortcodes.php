@@ -100,6 +100,7 @@ function gf_cart_shortcode()
 
 // Category sidebar
 function gf_category_megamenu_shortcode() {
+
     $product_cat = get_option('filter_fields_order');
     $number_of_categories = esc_attr(get_option('number_of_categories_in_sidebar'));
     $i = 0;
