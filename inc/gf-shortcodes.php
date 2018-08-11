@@ -153,3 +153,19 @@ function gf_category_megamenu_shortcode() {
 </div>';
 }
 add_shortcode('gf-category-megamenu', 'gf_category_megamenu_shortcode');
+
+add_shortcode('gf-nav-menu-items', 'gf_nav_menu_items_visibility_control');
+function gf_nav_menu_items_visibility_control(){
+    $args = array(
+        'name' => 'Topbar'
+    );
+    $menu_items = wp_get_nav_menu_items('Topbar');
+    foreach ($menu_items as $menu_item){
+        if(is_user_logged_in() && $menu_item->post_title == 'Log Out'){
+            echo '<a href="'.$menu_item->url.'">'.$menu_item->post_title.'</a>';
+        }
+        if(!is_user_logged_in() && $menu_item->post_title != 'Log Out'){
+            echo '<a href="'.$menu_item->url.'">'.$menu_item->post_title.'</a>';
+        }
+    }
+}
