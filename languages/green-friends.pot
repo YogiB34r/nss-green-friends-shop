@@ -1,0 +1,92 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Non stop shop\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-08-11 16:11+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: \n"
+"Language: \n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco https://localise.biz/"
+
+#: inc/gf-shortcodes.php:96
+msgid "Cart View"
+msgstr ""
+
+#: inc/gf-shortcodes.php:37
+msgid "Categories"
+msgstr ""
+
+#: inc/gf-single-product-functions.php:126
+msgid "Dostava se obavlja kurirskom službom i dodatno se naplaćuje."
+msgstr ""
+
+#. Author of the theme
+msgid "Green Friends"
+msgstr ""
+
+#: inc/gf-single-product-functions.php:129
+msgid "Isporuka se vrši na teritoriji Srbije bez Kosova."
+msgstr ""
+
+#: inc/gf-shortcodes.php:16
+msgid "My account"
+msgstr ""
+
+#: inc/gf-single-product-functions.php:118
+msgid ""
+"Navedete operateru kataloške brojeve proizvoda koje naručujete kao i "
+"količinu svakog od njih"
+msgstr ""
+
+#: inc/gf-single-product-functions.php:120
+msgid "Navedete operateru lične podatke i adresu isporuke"
+msgstr ""
+
+#. Name of the theme
+msgid "Non stop shop"
+msgstr ""
+
+#: inc/gf-single-product-functions.php:129
+msgid ""
+"Okvirno vreme uručenja proizvoda = Vreme pripreme pošiljke: 3 - 5 dana "
+"radnih + Vreme dostave: 1 radni dan."
+msgstr ""
+
+#: inc/gf-shortcodes.php:187 inc/gf-shortcodes.php:192
+msgid "Order Tracking"
+msgstr ""
+
+#: inc/gf-single-product-functions.php:134
+msgid "Ovaj proizvod se može platiti na jedan od sledećih načina:"
+msgstr ""
+
+#: inc/gf-single-product-functions.php:136
+msgid "Platnim karticama:"
+msgstr ""
+
+#: inc/gf-single-product-functions.php:117
+msgid "Pozovete broj"
+msgstr ""
+
+#: inc/gf-shortcodes.php:186 inc/gf-shortcodes.php:191
+#: inc/gf-shortcodes.php:193
+msgid "Support"
+msgstr ""
+
+#: inc/gf-single-product-functions.php:121
+msgid "Ukoliko kupujete kao pravno lice pripremite podatke firme:"
+msgstr ""
+
+#: inc/gf-single-product-functions.php:137
+msgid "Uplatnicom na šalteru"
+msgstr ""
+
+#: inc/gf-single-product-functions.php:124
+msgid "Vreme isporuke proizvoda i troškovi dostave"
+msgstr ""

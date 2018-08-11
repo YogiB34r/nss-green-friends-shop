@@ -61,11 +61,11 @@ function my_wc_hide_in_stock_message($html, $product)
 
 add_action('woocommerce_single_product_summary', 'gf_display_tax_notice', 11);
 function gf_display_tax_notice(){
-    echo '<p>Prikazana cena je sa uračunatim PDV-om.</p>';
+    echo '<p>'._e('Prikazana cena je sa uračunatim PDV-om.', 'green-fiends').'</p>';
 }
 add_action('woocommerce_single_product_summary', 'gf_display_offer_notice', 12);
 function gf_display_offer_notice(){
-    echo '<p>Ponuda važi dok traju zalihe.</p>';
+    echo '<p>'._e('Ponuda važi dok traju zalihe', 'green-fiends').'</p>';
 }
 
 add_filter( 'woocommerce_get_price_html', 'change_displayed_sale_price_html', 10, 2 );
@@ -109,32 +109,32 @@ function woo_new_product_tab_content() {
     $nacni_placanja = __( 'Detaljnije o načinima plaćanja', 'nonstopshop' );
 
     echo "
-	<h3 class='reset footerTitle2'>Naručivanje telefonom</h3>
+	<h3 class='reset footerTitle2'>"._e('Naručivanje telefonom', 'green-fiends')."</h3>
 	<p class='cartText3'>
-		Za <strong>naručivanje telefonom</strong> neophodno je da imate email adresu i da proizvod nije rasprodat:
+		Za <strong>naručivanje telefonom</strong>"._e('neophodno je da imate email adresu i da proizvod nije rasprodat:', 'green-fiends')."
 	</p>
 	<ul class='cartText3'>
-		<li>Pozovete broj <strong>011/33-34-773 ili 011/33-34-681</strong> (radnim danima od <strong>09-17h</strong>)</li>
-		<li>Navedete operateru kataloške brojeve proizvoda koje naručujete kao i količinu svakog od njih</li>
-		<li>Kataloški broj ovog proizvoda je: <strong>3093024</strong></li>
-		<li>Navedete operateru lične podatke i adresu isporuke</li>
-		<li>Ukoliko kupujete kao pravno lice pripremite podatke firme: <strong>naziv, adresu i PIB broj</strong></li>
+		<li>"._e('Pozovete broj', 'green-friends')." <strong>011/33-34-773 ili 011/33-34-681</strong> (radnim danima od <strong>09-17h</strong>)</li>
+		<li>"._e('Navedete operateru kataloške brojeve proizvoda koje naručujete kao i količinu svakog od njih', 'green-friends')." </li>
+		<li>"._e('Kataloški broj ovog proizvoda je:', 'green-fiends')."<strong>3093024</strong></li>
+		<li>"._e('Navedete operateru lične podatke i adresu isporuke', 'green-friends')."</li>
+		<li>"._e('Ukoliko kupujete kao pravno lice pripremite podatke firme:', 'green-friends')."<strong>naziv, adresu i PIB broj</strong></li>
 	</ul>
 	<div>
-		<h3 class='reset footerTitle2' id='delivery'>Vreme isporuke proizvoda i troškovi dostave</h3>
+		<h3 class='reset footerTitle2' id='delivery'>"._e('Vreme isporuke proizvoda i troškovi dostave', 'green-friends')."</h3>
 		<p class='defaultText'>
-			Dostava se obavlja kurirskom službom i dodatno se naplaćuje.<br> Cenovnik troškova dostave možete videti
+			"._e('Dostava se obavlja kurirskom službom i dodatno se naplaćuje.', 'green-friends')."<br> Cenovnik troškova dostave možete videti
 			<a href='". $podrska ."#troskovi_dostave' target='_blank' class='defaultLink3'>
 				". $link ."
-			</a>.<br> Isporuka se vrši na teritoriji Srbije bez Kosova. <br> Okvirno vreme uručenja proizvoda = Vreme pripreme pošiljke: 3 - 5 dana radnih + Vreme dostave: 1 radni dan.
+			</a>.<br>"._e('Isporuka se vrši na teritoriji Srbije bez Kosova.' , 'green-friends')."<br> "._e('Okvirno vreme uručenja proizvoda = Vreme pripreme pošiljke: 3 - 5 dana radnih + Vreme dostave: 1 radni dan.', 'green-friends')."
 			<a title='Zašto?' class='moreInfoShipping' href='#'></a>
 		</p>
 	</div>
 	<div>
-		<h3 class='reset footerTitle2'>Ovaj proizvod se može platiti na jedan od sledećih načina:</h3>
+		<h3 class='reset footerTitle2'>"._e('Ovaj proizvod se može platiti na jedan od sledećih načina:', 'green-friends')."</h3>
 		<ul class='defaultText'>
-			<li>Platnim karticama: <strong>Visa, Master i Maestro</strong></li>
-			<li>Uplatnicom na šalteru (virmanom)</li>
+			<li>"._e('Platnim karticama:', 'green-friends')." <strong>Visa, Master i Maestro</strong></li>
+			<li>"._e('Uplatnicom na šalteru', 'green-friends')." (virmanom)</li>
 			<li>E-Banking</li>
 		</ul>
 		<a href='". $podrska ."#nacini_placanja' target='_blank' class='defaultLink3'>
