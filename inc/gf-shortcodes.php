@@ -105,9 +105,13 @@ function gf_cart_shortcode()
 // Category sidebar
 function gf_category_megamenu_shortcode()
 {
+    $product_cat = get_terms(array('parent' => 0, 'taxonomy' => 'product_cat', 'hide_empty' => true));
+    $number_of_categories = 20;
+    if(!empty(get_option('filter_fields_order'))){
+        $product_cat = get_option('filter_fields_order');
+        $number_of_categories = esc_attr(get_option('number_of_categories_in_sidebar'));
+    }
 
-    $product_cat = get_option('filter_fields_order');
-    $number_of_categories = esc_attr(get_option('number_of_categories_in_sidebar'));
     $i = 0;
     echo
     '<div id="gf-wrapper">
