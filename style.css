@@ -556,7 +556,7 @@ h1.product_title.entry-title {
 }
 
 .woocommerce div.product form.cart .button {
-  background: url(http://greenfriends.local/wp-content/uploads/2018/08/btn_add_to_cart.png) no-repeat 6px center;
+  background: url(/wp-content/uploads/2018/08/btn_add_to_cart.png) no-repeat 6px center;
   border: 0;
   min-height: 78px;
   min-width: 175px;

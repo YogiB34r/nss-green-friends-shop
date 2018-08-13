@@ -181,11 +181,15 @@ function gf_mobile_nav_menu_shortcode() {
 }
 
 // Category sidebar
-add_shortcode('gf-category-megamenu', 'gf_category_megamenu_shortcode');
-function gf_category_megamenu_shortcode() {
+function gf_category_megamenu_shortcode()
+{
+    $product_cat = get_terms(array('parent' => 0, 'taxonomy' => 'product_cat', 'hide_empty' => true));
+    $number_of_categories = 20;
+    if(!empty(get_option('filter_fields_order'))){
+        $product_cat = get_option('filter_fields_order');
+        $number_of_categories = esc_attr(get_option('number_of_categories_in_sidebar'));
+    }
 
-    $product_cat = get_option('filter_fields_order');
-    $number_of_categories = esc_attr(get_option('number_of_categories_in_sidebar'));
     $i = 0;
     echo
     '<div id="gf-wrapper">
@@ -257,7 +261,7 @@ function gf_support_menu_items() {
     foreach ($menu_items as $menu_item) {
         if (is_user_logged_in()) {
             echo '<h2 class="widgettitle">'.__('Support').'</h2>
-                  <li id="menu-item-22819" class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item menu-item-22819"><a href="http://greenfriends.local/my-account/orders/">'.__('Order Tracking').'</a></li>
+                  <li id="menu-item-22819" class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item menu-item-22819"><a href="/my-account/orders/">'.__('Order Tracking').'</a></li>
                   <li id="menu-item-306" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-306"><a href="' . $menu_item->url . '">'.__('Support').'</a></li>';
             break;
         } else {
