@@ -5,6 +5,8 @@ Description:
 Author: Green Friends
 Author URI:
 Template:
+Text Domain: green-friends
+Domain Path: /languages
 */
 
 body {
@@ -128,7 +130,7 @@ img.gf-header-logo {
 }
 
 .gf-search-wrapper .search-submit {
-  padding: 11px 14px;
+  padding: 13px 14px;
   border: 1px solid #e2e2e2;
   border-top-right-radius: 2px;
   border-bottom-right-radius: 2px;
@@ -609,7 +611,8 @@ h1.product_title.entry-title {
 }
 
 .gf-category-expander__col__category {
-  font-weight: 600;
+  font-weight: 800;
+  padding-bottom: 12px;
 }
 
 .gf-category-expander__col__subcategory {
@@ -1050,4 +1053,28 @@ body.home .gf-footer-newsletter {
   .gf-inner-navigation__link {
     font-size: 14px;
   }
+}
+
+/*Vlada i  Igor*/
+.woocommerce-shipping-calculator p{
+  display: none;
+}
+
+.woocommerce #respond input#submit.alt, .woocommerce a.button.alt, .woocommerce button.button.alt, .woocommerce input.button.alt{
+  color: #f45411;
+  background-color: #EBE9EB;
+  border: 1px solid #f45411;
+  float: right;
+  margin-left: auto;
+}
+.woocommerce #respond input#submit.alt:hover, .woocommerce a.button.alt:hover, .woocommerce button.button.alt:hover, .woocommerce input.button.alt:hover{
+  background: rgba(0,0,0,.05);
+  color: #f45411;
+  border: none;
+}
+.gf-top-bar__container #custom_html-17{
+  display: none;
+}
+.gf-top-bar__container a{
+  padding-right: 12px;
 }

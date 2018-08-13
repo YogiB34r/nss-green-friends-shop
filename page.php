@@ -24,7 +24,7 @@ if (have_posts()):
               <?php
                 the_content();
                 wp_link_pages(array(
-                    'before' => '<div class="page-links">' . __('Pages:', 'non-stop-shop'),
+                    'before' => '<div class="page-links">' . __('Pages:', 'green-fiends'),
                     'after' => '</div>',
                 ));
               ?>
@@ -37,7 +37,7 @@ if (have_posts()):
   <?php
     endwhile;
 else:
-    echo '<p>Sorry, no posts matched your criteria.</p>';
+    echo '<p>'._e('Sorry, no posts matched your criteria.', 'green-fiends').'</p>';
 endif;
 ?>
 <?php get_footer(); ?>
