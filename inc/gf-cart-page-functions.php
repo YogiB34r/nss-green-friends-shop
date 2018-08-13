@@ -152,8 +152,8 @@ add_action('woocommerce_proceed_to_checkout', 'gf_button_proceed_to_checkout', 2
 function gf_button_proceed_to_checkout()
 {
     echo '<div class="gf-button-proceed-to-checkout">
-            <a href="http://greenfriends.local/checkout/">
-                <img src="https://nss-devel.ha.rs/wp-content/uploads/2018/06/btn_order.png" alt="">
+            <a href="/checkout/">
+                <img src="/wp-content/uploads/2018/06/btn_order.png" alt="">
             </a>
           </div>';
 }
