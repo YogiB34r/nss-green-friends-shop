@@ -190,7 +190,7 @@ function gf_support_menu_items()
         } else {
             echo '<h2 class="widgettitle">'.__('Support').'</h2>
                   <li id="menu-item-22819" class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item menu-item-22819"><a href="' . $menu_item->url . '">'.__('Order Tracking').'</a></li>
-                  <li id="menu-item-306" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-306"><a href="' . $menu_item->url . '">'._e('Support', 'green-friends').'</a></li>';
+                  <li id="menu-item-306" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-306"><a href="' . $menu_item->url . '">'.__('Support').'</a></li>';
             break;
         }
     }

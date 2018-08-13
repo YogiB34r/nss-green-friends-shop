@@ -134,7 +134,7 @@ function bbloomer_print_cart_weight($posted)
     global $woocommerce;
     $html =
         '<tr class="shipping">
-			<th>'._e('Težina korpe', 'green-fiends').'</th>
+			<th>'.__('Težina korpe').'</th>
 				<td data-title="Tezina">
 					<span class="woocommerce-Price-amount amount">' . $woocommerce->cart->cart_contents_weight . '<span class="woocommerce-Price-currencySymbol">' . get_option('woocommerce_weight_unit') . '</span></span>
 				</td>
