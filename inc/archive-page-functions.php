@@ -67,12 +67,16 @@ function gf_display_categories_on_archive_page()
         ]);
 
         echo '<div class="row gf-category-expander">';
+        $second_lvl_cat_ids = [];
         foreach ($categories as $category) {
             $child_args = array(
                 'taxonomy' => 'product_cat',
                 'hide_empty' => false,
                 'parent' => $category->term_id
             );
+
+            $second_lvl_cat_ids[] = $category->term_id;
+
             $child_cats = get_terms($child_args);
             echo '<div class="col-3 gf-category-expander__col">
                 <a class="gf-category-expander__col__category" href="' . get_term_link($category) . '">' . $category->name . '</a>
@@ -96,7 +100,14 @@ function gf_display_categories_on_archive_page()
         foreach ($childless_cats as $cat){
             $childless_cats_ids[] = $cat->term_id;
         }
-        if(!in_array(get_queried_object_id(), $childless_cats_ids)){
+        $result = false;
+        foreach ($second_lvl_cat_ids as $second_lvl_cat_id){
+            if(!in_array($second_lvl_cat_id, $childless_cats_ids)){
+                $result = true;
+                break;
+            }
+        }
+        if(!in_array(get_queried_object_id(), $childless_cats_ids) and $result === true){
             echo '<div class="gf-category-expander__footer"><span class="fas fa-angle-down"></span></div>';
         }
     echo '</div>';
