@@ -1250,3 +1250,13 @@ body.home .gf-footer-newsletter {
 .gf-top-bar__container a{
   padding-right: 12px;
 }
+
+.woocommerce #content table.cart img,
+.woocommerce table.cart img,
+.woocommerce-page #content table.cart img,
+.woocommerce-page table.cart img{
+  width: 100px;
+}
+.woocommerce-terms-and-conditions-wrapper a{
+  color: #f45411;
+}

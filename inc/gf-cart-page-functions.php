@@ -163,20 +163,20 @@ function custom_wc_empty_cart_message() {
     $custum_html = '<div id="core" class="borderedWrapper">
                             <form name="allfrm" method="post" action="//www.nonstopshop.rs/cms/identification.php">
                                                                     
-                                    <p class="titleSmall">'._e('Proizvodi u korpi:', 'green-fiends').'</p>
+                                    <p class="titleSmall">'.__('Proizvodi u korpi:').'</p>
     
-                                    <p class="cartText3"><strong>'._e('U Vašoj korpi trenutno nema proizvoda.', 'green-fiends').'</strong></p>
+                                    <p class="cartText3"><strong>'.__('U Vašoj korpi trenutno nema proizvoda.').'</strong></p>
                                     
-                                    <p class="cartText3">'._e('Da biste naručili proizvod(e) potrebno je da ih prethodno dodate u korpu.', 'green-fiends').' <br>
-                                        '._e('Proizvod se dodaje u korpu klikom na dugme "Stavi u korpu" koje se nalazi na stranici
-                                        svakog proizvoda.', 'green-fiends').' </p><br>
+                                    <p class="cartText3">'.__('Da biste naručili proizvod(e) potrebno je da ih prethodno dodate u korpu.').' <br>
+                                        '.__('Proizvod se dodaje u korpu klikom na dugme "Stavi u korpu" koje se nalazi na stranici
+                                        svakog proizvoda.').' </p><br>
                                     
                                     <img src="/wp-content/uploads/2018/07/btn_add_to_cart.png" alt="dodaj u korpu">
                                                                     
                                     <p class="cartText3 intro-text"><strong>napomena:</strong><br>
-                                        '._e('Pre nego što započnete sa naručivanjem potrebno je da se "registrujete". Link za registraciju se 
+                                        '.__('Pre nego što započnete sa naručivanjem potrebno je da se "registrujete". Link za registraciju se 
                                         nalazi na vrhu svake stranice. Registracija se obavlja samo jednom nakon čega će vas sistem 
-                                        automatski prepoznati svaki sledeći put kada posetite sajt.', 'green-fiends').'</p>
+                                        automatski prepoznati svaki sledeći put kada posetite sajt.').'</p>
                             </form> 
                             </div>';
     echo $custum_html;
