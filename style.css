@@ -94,6 +94,8 @@ body.logged-in .site-header {
 
 .gf-logo {
   height: 70px;
+  position: relative;
+  z-index: 1000;
 }
 
 .gf-logo-wrapper {
