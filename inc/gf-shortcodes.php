@@ -100,9 +100,19 @@ function gf_cart_shortcode() {
 add_shortcode('gf-category-mobile', 'gf_category_mobile_toggle_shortcode');
 function gf_category_mobile_toggle_shortcode() {
     echo '<div class="gf-category-mobile-toggle">Kategorije</div>';
-
-    $product_cat = get_option('filter_fields_order');
-    $number_of_categories = esc_attr(get_option('number_of_categories_in_sidebar'));
+    $product_cat_raw = get_terms(array('parent' => 0, 'taxonomy' => 'product_cat'));
+    $product_cat = [];
+    foreach($product_cat_raw as $cat){
+        $product_cat[] = array(
+            'name' => $cat->name,
+            'term_id' => $cat->term_id
+        );
+    }
+    $number_of_categories = 20;
+    if(!empty(get_option('filter_fields_order'))){
+        $product_cat = get_option('filter_fields_order');
+        $number_of_categories = esc_attr(get_option('number_of_categories_in_sidebar'));
+    }
     $i = 0;
     echo '<div class="gf-category-accordion">';
     foreach ($product_cat as $parent_product_cat) {
@@ -193,7 +203,6 @@ function gf_category_megamenu_shortcode()
         );
     }
     $number_of_categories = 20;
-//    var_dump($product_cat);
     if(!empty(get_option('filter_fields_order'))){
         $product_cat = get_option('filter_fields_order');
         $number_of_categories = esc_attr(get_option('number_of_categories_in_sidebar'));
