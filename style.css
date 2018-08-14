@@ -1260,3 +1260,9 @@ body.home .gf-footer-newsletter {
 .woocommerce-terms-and-conditions-wrapper a{
   color: #f45411;
 }
+.woocommerce-MyAccount-content a{
+  color: #f45411;
+}
+.woocommerce-MyAccount-content a:hover{
+  border-bottom: 1px solid #f45411;
+}
