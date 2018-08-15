@@ -152,7 +152,7 @@ add_action('woocommerce_proceed_to_checkout', 'gf_button_proceed_to_checkout', 2
 function gf_button_proceed_to_checkout()
 {
     echo '<div class="gf-button-proceed-to-checkout">
-            <a href="/checkout/">
+            <a href="'. wc_get_checkout_url() .'">
                 <img src="/wp-content/uploads/2018/06/btn_order.png" alt="">
             </a>
           </div>';
