@@ -1472,3 +1472,12 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__submit {
 .woocommerce-MyAccount-content a:hover{
   border-bottom: 1px solid #f45411;
 }
+
+.gf-footer-images li {
+  height: 45px;
+}
+
+.gf-footer-images li img{
+  width: auto !important;
+  height: 100% !important;
+}
