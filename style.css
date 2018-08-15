@@ -454,6 +454,76 @@ h1.product_title.entry-title {
   margin: 0 0 1em;
 }
 
+.gf-product-controls {
+  display: flex;
+  flex-flow: row;
+  padding-left: 20px;
+}
+
+.woocommerce .woocommerce-result-count,
+.woocommerce-page .woocommerce-result-count,
+.woocommerce form.form-wppp-select,
+.woocommerce .woocommerce-ordering {
+  float: unset !important;
+}
+
+.woocommerce .gridlist-toggle {
+  margin-right: 20px;
+}
+
+.woocommerce .woocommerce-result-count {
+  color: #666;
+  order: 1;
+  flex: 1;
+}
+
+.woocommerce .gridlist-toggle {
+  padding: 0 !important;
+  order: 2;
+}
+
+.woocommerce .woocommerce-ordering {
+  order: 3;
+  margin-left: 20px;
+}
+
+.woocommerce form.form-wppp-select {
+  margin-left: 0 !important;
+  order: 4;
+}
+
+.woocommerce .woocommerce-ordering select,
+.woocommerce form.form-wppp-select select {
+  text-transform: none;
+  background: #e8e8e8;
+  border: solid 1px #777;
+  border-radius: 4px;
+  padding: 10px;
+  margin-right: 20px;
+}
+
+.gf-wc-pagination-wrapper {
+  order: 5;
+}
+
+.woocommerce-pagination.gf-wc-pagination {
+  display: flex;
+  align-items: center;
+}
+
+.woocommerce-pagination.gf-wc-pagination .prev.page-numbers,
+.woocommerce-pagination.gf-wc-pagination .next.page-numbers {
+  padding: 7px 14px;
+  border: solid 1px #666;
+  border-radius: 5px;
+  font-size: 20px;
+}
+
+.woocommerce-pagination.gf-wc-pagination .page-numbers {
+  margin: 0 5px;
+  font-size: 25px;
+}
+
 .woocommerce .products ul,
 .woocommerce ul.products {
   margin: 20px 0;
@@ -1180,6 +1250,38 @@ body.home .gf-footer-newsletter {
 }
 
 /* media queries */
+@media only screen and (max-width: 1200px) {
+  .gf-product-controls {
+    flex-flow: column;
+  }
+
+  .woocommerce .gridlist-toggle {
+    display: none;
+  }
+
+  .woocommerce .woocommerce-result-count {
+    margin: 20px 0;
+  }
+
+  .woocommerce .woocommerce-ordering,
+  .woocommerce form.form-wppp-select {
+    margin-bottom: 20px;
+    margin-left: 0;
+  }
+
+  .woocommerce .woocommerce-ordering select,
+  .woocommerce form.form-wppp-select select {
+    width: 100%;
+  }
+
+  .woocommerce-pagination.gf-wc-pagination {
+    justify-content: center;
+  }
+
+  .woocommerce-pagination.gf-wc-pagination .page-numbers {
+    margin: 0 10px;
+  }
+}
 
 @media only screen and (max-width: 1200px) and (min-width: 767px) {
   .woocommerce-account .woocommerce-MyAccount-navigation {

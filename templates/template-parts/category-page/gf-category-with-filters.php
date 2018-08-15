@@ -62,8 +62,9 @@
              * @hooked woocommerce_result_count - 20
              * @hooked woocommerce_catalog_ordering - 30
              */
-            do_action('woocommerce_before_shop_loop');
-
+            echo '<div class="gf-product-controls">';
+              do_action('woocommerce_before_shop_loop');
+            echo '</div>';
             ?>
         <?php
         /**
@@ -98,7 +99,9 @@
          *
          * @hooked woocommerce_pagination - 10
          */
-        do_action( 'woocommerce_after_shop_loop' );
+         echo '<div class="gf-product-controls gf-product-controls--bottom">';
+          do_action( 'woocommerce_after_shop_loop' );
+         echo '</div>';
         } else {
             /**
              * Hook: woocommerce_no_products_found.
