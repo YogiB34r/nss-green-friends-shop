@@ -6,6 +6,8 @@
       </div>
     </div>
     <div class="gf-content-wrapper col-md-9 col-sm-12">
+
+
         <?php
         /**
          * The Template for displaying product archives, including the main shop page which is a post type archive
@@ -42,6 +44,10 @@
                 <h1 class="woocommerce-products-header__title page-title"><?php woocommerce_page_title(); ?></h1>
             <?php endif; ?>
 
+            <div class="gf-product-filters-mobile-wrapper">
+                <?php dynamic_sidebar('gf-category-sidebar-product-filters');?>
+            </div>
+            
             <?php
             /**
              * Hook: woocommerce_archive_description.
