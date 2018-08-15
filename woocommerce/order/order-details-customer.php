@@ -25,7 +25,7 @@ $show_shipping = ! wc_ship_to_billing_address_only() && $order->needs_shipping_a
 	<?php if ( $show_shipping ) : ?>
 
 	<section class="row">
-		<div class="col-6">
+		<div class="col-12 col-md-6 gf-customer-details__section">
 
 	<?php endif; ?>
 
@@ -47,7 +47,7 @@ $show_shipping = ! wc_ship_to_billing_address_only() && $order->needs_shipping_a
 
 		</div><!-- /.col-1 -->
 
-		<div class="col-6">
+		<div class="col-12 col-md-6 gf-customer-details__section">
 			<h2 class="woocommerce-column__title"><?php esc_html_e( 'Shipping address', 'woocommerce' ); ?></h2>
 			<address>
 				<?php echo wp_kses_post( $order->get_formatted_shipping_address( __( 'N/A', 'woocommerce' ) ) ); ?>

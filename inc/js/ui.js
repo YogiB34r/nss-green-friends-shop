@@ -11,7 +11,7 @@ jQuery(document).ready(function() {
 			if (jQuery('.gf-search-toggle i').hasClass('fa-times')) {
 		  		jQuery('.gf-search-toggle i').toggleClass('fa-times fa-search');
 			}
-			search.hide();
+      search.hide();
 		}
 	});
 
