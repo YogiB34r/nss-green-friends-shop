@@ -450,6 +450,7 @@ body.home img.gf-header-logo {
 
 .woocommerce .woocommerce-breadcrumb a:hover {
   color: #f45411;
+  text-decoration: underline;
 }
 
 h1.product_title.entry-title {
