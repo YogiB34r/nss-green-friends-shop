@@ -216,7 +216,7 @@ function gf_category_megamenu_shortcode()
 		     <div class="gf-toggle"><i class="fa fa-bars"></i></div>
 		       <div class="gf-navblock">';
     foreach ($product_cat as $parent_product_cat) {
-        if ($parent_product_cat['slug'] != 'gf-slider' && $parent_product_cat['slug'] != 'uncategorized'):
+        if (isset($parent_product_cat['slug']) && $parent_product_cat['slug'] != 'gf-slider' && $parent_product_cat['slug'] != 'uncategorized'):
             echo '
             <ul class="gf-navigation">';
             $i++;
