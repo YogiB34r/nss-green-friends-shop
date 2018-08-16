@@ -9,7 +9,6 @@ if ( is_singular('product') ) {
 // get categories
     $args = array('parrent' => 0);
     $terms = wp_get_post_terms( $post->ID, 'product_cat');
-    var_dump($terms);
     foreach ( $terms as $term ) {
         $children = get_term_children( $term->term_id, 'product_cat' );
         if ( !sizeof( $children ) )
