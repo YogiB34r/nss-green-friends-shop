@@ -108,7 +108,7 @@ function gf_display_categories_on_archive_page()
             }
         }
         if(!in_array(get_queried_object_id(), $childless_cats_ids) and $result === true){
-            echo '<div class="gf-category-expander__footer"><span class="fas fa-angle-down"></span></div>';
+            echo '<div class="gf-category-expander__footer"><span class="fas fa-angle-up"></span></div>';
         }
     echo '</div>';
     }
@@ -122,4 +122,3 @@ add_action( 'woocommerce_before_shop_loop', 'woocommerce_catalog_ordering', 26);
 add_action( 'woocommerce_after_shop_loop', 'woocommerce_catalog_ordering', 26 );
 add_action( 'woocommerce_before_shop_loop', 'woocommerce_pagination', 27 );
 add_action( 'woocommerce_after_shop_loop', 'woocommerce_pagination', 27 );
-
