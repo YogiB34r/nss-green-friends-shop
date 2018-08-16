@@ -22,7 +22,6 @@ if ( is_singular('product') ) {
             'terms' => $cats_array,
             'parent' => 0
         )));
-    var_dump($query_args);
 
     $r = new WP_Query($query_args);
     if ($r->have_posts()) { ?>
