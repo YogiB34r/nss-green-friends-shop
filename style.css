@@ -940,7 +940,7 @@ a.added_to_cart.wc-forward {
 
 .gf-wrapper-before {
   height: 1px;
-  padding-top: 10%;
+  padding-top: 6.5em;
   background: #fafafa;
 }
 
@@ -971,6 +971,7 @@ a.added_to_cart.wc-forward {
 
 .gf-sidebar .woocommerce ul.products li.product {
   text-align: center;
+  margin-bottom: 0.4em;
 }
 
 .gf-sidebar .woocommerce ul.products li.product a img {
@@ -1187,6 +1188,7 @@ a.added_to_cart.wc-forward {
 .gf-sidebar .widget .woocommerce ul.products li.product .price {
   color: #666;
   text-decoration: none;
+  margin: 0;
 }
 
 .gf-sidebar .widget .woocommerce-Price-amount {
