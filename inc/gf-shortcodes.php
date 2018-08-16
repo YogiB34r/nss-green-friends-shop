@@ -200,6 +200,7 @@ function gf_category_megamenu_shortcode()
         $product_cat[] = array(
                 'name' => $cat->name,
                 'term_id' => $cat->term_id,
+                'slug' => $cat->slug,
         );
     }
     $number_of_categories = 20;
@@ -215,7 +216,7 @@ function gf_category_megamenu_shortcode()
 		     <div class="gf-toggle"><i class="fa fa-bars"></i></div>
 		       <div class="gf-navblock">';
     foreach ($product_cat as $parent_product_cat) {
-        if ($parent_product_cat['name'] != 'Gf slider' && $parent_product_cat['name'] != 'Uncategorized'):
+        if ($parent_product_cat['slug'] != 'gf-slider' && $parent_product_cat['slug'] != 'uncategorized'):
             echo '
             <ul class="gf-navigation">';
             $i++;
