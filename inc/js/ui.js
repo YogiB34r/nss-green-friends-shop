@@ -10,7 +10,8 @@ jQuery(document).ready(function() {
     if (jQuery(window).scrollTop() > siteHeader) {
       jQuery('.gf-header-logo').css({'max-width': '102px'});
     } else {
-      jQuery('.gf-header-logo').css({'max-width': '235px'});
+      jQuery('.gf-header-logo').css({'max-width': '180px'});
+      jQuery('body.home .gf-header-logo').css({'max-width': '235px'});
     }
   });
 

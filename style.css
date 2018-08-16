@@ -106,8 +106,12 @@ img.gf-header-logo {
   width: 100%;
   height: auto;
   min-width: 102px;
-  max-width: 235px;
+  max-width: 180px;
   transition: 0.5s all;
+}
+
+body.home img.gf-header-logo {
+  max-width: 235px;
 }
 
 .gf-hamburger-menu,
@@ -435,11 +439,11 @@ img.gf-header-logo {
 .woocommerce .woocommerce-breadcrumb {
   padding: 30px 20px 10px;
   margin: 0;
-  color: #1d1d1d;
+  color: #454545;
 }
 
 .woocommerce .woocommerce-breadcrumb a {
-  color: #666;
+  color: #f45411;
   font-size: 1rem;
   font-weight: 600;
 }
@@ -521,6 +525,11 @@ h1.product_title.entry-title {
 
 .pswp__bg {
   background: rgba(0, 0, 0, 0.6);
+}
+
+.sku_wrapper .sku {
+  font-size: 1.1em;
+  font-weight: 700;
 }
 
 .woocommerce ul.products li.product .woocommerce-loop-category__title,
@@ -887,7 +896,7 @@ a.added_to_cart.wc-forward {
 }
 
 .gf-expander__subcategory-list {
-  display: none;
+  display: block;
 }
 
 .gf-category-expander__col li {
@@ -904,7 +913,7 @@ a.added_to_cart.wc-forward {
 }
 
 .gf-category-expander__col__category {
-  font-weight: 800;
+  font-weight: 700;
   padding-bottom: 12px;
 }
 
