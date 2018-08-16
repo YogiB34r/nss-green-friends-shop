@@ -278,7 +278,7 @@ img.gf-header-logo {
 .gf-navigation-wrapper {
   width: 100%;
   display: flex;
-  justify-content: end;
+  justify-content: flex-end;
 }
 
 .gf-navigation-wrapper a {
