@@ -128,7 +128,7 @@ img.gf-header-logo {
 
 .gf-category-accordion {
 	position: fixed;
-	top: 46px;
+	top: 0;
 	left: 0;
   overflow: scroll;
   padding: 10px;
@@ -278,7 +278,7 @@ img.gf-header-logo {
 .gf-navigation-wrapper {
   width: 100%;
   display: flex;
-  justify-content: end;
+  justify-content: flex-end;
 }
 
 .gf-navigation-wrapper a {
@@ -518,6 +518,10 @@ h1.product_title.entry-title {
   margin: 20px 0;
 }
 
+.pswp__bg {
+  background: rgba(0, 0, 0, 0.6);
+}
+
 .woocommerce ul.products li.product .woocommerce-loop-category__title,
 .woocommerce ul.products li.product .woocommerce-loop-product__title {
   color: #515151;
@@ -562,7 +566,8 @@ h1.product_title.entry-title {
 }
 
 .woocommerce ul.products li.product .button,
-.add_to_cart_button {
+.add_to_cart_button,
+a.added_to_cart.wc-forward {
   display: block;
   margin: 1em auto;
   padding: .718em .2em;
@@ -573,12 +578,13 @@ h1.product_title.entry-title {
   border-radius: 4px;
   background: #fafafa;
   color: #515151;
-  font-size: 13px;
-  font-weight: 800;
+  font-size: 1em;
+  font-weight: 700;
   transition: 0.2s all;
 }
 
-.add_to_cart_button {
+.add_to_cart_button,
+a.added_to_cart.wc-forward {
   padding: .718em .2em;
   width: 100%;
   margin: 10px auto;
@@ -586,6 +592,10 @@ h1.product_title.entry-title {
 
 .add_to_cart_button:hover {
   color: #f45411;
+}
+
+a.added_to_cart.wc-forward {
+  border: solid 2px #f45411;
 }
 
 .woocommerce ul.products li.product .button:hover {
@@ -1002,6 +1012,7 @@ h1.product_title.entry-title {
 }
 
 .category-item {
+  position: relative;
   border-bottom: 0;
   transition: 0.2s all;
 }
@@ -1229,7 +1240,7 @@ body.home .widget_gf_newsletter_widget {
 	justify-content: space-around;
 	border: solid 3px #f45411;
 	border-radius: 7px;
-	padding: 25px 0px;
+	padding: 25px;
   text-align: center;
 }
 
@@ -1341,6 +1352,12 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__submit {
 }
 
 @media only screen and (max-width: 1200px) and (min-width: 767px) {
+
+  .gf-primary-navigation,
+  .gf-main-content-container {
+    width: 90%;
+  }
+
   .woocommerce-account .woocommerce-MyAccount-navigation {
     width: 100%;
   }
@@ -1399,6 +1416,12 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__submit {
 
   .widget_gf_image_slider_widget {
     display: none;
+  }
+
+  .woocommerce ul.products li.product .button,
+  .add_to_cart_button,
+  a.added_to_cart.wc-forward {
+    font-size: 1.1em;
   }
 
   body.home .widget_gf_newsletter_widget {

@@ -35,13 +35,22 @@ jQuery(document).ready(function() {
 
   jQuery('.category-item a').hover(function(e) {
     var currentLink = jQuery(this);
+    var menu = currentLink.next();
+
     var linkOffset = currentLink.offset();
-    var currentLinkOffset = linkOffset.top - jQuery(window).scrollTop();
-    var offsetLeft =  currentLink.offset().left + currentLink.width() + 1;
+    var linkOffsetBottom = jQuery(window).height() - linkOffset.top - currentLink.height();
+
+    var menuOffsetTop = 0;
+    var menuOffsetLeft = currentLink.width();
+
+    if (linkOffsetBottom < currentLink.next().height()) {
+      menuOffsetTop = -(menu.height() / 4) - jQuery(window).scrollTop();
+    }
+
     currentLink.next().css({
-      position: "fixed",
-      top: (currentLinkOffset + currentLink.height())+ "px",
-      left: (offsetLeft) + "px"
+      position: "absolute",
+      top: menuOffsetTop + "px",
+      left: menuOffsetLeft + "px"
     });
   });
 
@@ -54,29 +63,29 @@ jQuery(document).ready(function() {
     e.preventDefault();
   });
 
-  jQuery('.price_slider_amount button').click(function () {
-    let url = (location.origin).concat(location.pathname);
-
-    let filterForm = jQuery('.widget_price_filter form');
-    let min_price = jQuery('.widget_price_filter input[name="min_price"]').val();
-    let max_price = jQuery('.widget_price_filter input[name="max_price"]').val();
-    let filter_color= jQuery('.woocommerce-widget-layered-nav-dropdown input[name="filter_color"]').val();
-    let filter_size= jQuery('.woocommerce-widget-layered-nav-dropdown input[name="filter_size"]').val();
-    let filter_manufacturer = jQuery('.woocommerce-widget-layered-nav-dropdown input[name="filter_manufacturer"]').val();
-
-    let filterContent = jQuery.extend({}, {
-      min_price: min_price,
-      max_price: max_price,
-      filter_color: filter_color,
-      filter_size: filter_size,
-      filter_manufacturer: filter_manufacturer
-    });
-
-    jQuery.ajax({
-      method: 'GET',
-      url: url,
-      contentType: 'application/json; charset=utf-8',
-      data: filterContent
-    });
-  });
+  // jQuery('.price_slider_amount button').click(function () {
+  //   let url = (location.origin).concat(location.pathname);
+  //
+  //   let filterForm = jQuery('.widget_price_filter form');
+  //   let min_price = jQuery('.widget_price_filter input[name="min_price"]').val();
+  //   let max_price = jQuery('.widget_price_filter input[name="max_price"]').val();
+  //   let filter_color= jQuery('.woocommerce-widget-layered-nav-dropdown input[name="filter_color"]').val();
+  //   let filter_size= jQuery('.woocommerce-widget-layered-nav-dropdown input[name="filter_size"]').val();
+  //   let filter_manufacturer = jQuery('.woocommerce-widget-layered-nav-dropdown input[name="filter_manufacturer"]').val();
+  //
+  //   let filterContent = jQuery.extend({}, {
+  //     min_price: min_price,
+  //     max_price: max_price,
+  //     filter_color: filter_color,
+  //     filter_size: filter_size,
+  //     filter_manufacturer: filter_manufacturer
+  //   });
+  //
+  //   jQuery.ajax({
+  //     method: 'GET',
+  //     url: url,
+  //     contentType: 'application/json; charset=utf-8',
+  //     data: filterContent
+  //   });
+  // });
 });
