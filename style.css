@@ -107,6 +107,7 @@ img.gf-header-logo {
   height: auto;
   min-width: 102px;
   max-width: 235px;
+  transition: 0.5s all;
 }
 
 .gf-hamburger-menu,
