@@ -26,17 +26,17 @@ jQuery(document).ready(function() {
 
   jQuery(document).mouseup(function(e) {
     var category_list_accordion = jQuery('.gf-category-accordion');
-    var search = jQuery('.search-input-wrapper');
+    // var search = jQuery('.search-input-wrapper');
 
     if ((!category_list_accordion.is(e.target) && category_list_accordion.has(e.target).length === 0)) {
       category_list_accordion.hide();
     }
-    if (!search.is(e.target) && search.has(e.target).length === 0) {
-      if (jQuery('.gf-search-toggle i').hasClass('fa-times')) {
-        jQuery('.gf-search-toggle i').toggleClass('fa-times fa-search');
-      }
-      search.hide();
-    }
+    // if (!search.is(e.target) && search.has(e.target).length === 0) {
+    //   if (jQuery('.gf-search-toggle i').hasClass('fa-times')) {
+    //     jQuery('.gf-search-toggle i').toggleClass('fa-times fa-search');
+    //   }
+    //   search.hide();
+    // }
   });
 
   jQuery('.gf-category-mobile-toggle').click(function() {
@@ -52,10 +52,10 @@ jQuery(document).ready(function() {
     jQuery('.gf-mobile-menu').slideToggle();
   });
 
-  jQuery('.gf-search-toggle').click(function() {
-    jQuery('.search-input-wrapper').toggle();
-    jQuery('.gf-search-toggle i').toggleClass('fa-times fa-search');
-  });
+  // jQuery('.gf-search-toggle').click(function() {
+  //   jQuery('.search-input-wrapper').toggle();
+  //   jQuery('.gf-search-toggle i').toggleClass('fa-times fa-search');
+  // });
 
   jQuery('.category-item a').hover(function(e) {
 
