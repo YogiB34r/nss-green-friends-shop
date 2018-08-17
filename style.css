@@ -238,6 +238,7 @@ body.home img.gf-header-logo {
 .gf-search-wrapper .gf-search-toggle {
   padding: 13px 14px;
   border: 2px solid #e2e2e2;
+  border-left: none;
   border-top-right-radius: 2px;
   border-bottom-right-radius: 2px;
   background: #f6f6f6;
@@ -1499,6 +1500,9 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__submit {
 @media only screen and (max-width: 767px) and (min-width: 576px) {
   .gf-inner-navigation__link {
     font-size: 16px;
+  }
+  .gf-search-form--mobile .search-field {
+    width: 65%;
   }
 }
 
