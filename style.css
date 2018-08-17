@@ -1103,8 +1103,8 @@ a.added_to_cart.wc-forward {
   border: none;
   border-radius: 0;
   position: absolute;
-  top: 0;
-  left: 100%;
+/*   top: 0;
+  left: 100%; */
   min-width: 550px;
   width: 750px;
   background: #fafafa;
