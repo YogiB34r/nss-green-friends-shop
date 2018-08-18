@@ -1262,14 +1262,21 @@ body.home .widget_gf_newsletter_widget {
 }
 
 body.home .widget_gf_newsletter_widget .gf-newsletter__input {
-  width: 100%;
-  margin-bottom: 20px;
+  width: 50%;
+  /*margin-bottom: 20px;*/
 }
 
 body.home .widget_gf_newsletter_widget .gf-newsletter__submit {
   background: #f45411;
   color: #fafafa;
   font-weight: 700;
+  width: 50%;
+}
+body.home .widget_gf_newsletter_widget .gf-newsletter__submit:hover{
+  background-color: #ccc;
+}
+body.home .widget_gf_newsletter_widget .gf-newsletter__title{
+  display: none;
 }
 
 
