@@ -20,7 +20,7 @@ if ( is_singular('product') ) {
             'taxonomy' => 'product_cat',
             'field' => 'id',
             'terms' => $cats_array,
-            'parent' => 0
+            'parent' => 0,
         )));
 
     $r = new WP_Query($query_args);

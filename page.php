@@ -11,7 +11,8 @@ if (have_posts()):
           <div class="gf-content-wrapper col-md-9 col-sm-12">
             <header class="gf-entry-header">
                 <div class="gf-page-header__breadcrumb">
-                  <?php woocommerce_breadcrumb(); ?>
+                  <?php //woocommerce_breadcrumb(); ?>
+<?php echo do_shortcode('[yoast-breadcrumb]'); ?>
                 </div>
                 <div class="gf-page-header__heading">
                   <?php the_title('<h1 class="entry-title">', '</h1>'); ?>

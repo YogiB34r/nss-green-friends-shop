@@ -14,7 +14,7 @@ body {
 }
 
 #page {
-  padding-top: 115px;
+  padding-top: 85px;
 }
 
 a {
@@ -211,16 +211,12 @@ body.home img.gf-header-logo {
 }
 
 .gf-search-form--mobile {
-  position: relative;
-  top: 60px;
-  left: 0;
-  text-align: right;
+  text-align: center;
 }
 
 .search-input-wrapper {
   width: 100%;
-  display: none;
-  float: right;
+  float: unset;
 }
 
 .gf-search-wrapper .search-field {
@@ -229,7 +225,7 @@ body.home img.gf-header-logo {
   background: #f6f6f6;
   text-align: left;
   border-radius: 0px;
-  border: 1px solid #e2e2e2;
+  border: 2px solid #e2e2e2;
   padding: 13px 14px;
   font-size: 14px;
   font-weight: 600;
@@ -238,7 +234,8 @@ body.home img.gf-header-logo {
 .gf-search-wrapper .search-submit,
 .gf-search-wrapper .gf-search-toggle {
   padding: 13px 14px;
-  border: 1px solid #e2e2e2;
+  border: 2px solid #e2e2e2;
+  border-left: none;
   border-top-right-radius: 2px;
   border-bottom-right-radius: 2px;
   background: #f6f6f6;
@@ -359,6 +356,12 @@ body.home img.gf-header-logo {
 
 .gf-row {
   padding: 0 15px;
+  justify-content: center;
+}
+
+.widget_gf_image_banners_widget {
+  display: none;
+  max-width: 100%;
 }
 
 .gf-entry-header {
@@ -589,7 +592,7 @@ a.added_to_cart.wc-forward {
   border-radius: 4px;
   background: #fafafa;
   color: #515151;
-  font-size: 1em;
+  font-size: 0.8em;
   font-weight: 700;
   transition: 0.2s all;
 }
@@ -603,6 +606,7 @@ a.added_to_cart.wc-forward {
 
 .add_to_cart_button:hover {
   color: #f45411;
+  border-color: #f45411;
 }
 
 a.added_to_cart.wc-forward {
@@ -1103,8 +1107,8 @@ a.added_to_cart.wc-forward {
   border: none;
   border-radius: 0;
   position: absolute;
-  top: 0;
-  left: 100%;
+/*   top: 0;
+  left: 100%; */
   min-width: 550px;
   width: 750px;
   background: #fafafa;
@@ -1330,6 +1334,15 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__submit {
   background-size: cover;
 }
 
+.gf-footer-images li {
+  height: 45px;
+}
+
+.gf-footer-images li img{
+  width: auto !important;
+  height: 100% !important;
+}
+
 /* media queries */
 @media only screen and (max-width: 1200px) {
   .gf-product-controls {
@@ -1417,6 +1430,25 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__submit {
 
   .gf-search-form--mobile .search-field {
     width: 80%;
+    color: #1d1d1d;
+    background: #f6f6f6;
+    text-align: left;
+    border-radius: 0px;
+    border: 2px solid #e2e2e2;
+    padding: 13px 14px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .gf-search-form--mobile .search-submit {
+    padding: 13px 14px;
+    border: 2px solid #e2e2e2;
+    border-left: none;
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+    background: #f6f6f6;
+    margin-left: -5px;
+    font-size: 14px;
   }
 
   .gf-search-wrapper .gf-search-toggle {
@@ -1427,14 +1459,10 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__submit {
     display: none;
   }
 
-  .widget_gf_image_slider_widget {
-    display: none;
-  }
-
   .woocommerce ul.products li.product .button,
   .add_to_cart_button,
   a.added_to_cart.wc-forward {
-    font-size: 1.1em;
+    font-size: 1em;
   }
 
   body.home .widget_gf_newsletter_widget {
@@ -1489,17 +1517,39 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__submit {
   .gf-inner-navigation__link {
     font-size: 16px;
   }
+  .gf-search-form--mobile .search-field {
+    width: 65%;
+  }
 }
 
 @media only screen and (max-width: 576px) {
   .gf-main-content-container {
     width: 95%;
   }
+
+  .widget_gf_image_banners_widget {
+    display: block;
+  }
+
+  body.home .widget_gf_newsletter_widget {
+    display: none;
+  }
+
   .gf-entry-content {
     padding: 30px 0;
   }
   .gf-inner-navigation__link {
     font-size: 14px;
+  }
+
+  .woocommerce ul.products li.product .button,
+  .add_to_cart_button,
+  a.added_to_cart.wc-forward {
+    font-size: 0.8em;
+  }
+
+  .gf-footer-images li img{
+    height: 70% !important;
   }
 }
 
@@ -1520,6 +1570,10 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__submit {
   .woocommerce div.product .woocommerce-tabs ul.tabs li::before,
   .woocommerce div.product .woocommerce-tabs ul.tabs li::after {
     border-width: 0;
+  }
+
+  .gf-footer-images li img{
+    height: 50% !important;
   }
 }
 
@@ -1561,13 +1615,4 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__submit {
 }
 .woocommerce-MyAccount-content a:hover{
   border-bottom: 1px solid #f45411;
-}
-
-.gf-footer-images li {
-  height: 45px;
-}
-
-.gf-footer-images li img{
-  width: auto !important;
-  height: 100% !important;
 }
