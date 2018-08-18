@@ -203,12 +203,11 @@ function gf_category_megamenu_shortcode()
                 'slug' => $cat->slug,
         );
     }
-    $number_of_categories = 20;
+    $number_of_categories = 10;
     if(!empty(get_option('filter_fields_order'))){
         $product_cat = get_option('filter_fields_order');
         $number_of_categories = esc_attr(get_option('number_of_categories_in_sidebar'));
     }
-
     $i = 0;
     echo
     '<div id="gf-wrapper">
@@ -216,7 +215,7 @@ function gf_category_megamenu_shortcode()
 		     <div class="gf-toggle"><i class="fa fa-bars"></i></div>
 		       <div class="gf-navblock">';
     foreach ($product_cat as $parent_product_cat) {
-        if (isset($parent_product_cat['slug']) && $parent_product_cat['slug'] != 'gf-slider' && $parent_product_cat['slug'] != 'uncategorized'):
+        if ($parent_product_cat['name'] != 'Uncategorized'):
             echo '
             <ul class="gf-navigation">';
             $i++;
