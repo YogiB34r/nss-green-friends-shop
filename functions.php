@@ -8,6 +8,7 @@ function wc_support() {
     add_theme_support( 'wc-product-gallery-zoom' );
     add_theme_support( 'wc-product-gallery-lightbox' );
     add_theme_support( 'wc-product-gallery-slider' );
+    add_theme_support( 'yoast-seo-breadcrumbs' );
 }
 function require_on_init(){
     foreach(glob(get_stylesheet_directory()."/inc/*.php") as $file){
@@ -24,4 +25,5 @@ function change_existing_currency_symbol( $currency_symbol, $currency ) {
     return $currency_symbol;
 }
 
+//remove_action( 'woocommerce_before_main_content','woocommerce_breadcrumb', 20);
 
