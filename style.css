@@ -558,12 +558,18 @@ h1.product_title.entry-title {
 
 .price del .woocommerce-Price-amount,
 .price del {
-  color: #c2c2c4;
+  color: #454545;
+  font-size: 0.85em;
+}
+
+.price ins {
+  font-weight: 800;
+  font-size: 1.05em;
 }
 
 .price .woocommerce-Price-amount,
 .price ins {
-  color: #ee100b;
+  color: #1d1d1d;
 }
 
 .woocommerce ul.products li.product .price {
@@ -618,6 +624,7 @@ a.added_to_cart.wc-forward {
 }
 
 .woocommerce #content div.product div.summary p, .woocommerce div.product div.summary p, .woocommerce-page #content div.product div.summary p, .woocommerce-page div.product div.summary p, .saved-sale {
+  margin-top: 10px;
   margin-bottom: 20px;
 }
 
