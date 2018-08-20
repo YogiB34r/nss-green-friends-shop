@@ -11,7 +11,7 @@ function gf_my_account_link_shortcode() {
         $myaccount_page_url = get_permalink($myaccount_page);
     }
 
-    echo '<div class="gf-my-account"><a href=" ' . $myaccount_page_url . '"><i class="fas fa-user"></i>'.__('My account').'</a></div>';
+    echo '<div class="gf-my-account"><a href=" ' . $myaccount_page_url . '"><i class="fas fa-user"></i> '.__('Moj nalog').'</a></div>';
 }
 
 add_shortcode('gf-category-dropdown', 'gf_category_dropdown_shortcode');
@@ -92,7 +92,7 @@ function gf_cart_shortcode() {
         <p class="gf-header-cart__title">
             <i class="fas fa-shopping-cart"></i> <span
                     class="shopping-cart__count"><?php echo sprintf(_n('%d', '%d', $woocommerce->cart->cart_contents_count, 'woothemes'),
-                    $woocommerce->cart->cart_contents_count); ?></span>Vaša korpa</p>
+                    $woocommerce->cart->cart_contents_count); ?></span>Korpa</p>
     </a>
     <?php
 }
@@ -161,7 +161,7 @@ function gf_mobile_nav_menu_shortcode() {
     <li class="gf-mobile-menu__link">
       <a class="gf-header-cart" href="<?php echo wc_get_cart_url(); ?>"
          title="<?php _e('Cart View', 'green-friends'); ?>">
-         Vaša korpa(<?php echo sprintf(_n('%d', '%d', $woocommerce->cart->cart_contents_count, 'woothemes'), $woocommerce->cart->cart_contents_count); ?>)
+         Korpa(<?php echo sprintf(_n('%d', '%d', $woocommerce->cart->cart_contents_count, 'woothemes'), $woocommerce->cart->cart_contents_count); ?>)
       </a>
     </li>
     <li class="gf-mobile-menu__link">
@@ -170,7 +170,7 @@ function gf_mobile_nav_menu_shortcode() {
         if ($myaccount_page) {
             $myaccount_page_url = get_permalink($myaccount_page);
         }
-        echo '<a href=" ' . $myaccount_page_url . '">'.__('My account').'</a>';
+        echo '<a href=" ' . $myaccount_page_url . '">'.__('Moj nalog').'</a>';
       ?>
     </li>
     <li class="gf-mobile-menu__link">
@@ -199,15 +199,15 @@ function gf_category_megamenu_shortcode()
     foreach($product_cat_raw as $cat){
         $product_cat[] = array(
                 'name' => $cat->name,
-                'term_id' => $cat->term_id
+                'term_id' => $cat->term_id,
+                'slug' => $cat->slug,
         );
     }
-    $number_of_categories = 20;
+    $number_of_categories = 10;
     if(!empty(get_option('filter_fields_order'))){
         $product_cat = get_option('filter_fields_order');
         $number_of_categories = esc_attr(get_option('number_of_categories_in_sidebar'));
     }
-
     $i = 0;
     echo
     '<div id="gf-wrapper">
@@ -215,7 +215,7 @@ function gf_category_megamenu_shortcode()
 		     <div class="gf-toggle"><i class="fa fa-bars"></i></div>
 		       <div class="gf-navblock">';
     foreach ($product_cat as $parent_product_cat) {
-        if ($parent_product_cat['name'] != 'Gf-slider' && $parent_product_cat['name'] != 'Uncategorized'):
+        if ($parent_product_cat['name'] != 'Uncategorized'):
             echo '
             <ul class="gf-navigation">';
             $i++;
@@ -258,17 +258,4 @@ function gf_category_megamenu_shortcode()
     echo '</div>
 	</div>
 </div>';
-}
-
-add_shortcode('gf-nav-menu-items', 'gf_nav_menu_items_visibility_control');
-function gf_nav_menu_items_visibility_control() {
-    $menu_items = wp_get_nav_menu_items('Topbar');
-    foreach ($menu_items as $menu_item) {
-        if (is_user_logged_in() && $menu_item->post_title == 'Log Out') {
-            echo '<a href="' . $menu_item->url . '">' . $menu_item->post_title . '</a>';
-        }
-        if (!is_user_logged_in() && $menu_item->post_title != 'Log Out') {
-            echo '<a href="' . $menu_item->url . '">' . $menu_item->post_title . '</a>';
-        }
-    }
 }
