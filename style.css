@@ -463,6 +463,7 @@ h1.product_title.entry-title {
   margin: 0 0 1em;
   color: #454545;
   font-weight: 600;
+  padding: 0 20px 10px;
 }
 
 .gf-product-controls {
@@ -482,6 +483,23 @@ h1.product_title.entry-title {
   order: 2;
 }
 
+.gridlist-toggle a {
+  padding: .568em;
+  margin-left: 5px;
+  border-radius: 5px;
+  border: solid 1px transparent;
+  background: #fafafa;
+  border: solid 1px #777;
+}
+
+.gridlist-toggle a:hover {
+  color: #1d1d1d;
+}
+
+.gridlist-toggle a.active {
+  background: #e8e8e8;
+}
+
 .woocommerce .woocommerce-ordering {
   order: 3;
   margin-left: 20px;
@@ -498,8 +516,23 @@ h1.product_title.entry-title {
   background: #e8e8e8;
   border: solid 1px #777;
   border-radius: 4px;
-  padding: 10px;
+  padding: 11px;
   margin-right: 20px;
+}
+
+.woocommerce .woocommerce-ordering select,
+.woocommerce form.form-wppp-select select {
+	text-transform: none;
+	background: #ddd;
+	border: solid 1px #aaa;
+	border-radius: 7px;
+	padding: 5px;
+	margin-right: 20px;
+	color: #1d1d1d;
+}
+
+.woocommerce form.form-wppp-select select {
+	background: #fafafa;
 }
 
 .gf-wc-pagination-wrapper {
@@ -513,7 +546,7 @@ h1.product_title.entry-title {
 
 .woocommerce-pagination.gf-wc-pagination .prev.page-numbers,
 .woocommerce-pagination.gf-wc-pagination .next.page-numbers {
-  padding: 7px 14px;
+  padding: 7px 14px 10px;
   border: solid 1px #666;
   border-radius: 5px;
   font-size: 20px;
@@ -521,7 +554,7 @@ h1.product_title.entry-title {
 
 .woocommerce-pagination.gf-wc-pagination .page-numbers {
   margin: 0 5px;
-  font-size: 25px;
+  font-size: 19px;
 }
 
 .woocommerce .products ul,
@@ -540,7 +573,11 @@ h1.product_title.entry-title {
 
 .woocommerce ul.products li.product .woocommerce-loop-category__title,
 .woocommerce ul.products li.product .woocommerce-loop-product__title {
-  color: #515151;
+  color: #666;
+  font-size: 1em;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 10px;
 }
 
 .woocommerce ul.products li.product .woocommerce-loop-category__title,
@@ -548,7 +585,7 @@ h1.product_title.entry-title {
 .woocommerce ul.products li.product p.price,
 .woocommerce ul.products li.product span.price,
 .woocommerce ul.products li.product h3, .woocommerce ul.products li.product .button {
-  text-align: center;
+  text-align: left;
 }
 
 .woocommerce div.product p.price,
@@ -558,29 +595,48 @@ h1.product_title.entry-title {
   color: #f45411;
 }
 
-.price del .woocommerce-Price-amount,
+.price {
+  display: flex;
+  align-items: baseline;
+  flex-flow: column;
+}
+
+body.single-product .summary .price  {
+  flex-flow: wrap;
+}
+
 .price del {
+  order: 2;
   color: #454545;
   font-size: 0.85em;
+  text-decoration: none;
 }
 
 .price ins {
+  order: 1;
   font-weight: 800;
   font-size: 1.05em;
-}
-
-.price .woocommerce-Price-amount,
-.price ins {
+  text-decoration: none;
   color: #1d1d1d;
 }
 
-body.single-product .price .woocommerce-Price-amount,
-body.single-product.price ins {
+body.single-product .summary ins {
+  margin-right: 10px;
+
+}
+
+body.single-product .summary ins {
   color: #f45411;
 }
 
+body.single-product .summary del {
+  text-decoration: line-through;
+}
+
 .woocommerce ul.products li.product .price {
-  color: #ee100b;
+  display: flex;
+  align-items: initial;
+  color: #1d1d1d;
   text-align: center;
   font-weight: 600;
   font-size: 18px;
@@ -598,7 +654,7 @@ a.added_to_cart.wc-forward {
   display: block;
   margin: 1em auto;
   padding: .718em .2em;
-  width: 70%;
+  width: 100%;
   text-transform: uppercase;
   text-align: center;
   border: solid 2px #e8e8e8;
@@ -628,11 +684,22 @@ a.added_to_cart.wc-forward {
 
 .woocommerce ul.products li.product .button:hover {
   color: #f45411;
+  border: solid 2px #f45411;
+  border-radius: 4px;
 }
 
 .woocommerce #content div.product div.summary p, .woocommerce div.product div.summary p, .woocommerce-page #content div.product div.summary p, .woocommerce-page div.product div.summary p, .saved-sale {
   margin-top: 10px;
   margin-bottom: 20px;
+}
+
+.saved-sale {
+  order: 3;
+  font-size: 0.9em;
+}
+
+.saved-sale .woocommerce-Price-amount.amount {
+  font-weight: 600;
 }
 
 .woocommerce div.product form.cart,
