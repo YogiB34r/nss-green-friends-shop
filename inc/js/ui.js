@@ -98,9 +98,9 @@ jQuery(document).ready(function() {
     jQuery(this).toggleClass('fa-angle-down fa-angle-up');
   });
 
-  jQuery('form.woocommerce-widget-layered-nav-dropdown, .widget_price_filter form').submit(function(e) {
-    e.preventDefault();
-  });
+  // jQuery('form.woocommerce-widget-layered-nav-dropdown, .widget_price_filter form').submit(function(e) {
+  //   e.preventDefault();
+  // });
 
   // jQuery('.price_slider_amount button').click(function () {
   //   let url = (location.origin).concat(location.pathname);
