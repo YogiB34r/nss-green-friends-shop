@@ -85,6 +85,11 @@ function gf_register_sidebars() {
             'id'            => 'gf-category-sidebar-product-filters',
             'description'   => 'Category page sidebar (product filters for mobile)',
         ),
+        array(
+            'name'          => __('Sidebar (single product page)', ''.$theme->get('TextDomain').''),
+            'id'            => 'gf-sidebar-single-productpage',
+            'description'   => 'Sidebar (single product page)',
+        ),
     );
 
 
