@@ -86,12 +86,16 @@ function gf_display_offer_notice(){
 
 add_filter( 'woocommerce_get_price_html', 'change_displayed_sale_price_html', 10, 2 );
 function change_displayed_sale_price_html( $price, $product ) {
-    // Only on sale products on frontend and excluding min/max price on variable products
-    if( $product->is_on_sale() && ! is_admin() && ! $product->is_type('variable')){
-        // Get product prices
-        $regular_price = $product->get_regular_price(); // Regular price
-        $sale_price = $product->get_price(); // Active price (the "Sale price" when on-sale)
-
+    // Only on sale products on frontend
+    // Get product prices
+    if( $product->is_on_sale() && ! is_admin()){
+        if ($product->is_type('variable')){
+            $regular_price = $product->get_variation_regular_price(); // Regular price
+            $sale_price = $product->get_price(); // Active price (the "Sale price" when on-sale)
+        }else{
+            $regular_price = $product->get_regular_price(); // Regular price
+            $sale_price = $product->get_price(); // Active price (the "Sale price" when on-sale)
+        }
         // "Saving price" calculation and formatting
         $saving_price = wc_price( $regular_price - $sale_price, ['decimals' => 0 ] );
 
