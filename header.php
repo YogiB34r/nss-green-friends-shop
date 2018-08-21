@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
   <link rel="profile" href="http://gmpg.org/xfn/11">
   <link rel="pingback" href="<?php bloginfo('pingback_url'); ?>">
-
+  <title>NonStopShop.rs - online kupovina -  uvek dobre cene - onlajn prodavnica - prodaja preko interneta - Srbija - Beograd</title>
   <?php wp_head(); ?>
 </head>
 
@@ -25,12 +25,12 @@
               <?php dynamic_sidebar('gf-header-row-2-col-1') ?>
             </div>
           </div>
-          <div class="col-md-5 gf-search">
+          <div class="col-md-6 col-lg-7 gf-search">
             <div class="gf-search-wrapper">
               <?php get_search_form()?>
             </div>
           </div>
-          <div class="col-9 col-md-4 gf-navigation">
+          <div class="col-9 col-md-3 col-lg-2 gf-navigation">
             <div class="gf-navigation-wrapper">
               <?php dynamic_sidebar('gf-header-row-2-col-3')?>
             </div>

@@ -12,7 +12,8 @@ jQuery(document).ready(function() {
   jQuery(document).scroll(function() {
     if (jQuery(window).scrollTop() > siteHeaderHeight) {
       jQuery('.gf-header-logo').css({
-        'max-width': '102px'
+        'max-width': '102px',
+        'top': '0'
       });
     } else {
       jQuery('.gf-header-logo').css({
@@ -21,6 +22,17 @@ jQuery(document).ready(function() {
       jQuery('body.home .gf-header-logo').css({
         'max-width': '235px'
       });
+
+      if (jQuery(window).width() > 767) {
+        jQuery('.gf-header-logo').css({
+          'top': '-42px'
+        });
+      }
+      else {
+        jQuery('.gf-header-logo').css({
+          'top': '0'
+        });
+      }
     }
   });
 
@@ -98,9 +110,9 @@ jQuery(document).ready(function() {
     jQuery(this).toggleClass('fa-angle-down fa-angle-up');
   });
 
-  jQuery('form.woocommerce-widget-layered-nav-dropdown, .widget_price_filter form').submit(function(e) {
-    e.preventDefault();
-  });
+  // jQuery('form.woocommerce-widget-layered-nav-dropdown, .widget_price_filter form').submit(function(e) {
+  //   e.preventDefault();
+  // });
 
   // jQuery('.price_slider_amount button').click(function () {
   //   let url = (location.origin).concat(location.pathname);

@@ -105,6 +105,7 @@ function change_displayed_sale_price_html( $price, $product ) {
     return $price;
 }
 
+
 add_filter( 'woocommerce_product_tabs', 'woo_new_product_tab' );
 function woo_new_product_tab( $tabs ) {
 
@@ -162,3 +163,7 @@ function woo_new_product_tab_content() {
 
 
 remove_action( 'woocommerce_after_single_variation','woocommerce_single_product_summary', 20 );
+
+
+remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_title', 5 );
+add_action('woocommerce_before_single_product','woocommerce_template_single_title', 11 );

@@ -217,7 +217,7 @@ function gf_category_megamenu_shortcode()
     foreach ($product_cat as $parent_product_cat) {
         if ($parent_product_cat['name'] != 'Uncategorized'):
             echo '
-            <ul class="gf-navigation">';
+            <ul class="gf-category-items">';
             $i++;
             if ($i <= $number_of_categories) {
                 echo '<li class="category-item">
