@@ -12,7 +12,8 @@ jQuery(document).ready(function() {
   jQuery(document).scroll(function() {
     if (jQuery(window).scrollTop() > siteHeaderHeight) {
       jQuery('.gf-header-logo').css({
-        'max-width': '102px'
+        'max-width': '102px',
+        'top': '0'
       });
     } else {
       jQuery('.gf-header-logo').css({
@@ -21,6 +22,17 @@ jQuery(document).ready(function() {
       jQuery('body.home .gf-header-logo').css({
         'max-width': '235px'
       });
+
+      if (jQuery(window).width() > 767) {
+        jQuery('.gf-header-logo').css({
+          'top': '-42px'
+        });
+      }
+      else {
+        jQuery('.gf-header-logo').css({
+          'top': '0'
+        });
+      }
     }
   });
 
