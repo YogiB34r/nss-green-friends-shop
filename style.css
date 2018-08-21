@@ -1108,11 +1108,6 @@ body.home .saved-sale {
   width: 50%;
   margin: 0 auto;
 }
-
-.gf-sidebar .widget_gf_social_icons_widget img, .gf-sidebar .widget_gf_social_icons_widget img, .gf-sidebar .widget_gf_social_icons_widget img, .gf-sidebar .widget_media_image img {
-  width: 100%;
-}
-
 .gf-sidebar .widget_gf_social_icons_widget ul li {
   display: block;
 }
@@ -1290,6 +1285,7 @@ body.home .saved-sale {
 .gf-sidebar .widget {
   padding: 10px;
   list-style: none;
+  text-align: center;
 }
 
 .gf-sidebar .widget h3 {
