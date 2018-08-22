@@ -10,49 +10,45 @@ jQuery(document).ready(function() {
   }
 
   jQuery(document).scroll(function() {
-    if (jQuery(window).scrollTop() > siteHeaderHeight) {
-      jQuery('.gf-header-logo').css({
-        'max-width': '102px',
-        'top': '0'
-      });
-    } else {
-      jQuery('.gf-header-logo').css({
-        'max-width': '180px'
-      });
-      jQuery('body.home .gf-header-logo').css({
-        'max-width': '235px'
-      });
-
-      if (jQuery(window).width() > 767) {
-        jQuery('.gf-header-logo').css({
-          'top': '-42px'
-        });
-      }
-      else {
-        jQuery('.gf-header-logo').css({
-          'top': '0'
-        });
-      }
-    }
+    // if (jQuery(window).scrollTop() > siteHeaderHeight) {
+    //   jQuery('.gf-header-logo').css({
+    //     'max-width': '102px',
+    //     'top': '0'
+    //   });
+    // } else {
+    //   jQuery('.gf-header-logo').css({
+    //     'max-width': '180px'
+    //   });
+    //   jQuery('body.home .gf-header-logo').css({
+    //     'max-width': '235px'
+    //   });
+    //
+    //   if (jQuery(window).width() > 767) {
+    //     jQuery('.gf-header-logo').css({
+    //       'top': '-42px'
+    //     });
+    //   }
+    //   else {
+    //     jQuery('.gf-header-logo').css({
+    //       'top': '0'
+    //     });
+    //   }
+    // }
   });
 
   jQuery(document).mouseup(function(e) {
     var category_list_accordion = jQuery('.gf-category-accordion');
-    // var search = jQuery('.search-input-wrapper');
+    var category_list_toggle = jQuery('.gf-category-mobile-toggle');
 
-    if ((!category_list_accordion.is(e.target) && category_list_accordion.has(e.target).length === 0)) {
+    if (category_list_toggle.is(e.target)) {
+      category_list_accordion.slideToggle();
+    }
+    else {
       category_list_accordion.hide();
     }
-    // if (!search.is(e.target) && search.has(e.target).length === 0) {
-    //   if (jQuery('.gf-search-toggle i').hasClass('fa-times')) {
-    //     jQuery('.gf-search-toggle i').toggleClass('fa-times fa-search');
-    //   }
-    //   search.hide();
-    // }
   });
 
-  jQuery('.gf-category-mobile-toggle').click(function() {
-    jQuery('.gf-category-accordion').slideToggle();
+  jQuery('.gf-category-mobile-toggle').click(function(e) {
   });
 
   jQuery('.gf-category-accordion__expander').click(function() {
