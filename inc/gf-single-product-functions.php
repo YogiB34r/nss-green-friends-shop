@@ -137,7 +137,6 @@ function woo_new_product_tab_content() {
 	<ul class='cartText3'>
 		<li>".__('Pozovete broj')." <strong>011/33-34-773 ili 011/33-34-681</strong> (radnim danima od <strong>09-17h</strong>)</li>
 		<li>".__('Navedete operateru kataloške brojeve proizvoda koje naručujete kao i količinu svakog od njih')." </li>
-		<li>".__('Kataloški broj ovog proizvoda je:', 'green-fiends')."<strong>3093024</strong></li>
 		<li>".__('Navedete operateru lične podatke i adresu isporuke')."</li>
 		<li>".__('Ukoliko kupujete kao pravno lice pripremite podatke firme:')."<strong>naziv, adresu i PIB broj</strong></li>
 	</ul>

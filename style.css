@@ -808,13 +808,49 @@ body.home .saved-sale {
 
 .woocommerce-tabs.wc-tabs-wrapper {
   margin-bottom: 45px;
-  border-bottom: solid 1px #d9d9d9;
+}
+
+.product .woocommerce div.product .woocommerce-tabs ul.tabs {
+  padding: 0;
+}
+
+.woocommerce div.product .woocommerce-tabs ul.tabs::before {
+  opacity: 0;
+}
+
+.woocommerce div.product .woocommerce-tabs ul.tabs li.active {
+  background: transparent;
+  border: none;
+}
+
+.woocommerce div.product .woocommerce-tabs ul.tabs li {
+  background: transparent;
+  border: none;
+}
+
+.product .woocommerce div.product .woocommerce-tabs ul.tabs li a {
+  font-weight: 600;
+}
+
+.product .woocommerce div.product .woocommerce-tabs ul.tabs li a:hover {
+  color: #666;
+}
+
+.woocommerce div.product .woocommerce-tabs ul.tabs li.active a,
+.product .woocommerce div.product .woocommerce-tabs ul.tabs li a:hover {
+  color: #f45411 !important;
+}
+
+.woocommerce div.product .woocommerce-tabs ul.tabs li::before,
+.woocommerce div.product .woocommerce-tabs ul.tabs li::after {
+  border-width: 0;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
 }
 
 .woocommerce div.product .woocommerce-tabs .panel {
-  border: solid 1px #d9d9d9;
-  border-top: none;
-  border-bottom: none;
+  border: solid 1px #ccc;
   padding: 30px;
 }
 
@@ -1720,35 +1756,6 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
 
   .gf-category-accordion {
     width: 70%;
-  }
-
-  .product .woocommerce div.product .woocommerce-tabs ul.tabs {
-    padding: 0;
-  }
-
-  .product .woocommerce div.product .woocommerce-tabs ul.tabs li {
-    background-color: transparent;
-    border: none;
-  }
-
-  .product .woocommerce div.product .woocommerce-tabs ul.tabs li a {
-    font-weight: 600;
-  }
-
-  .product .woocommerce div.product .woocommerce-tabs ul.tabs li a:hover {
-    color: #666;
-  }
-
-  .product .woocommerce div.product .woocommerce-tabs ul.tabs li a:hover {
-    color: #f45411;
-  }
-
-  .woocommerce div.product .woocommerce-tabs ul.tabs li::before,
-  .woocommerce div.product .woocommerce-tabs ul.tabs li::after {
-    border-width: 0;
-    border-radius: 0;
-    border: none;
-    box-shadow: none;
   }
 
   .gf-footer-images li img {
