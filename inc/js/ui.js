@@ -88,7 +88,7 @@ jQuery(document).ready(function() {
       menuOffsetTop = 0;
     } else {
       if (menu.height() > linkOffsetTop) {
-        menuOffsetBottom = siteHeader.offset().top + siteHeaderHeight;
+        menuOffsetBottom = menu.height() / 2;
       } else {
         menuOffsetBottom = 0;
       }
