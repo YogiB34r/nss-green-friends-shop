@@ -17,7 +17,6 @@ function wpseo_remove_breadcrumb_link( $link_output , $link ){
 
     return $link_output;
 }
-
 remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_excerpt', 20);
 
 remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_meta', 40);
