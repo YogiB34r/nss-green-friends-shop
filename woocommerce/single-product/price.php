@@ -23,4 +23,4 @@ if ( ! defined( 'ABSPATH' ) ) {
 global $product;
 
 ?>
-<p class="price"><?='<span class="price-text">'.__('Price:&nbsp;').'</span>'.$product->get_price_html().''?></p>
+<p class="price"><?='<span class="price-text">'.__('Cena:&nbsp;').'</span>'.$product->get_price_html().''?></p>
