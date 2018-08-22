@@ -1805,3 +1805,7 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
 .related .saved-sale{
   display: none;
 }
+.price-text {
+  color: #212529;
+  font-size: 1rem;
+}
