@@ -1809,3 +1809,6 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
   color: #212529;
   font-size: 1rem;
 }
+.screen-reader-text {
+  display: none;
+}
