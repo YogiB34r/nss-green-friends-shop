@@ -618,11 +618,21 @@ h1.product_title.entry-title {
 
 body.single-product .summary .price  {
   flex-flow: wrap;
+  justify-content: flex-start;
+}
+
+body.single-product .summary .price ins,
+body.single-product .summary .price del {
+  font-size: 24px;
+}
+
+.summary .price del {
+  color: #454545;
 }
 
 .price del {
   order: 2;
-  color: #454545;
+  color: #888 !important;
   font-size: 1rem;
   text-decoration: none;
 }
@@ -650,7 +660,7 @@ body.single-product .summary del {
 .woocommerce ul.products li.product .price {
   display: flex;
   align-items: initial;
-  color: #454545;
+  color: #ed0f08;
   text-align: center;
   font-weight: 600;
   margin: 20px 0;
@@ -659,11 +669,6 @@ body.single-product .summary del {
 
 .woocommerce ul.products li.product ins .price {
   font-size: 1.3rem;
-}
-
-.woocommerce ul.products li.product .price:first-child {
-  color: #e8e8e8;
-  text-align: center;
 }
 
 .woocommerce ul.products li.product .button,
@@ -1351,6 +1356,7 @@ body.home .gf-wrapper-before {
 
 .widget_gf_social_icons_widget {
   border-top: solid 30px #627aad;
+  text-align: left;
 }
 
 .widget#text-5 {
