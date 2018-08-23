@@ -44,13 +44,14 @@ strong {
 }
 
 .gf-top-bar {
-  background-color: #1D1D1D;
+  background-color: #1d1d1d;
   color: white;
   padding: 14px 0;
+  min-width: 100%;
 }
 
 .gf-top-bar__container {
-  min-width: 80%;
+  width: 95%;
   display: flex;
   margin: 0 auto;
 }
@@ -86,8 +87,8 @@ strong {
 
 .gf-primary-navigation {
   height: 70px;
+  width: 95%;
   align-items: center;
-  width: 80%;
   margin: 0 auto;
 }
 
@@ -354,7 +355,7 @@ img.gf-header-logo {
 /* main-content */
 
 .gf-main-content-container {
-  width: 80%;
+  width: 95%;
   margin: 0 auto;
   padding: 0 15px;
 }
@@ -1565,6 +1566,14 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
 }
 
 /* media queries */
+
+@media only screen and (min-width: 1200px) {
+  .gf-primary-navigation,
+  .gf-main-content-container {
+    width: 1156px;
+  }
+}
+
 @media only screen and (max-width: 1200px) {
   .gf-product-controls {
     flex-flow: column;
@@ -1600,12 +1609,6 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
 }
 
 @media only screen and (max-width: 1200px) and (min-width: 767px) {
-
-  .gf-primary-navigation,
-  .gf-main-content-container {
-    width: 90%;
-  }
-
   .woocommerce-account .woocommerce-MyAccount-navigation {
     width: 100%;
   }
@@ -1616,10 +1619,28 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
   }
 }
 
+@media only screen and (max-width: 1200px) and (min-width: 992px) {
+  .gf-primary-navigation,
+  .gf-main-content-container {
+    width: 956px;
+  }
+}
+
+@media only screen and (max-width: 992px) and (min-width: 767px) {
+  .gf-primary-navigation,
+  .gf-main-content-container {
+    width: 736px;
+  }
+}
+
 @media only screen and (max-width: 767px) {
 
   #wpadminbar {
     position: fixed;
+  }
+
+  .gf-main-content-container {
+    width: 95%;
   }
 
   .gf-logo-wrapper {
@@ -1749,10 +1770,6 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
 }
 
 @media only screen and (max-width: 576px) {
-  .gf-main-content-container {
-    width: 95%;
-  }
-
   .widget_gf_image_banners_widget {
     display: block;
   }
