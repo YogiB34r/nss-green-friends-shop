@@ -30,7 +30,7 @@ function change_existing_currency_symbol( $currency_symbol, $currency ) {
 /**
  * Show out of stock items last.
  */
-add_filter('posts_clauses', 'order_by_stock_status');
+//add_filter('posts_clauses', 'order_by_stock_status');
 //add_filter('pre_get_posts', 'order_by_stock_status');
 function order_by_stock_status($posts_clauses) {
     global $wpdb;
