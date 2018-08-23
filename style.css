@@ -626,6 +626,7 @@ h1.product_title.entry-title {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
+  margin-bottom: 20px;
 }
 
 body.single-product .summary .price  {
@@ -766,10 +767,12 @@ body.home .saved-sale {
 
 .woocommerce div.product form.cart,
 .woocommerce div.product form.variations_form.cart {
+  margin: 20px 0 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px;
+  flex-flow: column;
+  padding: 10px;
 }
 
 .woocommerce div.product form.cart {
@@ -1187,6 +1190,7 @@ body.home .gf-wrapper-before {
 }
 .gf-sidebar .widget_gf_social_icons_widget ul li {
   display: block;
+  text-align: left;
 }
 
 .widget_gf_social_icons_widget h2.widgettitle {
@@ -1769,10 +1773,6 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
   .add_to_cart_button,
   a.added_to_cart.wc-forward {
     font-size: 0.8em;
-  }
-
-  .price {
-    margin-bottom: 20px;
   }
 
   .price del,

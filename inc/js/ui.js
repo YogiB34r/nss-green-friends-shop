@@ -70,6 +70,7 @@ jQuery(document).ready(function() {
     var half_a_screen = jQuery(window).height() / 2;
     var currentLink = jQuery(this);
     var menu = currentLink.next();
+	  var firstLinkOffsetTop = currentLink.parent().parent().parent().find('a:first-child').offset().top;
 
     currentLink.next().css({
       top: 'unset',
@@ -85,17 +86,17 @@ jQuery(document).ready(function() {
     var menuOffsetLeft = currentLink.width();
 
     if (linkOffsetTop < half_a_screen) {
-      menuOffsetTop = 0;
+      menuOffsetTop = 0 + 'px';
     } else {
-      if (menu.height() > linkOffsetTop) {
-        menuOffsetBottom = menu.height() / 2;
+      if (menu.height() > linkOffsetTop - firstLinkOffsetTop) {
+        menuOffsetTop = '-' + (linkOffsetTop - firstLinkOffsetTop) + 'px';
       } else {
         menuOffsetBottom = 0;
       }
     }
     currentLink.next().css({
       position: "absolute",
-      top: menuOffsetTop + 'px',
+      top: menuOffsetTop,
       bottom: '-' + menuOffsetBottom + 'px',
       left: menuOffsetLeft + 'px'
     });
