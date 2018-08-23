@@ -15,8 +15,11 @@
     <header id="masthead" class="site-header" role="banner">
       <div class="container-fluid container--navigation">
         <div class="row gf-top-bar">
-          <div class="gf-top-bar__container">
-            <?php dynamic_sidebar('gf-header-row-1') ?>
+          <div class="row gf-top-bar__container">
+            <div class="col-3"></div>
+            <div class="col-9 gf-top-bar__menu">
+              <?php dynamic_sidebar('gf-header-row-1') ?>
+            </div>
           </div>
         </div>
         <div class="row gf-primary-navigation">
