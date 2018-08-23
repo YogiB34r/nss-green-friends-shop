@@ -40,7 +40,7 @@ strong {
   z-index: 2000;
   background: #fff;
   box-shadow: 0 0 7px rgba(0, 0, 0, 0.8);
-  overflow: hidden;
+  overflow: visible;
 }
 
 .gf-top-bar {
