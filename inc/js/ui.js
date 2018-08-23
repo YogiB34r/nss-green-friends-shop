@@ -43,7 +43,7 @@ jQuery(document).ready(function() {
     if (category_list_toggle.is(e.target)) {
       category_list_accordion.slideToggle();
     }
-    else {
+    else if(category_list_accordion.has(e.target).length === 0) {
       category_list_accordion.hide();
     }
   });

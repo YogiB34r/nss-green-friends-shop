@@ -40,6 +40,7 @@ strong {
   z-index: 2000;
   background: #fff;
   box-shadow: 0 0 7px rgba(0, 0, 0, 0.8);
+  overflow: hidden;
 }
 
 .gf-top-bar {
@@ -572,9 +573,20 @@ h1.product_title.entry-title {
   color: #f45411;
 }
 
-.woocommerce .products ul,
-.woocommerce ul.products {
+.woocommerce ul.products.grid {
   margin: 20px 0;
+  display: flex !important;
+  flex-wrap: wrap;
+}
+
+.woocommerce ul.products.list {
+  margin: 20px 0;
+  display: block !important;
+}
+
+.woocommerce-page ul.products.grid li {
+  display: flex;
+  flex-flow: column;
 }
 
 .pswp__bg {
@@ -659,6 +671,7 @@ body.single-product .summary del {
 
 .woocommerce ul.products li.product .price {
   display: flex;
+  flex-wrap: wrap;
   align-items: initial;
   color: #ed0f08;
   text-align: center;
@@ -669,6 +682,12 @@ body.single-product .summary del {
 
 .woocommerce ul.products li.product ins .price {
   font-size: 1.3rem;
+}
+
+.woocommerce ul.products.grid .gridlist-buttonwrap {
+	width: 100%;
+  align-self: flex-end;
+  margin: auto 0 0;
 }
 
 .woocommerce ul.products li.product .button,
@@ -690,7 +709,7 @@ a.added_to_cart.wc-forward {
 }
 
 
-ul.list .woocommerce ul.products li.product .button,
+ul.list ul.products li.product .button,
 ul.list .add_to_cart_button,
 ul.list a.added_to_cart.wc-forward {
   margin: 1em auto 1em 0 !important;
@@ -720,8 +739,16 @@ a.added_to_cart.wc-forward {
 }
 
 .woocommerce #content div.product div.summary p, .woocommerce div.product div.summary p, .woocommerce-page #content div.product div.summary p, .woocommerce-page div.product div.summary p, .saved-sale {
+}
+
+ul.grid .saved-sale {
+  margin: 0;
   margin-top: 10px;
   margin-bottom: 20px;
+}
+
+ul.list .saved-sale {
+  margin: 0;
 }
 
 .saved-sale {
@@ -753,7 +780,7 @@ body.home .saved-sale {
   display: none;
 }
 
-.woocommerce div.product form.variations_form.cart {
+.site-main .woocommerce div.product form.variations_form.cart {
 	display: flex;
 	align-items: flex-start;
 	justify-content: space-between;
@@ -1733,6 +1760,7 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
   .gf-entry-content {
     padding: 30px 0;
   }
+
   .gf-inner-navigation__link {
     font-size: 14px;
   }
@@ -1741,6 +1769,15 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
   .add_to_cart_button,
   a.added_to_cart.wc-forward {
     font-size: 0.8em;
+  }
+
+  .price {
+    margin-bottom: 20px;
+  }
+
+  .price del,
+  .price ins {
+    font-size: 1rem;
   }
 
   .gf-footer-images li img{
