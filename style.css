@@ -1525,13 +1525,15 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__submit {
   font-weight: 700;
   width: 50%;
 }
+
 body.home .widget_gf_newsletter_widget .gf-newsletter__submit:hover{
-  background-color: #ccc;
+  background-color: #f45411;
+  border-color: #fff;
 }
+
 body.home .widget_gf_newsletter_widget .gf-newsletter__title{
   display: none;
 }
-
 
 .site-footer .gf-newsletter__title, .site-footer .gf-newsletter__subtitle, .site-footer .gf-newsletter__submit {
   font-weight: 600;
