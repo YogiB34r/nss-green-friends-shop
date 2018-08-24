@@ -385,7 +385,7 @@ img.gf-header-logo {
 }
 
 .gf-page-header__breadcrumb {
-  padding: 10px 0 10px;
+  padding: 0 0 10px;
   margin: 0;
   margin-bottom: 20px;
   color: #f45411;
@@ -464,7 +464,7 @@ img.gf-header-logo {
 /* woocommerce overrides */
 .woocommerce .woocommerce-breadcrumb {
   color: #f45411;
-  padding: 10px 0 10px;
+  padding: 0 0 10px;
 }
 
 .woocommerce .woocommerce-breadcrumb a {
