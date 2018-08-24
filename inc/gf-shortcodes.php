@@ -105,108 +105,112 @@ function gf_cart_shortcode()
 add_shortcode('gf-category-mobile', 'gf_category_mobile_toggle_shortcode');
 function gf_category_mobile_toggle_shortcode()
 {
-    echo '<div class="gf-category-mobile-toggle">Kategorije</div>';
-    $product_cat_raw = get_terms(array('parent' => 0, 'taxonomy' => 'product_cat'));
-    $product_cat = [];
-    foreach ($product_cat_raw as $cat) {
-        $product_cat[] = array(
-            'name' => $cat->name,
-            'term_id' => $cat->term_id
-        );
-    }
-    $number_of_categories = 20;
-    if (!empty(get_option('filter_fields_order'))) {
-        $product_cat = get_option('filter_fields_order');
-        $number_of_categories = esc_attr(get_option('number_of_categories_in_sidebar'));
-    }
-    $i = 0;
-    echo '<div class="gf-category-accordion">';
-    foreach ($product_cat as $parent_product_cat) {
-        if ($parent_product_cat['name'] != 'Gf-slider' && $parent_product_cat['name'] != 'Uncategorized'):
-            $i++;
-            if ($i <= $number_of_categories) {
-                echo '<div class="gf-category-accordion__item gf-category-accordion__item--main">
+    if (wp_is_mobile()) {
+        echo '<div class="gf-category-mobile-toggle">Kategorije</div>';
+        $product_cat_raw = get_terms(array('parent' => 0, 'taxonomy' => 'product_cat'));
+        $product_cat = [];
+        foreach ($product_cat_raw as $cat) {
+            $product_cat[] = array(
+                'name' => $cat->name,
+                'term_id' => $cat->term_id
+            );
+        }
+        $number_of_categories = 20;
+        if (!empty(get_option('filter_fields_order'))) {
+            $product_cat = get_option('filter_fields_order');
+            $number_of_categories = esc_attr(get_option('number_of_categories_in_sidebar'));
+        }
+        $i = 0;
+        echo '<div class="gf-category-accordion">';
+        foreach ($product_cat as $parent_product_cat) {
+            if ($parent_product_cat['name'] != 'Gf-slider' && $parent_product_cat['name'] != 'Uncategorized'):
+                $i++;
+                if ($i <= $number_of_categories) {
+                    echo '<div class="gf-category-accordion__item gf-category-accordion__item--main">
                         <a tabindex="-1" href="' . get_term_link((int)$parent_product_cat['term_id']) . '">' . $parent_product_cat['name'] . '</a>
                         <i class="gf-category-accordion__expander fas fa-plus"></i>';
-                $child_args = array(
-                    'taxonomy' => 'product_cat',
-                    'hide_empty' => false,
-                    'parent' => $parent_product_cat['term_id']
-                );
-                $child_product_cats = get_terms($child_args);
-
-                foreach ($child_product_cats as $child_product_cat) {
-                    $child_child_args = array('taxonomy' => 'product_cat',
+                    $child_args = array(
+                        'taxonomy' => 'product_cat',
                         'hide_empty' => false,
-                        'parent' => $child_product_cat->term_id
+                        'parent' => $parent_product_cat['term_id']
                     );
-                    $child_child_product_cats = get_terms($child_child_args);
-                    echo '<div class="gf-category-accordion__item gf-category-accordion__subitem mt-sm">
+                    $child_product_cats = get_terms($child_args);
+
+                    foreach ($child_product_cats as $child_product_cat) {
+                        $child_child_args = array('taxonomy' => 'product_cat',
+                            'hide_empty' => false,
+                            'parent' => $child_product_cat->term_id
+                        );
+                        $child_child_product_cats = get_terms($child_child_args);
+                        echo '<div class="gf-category-accordion__item gf-category-accordion__subitem mt-sm">
                               <a class="" href="' . get_term_link($child_product_cat->term_id) . '">' . $child_product_cat->name . '</a>
                               <i class="gf-category-accordion__expander fas fa-plus"></i>';
-                    foreach ($child_child_product_cats as $child_child_product_cat) {
-                        echo '<div class="gf-category-accordion__item gf-category-accordion__item--last">
+                        foreach ($child_child_product_cats as $child_child_product_cat) {
+                            echo '<div class="gf-category-accordion__item gf-category-accordion__item--last">
                                 <a class="" href="' . get_term_link($child_child_product_cat->term_id) . '">' . $child_child_product_cat->name . '</a>
                               </div>';
+                        }
+                        echo '</div>';
                     }
                     echo '</div>';
-                }
-                echo '</div>';
-            };
-        endif;
+                };
+            endif;
+        }
+        echo '</div>';
     }
-    echo '</div>';
 }
 
 add_shortcode('gf-mobile-nav-menu', 'gf_mobile_nav_menu_shortcode');
 function gf_mobile_nav_menu_shortcode()
 {
-    echo '<div class="gf-hamburger-menu"><i class="fas fa-bars"></i></div>';
+    if (wp_is_mobile()) {
+        echo '<div class="gf-hamburger-menu"><i class="fas fa-bars"></i></div>';
 
-    echo '<div class="gf-mobile-menu">';
-    global $woocommerce ?>
-    <li class="gf-mobile-menu__link">
-        <a class="gf-header-cart" href="<?php echo wc_get_cart_url(); ?>"
-           title="<?php _e('Cart View', 'green-friends'); ?>">
-            Korpa(<?php echo sprintf(_n('%d', '%d', $woocommerce->cart->cart_contents_count, 'woothemes'), $woocommerce->cart->cart_contents_count); ?>
-            )
-        </a>
-    </li>
-    <li class="gf-mobile-menu__link">
-        <?php
-        $myaccount_page = get_option('woocommerce_myaccount_page_id');
-        if ($myaccount_page) {
-            $myaccount_page_url = get_permalink($myaccount_page);
-        }
-        echo '<a href=" ' . $myaccount_page_url . '">' . __('Moj nalog') . '</a>';
-        ?>
-    </li>
-    <li class="gf-mobile-menu__link">
-        <?php
-        $menu_items = wp_get_nav_menu_items('Topbar');
-        foreach ($menu_items as $menu_item) {
-            if (is_user_logged_in() && $menu_item->post_title == 'Log Out') {
-                echo '<a href="' . $menu_item->url . '">' . $menu_item->post_title . '</a>';
+        echo '<div class="gf-mobile-menu">';
+        global $woocommerce ?>
+        <li class="gf-mobile-menu__link">
+            <a class="gf-header-cart" href="<?php echo wc_get_cart_url(); ?>"
+               title="<?php _e('Cart View', 'green-friends'); ?>">
+                Korpa(<?php echo sprintf(_n('%d', '%d', $woocommerce->cart->cart_contents_count, 'woothemes'), $woocommerce->cart->cart_contents_count); ?>
+                )
+            </a>
+        </li>
+        <li class="gf-mobile-menu__link">
+            <?php
+            $myaccount_page = get_option('woocommerce_myaccount_page_id');
+            if ($myaccount_page) {
+                $myaccount_page_url = get_permalink($myaccount_page);
             }
-            if (!is_user_logged_in() && $menu_item->post_title != 'Log Out') {
-                echo '<a href="' . $menu_item->url . '">' . $menu_item->post_title . '</a>';
+            echo '<a href=" ' . $myaccount_page_url . '">' . __('Moj nalog') . '</a>';
+            ?>
+        </li>
+        <li class="gf-mobile-menu__link">
+            <?php
+            $menu_items = wp_get_nav_menu_items('Topbar');
+            foreach ($menu_items as $menu_item) {
+                if (is_user_logged_in() && $menu_item->post_title == 'Log Out') {
+                    echo '<a href="' . $menu_item->url . '">' . $menu_item->post_title . '</a>';
+                }
+                if (!is_user_logged_in() && $menu_item->post_title != 'Log Out') {
+                    echo '<a href="' . $menu_item->url . '">' . $menu_item->post_title . '</a>';
+                }
             }
-        }
-        ?>
-    </li>
-    <?php
-    echo '</div>';
+            ?>
+        </li>
+        <?php
+        echo '</div>';
+    }
 }
 
 // Category sidebar
 add_shortcode('gf-category-megamenu', 'gf_category_megamenu_shortcode');
 function gf_category_megamenu_shortcode()
 {
-    $gf_slider_id='';
-    if (get_term_by('slug', 'gf-slider', 'product_cat')){
+    $gf_slider_id = '';
+    if (get_term_by('slug', 'gf-slider', 'product_cat')) {
         $gf_slider_id = get_term_by('slug', 'gf-slider', 'product_cat')->term_id;
     }
-    $product_cat_raw = get_terms(array('parent' => 0, 'taxonomy' => 'product_cat','exclude_tree'=>$gf_slider_id));
+    $product_cat_raw = get_terms(array('parent' => 0, 'taxonomy' => 'product_cat', 'exclude_tree' => $gf_slider_id));
     $product_cat = [];
     foreach ($product_cat_raw as $cat) {
         $product_cat[] = array(
