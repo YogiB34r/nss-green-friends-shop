@@ -502,6 +502,15 @@ h1.product_title.entry-title {
   flex-flow: row;
 }
 
+.gf-product-controls--bottom {
+  justify-content: flex-start;
+
+}
+
+.gf-product-controls--bottom form.woocommerce-ordering {
+  margin-left: 0;
+}
+
 .woocommerce .woocommerce-result-count {
   color: #666;
   order: 1;
@@ -1017,6 +1026,11 @@ body.home .saved-sale {
 .widget_layered_nav,
 .widget_price_filter {
   margin: 20px 0;
+}
+
+.widget_price_filter {
+  margin-top: 0;
+  padding-top: 0;
 }
 
 .woocommerce .widget_price_filter .price_slider_wrapper .ui-widget-content {
