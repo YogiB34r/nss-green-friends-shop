@@ -369,10 +369,6 @@ img.gf-header-logo {
   padding: 25px 0 25px 25px;
 }
 
-body.home .gf-content-wrapper {
-  padding-left: 0;
-}
-
 .gf-row {
   padding: 0 15px;
   justify-content: center;
@@ -496,8 +492,8 @@ h1.product_title.entry-title {
 }
 
 .woocommerce-product-gallery__trigger {
-  height: 100%;
-  width: 100%;
+  height: 100% !important;
+  width: 100% !important;
   opacity: 0;
 }
 
