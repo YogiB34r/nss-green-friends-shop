@@ -877,7 +877,7 @@ body.home .saved-sale {
   margin-bottom: 45px;
 }
 
-.product .woocommerce div.product .woocommerce-tabs ul.tabs {
+.woocommerce div.product .woocommerce-tabs ul.tabs {
   padding: 0;
   margin: 0 0 10px;
 }
@@ -1187,7 +1187,7 @@ body.home .saved-sale {
   background: #fff;
 }
 
-body.home .gf-wrapper-before {
+.gf-wrapper-before {
   padding-top: 25px;
 }
 
