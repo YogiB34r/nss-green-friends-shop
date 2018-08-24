@@ -1914,5 +1914,5 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
 }
 
 #to_top_scrollup {
-  background-color: #666;
+  background-color: #666 !important;
 }
