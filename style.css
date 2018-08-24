@@ -689,7 +689,6 @@ body.single-product .summary .price del {
   order: 2;
   color: #888 !important;
   font-size: 1rem;
-  text-decoration: none;
 }
 
 .price ins {
@@ -1028,7 +1027,7 @@ body.home .saved-sale {
   margin: 20px 0;
 }
 
-.widget_price_filter {
+.gf-sidebar .widget.widget_price_filter {
   margin-top: 0;
   padding-top: 0;
 }
