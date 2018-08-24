@@ -1,21 +1,24 @@
 <?php
 add_shortcode('gf-footer-credits', 'gf_footer_credits_shortcode');
-function gf_footer_credits_shortcode() {
+function gf_footer_credits_shortcode()
+{
     echo get_bloginfo('name') . ' ' . date('Y');
 }
 
 add_shortcode('gf-my-account-link', 'gf_my_account_link_shortcode');
-function gf_my_account_link_shortcode() {
+function gf_my_account_link_shortcode()
+{
     $myaccount_page = get_option('woocommerce_myaccount_page_id');
     if ($myaccount_page) {
         $myaccount_page_url = get_permalink($myaccount_page);
     }
 
-    echo '<div class="gf-my-account"><a href=" ' . $myaccount_page_url . '"><i class="fas fa-user"></i> '.__('Moj nalog').'</a></div>';
+    echo '<div class="gf-my-account"><a href=" ' . $myaccount_page_url . '"><i class="fas fa-user"></i> ' . __('Moj nalog') . '</a></div>';
 }
 
 add_shortcode('gf-category-dropdown', 'gf_category_dropdown_shortcode');
-function gf_category_dropdown_shortcode() {
+function gf_category_dropdown_shortcode()
+{
     $cat_args = array(
         'orderby' => 'term_group',
         'order' => 'asc',
@@ -31,7 +34,7 @@ function gf_category_dropdown_shortcode() {
           <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <i class="fas fa-bars"></i>
-            '._e('Categories' , 'green-friends').'
+            ' . _e('Categories', 'green-friends') . '
           </button>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">';
         foreach ($product_categories as $category) {
@@ -42,7 +45,8 @@ function gf_category_dropdown_shortcode() {
 }
 
 add_shortcode('gf-product-search', 'gf_product_search_shortcode');
-function gf_product_search_shortcode() {
+function gf_product_search_shortcode()
+{
     ?>
     <form class="form-inline row" name="gf-search-header" method="POST" action="<?php echo home_url(); ?>">
         <?php if (class_exists('WooCommerce')) : ?>
@@ -85,7 +89,8 @@ function gf_product_search_shortcode() {
 }
 
 add_shortcode('gf-cart', 'gf_cart_shortcode');
-function gf_cart_shortcode() {
+function gf_cart_shortcode()
+{
     global $woocommerce ?>
     <a class="gf-header-cart" href="<?php echo wc_get_cart_url(); ?>"
        title="<?php _e('Cart View', 'green-friends'); ?>">
@@ -98,18 +103,19 @@ function gf_cart_shortcode() {
 }
 
 add_shortcode('gf-category-mobile', 'gf_category_mobile_toggle_shortcode');
-function gf_category_mobile_toggle_shortcode() {
+function gf_category_mobile_toggle_shortcode()
+{
     echo '<div class="gf-category-mobile-toggle">Kategorije</div>';
     $product_cat_raw = get_terms(array('parent' => 0, 'taxonomy' => 'product_cat'));
     $product_cat = [];
-    foreach($product_cat_raw as $cat){
+    foreach ($product_cat_raw as $cat) {
         $product_cat[] = array(
             'name' => $cat->name,
             'term_id' => $cat->term_id
         );
     }
     $number_of_categories = 20;
-    if(!empty(get_option('filter_fields_order'))){
+    if (!empty(get_option('filter_fields_order'))) {
         $product_cat = get_option('filter_fields_order');
         $number_of_categories = esc_attr(get_option('number_of_categories_in_sidebar'));
     }
@@ -153,28 +159,30 @@ function gf_category_mobile_toggle_shortcode() {
 }
 
 add_shortcode('gf-mobile-nav-menu', 'gf_mobile_nav_menu_shortcode');
-function gf_mobile_nav_menu_shortcode() {
-  echo '<div class="gf-hamburger-menu"><i class="fas fa-bars"></i></div>';
+function gf_mobile_nav_menu_shortcode()
+{
+    echo '<div class="gf-hamburger-menu"><i class="fas fa-bars"></i></div>';
 
-  echo '<div class="gf-mobile-menu">';
+    echo '<div class="gf-mobile-menu">';
     global $woocommerce ?>
     <li class="gf-mobile-menu__link">
-      <a class="gf-header-cart" href="<?php echo wc_get_cart_url(); ?>"
-         title="<?php _e('Cart View', 'green-friends'); ?>">
-         Korpa(<?php echo sprintf(_n('%d', '%d', $woocommerce->cart->cart_contents_count, 'woothemes'), $woocommerce->cart->cart_contents_count); ?>)
-      </a>
+        <a class="gf-header-cart" href="<?php echo wc_get_cart_url(); ?>"
+           title="<?php _e('Cart View', 'green-friends'); ?>">
+            Korpa(<?php echo sprintf(_n('%d', '%d', $woocommerce->cart->cart_contents_count, 'woothemes'), $woocommerce->cart->cart_contents_count); ?>
+            )
+        </a>
     </li>
     <li class="gf-mobile-menu__link">
-      <?php
+        <?php
         $myaccount_page = get_option('woocommerce_myaccount_page_id');
         if ($myaccount_page) {
             $myaccount_page_url = get_permalink($myaccount_page);
         }
-        echo '<a href=" ' . $myaccount_page_url . '">'.__('Moj nalog').'</a>';
-      ?>
+        echo '<a href=" ' . $myaccount_page_url . '">' . __('Moj nalog') . '</a>';
+        ?>
     </li>
     <li class="gf-mobile-menu__link">
-      <?php
+        <?php
         $menu_items = wp_get_nav_menu_items('Topbar');
         foreach ($menu_items as $menu_item) {
             if (is_user_logged_in() && $menu_item->post_title == 'Log Out') {
@@ -184,27 +192,31 @@ function gf_mobile_nav_menu_shortcode() {
                 echo '<a href="' . $menu_item->url . '">' . $menu_item->post_title . '</a>';
             }
         }
-      ?>
+        ?>
     </li>
     <?php
-  echo '</div>';
+    echo '</div>';
 }
 
 // Category sidebar
 add_shortcode('gf-category-megamenu', 'gf_category_megamenu_shortcode');
 function gf_category_megamenu_shortcode()
 {
-    $product_cat_raw = get_terms(array('parent' => 0, 'taxonomy' => 'product_cat'));
+    $gf_slider_id='';
+    if (get_term_by('slug', 'gf-slider', 'product_cat')){
+        $gf_slider_id = get_term_by('slug', 'gf-slider', 'product_cat')->term_id;
+    }
+    $product_cat_raw = get_terms(array('parent' => 0, 'taxonomy' => 'product_cat','exclude_tree'=>$gf_slider_id));
     $product_cat = [];
-    foreach($product_cat_raw as $cat){
+    foreach ($product_cat_raw as $cat) {
         $product_cat[] = array(
-                'name' => $cat->name,
-                'term_id' => $cat->term_id,
-                'slug' => $cat->slug,
+            'name' => $cat->name,
+            'term_id' => $cat->term_id,
+            'slug' => $cat->slug,
         );
     }
     $number_of_categories = 10;
-    if(!empty(get_option('filter_fields_order'))){
+    if (!empty(get_option('filter_fields_order'))) {
         $product_cat = get_option('filter_fields_order');
         $number_of_categories = esc_attr(get_option('number_of_categories_in_sidebar'));
     }
@@ -216,14 +228,15 @@ function gf_category_megamenu_shortcode()
 		       <div class="gf-navblock">';
     foreach ($product_cat as $parent_product_cat) {
         if ($parent_product_cat['name'] != 'Uncategorized'):
+            $i++;
             echo '
             <ul class="gf-category-items">';
-            $i++;
             if ($i <= $number_of_categories) {
                 echo '<li class="category-item">
-                <a tabindex="-1" href="' . get_term_link((int)$parent_product_cat['term_id']) . '">' . $parent_product_cat['name'] . '</a>
-                <div class="mega-menu row z-depth-1 primary-color-dark" aria-labelledby="navbarDropdownMenuLink2">
-                  <div class="row mega-menu__row">';
+                        <a tabindex="-1" href="' . get_term_link((int)$parent_product_cat['term_id']) . '">
+                             ' . $parent_product_cat['name'] . '</a>
+                     <div class="mega-menu row z-depth-1 primary-color-dark" aria-labelledby="navbarDropdownMenuLink2">
+                        <div class="row mega-menu__row">';
                 $child_args = array(
                     'taxonomy' => 'product_cat',
                     'hide_empty' => false,

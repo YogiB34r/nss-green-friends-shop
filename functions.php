@@ -46,19 +46,24 @@ function change_existing_currency_symbol($currency_symbol, $currency)
 //    }
 //    return $posts_clauses;
 //}
-function gf_get_categories()
+function gf_get_categories($exlcude=array())
 {
     $args = array(
         'orderby' => 'name',
         'order' => 'asc',
         'hide_empty' => false,
+        'exclude'=> $exlcude,
     );
     $product_cats = get_terms('product_cat', $args);
     return $product_cats;
 }
-function gf_get_top_level_categories(){
+function gf_get_top_level_categories($exclude=array()){
     $top_level_categories =[];
-    foreach (gf_get_categories() as $category){
+    $param = '';
+    if (isset($exclude)){
+        $param = $exclude;
+    }
+    foreach (gf_get_categories($param) as $category){
         if (!$category->parent){
             $top_level_categories[]= $category;
         }
