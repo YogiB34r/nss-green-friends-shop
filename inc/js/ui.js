@@ -107,6 +107,16 @@ jQuery(document).ready(function() {
     jQuery(this).toggleClass('fa-angle-down fa-angle-up');
   });
 
+  if (jQuery('body').is('.archive, .single-product')) {
+    jQuery('.gf-wrapper-before span').toggleClass('fa-angle-down fa-angle-up');
+    jQuery('.gf-navblock').toggle();
+  }
+
+  jQuery('.gf-wrapper-before').click(function() {
+    jQuery('.gf-navblock').slideToggle();
+    jQuery('.gf-wrapper-before span').toggleClass('fa-angle-down fa-angle-up');
+  });
+
   // jQuery('form.woocommerce-widget-layered-nav-dropdown, .widget_price_filter form').submit(function(e) {
   //   e.preventDefault();
   // });
