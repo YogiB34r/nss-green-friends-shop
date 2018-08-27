@@ -2,7 +2,10 @@
 <div class="row">
   <div class="col-3 gf-sidebar gf-left-sidebar">
     <div class="gf-left-sidebar-wrapper">
-      <div class="gf-wrapper-before"></div>
+      <div class="gf-wrapper-before">
+        <div class="gf-category-sidebar-toggle">Kategorije</div>
+        <span class="fas fa-angle-up"></span>
+      </div>
       <?php dynamic_sidebar('gf-left-sidebar'); ?>
     </div>
   </div>
