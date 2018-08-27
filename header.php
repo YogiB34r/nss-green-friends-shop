@@ -18,7 +18,7 @@
           <div class="row gf-top-bar__container">
             <div class="col-3"></div>
             <div class="col-9 gf-top-bar__menu">
-              <?php dynamic_sidebar('gf-header-row-1') ?>
+              <?php dynamic_sidebar('gf-header-row-1') ;?>
             </div>
           </div>
         </div>

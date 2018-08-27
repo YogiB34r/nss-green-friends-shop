@@ -146,3 +146,19 @@ function order_by_stock_status($posts_clauses) {
     }
     return $posts_clauses;
 }
+//ne brisati ovo zatrebace mozda <3 Vlada
+//function advanced_search_query($query) {
+//
+//    if($query->is_search()) {
+//        // category terms search.
+//        if (isset($_GET['search-checkbox']) && !empty($_GET['search-checkbox']) && $_GET['search-checkbox'] != 'shop') {
+//            $query->set('tax_query', array(array(
+//                'taxonomy' => 'product_cat',
+//                'field' => 'slug',
+//                'terms' => array($_GET['search-checkbox']))
+//            ));
+//        }
+//    }
+//    return $query;
+//}
+//add_action('pre_get_posts', 'advanced_search_query', 1000);
