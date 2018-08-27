@@ -1,7 +1,10 @@
 <div class="row">
     <div class="col-3 list-unstyled gf-sidebar">
       <div class="gf-left-sidebar-wrapper">
-        <div class="gf-wrapper-before"></div>
+        <div class="gf-wrapper-before">
+          <div class="gf-category-sidebar-toggle">Kategorije</div>
+          <span class="fas fa-angle-up"></span>
+        </div>
         <?php dynamic_sidebar('gf-category-sidebar')?>
       </div>
     </div>
@@ -47,7 +50,7 @@
             <div class="gf-product-filters-mobile-wrapper">
                 <?php dynamic_sidebar('gf-category-sidebar-product-filters');?>
             </div>
-            
+
             <?php
             /**
              * Hook: woocommerce_archive_description.
