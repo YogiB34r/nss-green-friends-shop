@@ -218,89 +218,76 @@ function gf_category_megamenu_shortcode()
     $parent_cats = [];
     $child_cats = [];
     $childs_of_child = [];
-    foreach (gf_get_top_level_categories($gf_slider_id, $uncategorized_id) as $cat) {
-        if (empty(get_term_children($cat->term_id, 'product_cat'))) {
-            $product_cats[] = (array)$cat;
-        } else {
-            $product_cats[] = (array)$cat;
-            foreach (get_term_children($cat->term_id, 'product_cat') as $second_level_cat) {
-                if (gf_check_level_of_category($second_level_cat) == 2) {
-                    if (empty(get_term_children($second_level_cat, 'product_cat'))) {
-                        $product_cats[] = (array)get_term($second_level_cat, 'product_cat');
-                    } else {
-                        $product_cats[] = (array)get_term($second_level_cat, 'product_cat');
-                        foreach (get_term_children($second_level_cat, 'product_cat') as $third_level_cat) {
-                            $product_cats[] = (array)get_term($third_level_cat, 'product_cat');
+    $number_of_categories = 10;
+    if (!empty(get_option('filter_fields_order'))) {
+        $product_cats_array = get_option('filter_fields_order');
+        foreach ($product_cats_array as $product_cat) {
+            $product_cats[] = get_term($product_cat['term_id']);
+        }
+        $number_of_categories = esc_attr(get_option('number_of_categories_in_sidebar'));
+    } else{
+        foreach (gf_get_top_level_categories($gf_slider_id, $uncategorized_id) as $cat) {
+            if (empty(get_term_children($cat->term_id, 'product_cat'))) {
+                $product_cats[] = $cat;
+            } else {
+                $product_cats[] = $cat;
+                foreach (get_term_children($cat->term_id, 'product_cat') as $second_level_cat) {
+                    if (gf_check_level_of_category($second_level_cat) == 2) {
+                        if (empty(get_term_children($second_level_cat, 'product_cat'))) {
+                            $product_cats[] = get_term($second_level_cat, 'product_cat');
+                        } else {
+                            $product_cats[] = get_term($second_level_cat, 'product_cat');
+                            foreach (get_term_children($second_level_cat, 'product_cat') as $third_level_cat) {
+                                $product_cats[] = get_term($third_level_cat, 'product_cat');
+                            }
                         }
                     }
                 }
             }
         }
     }
-    foreach ($product_cats as $cat) {
-        if (gf_check_level_of_category($cat['term_id']) == 1) {
-            $parent_cats[] = $cat;
-        }
-    }
-    foreach ($product_cats as $cat) {
-        if (gf_check_level_of_category($cat['term_id']) == 2) {
-            $child_cats[] = $cat;
-        }
-    }
-    foreach ($product_cats as $cat) {
-        if (gf_check_level_of_category($cat['term_id']) == 3) {
-            $childs_of_child[] = $cat;
-        }
-    }
-    $number_of_categories = 10;
-    if (!empty(get_option('filter_fields_order'))) {
-        $product_cat = get_option('filter_fields_order');
-        $number_of_categories = esc_attr(get_option('number_of_categories_in_sidebar'));
-    }
     $i = 0;
+    $c = 0;
+    $pcc = 0;
     echo
     '<div id="gf-wrapper">
 	     <div class="gf-sidebar">
 		     <div class="gf-toggle"><i class="fa fa-bars"></i></div>
 		       <div class="gf-navblock">';
-    foreach ($product_cat as $parent_product_cat) {
-        if ($parent_product_cat['parent'] == 0):
-            $second_level_children = [];
-            foreach (get_term_children($parent_product_cat['term_id'], 'product_cat') as $child) {
-                if (gf_check_level_of_category($child) == 2) {
-                    $second_level_children = (array)get_term($child, 'product_cat');
-                }
-            }
-            $third_level_children = [];
-            foreach (get_term_children($parent_product_cat['term_id'], 'product_cat') as $child) {
-                if (gf_check_level_of_category($child) == 3) {
-                    $third_level_children = (array)get_term($child, 'product_cat');
-                }
-            }
-            $i++;
-            echo '
-            <ul class="gf-category-items">';
-            if ($i <= $number_of_categories) {
+    if ($i <= $number_of_categories) {
+        foreach ($product_cats as $cat) {
+            if ($cat->parent == 0) {
+                $parent_children_count = count(get_term_children($cat->term_id,'product_cat'));
+                $i++;
                 require(realpath(__DIR__ . '/../templates/template-parts/category-megamenu/first-level.php'));
-                foreach ($second_level_children as $child_product_cat) {
-                    $child_product_cat = (array)get_term($child_product_cat, 'product_cat');
-                    if ($child_product_cat) {
-                        require(realpath(__DIR__ . '/../templates/template-parts/category-megamenu/second-level.php'));
-                        foreach ($third_level_children as $child_child_product_cat) {
-                            $child_child_product_cat = (array)get_term($child_child_product_cat, 'product_cat');
-                            if ($child_child_product_cat) {
-                                var_dump($child_child_product_cat);
-                                require(realpath(__DIR__ . '/../templates/template-parts/category-megamenu/third-level.php'));
-                            }
-                        }
-                        echo '</ol>
-                    </div>';
-                    }
-                    echo '</div></div></li>';
+            }
+            if (gf_check_level_of_category($cat->term_id) == 2) {
+                $child_count = count(get_term_children($cat->term_id, 'product_cat'));
+                require(realpath(__DIR__ . '/../templates/template-parts/category-megamenu/second-level.php'));
+                $pcc++;
+            }
+            if (gf_check_level_of_category($cat->term_id) == 3) {
+                require(realpath(__DIR__ . '/../templates/template-parts/category-megamenu/third-level.php'));
+                $c++;
+                $pcc++;
+            }
+
+            if (gf_check_level_of_category($cat->term_id) == 3 || gf_check_level_of_category($cat->term_id) == 2) {
+                if ($c == $child_count) {
+                    echo '</ol>
+                                    </div>';
+                    $c = 0;
                 }
-            };
-            echo '</ul>';
-        endif;
+            }
+            if ($pcc == $parent_children_count){
+                echo '</div>
+                    </div>
+                </li>
+            </ul>';
+                $pcc=0;
+            }
+        }
+
     }
     echo '</div>
 	</div>
