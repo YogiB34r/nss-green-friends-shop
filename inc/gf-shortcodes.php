@@ -218,7 +218,7 @@ function gf_category_megamenu_shortcode()
     $parent_cats = [];
     $child_cats = [];
     $childs_of_child = [];
-    $number_of_categories = 10;
+    $number_of_categories = 24;
     if (!empty(get_option('filter_fields_order'))) {
         $product_cats_array = get_option('filter_fields_order');
         foreach ($product_cats_array as $product_cat) {
