@@ -1976,6 +1976,13 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
 }
 
 .woocommerce .button,
-a.product_type_simple {
+a.product_type_simple,
+a.add_to_cart_button {
   display: none !important;
+}
+
+body.single-product .woocommerce .button,
+body.single-product a.product_type_simple,
+body.single-product a.add_to_cart_button {
+  display: block !important;
 }
