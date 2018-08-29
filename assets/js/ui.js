@@ -9,6 +9,9 @@ jQuery(document).ready(function() {
     });
   }
 
+  var product_title = jQuery('.gf-category-box__item h5');
+  $clamp(product_title, {clamp: 2});
+
   jQuery(document).scroll(function() {
     // if (jQuery(window).scrollTop() > siteHeaderHeight) {
     //   jQuery('.gf-header-logo').css({
@@ -46,9 +49,6 @@ jQuery(document).ready(function() {
     else if(category_list_accordion.has(e.target).length === 0) {
       category_list_accordion.hide();
     }
-  });
-
-  jQuery('.gf-category-mobile-toggle').click(function(e) {
   });
 
   jQuery('.gf-category-accordion__expander').click(function() {
