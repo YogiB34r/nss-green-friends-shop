@@ -78,7 +78,7 @@ function gf_display_categories_on_archive_page()
             $second_lvl_cat_ids[] = $category->term_id;
 
             $child_cats = get_terms($child_args);
-            echo '<div class="col-3 gf-category-expander__col">
+            echo '<div class="col-12 col-sm-6 col-md-3 gf-category-expander__col">
                 <a class="gf-category-expander__col__category" href="' . get_term_link($category) . '">' . $category->name . '</a>
                 <ul class="gf-expander__subcategory-list">';
 
