@@ -9,8 +9,8 @@
 <?php if (get_queried_object() && is_product_category()): ?>
     <input class="search-radio-box" type="radio" name="search-radiobutton" checked="checked" value="category">
     <label for="search-checkbox"><?= get_queried_object()->name ?></label>
-    <input class="search-radio-box" type="radio" name="search-radiobutton" value="shop"><label
-            for="search-checkbox">Pretraga celog sajta</label>
+    <input class="search-radio-box" type="radio" name="search-radiobutton" value="shop">
+	<label for="search-checkbox">Pretraga celog sajta</label>
 <?php endif ;?>
 <script type="text/javascript">
     jQuery(document).ready(function($){

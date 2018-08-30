@@ -9,8 +9,12 @@ jQuery(document).ready(function() {
     });
   }
 
-  var product_title = jQuery('.gf-category-box__item h5');
-  $clamp(product_title, {clamp: 2});
+  jQuery('.gf-category-box__item h5').each(function(index, element) {
+    $clamp(element, { clamp: 4, useNativeClamp: false });
+  });
+  jQuery('.woocommerce-loop-product__title').each(function(index, element) {
+    $clamp(element, { clamp: 4, useNativeClamp: false });
+  });
 
   jQuery(document).scroll(function() {
     // if (jQuery(window).scrollTop() > siteHeaderHeight) {
