@@ -206,6 +206,22 @@ function gf_mobile_nav_menu_shortcode()
 add_shortcode('gf-category-megamenu', 'gf_category_megamenu_shortcode');
 function gf_category_megamenu_shortcode()
 {
+    $key = 'gf-slider';
+    $group = 'gf-sidebar-static';
+    $html = wp_cache_get($key, $group);
+    if ($html === false) {
+        ob_start();
+        printMegaMenu();
+        $html = ob_get_clean();
+        wp_cache_set($key, $html, $group, 0);
+    }
+    echo $html;
+}
+
+/**
+ * Prints out mega menu with categories
+ */
+function printMegaMenu() {
     $gf_slider_id = '';
     if (get_term_by('slug', 'gf-slider', 'product_cat')) {
         $gf_slider_id = get_term_by('slug', 'gf-slider', 'product_cat')->term_id;
