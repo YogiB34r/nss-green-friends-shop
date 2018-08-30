@@ -222,6 +222,14 @@ img.gf-header-logo {
   text-align: center;
 }
 
+.gf-radio-search-wrapper {
+
+}
+
+.gf-radio-search-wrapper--mobile {
+  display: none;
+}
+
 .search-input-wrapper {
   width: 100%;
   float: unset;
@@ -639,6 +647,11 @@ h1.product_title.entry-title {
   flex-flow: column;
 }
 
+.woocommerce-page ul.products.grid li,
+.woocommerce-page ul.products.list li {
+  border-bottom: solid 1px #666;
+}
+
 .pswp__bg {
   background: rgba(0, 0, 0, 0.6);
 }
@@ -864,6 +877,8 @@ body.home .saved-sale {
 
 .woocommerce-page div.product form.cart div.quantity label {
   margin-bottom: 10px;
+  display: block;
+  text-align: center;
 }
 
 .woocommerce #content div.product form.cart div.quantity, .woocommerce div.product form.cart div.quantity, .woocommerce-page #content div.product form.cart div.quantity, .woocommerce-page div.product form.cart div.quantity {
@@ -1600,7 +1615,7 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
   color: #fff;
 }
 
-.site-footer h2.widgettitle {
+.site-footer .custom-html-widget h3 {
   font-size: 18px;
   font-weight: 600;
   margin-bottom: 20px;
@@ -1773,6 +1788,14 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
     display: none;
   }
 
+  .gf-radio-search-wrapper {
+    display: none;
+  }
+
+  .gf-radio-search-wrapper--mobile {
+    display: block;
+  }
+
   .gf-search {
     position: absolute;
     width: 80%;
@@ -1900,16 +1923,17 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
   .price ins {
     font-size: 1rem;
   }
-	
+
   .woocommerce .woocommerce-ordering select,
   .woocommerce form.form-wppp-select select,
   .woocommerce-pagination.gf-wc-pagination {
     display: none;
   }
-	
+
   .gf-product-controls--bottom .woocommerce-pagination.gf-wc-pagination {
     display: block;
   }
+
   .gf-footer-images li img{
     height: 70% !important;
   }
@@ -1986,6 +2010,10 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
 }
 .screen-reader-text {
   display: none;
+}
+
+.quantity label.screen-reader-text:first-child {
+  display: block !important;
 }
 
 #to_top_scrollup {
