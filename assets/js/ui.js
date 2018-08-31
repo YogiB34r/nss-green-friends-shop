@@ -1,5 +1,4 @@
 jQuery(document).ready(function() {
-
   var siteHeader = jQuery('.site-header');
   var siteHeaderHeight = siteHeader.height();
 
@@ -10,10 +9,16 @@ jQuery(document).ready(function() {
   }
 
   jQuery('.gf-category-box__item h5').each(function(index, element) {
-    $clamp(element, { clamp: 4, useNativeClamp: false });
+    $clamp(element, { clamp: 3, useNativeClamp: false });
   });
   jQuery('.woocommerce-loop-product__title').each(function(index, element) {
-    $clamp(element, { clamp: 4, useNativeClamp: false });
+    $clamp(element, { clamp: 3, useNativeClamp: false });
+  });
+	
+  jQuery('.woosticker.custom_sticker_image:contains("Sold")').addClass('woosticker-onsale').each(function() {
+	if(jQuery(this).parent().is('.products .product') || jQuery(this).parent().parent().is('.gf-category-box__item')) {
+	  jQuery(this).addClass('woosticker-onsale--loop');	 
+    }
   });
 
   jQuery(document).scroll(function() {
