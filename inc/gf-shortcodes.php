@@ -207,13 +207,17 @@ add_shortcode('gf-category-megamenu', 'gf_category_megamenu_shortcode');
 function gf_category_megamenu_shortcode()
 {
     $key = 'gf-slider';
-    $group = 'gf-sidebar-static';
-    $html = wp_cache_get($key, $group);
+//    $group = 'gf-sidebar-static';
+    $redis = new Redis();
+    $redis->connect('127.0.0.1');
+//    $html = wp_cache_get($key, $group);
+    $html = $redis->get($key);
     if ($html === false) {
         ob_start();
         printMegaMenu();
         $html = ob_get_clean();
-        wp_cache_set($key, $html, $group, 0);
+//        wp_cache_set($key, $html, $group, 300);
+        $redis->set($key, $html, 60 * 60); // 1 hour
     }
     echo $html;
 }
