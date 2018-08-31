@@ -206,7 +206,7 @@ function gf_mobile_nav_menu_shortcode()
 add_shortcode('gf-category-megamenu', 'gf_category_megamenu_shortcode');
 function gf_category_megamenu_shortcode()
 {
-    $key = 'gf-slider';
+    $key = 'gf-megamenu';
 //    $group = 'gf-sidebar-static';
     $redis = new Redis();
     $redis->connect('127.0.0.1');
