@@ -2062,3 +2062,16 @@ body.single-product .product .entry-summary a.button.product_type_simple,
 body.single-product .product .entry-summary  a.button.product_type_variable {
 	display: block !important;
 }
+
+.tnp-email, .tnp-submit{
+  width: 50% !important;
+}
+.tnp-submit{
+  background-color: #f45411 !important;
+  font-weight: bold !important;
+}
+.tnp-submit:hover {
+  background-color: #f45411 !important;
+  text-decoration: underline !important;
+  cursor: pointer !important;
+}
