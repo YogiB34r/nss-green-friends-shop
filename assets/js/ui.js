@@ -8,6 +8,18 @@ jQuery(document).ready(function() {
     });
   }
 
+  var radioValue='';
+  jQuery(".gf-search-form").submit(function () {
+     var radioValue = jQuery('input[name=search-radiobutton]:checked').val();
+     if (radioValue === 'category'){
+       jQuery(".gf-search-form").attr("action", "");
+     }
+  });
+  jQuery('label[for="search-checkbox"]').click(function() {
+    var radio = jQuery(this).children('.search-radio-box');
+    radio.prop('checked', !radio.prop('checked'));
+  });
+
   jQuery('.gf-category-box__item h5').each(function(index, element) {
     $clamp(element, { clamp: 3, useNativeClamp: false });
   });
@@ -19,6 +31,14 @@ jQuery(document).ready(function() {
 	if(jQuery(this).parent().is('.products .product') || jQuery(this).parent().parent().is('.gf-category-box__item')) {
 	  jQuery(this).addClass('woosticker-onsale--loop');	 
     }
+  });
+
+  if(jQuery('.products').hasClass('list')) {
+    jQuery('.products .woosticker.custom_sticker_image:contains("Sold")').toggleClass('woosticker-onsale--loop-list');
+  }
+	
+  jQuery('.gridlist-toggle a').click(function() {
+    jQuery('.products .woosticker.custom_sticker_image:contains("Sold")').toggleClass('woosticker-onsale--loop-list');
   });
 
   jQuery(document).scroll(function() {
@@ -118,7 +138,6 @@ jQuery(document).ready(function() {
 
   if (jQuery('body').is('.archive, .single-product')) {
     jQuery('.gf-wrapper-before span').toggleClass('fa-angle-down fa-angle-up');
-    jQuery('.gf-navblock').toggle();
   }
 
   jQuery('.gf-wrapper-before').click(function() {

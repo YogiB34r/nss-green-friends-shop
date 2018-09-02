@@ -263,13 +263,35 @@ img.gf-header-logo {
 }
 
 .search-radio-box {
-  vertical-align: bottom;
 }
 
 label[for='search-checkbox'] {
   font-size: 14px;
   margin-right: 14px;
-	
+}
+
+label[for='search-checkbox']:hover {
+  cursor: pointer;
+}
+
+label[for='search-checkbox'] span::before {
+	content: "";
+	display: inline-block;
+	height: 14px;
+	width: 14px;
+	border: 1px solid #e55a00;
+	box-shadow: inset 0px 0px 0px 2px white;
+	border-radius: 8px;
+	margin-right: 4px;
+	vertical-align: bottom;
+}
+
+input[type="radio"]:checked + span {
+  color: #f45411;
+}
+
+input[type="radio"]:checked + span::before {
+	background-color: #FE6400;
 }
 
 .gf-search-wrapper .gf-search-toggle-wrapper {
@@ -660,6 +682,26 @@ h1.product_title.entry-title {
 
 .pswp__bg {
   background: rgba(0, 0, 0, 0.6);
+}
+
+.woosticker-onsale {
+	float: left;
+	width: 48% !important;
+	height: 94px !important;
+	background-size: contain !important;
+	background-repeat: no-repeat;
+	min-height: 94px;
+	position: absolute;
+	top: 10% !important;
+}
+
+.woosticker-onsale--loop {
+  width: 100% !important;
+  top: 28% !important;
+}
+
+.woosticker-onsale--loop-list {
+  width: 30.75% !important;
 }
 
 .sku_wrapper .sku {
@@ -1274,6 +1316,14 @@ body.home .saved-sale {
   box-shadow: 4px 0 6px rgba(13, 13, 13, 0.1);
 }
 
+.gf-navblock {
+  display: none;
+}
+
+body.home .gf-navblock{
+  display: block;
+}
+
 .gf-sidebar .category-item {
   list-style: none;
   border-bottom: solid 1px #fff;
@@ -1667,22 +1717,6 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
   height: 100% !important;
 }
 
-.woosticker-onsale {
-	float: left;
-	width: 48% !important;
-	height: 94px !important;
-	background-size: contain !important;
-	background-repeat: no-repeat;
-	min-height: 94px;
-	position: absolute;
-	top: 10% !important;
-}
-
-.woosticker-onsale--loop {
-	width: 100% !important;
-	top: 28% !important;
-}
-
 /* media queries */
 
 @media only screen and (min-width: 1200px) {
@@ -2061,4 +2095,8 @@ a.button.product_type_variable {
 body.single-product .product .entry-summary a.button.product_type_simple,
 body.single-product .product .entry-summary  a.button.product_type_variable {
 	display: block !important;
+}
+.woocommerce div.product p.stock{
+	font-size: 24px;
+	font-weight: bold;
 }
