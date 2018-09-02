@@ -112,7 +112,8 @@ function gf_category_mobile_toggle_shortcode()
         foreach ($product_cat_raw as $cat) {
             $product_cat[] = array(
                 'name' => $cat->name,
-                'term_id' => $cat->term_id
+                'term_id' => $cat->term_id,
+                'slug' => $cat->slug
             );
         }
         $number_of_categories = 20;
@@ -123,7 +124,7 @@ function gf_category_mobile_toggle_shortcode()
         $i = 0;
         echo '<div class="gf-category-accordion">';
         foreach ($product_cat as $parent_product_cat) {
-            if ($parent_product_cat['name'] != 'Gf-slider' && $parent_product_cat['name'] != 'Uncategorized'):
+            if ($parent_product_cat['slug'] != 'specijalne-promocije' && $parent_product_cat['slug'] != 'uncategorized'):
                 $i++;
                 if ($i <= $number_of_categories) {
                     echo '<div class="gf-category-accordion__item gf-category-accordion__item--main">
@@ -227,17 +228,14 @@ function gf_category_megamenu_shortcode()
  */
 function printMegaMenu() {
     $gf_slider_id = '';
-    if (get_term_by('slug', 'gf-slider', 'product_cat')) {
-        $gf_slider_id = get_term_by('slug', 'gf-slider', 'product_cat')->term_id;
+    if (get_term_by('slug', 'specijalne-promocije', 'product_cat')) {
+        $gf_slider_id = get_term_by('slug', 'specijalne-promocije', 'product_cat')->term_id;
     }
     $uncategorized_id = '';
     if (get_term_by('slug', 'uncategorized', 'product_cat')) {
-        $uncategorized_id = get_term_by('slug', 'gf-slider', 'product_cat')->term_id;
+        $uncategorized_id = get_term_by('slug', 'uncategorized', 'product_cat')->term_id;
     }
     $product_cats = [];
-    $parent_cats = [];
-    $child_cats = [];
-    $childs_of_child = [];
     $number_of_categories = 24;
     if (!empty(get_option('filter_fields_order'))) {
         $product_cats_array = get_option('filter_fields_order');
