@@ -51,23 +51,18 @@
     </form>
     <div class="gf-radio-search-wrapper gf-radio-search-wrapper--mobile">
       <?php if (get_queried_object() && is_product_category()): ?>
-          <input class="search-radio-box" type="radio" name="search-radiobutton" checked="checked" value="category">
-          <label for="search-checkbox"><?= get_queried_object()->name ?></label>
-          <input class="search-radio-box" type="radio" name="search-radiobutton" value="shop">
-          <label for="search-checkbox">Pretraga celog sajta</label>
+          <label for="search-checkbox">
+		    <input class="search-radio-box" type="radio" name="search-radiobutton" checked="checked" value="category" hidden>
+			<span><?= get_queried_object()->name ?></span>
+		  </label>
+		  <span class="search-radio" type="radio" name="search-radiobutton" value="shop" hidden></span>
+          <label for="search-checkbox">
+            <input class="search-radio-box" type="radio" name="search-radiobutton" value="shop" hidden>
+			<span>Pretraga celog sajta</span>
+		  </label>
       <?php endif ;?>
     </div>
-    <script type="text/javascript">
-        jQuery(document).ready(function($){
-            var radioValue='';
-            $(".gf-search-form--mobile").submit(function () {
-                var radioValue = $('.gf-search-form--mobile input[name=search-radiobutton]:checked').val();
-                if (radioValue === 'category'){
-                    $(".gf-search-form").attr("action", "");
-                }
-            });
-        });
-    </script>
     <div id="content" class="site-content" tabindex="-1">
       <div class="col-full">
         <div class="gf-main-content-container">
+
