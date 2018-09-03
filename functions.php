@@ -146,6 +146,22 @@ function order_by_stock_status($posts_clauses) {
     }
     return $posts_clauses;
 }
+
+/**
+ * Saves uploads into folders organized by day.
+ *
+ * @param $uploads
+ * @return mixed
+ */
+function upload_dir_filter($uploads){
+    $day = date('d');
+    $uploads['path'] .= '/' . $day;
+    $uploads['url']  .= '/' . $day;
+
+    return $uploads;
+}
+add_filter('upload_dir', 'upload_dir_filter');
+
 //ne brisati ovo zatrebace mozda <3 Vlada
 //function advanced_search_query($query) {
 //
