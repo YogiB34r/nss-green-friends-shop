@@ -221,6 +221,8 @@ function gf_category_megamenu_shortcode()
         $redis->set($key, $html, 60 * 60); // 1 hour
     }
     echo $html;
+
+
 }
 
 /**

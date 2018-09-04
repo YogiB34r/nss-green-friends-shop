@@ -162,3 +162,9 @@ function order_by_stock_status($posts_clauses) {
 //    return $query;
 //}
 //add_action('pre_get_posts', 'advanced_search_query', 1000);
+
+
+
+
+
+
