@@ -684,26 +684,6 @@ h1.product_title.entry-title {
   background: rgba(0, 0, 0, 0.6);
 }
 
-.woosticker-onsale {
-	float: left;
-	width: 48% !important;
-	height: 94px !important;
-	background-size: contain !important;
-	background-repeat: no-repeat;
-	min-height: 94px;
-	position: absolute;
-	top: 10% !important;
-}
-
-.woosticker-onsale--loop {
-  width: 100% !important;
-  top: 28% !important;
-}
-
-.woosticker-onsale--loop-list {
-  width: 30.75% !important;
-}
-
 .sku_wrapper .sku {
   font-size: 1.1em;
   font-weight: 700;
@@ -1928,11 +1908,6 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
 
   .woocommerce .site-main .widget_price_filter {
     display: block;
-  }
-
-  .woosticker-onsale {
-	width: 100% !important;
-	  min-height: 150px !important;
   }
 
   .gf-category-expander {
