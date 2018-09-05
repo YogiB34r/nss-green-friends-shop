@@ -178,3 +178,9 @@ add_filter('upload_dir', 'upload_dir_filter');
 //    return $query;
 //}
 //add_action('pre_get_posts', 'advanced_search_query', 1000);
+
+
+
+
+
+
