@@ -25,12 +25,12 @@
         <div class="row gf-primary-navigation">
           <div class="col-3 gf-logo">
             <div class="gf-logo-wrapper">
-              <?php dynamic_sidebar('gf-header-row-2-col-1') ?>
+                <?php dynamic_sidebar('gf-header-row-2-col-1') ?>
             </div>
           </div>
           <div class="col-md-6 col-lg-7 gf-search">
             <div class="gf-search-wrapper">
-              <?php get_search_form()?>
+                <?php dynamic_sidebar('gf-header-row-2-col-2') ?>
             </div>
           </div>
           <div class="col-9 col-md-3 col-lg-2 gf-navigation">
