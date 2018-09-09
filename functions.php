@@ -154,7 +154,8 @@ function order_by_stock_status($posts_clauses) {
  * @return mixed
  */
 function upload_dir_filter($uploads){
-    $day = date('d');
+    //$day = date('d');
+	$day = date('d/i');
     $uploads['path'] .= '/' . $day;
     $uploads['url']  .= '/' . $day;
 
