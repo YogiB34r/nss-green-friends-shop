@@ -2,15 +2,15 @@
 /* Template Name: redirectOldProducts */
 
 $sku = $_GET['id'];
-$product = get_product_by_sku($sku);
-if (!$product) {
+$wcproduct = get_product_by_sku($sku);
+if (!$wcproduct) {
 global $wp_query;
   $wp_query->set_404();
   status_header( 404 );
   get_template_part( 404 ); exit();
 }
 
-$url = get_permalink($product->get_id());
+$url = get_permalink($wcproduct->get_id());
 //echo $id = wc_get_product_id_by_sku($id);
 //echo $url = get_permalink($id);
 
