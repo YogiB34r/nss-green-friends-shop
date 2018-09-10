@@ -505,6 +505,18 @@ input[type="radio"]:checked + span::before {
 }
 
 /* woocommerce overrides */
+
+.woocommerce-message {
+  display: flex;
+  border: solid 2.75px #8fae1b;
+}
+
+.woocommerce-message a.button {
+  order: 2;
+  margin-top: 20px;
+  text-align: center;
+}
+
 .woocommerce .woocommerce-breadcrumb {
   color: #f45411;
   padding: 0 0 10px;
