@@ -169,3 +169,20 @@ remove_action( 'woocommerce_after_single_variation','woocommerce_single_product_
 
 remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_title', 5 );
 add_action('woocommerce_before_single_product','woocommerce_template_single_title', 11 );
+
+/**
+ * Customize product data tabs
+ */
+add_filter( 'woocommerce_product_tabs', 'woo_custom_description_tab', 98 );
+function woo_custom_description_tab( $tabs ) {
+
+    $tabs['description']['callback'] = 'woo_custom_description_tab_content';	// Custom description callback
+
+    return $tabs;
+}
+
+function woo_custom_description_tab_content() {
+    global $product;
+
+    echo '<p>'.$product->get_description().'</p>';
+}
