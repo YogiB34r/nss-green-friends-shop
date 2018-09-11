@@ -1,22 +1,10 @@
 <?php
 
-function gf_yoast_breadcrumbs(){
-    if ( function_exists('yoast_breadcrumb') ) {
-        yoast_breadcrumb( '<nav class="woocommerce-breadcrumb"><p id="breadcrumbs">','</p></nav>');
-    }
+function gf_wc_breadcrumbs_single_product(){
+    woocommerce_breadcrumb();
 }
-add_action('woocommerce_before_single_product', 'gf_yoast_breadcrumbs', 10);
+add_action('woocommerce_before_single_product', 'gf_wc_breadcrumbs_single_product', 10);
 
-add_filter( 'wpseo_breadcrumb_single_link' ,'wpseo_remove_breadcrumb_link', 10 ,2);
-function wpseo_remove_breadcrumb_link( $link_output , $link ){
-    $text_to_remove = 'Products';
-
-    if( $link['text'] == $text_to_remove ) {
-        $link_output = '';
-    }
-
-    return $link_output;
-}
 remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_excerpt', 20);
 
 remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_meta', 40);
