@@ -175,17 +175,4 @@ jQuery(document).ready(function () {
     //     data: filterContent
     //   });
     // });
-
-
-
-    var tags = [ "c++", "java", "php", "coldfusion", "javascript", "asp", "ruby" ];
-    jQuery( "#autocomplete" ).autocomplete({
-        source: function( request, response ) {
-            console.log("caooo");
-            var matcher = new RegExp( "^" + jQuery.ui.autocomplete.escapeRegex( request.term ), "i" );
-            response( jQuery.grep( tags, function( item ){
-                return matcher.test( item );
-            }) );
-        }
-    });
 });
