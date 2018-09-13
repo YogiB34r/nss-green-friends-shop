@@ -2114,3 +2114,6 @@ body.single-product .product .entry-summary  a.button.product_type_variable {
 .error-404.not-found p {
   margin-bottom: 20px;
 }
+.aws-search-field  {
+  max-width: 95%;
+}
