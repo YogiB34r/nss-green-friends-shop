@@ -186,3 +186,8 @@ function wc_empty_cart_redirect_url() {
     return get_home_url();
 }
 add_filter( 'woocommerce_return_to_shop_redirect', 'wc_empty_cart_redirect_url' );
+//They only way to translate shipping
+function gf_translate_shipping($i, $package){
+    return sprintf( _nx( 'Dostava', 'Dostava %d', ( $i + 1 ), 'shipping packages', 'green-friends' ), ( $i + 1 ) );
+}
+add_filter('woocommerce_shipping_package_name','gf_translate_shipping',10,3);
