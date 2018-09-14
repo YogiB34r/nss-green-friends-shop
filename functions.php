@@ -246,6 +246,17 @@ add_filter('upload_dir', 'upload_dir_filter');
 //add_action('pre_get_posts', 'advanced_search_query', 1000);
 
 
-
+add_action( 'pre_get_posts', function ( $q ) {
+    if (   !is_admin()                 // Target only front end
+        && $q->is_main_query()        // Only target the main query
+//        && $q->is_post_type_archive() // Change to suite your needs
+    ) {
+        $q->set( 'meta_key', '_stock_status' );
+        $q->set( 'orderby',  'meta_value'    );
+        $q->set( 'order',    'ASC'           );
+        $q->set( 'orderby',  'date'    );
+        $q->set( 'order',    'ASC'           );
+    }
+}, PHP_INT_MAX );
 
 
