@@ -171,6 +171,8 @@ function woo_custom_description_tab( $tabs ) {
 
 function woo_custom_description_tab_content() {
     global $product;
-
+    global $post;
     echo '<p>'.$product->get_description().'</p>';
+    echo '<p>&nbsp</p><p>&nbsp</p>';
+    echo '<p>'.get_post_meta($post->ID,'features',true).'</p>';
 }
