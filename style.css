@@ -1331,15 +1331,6 @@ body.home .gf-navblock{
   width: 50%;
   margin: 0 auto;
 }
-.gf-sidebar .widget_gf_social_icons_widget ul li {
-  display: block;
-  text-align: left;
-}
-
-.widget_gf_social_icons_widget h2.widgettitle {
-  margin: 20px 0;
-}
-
 #gf-cont {
   display: table-cell;
   vertical-align: top;
@@ -1563,11 +1554,6 @@ body.home .gf-navblock{
 .woocommerce button.button.alt.disabled:hover {
   background-color: transparent;
   color: transparent;
-}
-
-.widget_gf_social_icons_widget {
-  border-top: solid 30px #627aad;
-  text-align: left;
 }
 
 .widget#text-5 {
