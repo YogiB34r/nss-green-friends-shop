@@ -293,7 +293,26 @@ function woocommerce_breadcrumb( $args = array() ) {
 
     wc_get_template( 'global/breadcrumb.php', $args );
 }
+//print all enqued styles 
+function gf_print_styles() {
 
+    $result = [];
+    $result['scripts'] = [];
+    $result['styles'] = [];
+
+    // Print all loaded Scripts
+    global $wp_scripts;
+    foreach( $wp_scripts->queue as $script ) :
+        $result['scripts'][] =  $wp_scripts->registered[$script]->src . ";";
+    endforeach;
+
+    global $wp_styles;
+    foreach( $wp_styles->queue as $style ) :
+        $result['styles'][] =  $wp_styles->registered[$style]->src . ";";
+    endforeach;
+
+    return $result;
+}
 
 
 
