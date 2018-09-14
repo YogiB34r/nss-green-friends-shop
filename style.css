@@ -1510,6 +1510,7 @@ body.home .gf-navblock{
   padding: 10px;
   list-style: none;
   text-align: center;
+  margin: 0;
 }
 
 .gf-sidebar .widget h3 {
