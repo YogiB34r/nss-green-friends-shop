@@ -2117,3 +2117,6 @@ body.single-product .product .entry-summary  a.button.product_type_variable {
 .aws-search-field  {
   max-width: 95%;
 }
+.woocommerce-product-gallery__trigger{
+  max-height: 60%;
+}
