@@ -268,7 +268,6 @@ function order_by_test($posts_clauses) {
         $posts_clauses['orderby'] = " istockstatus.meta_value ASC, " . $posts_clauses['orderby'];
         $posts_clauses['where'] = " AND istockstatus.meta_key = '_stock_status' AND istockstatus.meta_value <> '' " . $posts_clauses['where'];
 //    }
-    var_dump($posts_clauses);
     return $posts_clauses;
 }
 
