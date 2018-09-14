@@ -1,0 +1,65 @@
+/*===========
+ GF WIDGETS
+============*/
+/*GF IMAGE BANNER*/
+.gf-image-banner-widget-form label{
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 14px;
+    padding-bottom: 7px;
+}
+.gf-image-banner-widget-form input{
+    margin-top: 10px;
+}
+.gf-image-banner-block{
+    margin-top: 10px;
+    border-bottom: 1px solid #eeeeee;
+}
+
+/*GF PRODUCT SLIDER*/
+.gf-product-slider-wrapper input{
+    margin-bottom: 12px;
+}
+.gf-category-select{
+    margin-bottom: 12px;
+}
+
+/*GF SOCIAL ICONS*/
+.social-icons-widget-admin-input{
+    margin-bottom: 14px ;
+}
+.input-wrapper{
+    margin-top: 20px;
+}
+
+/*=============
+GF SORTABLE CATEGORIES
+===============*/
+.filter-fields-list .parent-cat {
+    max-width: 30%;
+    margin-bottom: 20px;
+}
+.parent-header, .child-header, .childs-of-child-header {
+    background-color: #1C2336!important;
+    color: white!important;
+}
+.filter-fields-list{
+    text-align: center;
+}
+.filter-fields-list .child-cat,h5{
+    margin: 10px 40px;
+}
+.gf-sortable-categories-wrapper h2:hover,h3:hover,h4:hover,h5:hover {
+    cursor: pointer;
+}
+.parent-cat-children, .child-cat-children{
+    background-color: #E7E7E7;
+    border: 2px solid #FE7725 !important;
+}
+.ui-state-active , .childs-of-child-header{
+    background-color: #FE7725!important;
+    border: none!important;
+}
+.ui-icon {
+    float: right;
+}
