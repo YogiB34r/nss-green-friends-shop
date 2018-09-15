@@ -293,7 +293,7 @@ function woocommerce_breadcrumb( $args = array() ) {
 
     wc_get_template( 'global/breadcrumb.php', $args );
 }
-//print all enqued styles 
+//print all enqued styles
 function gf_print_styles() {
 
     $result = [];
