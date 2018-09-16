@@ -323,18 +323,126 @@ function custom_woo_product_loop()
     if (is_shop() || is_product_category() || is_product_tag()) { // Only run on shop archive pages, not single products or other pages
         $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());;
         if (get_query_var('taxonomy')) { // Za kategorije
+            $allIds = [];
             $args = array(
                 'post_type' => 'product',
-                'posts_per_page' => $per_page,
-                'paged' => get_query_var('paged'),
+                'orderby' => 'date',
+                'order' => 'ASC',
+                'posts_per_page' => -1,
+                'paged' => (get_query_var('paged')) ? get_query_var('paged') : 1,
                 'tax_query' => array(
                     array(
                         'taxonomy' => get_query_var('taxonomy'),
                         'field' => 'slug',
                         'terms' => get_query_var('term'),
                     ),
-                ),
+                'meta_query' => array(
+                    array('relation' => 'OR',
+                        array( // Simple products type
+                            'key' => '_sale_price',
+                            'value' => 0,
+                            'compare' => '>',
+                            'type' => 'numeric'
+                        ),
+                        array( // Variable products type
+                            'key' => '_min_variation_sale_price',
+                            'value' => 0,
+                            'compare' => '>',
+                            'type' => 'numeric'
+                        ),
+                    ),
+                    array(
+                        'relation' => 'AND',
+                        array(
+                            'key' => '_stock_status',
+                            'value' => 'instock',
+                            'compare' => '='
+                        )
+                    )
+                )
+            ));
+            $productsSale = new WP_Query($args);
+            foreach ($productsSale->get_posts() as $post) {
+                $allIds[] = $post->ID;
+            }
+            $args = array(
+                'post_type' => 'product',
+                'orderby' => 'date',
+                'order' => 'ASC',
+                'posts_per_page' => -1,
+                'paged' => (get_query_var('paged')) ? get_query_var('paged') : 1,
+                'tax_query' => array(
+                    array(
+                        'taxonomy' => get_query_var('taxonomy'),
+                        'field' => 'slug',
+                        'terms' => get_query_var('term'),
+                    ),
+                'meta_query' => array(
+                    array('relation' => 'OR',
+                        array( // Simple products type
+                            'key' => '_sale_price',
+                            'value' => '',
+                            'compare' => '=',
+                            'type' => 'char'
+                        ),
+                        array( // Variable products type
+                            'key' => '_min_variation_sale_price',
+                            'value' => '',
+                            'compare' => '=',
+                            'type' => 'char'
+                        ),
+                    ),
+                    array(
+                        'relation' => 'AND',
+                        array(
+                            'key' => '_stock_status',
+                            'value' => 'instock',
+                            'compare' => '='
+                        )
+                    )
+                )
+            ));
+            $productsNotOnSale = new WP_Query($args);
+            foreach ($productsNotOnSale->get_posts() as $post) {
+                $allIds[] = $post->ID;
+            }
+            $args = array(
+                'post_type' => 'product',
+                'orderby' => 'date',
+                'order' => 'ASC',
+                'posts_per_page' => -1,
+                'paged' => (get_query_var('paged')) ? get_query_var('paged') : 1,
+                'tax_query' => array(
+                    array(
+                        'taxonomy' => get_query_var('taxonomy'),
+                        'field' => 'slug',
+                        'terms' => get_query_var('term'),
+                    ),
+                'meta_query' => array(
+                    'key' => '_stock_status',
+                    'value' => 'outofstock',
+                    'compare' => '='
+                )
+            ));
+            $productsOutOfStock = new WP_Query($args);
+            foreach ($productsOutOfStock->get_posts() as $post) {
+                $allIds[] = $post->ID;
+            }
+            $args =array(
+                'post_type' => 'product',
+                'orderby' => 'post__in',
+                'post__in' => $allIds,
+                'posts_per_page' => $per_page,
+                'paged' => (get_query_var('paged')) ? get_query_var('paged') : 1,
             );
+            $sortedProducts = new WP_Query($args);
+            if ($sortedProducts->have_posts()) :
+                while ($sortedProducts->have_posts()) : $sortedProducts->the_post();
+                    do_action('woocommerce_shop_loop');
+                    wc_get_template_part('content', 'product');
+                endwhile;
+                wp_reset_postdata();
+            endif;
         } else { // Za main shop
             $allIds = [];
             $args = array(
@@ -430,9 +538,6 @@ function custom_woo_product_loop()
                 'posts_per_page' => $per_page,
                 'paged' => (get_query_var('paged')) ? get_query_var('paged') : 1,
                 );
-
-
-
             $sortedProducts = new WP_Query($args);
             if ($sortedProducts->have_posts()) :
                 while ($sortedProducts->have_posts()) : $sortedProducts->the_post();
