@@ -114,6 +114,7 @@ function gf_get_third_level_categories($parent_id = null)
     }
     return $third_level_categories;
 }
+
 //Testira razliku array-a order sensitive
 function gf_array_reccursive_difrence(array $array1, array $array2, array $_ = null)
 {
@@ -260,41 +261,46 @@ add_filter('upload_dir', 'upload_dir_filter');
 //}, PHP_INT_MAX );
 
 //
-add_filter('posts_clauses', 'order_by_test');
-function order_by_test($posts_clauses) {
+//add_filter('posts_clauses', 'order_by_test');
+function order_by_test($posts_clauses)
+{
     global $wpdb;
     // only change query on WooCommerce loops
 //    if (is_woocommerce() && (is_shop() || is_product_category() || is_product_tag() || is_product_taxonomy())) {
-    if(is_shop() || is_product_category()){
+    if (is_shop() || is_product_category()) {
         $posts_clauses['join'] .= " INNER JOIN $wpdb->postmeta istockstatus ON ($wpdb->posts.ID = istockstatus.post_id) ";
         $posts_clauses['orderby'] = " istockstatus.meta_value ASC, " . $posts_clauses['orderby'];
         $posts_clauses['where'] = " AND istockstatus.meta_key = '_stock_status' AND istockstatus.meta_value <> '' " . $posts_clauses['where'];
     }
     return $posts_clauses;
 }
+
 // custom breadcrumbs based on wc breadcrumbs
-function woocommerce_breadcrumb( $args = array() ) {
-    $args = wp_parse_args( $args, apply_filters( 'woocommerce_breadcrumb_defaults', array(
-        'delimiter'   => '&nbsp;&#47;&nbsp;',
-        'wrap_before' => '<nav class="woocommerce-breadcrumb" ' . ( is_single() ? 'itemprop="breadcrumb"' : '' ) . '>',
-        'wrap_after'  => '</nav>',
-        'before'      => '',
-        'after'       => '',
-        'home'        => _x( 'Home', 'breadcrumb', 'woocommerce' )
-    ) ) );
+function woocommerce_breadcrumb($args = array())
+{
+    $args = wp_parse_args($args, apply_filters('woocommerce_breadcrumb_defaults', array(
+        'delimiter' => '&nbsp;&#47;&nbsp;',
+        'wrap_before' => '<nav class="woocommerce-breadcrumb" ' . (is_single() ? 'itemprop="breadcrumb"' : '') . '>',
+        'wrap_after' => '</nav>',
+        'before' => '',
+        'after' => '',
+        'home' => _x('Home', 'breadcrumb', 'woocommerce')
+    )));
 
     $breadcrumbs = new gf_breadcrumbs();
 
-    if ( $args['home'] ) {
-        $breadcrumbs->add_crumb( $args['home'], apply_filters( 'woocommerce_breadcrumb_home_url', home_url() ) );
+    if ($args['home']) {
+        $breadcrumbs->add_crumb($args['home'], apply_filters('woocommerce_breadcrumb_home_url', home_url()));
     }
 
     $args['breadcrumb'] = $breadcrumbs->generate();
 
-    wc_get_template( 'global/breadcrumb.php', $args );
+    wc_get_template('global/breadcrumb.php', $args);
 }
-//print all enqued styles 
-function gf_print_styles() {
+
+//print all enqued styles
+function gf_print_styles()
+{
 
     $result = [];
     $result['scripts'] = [];
@@ -302,16 +308,145 @@ function gf_print_styles() {
 
     // Print all loaded Scripts
     global $wp_scripts;
-    foreach( $wp_scripts->queue as $script ) :
-        $result['scripts'][] =  $wp_scripts->registered[$script]->src . ";";
+    foreach ($wp_scripts->queue as $script) :
+        $result['scripts'][] = $wp_scripts->registered[$script]->src . ";";
     endforeach;
     //Print all loaded Styles
     global $wp_styles;
-    foreach( $wp_styles->queue as $style ) :
-        $result['styles'][] =  $wp_styles->registered[$style]->src . ";";
+    foreach ($wp_styles->queue as $style) :
+        $result['styles'][] = $wp_styles->registered[$style]->src . ";";
     endforeach;
 
     return $result;
+}
+
+function custom_woo_product_loop()
+{
+    if (is_shop() || is_product_category() || is_product_tag()) { // Only run on shop archive pages, not single products or other pages
+        $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());;
+        if (get_query_var('taxonomy')) { // Za kategorije
+            $args = array(
+                'post_type' => 'product',
+                'posts_per_page' => $per_page,
+                'paged' => get_query_var('paged'),
+                'tax_query' => array(
+                    array(
+                        'taxonomy' => get_query_var('taxonomy'),
+                        'field' => 'slug',
+                        'terms' => get_query_var('term'),
+                    ),
+                ),
+            );
+        } else { // Za main shop
+            $allIds = [];
+            $args = array(
+                'post_type' => 'product',
+                'orderby' => 'date',
+                'order' => 'ASC',
+                'posts_per_page' => -1,
+                'paged' => (get_query_var('paged')) ? get_query_var('paged') : 1,
+                'meta_query' => array(
+                    array('relation' => 'OR',
+                        array( // Simple products type
+                            'key' => '_sale_price',
+                            'value' => 0,
+                            'compare' => '>',
+                            'type' => 'numeric'
+                        ),
+                        array( // Variable products type
+                            'key' => '_min_variation_sale_price',
+                            'value' => 0,
+                            'compare' => '>',
+                            'type' => 'numeric'
+                        ),
+                    ),
+                    array(
+                        'relation' => 'AND',
+                        array(
+                            'key' => '_stock_status',
+                            'value' => 'instock',
+                            'compare' => '='
+                        )
+                    )
+                )
+            );
+            $productsSale = new WP_Query($args);
+            foreach ($productsSale->get_posts() as $post) {
+                $allIds[] = $post->ID;
+            }
+            $args = array(
+                'post_type' => 'product',
+                'orderby' => 'date',
+                'order' => 'ASC',
+                'posts_per_page' => -1,
+                'paged' => (get_query_var('paged')) ? get_query_var('paged') : 1,
+                'meta_query' => array(
+                    array('relation' => 'OR',
+                        array( // Simple products type
+                            'key' => '_sale_price',
+                            'value' => '',
+                            'compare' => '=',
+                            'type' => 'char'
+                        ),
+                        array( // Variable products type
+                            'key' => '_min_variation_sale_price',
+                            'value' => '',
+                            'compare' => '=',
+                            'type' => 'char'
+                        ),
+                    ),
+                    array(
+                        'relation' => 'AND',
+                        array(
+                            'key' => '_stock_status',
+                            'value' => 'instock',
+                            'compare' => '='
+                        )
+                    )
+                )
+            );
+            $productsNotOnSale = new WP_Query($args);
+            foreach ($productsNotOnSale->get_posts() as $post) {
+                $allIds[] = $post->ID;
+            }
+            $args = array(
+                'post_type' => 'product',
+                'orderby' => 'date',
+                'order' => 'ASC',
+                'posts_per_page' => -1,
+                'paged' => (get_query_var('paged')) ? get_query_var('paged') : 1,
+                'meta_query' => array(
+                    'key' => '_stock_status',
+                    'value' => 'outofstock',
+                    'compare' => '='
+                )
+            );
+            $productsOutOfStock = new WP_Query($args);
+            foreach ($productsOutOfStock->get_posts() as $post) {
+                $allIds[] = $post->ID;
+            }
+            $args =array(
+                'post_type' => 'product',
+                'orderby' => 'post__in',
+                'post__in' => $allIds,
+                'posts_per_page' => $per_page,
+                'paged' => (get_query_var('paged')) ? get_query_var('paged') : 1,
+                );
+
+
+
+            $sortedProducts = new WP_Query($args);
+            if ($sortedProducts->have_posts()) :
+                while ($sortedProducts->have_posts()) : $sortedProducts->the_post();
+                    do_action('woocommerce_shop_loop');
+                    wc_get_template_part('content', 'product');
+                endwhile;
+                wp_reset_postdata();
+            endif;
+        }
+    } else { //za ostale page-eve
+        woocommerce_content();
+    }
 }
 
 

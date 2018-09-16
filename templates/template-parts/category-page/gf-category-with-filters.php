@@ -63,7 +63,6 @@
         </header>
         <?php
         if ( woocommerce_product_loop() ) {
-
             /**
              * Hook: woocommerce_before_shop_loop.
              *
@@ -84,21 +83,8 @@
          * @hooked woocommerce_catalog_ordering - 30
          */
         woocommerce_product_loop_start();
-
         if ( wc_get_loop_prop( 'total' ) ) {
-            while ( have_posts() ) {
-                the_post();
-
-                /**
-                 * Hook: woocommerce_shop_loop.
-                 *
-                 * @hooked WC_Structured_Data::generate_product_data() - 10
-                 */
-                ?>
-                <?php do_action( 'woocommerce_shop_loop' )?>
-                <?php
-                wc_get_template_part( 'content', 'product' );
-            }
+            custom_woo_product_loop();
         }
 
         woocommerce_product_loop_end();

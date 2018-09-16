@@ -101,66 +101,6 @@ function gf_cart_shortcode()
     </a>
     <?php
 }
-
-add_shortcode('gf-category-mobile', 'gf_category_mobile_toggle_shortcode');
-function gf_category_mobile_toggle_shortcode()
-{
-    if (wp_is_mobile()) {
-        echo '<div class="gf-category-mobile-toggle">Kategorije</div>';
-        $product_cat_raw = get_terms(array('parent' => 0, 'taxonomy' => 'product_cat'));
-        $product_cat = [];
-        foreach ($product_cat_raw as $cat) {
-            $product_cat[] = array(
-                'name' => $cat->name,
-                'term_id' => $cat->term_id,
-                'slug' => $cat->slug
-            );
-        }
-        $number_of_categories = 20;
-        if (!empty(get_option('filter_fields_order'))) {
-            $product_cat = get_option('filter_fields_order');
-            $number_of_categories = esc_attr(get_option('number_of_categories_in_sidebar'));
-        }
-        $i = 0;
-        echo '<div class="gf-category-accordion">';
-        foreach ($product_cat as $parent_product_cat) {
-            if ($parent_product_cat['slug'] != 'specijalne-promocije' && $parent_product_cat['slug'] != 'uncategorized'):
-                $i++;
-                if ($i <= $number_of_categories) {
-                    echo '<div class="gf-category-accordion__item gf-category-accordion__item--main">
-                        <a tabindex="-1" href="' . get_term_link((int)$parent_product_cat['term_id']) . '">' . $parent_product_cat['name'] . '</a>
-                        <i class="gf-category-accordion__expander fas fa-plus"></i>';
-                    $child_args = array(
-                        'taxonomy' => 'product_cat',
-                        'hide_empty' => false,
-                        'parent' => $parent_product_cat['term_id']
-                    );
-                    $child_product_cats = get_terms($child_args);
-
-                    foreach ($child_product_cats as $child_product_cat) {
-                        $child_child_args = array('taxonomy' => 'product_cat',
-                            'hide_empty' => false,
-                            'parent' => $child_product_cat->term_id
-                        );
-                        $child_child_product_cats = get_terms($child_child_args);
-                        echo '<div class="gf-category-accordion__item gf-category-accordion__subitem mt-sm">
-                              <a class="" href="' . get_term_link($child_product_cat->term_id) . '">' . $child_product_cat->name . '</a>
-                              <i class="gf-category-accordion__expander fas fa-plus"></i>';
-                        foreach ($child_child_product_cats as $child_child_product_cat) {
-                            echo '<div class="gf-category-accordion__item gf-category-accordion__item--last">
-                                <a class="" href="' . get_term_link($child_child_product_cat->term_id) . '">' . $child_child_product_cat->name . '</a>
-                              </div>';
-                        }
-                        echo '</div>';
-                    }
-                    echo '</div>';
-                };
-            endif;
-        }
-        echo '</div>';
-    }
-}
-
 add_shortcode('gf-mobile-nav-menu', 'gf_mobile_nav_menu_shortcode');
 function gf_mobile_nav_menu_shortcode()
 {
