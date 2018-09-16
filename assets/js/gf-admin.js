@@ -164,38 +164,39 @@ jQuery(document).ready(function ($) {
     //     });
     //     return false;
     // });
-    $('.accordion-first-level').accordion({
-        collapsible: true,
-        header: ">h2",
-        heightStyle: "content",
-        active:false,
-        icons: { "header": "ui-icon-plus", "activeHeader": "ui-icon-minus" }
-    });
-    $('.accordion-second-level').accordion({
-        collapsible: true,
-        header: ">h4",
-        heightStyle: "content",
-        active:false,
-        icons: { "header": "ui-icon-plus", "activeHeader": "ui-icon-minus" }
-    });
-    $('.filter-fields-list').sortable({
-        handle: "h2",
-        axis: 'y',
-        cursor: 'move',
-        items: 'li',
-    });
-    $('.parent-cat-children').sortable({
-        handle: "h4",
-        axis: 'y',
-        cursor: 'move',
-        items: 'li',
-    });
-    $('.child-cat-children').sortable({
-        handle: "h5",
-        axis: 'y',
-        cursor: 'move',
-        items: 'li',
-    });
-
+    if ($('.gf-sortable-categories-wrapper').length > 0) {
+        $('.accordion-first-level').accordion({
+            collapsible: true,
+            header: ">h2",
+            heightStyle: "content",
+            active: false,
+            icons: {"header": "ui-icon-plus", "activeHeader": "ui-icon-minus"}
+        });
+        $('.accordion-second-level').accordion({
+            collapsible: true,
+            header: ">h4",
+            heightStyle: "content",
+            active: false,
+            icons: {"header": "ui-icon-plus", "activeHeader": "ui-icon-minus"}
+        });
+        $('.filter-fields-list').sortable({
+            handle: "h2",
+            axis: 'y',
+            cursor: 'move',
+            items: 'li'
+        });
+        $('.parent-cat-children').sortable({
+            handle: "h4",
+            axis: 'y',
+            cursor: 'move',
+            items: 'li'
+        });
+        $('.child-cat-children').sortable({
+            handle: "h5",
+            axis: 'y',
+            cursor: 'move',
+            items: 'li'
+        });
+    }
 
 });

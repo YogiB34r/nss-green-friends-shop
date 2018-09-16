@@ -365,6 +365,7 @@ function custom_woo_product_loop()
             foreach ($productsSale->get_posts() as $post) {
                 $allIds[] = $post->ID;
             }
+
             $args = array(
                 'post_type' => 'product',
                 'orderby' => 'date',
