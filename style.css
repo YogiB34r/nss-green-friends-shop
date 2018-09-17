@@ -2117,3 +2117,28 @@ body.single-product .product .entry-summary  a.button.product_type_variable {
 .aws-search-field  {
   max-width: 95%;
 }
+
+#cookie-notice {
+  color: rgb(255, 255, 255);
+  background-color: rgba(51,51,51,.8);
+  font-weight: 600;
+}
+
+.cookie-notice-container {
+  display: flex;
+  align-items: center;
+}
+
+a#cn-accept-cookie {
+  background: #f45411;
+  border: none;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+a.#cn-more-info {
+  background: #fff;
+  color: #f45411;
+  text-transform: uppercase;
+  border: none;
+}
