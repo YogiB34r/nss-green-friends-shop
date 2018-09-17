@@ -1,4 +1,4 @@
-<?php get_header(); ?>
+<?php get_header();?>
 <div class="row">
   <div class="col-3 gf-sidebar gf-left-sidebar">
     <div class="gf-left-sidebar-wrapper">
