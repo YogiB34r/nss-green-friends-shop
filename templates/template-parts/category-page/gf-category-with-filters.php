@@ -84,7 +84,11 @@
          */
         woocommerce_product_loop_start();
         if ( wc_get_loop_prop( 'total' ) ) {
-            custom_woo_product_loop();
+            if(isset($_GET['s'])){
+                gf_custom_search();
+            }else{
+                custom_woo_product_loop();
+            }
         }
 
         woocommerce_product_loop_end();
