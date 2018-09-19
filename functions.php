@@ -409,14 +409,9 @@ function gf_custom_search()
 {
     $input = $_GET['s'];
 
-    $category = get_term_by('name', $input, 'product_cat');
-    $sql_part = "AND (productName LIKE '%{$input}%' OR description LIKE '%{$input}%' OR shortDescription LIKE '%{$input}%'))";
-    if ($input == $category->name) {
-        $sql_part = "AND categoryIds LIKE '%{$category->term_id}%'";
-    }
-
-    if (is_shop() || is_product_category() || is_product_tag()) { // Only run on shop archive pages, not single products or other pages
+    if (is_shop()) { // Only run on shop archive pages, not single products or other pages
         global $wpdb;
+        
         $allIds = [];
         $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
 
@@ -425,7 +420,9 @@ function gf_custom_search()
         $sql = "SELECT postId FROM wp_gf_products
                     WHERE salePrice > 0
                     AND stockStatus = 1
-                    AND status = 1" . $sql_part;
+                    AND status = 1
+                    AND (productName LIKE '%{$input}%' OR description LIKE '%{$input}%' OR shortDescription LIKE '%{$input}%')";
+
         $productsSale = $wpdb->get_results($sql);
         foreach ($productsSale as $post) {
             $allIds[] = $post->postId;
@@ -435,7 +432,7 @@ function gf_custom_search()
                     WHERE salePrice > 0
                     AND stockStatus = 1
                     AND status = 1
-                    AND (productName LIKE '%{$input}%' OR description LIKE '%{$input}%' OR shortDescription LIKE '%{$input}%'))";
+                    AND (productName LIKE '%{$input}%' OR description LIKE '%{$input}%' OR shortDescription LIKE '%{$input}%')";
         $productsNotOnSale = $wpdb->get_results($sql);
         foreach ($productsNotOnSale as $post) {
             $allIds[] = $post->postId;
@@ -444,7 +441,7 @@ function gf_custom_search()
         $sql = "SELECT postId FROM wp_gf_products
                     WHERE stockStatus = 0
                     AND status = 1
-                    AND (productName LIKE '%{$input}%' OR description LIKE '%{$input}%' OR shortDescription LIKE '%{$input}%'))";
+                    AND (productName LIKE '%{$input}%' OR description LIKE '%{$input}%' OR shortDescription LIKE '%{$input}%')";
         $productsOutOfStock = $wpdb->get_results($sql);
         foreach ($productsOutOfStock as $post) {
             $allIds[] = $post->postId;
@@ -455,6 +452,7 @@ function gf_custom_search()
             'post__in' => $allIds,
             'posts_per_page' => $per_page,
             'paged' => (get_query_var('paged')) ? get_query_var('paged') : 1,
+            'showposts' => -1
         );
         $sortedProducts = new WP_Query($args);
         if ($sortedProducts->have_posts()) :
