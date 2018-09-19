@@ -330,16 +330,16 @@ function custom_woo_product_loop()
             $category = get_term_by('slug', get_query_var('term'), 'product_cat');
 
             $sql = "SELECT postId FROM wp_gf_products WHERE salePrice > 0 AND stockStatus = 1 AND status = 1
-                AND categoryIds LIKE '%{$category->term_id}%'";
+                AND categoryIds LIKE '%{$category->term_id}%' ORDER BY createdAt";
             $productsSale = $wpdb->get_results($sql, OBJECT_K);
 
             $sql = "SELECT postId FROM wp_gf_products WHERE salePrice = 0 AND stockStatus = 1 AND status = 1
-                AND categoryIds LIKE '%{$category->term_id}%'";
+                AND categoryIds LIKE '%{$category->term_id}%' ORDER BY createdAt";
             $productsNotOnSale = $wpdb->get_results($sql, OBJECT_K);
             $allIds = array_merge(array_keys($productsSale), array_keys($productsNotOnSale));
 
             $sql = "SELECT postId FROM wp_gf_products WHERE stockStatus = 0 AND status = 1
-                AND categoryIds LIKE '%{$category->term_id}%'";
+                AND categoryIds LIKE '%{$category->term_id}%' ORDER BY createdAt";
             $productsOutOfStock = $wpdb->get_results($sql, OBJECT_K);
             $allIds = array_merge($allIds, array_keys($productsOutOfStock));
 
