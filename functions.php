@@ -297,6 +297,7 @@ function woocommerce_breadcrumb($args = array())
 
     wc_get_template('global/breadcrumb.php', $args);
 }
+
 //print all enqued styles
 function gf_print_styles()
 {
@@ -326,7 +327,7 @@ function custom_woo_product_loop()
         $allIds = [];
         $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
         if (get_query_var('taxonomy') === 'product_cat') { // Za kategorije
-            $category = get_term_by( 'slug', get_query_var('term'), 'product_cat' );
+            $category = get_term_by('slug', get_query_var('term'), 'product_cat');
 
             $sql = "SELECT postId FROM wp_gf_products WHERE salePrice > 0 AND stockStatus = 1 AND status = 1
                 AND categoryIds LIKE '%{$category->term_id}%'";
@@ -348,7 +349,7 @@ function custom_woo_product_loop()
             foreach ($productsOutOfStock as $post) {
                 $allIds[] = $post->postId;
             }
-            $args =array(
+            $args = array(
                 'post_type' => 'product',
                 'orderby' => 'post__in',
                 'post__in' => $allIds,
@@ -382,7 +383,7 @@ function custom_woo_product_loop()
             foreach ($productsOutOfStock as $post) {
                 $allIds[] = $post->ID;
             }
-            $args =array(
+            $args = array(
                 'post_type' => 'product',
                 'orderby' => 'post__in',
                 'post__in' => $allIds,
@@ -404,103 +405,67 @@ function custom_woo_product_loop()
 }
 
 
-function gf_custom_search(){
+function gf_custom_search()
+{
     $input = $_GET['s'];
+
+    $category = get_term_by('name', $input, 'product_cat');
+    $sql_part = "AND (productName LIKE '%{$input}%' OR description LIKE '%{$input}%' OR shortDescription LIKE '%{$input}%'))";
+    if ($input == $category->name) {
+        $sql_part = "AND categoryIds LIKE '%{$category->term_id}%'";
+    }
 
     if (is_shop() || is_product_category() || is_product_tag()) { // Only run on shop archive pages, not single products or other pages
         global $wpdb;
         $allIds = [];
         $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
-        if (get_query_var('taxonomy') === 'product_cat') { // Za kategorije
-            $category = get_term_by( 'slug', get_query_var('term'), 'product_cat' );
 
-            $sql = "SELECT postId FROM wp_gf_products 
-                    WHERE salePrice > 0 
-                    AND stockStatus = 1 
-                    AND status = 1
-                    AND categoryIds LIKE '%{$category->term_id}%'";
-            $productsSale = $wpdb->get_results($sql);
-            foreach ($productsSale as $post) {
-                $allIds[] = $post->postId;
-            }
+        //@TODO add category
 
-            $sql = "SELECT postId FROM wp_gf_products WHERE salePrice = 0 AND stockStatus = 1 AND status = 1
-                AND categoryIds LIKE '%{$category->term_id}%'";
-            $productsNotOnSale = $wpdb->get_results($sql);
-            foreach ($productsNotOnSale as $post) {
-                $allIds[] = $post->postId;
-            }
-
-            $sql = "SELECT postId FROM wp_gf_products WHERE stockStatus = 0 AND status = 1
-                AND categoryIds LIKE '%{$category->term_id}%'";
-            $productsOutOfStock = $wpdb->get_results($sql);
-            foreach ($productsOutOfStock as $post) {
-                $allIds[] = $post->postId;
-            }
-            $args =array(
-                'post_type' => 'product',
-                'orderby' => 'post__in',
-                'post__in' => $allIds,
-                'posts_per_page' => $per_page,
-                'paged' => (get_query_var('paged')) ? get_query_var('paged') : 1,
-            );
-            $sortedProducts = new WP_Query($args);
-            if ($sortedProducts->have_posts()) :
-                while ($sortedProducts->have_posts()) : $sortedProducts->the_post();
-                    do_action('woocommerce_shop_loop');
-                    wc_get_template_part('content', 'product');
-                endwhile;
-                wp_reset_postdata();
-            endif;
-        } else { // Za main shop
-            //@TODO add category
-            $sql = "SELECT postId FROM wp_gf_products 
-                    WHERE salePrice > 0 
-                    AND stockStatus = 1 
-                    AND status = 1 
-                    AND (productName LIKE '%{$input}%' OR description LIKE '%{$input}%' OR shortDescription LIKE '%{$input}%'))";
-            $productsSale = $wpdb->get_results($sql);
-            foreach ($productsSale as $post) {
-                $allIds[] = $post->postId;
-            }
-
-            $sql = "SELECT postId FROM wp_gf_products 
-                    WHERE salePrice > 0 
-                    AND stockStatus = 1 
-                    AND status = 1
-                    AND (productName LIKE '%{$input}%' OR description LIKE '%{$input}%' OR shortDescription LIKE '%{$input}%'))";
-            $productsNotOnSale = $wpdb->get_results($sql);
-            foreach ($productsNotOnSale as $post) {
-                $allIds[] = $post->postId;
-            }
-
-            $sql = "SELECT postId FROM wp_gf_products 
-                    WHERE stockStatus = 0 
-                    AND status = 1
-                    AND (productName LIKE '%{$input}%' OR description LIKE '%{$input}%' OR shortDescription LIKE '%{$input}%'))";
-            $productsOutOfStock = $wpdb->get_results($sql);
-            foreach ($productsOutOfStock as $post) {
-                $allIds[] = $post->postId;
-            }
-            $args =array(
-                'post_type' => 'product',
-                'orderby' => 'post__in',
-                'post__in' => $allIds,
-                'posts_per_page' => $per_page,
-                'paged' => (get_query_var('paged')) ? get_query_var('paged') : 1,
-            );
-            $sortedProducts = new WP_Query($args);
-            if ($sortedProducts->have_posts()) :
-                while ($sortedProducts->have_posts()) : $sortedProducts->the_post();
-                    do_action('woocommerce_shop_loop');
-                    wc_get_template_part('content', 'product');
-                endwhile;
-                wp_reset_postdata();
-            endif;
+        $sql = "SELECT postId FROM wp_gf_products
+                    WHERE salePrice > 0
+                    AND stockStatus = 1
+                    AND status = 1" . $sql_part;
+        $productsSale = $wpdb->get_results($sql);
+        foreach ($productsSale as $post) {
+            $allIds[] = $post->postId;
         }
-    } else { //za ostale page-eve
-        woocommerce_content();
+
+        $sql = "SELECT postId FROM wp_gf_products
+                    WHERE salePrice > 0
+                    AND stockStatus = 1
+                    AND status = 1
+                    AND (productName LIKE '%{$input}%' OR description LIKE '%{$input}%' OR shortDescription LIKE '%{$input}%'))";
+        $productsNotOnSale = $wpdb->get_results($sql);
+        foreach ($productsNotOnSale as $post) {
+            $allIds[] = $post->postId;
+        }
+
+        $sql = "SELECT postId FROM wp_gf_products
+                    WHERE stockStatus = 0
+                    AND status = 1
+                    AND (productName LIKE '%{$input}%' OR description LIKE '%{$input}%' OR shortDescription LIKE '%{$input}%'))";
+        $productsOutOfStock = $wpdb->get_results($sql);
+        foreach ($productsOutOfStock as $post) {
+            $allIds[] = $post->postId;
+        }
+        $args = array(
+            'post_type' => 'product',
+            'orderby' => 'post__in',
+            'post__in' => $allIds,
+            'posts_per_page' => $per_page,
+            'paged' => (get_query_var('paged')) ? get_query_var('paged') : 1,
+        );
+        $sortedProducts = new WP_Query($args);
+        if ($sortedProducts->have_posts()) :
+            while ($sortedProducts->have_posts()) : $sortedProducts->the_post();
+                do_action('woocommerce_shop_loop');
+                wc_get_template_part('content', 'product');
+            endwhile;
+            wp_reset_postdata();
+        endif;
     }
+
 
 }
 
@@ -522,31 +487,31 @@ function custom_woo_product_loop_backup()
                         'field' => 'slug',
                         'terms' => get_query_var('term'),
                     ),
-                'meta_query' => array(
-                    array('relation' => 'OR',
-                        array( // Simple products type
-                            'key' => '_sale_price',
-                            'value' => 0,
-                            'compare' => '>',
-                            'type' => 'numeric'
+                    'meta_query' => array(
+                        array('relation' => 'OR',
+                            array( // Simple products type
+                                'key' => '_sale_price',
+                                'value' => 0,
+                                'compare' => '>',
+                                'type' => 'numeric'
+                            ),
+                            array( // Variable products type
+                                'key' => '_min_variation_sale_price',
+                                'value' => 0,
+                                'compare' => '>',
+                                'type' => 'numeric'
+                            ),
                         ),
-                        array( // Variable products type
-                            'key' => '_min_variation_sale_price',
-                            'value' => 0,
-                            'compare' => '>',
-                            'type' => 'numeric'
-                        ),
-                    ),
-                    array(
-                        'relation' => 'AND',
                         array(
-                            'key' => '_stock_status',
-                            'value' => 'instock',
-                            'compare' => '='
+                            'relation' => 'AND',
+                            array(
+                                'key' => '_stock_status',
+                                'value' => 'instock',
+                                'compare' => '='
+                            )
                         )
                     )
-                )
-            ));
+                ));
             $productsSale = new WP_Query($args);
             foreach ($productsSale->get_posts() as $post) {
                 $allIds[] = $post->ID;
@@ -564,31 +529,31 @@ function custom_woo_product_loop_backup()
                         'field' => 'slug',
                         'terms' => get_query_var('term'),
                     ),
-                'meta_query' => array(
-                    array('relation' => 'OR',
-                        array( // Simple products type
-                            'key' => '_sale_price',
-                            'value' => '',
-                            'compare' => '=',
-                            'type' => 'char'
+                    'meta_query' => array(
+                        array('relation' => 'OR',
+                            array( // Simple products type
+                                'key' => '_sale_price',
+                                'value' => '',
+                                'compare' => '=',
+                                'type' => 'char'
+                            ),
+                            array( // Variable products type
+                                'key' => '_min_variation_sale_price',
+                                'value' => '',
+                                'compare' => '=',
+                                'type' => 'char'
+                            ),
                         ),
-                        array( // Variable products type
-                            'key' => '_min_variation_sale_price',
-                            'value' => '',
-                            'compare' => '=',
-                            'type' => 'char'
-                        ),
-                    ),
-                    array(
-                        'relation' => 'AND',
                         array(
-                            'key' => '_stock_status',
-                            'value' => 'instock',
-                            'compare' => '='
+                            'relation' => 'AND',
+                            array(
+                                'key' => '_stock_status',
+                                'value' => 'instock',
+                                'compare' => '='
+                            )
                         )
                     )
-                )
-            ));
+                ));
             $productsNotOnSale = new WP_Query($args);
             foreach ($productsNotOnSale->get_posts() as $post) {
                 $allIds[] = $post->ID;
@@ -605,17 +570,17 @@ function custom_woo_product_loop_backup()
                         'field' => 'slug',
                         'terms' => get_query_var('term'),
                     ),
-                'meta_query' => array(
-                    'key' => '_stock_status',
-                    'value' => 'outofstock',
-                    'compare' => '='
-                )
-            ));
+                    'meta_query' => array(
+                        'key' => '_stock_status',
+                        'value' => 'outofstock',
+                        'compare' => '='
+                    )
+                ));
             $productsOutOfStock = new WP_Query($args);
             foreach ($productsOutOfStock->get_posts() as $post) {
                 $allIds[] = $post->ID;
             }
-            $args =array(
+            $args = array(
                 'post_type' => 'product',
                 'orderby' => 'post__in',
                 'post__in' => $allIds,
@@ -718,13 +683,13 @@ function custom_woo_product_loop_backup()
             foreach ($productsOutOfStock->get_posts() as $post) {
                 $allIds[] = $post->ID;
             }
-            $args =array(
+            $args = array(
                 'post_type' => 'product',
                 'orderby' => 'post__in',
                 'post__in' => $allIds,
                 'posts_per_page' => $per_page,
                 'paged' => (get_query_var('paged')) ? get_query_var('paged') : 1,
-                );
+            );
             $sortedProducts = new WP_Query($args);
             if ($sortedProducts->have_posts()) :
                 while ($sortedProducts->have_posts()) : $sortedProducts->the_post();
