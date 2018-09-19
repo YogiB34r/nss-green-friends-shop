@@ -330,24 +330,27 @@ function custom_woo_product_loop()
 
             $sql = "SELECT postId FROM wp_gf_products WHERE salePrice > 0 AND stockStatus = 1 AND status = 1
                 AND categoryIds LIKE '%{$category->term_id}%'";
-            $productsSale = $wpdb->get_results($sql);
-            foreach ($productsSale as $post) {
-                $allIds[] = $post->postId;
-            }
+            $productsSale = $wpdb->get_results($sql, OBJECT_K);
+
+//            foreach ($productsSale as $post) {
+//                $allIds[] = $post->postId;
+//            }
 
             $sql = "SELECT postId FROM wp_gf_products WHERE salePrice = 0 AND stockStatus = 1 AND status = 1
                 AND categoryIds LIKE '%{$category->term_id}%'";
-            $productsNotOnSale = $wpdb->get_results($sql);
-            foreach ($productsNotOnSale as $post) {
-                $allIds[] = $post->postId;
-            }
+            $productsNotOnSale = $wpdb->get_results($sql, OBJECT_K);
+            $allIds = array_merge(array_keys($productsSale), array_keys($productsNotOnSale));
+//            foreach ($productsNotOnSale as $post) {
+//                $allIds[] = $post->postId;
+//            }
 
             $sql = "SELECT postId FROM wp_gf_products WHERE stockStatus = 0 AND status = 1
                 AND categoryIds LIKE '%{$category->term_id}%'";
-            $productsOutOfStock = $wpdb->get_results($sql);
-            foreach ($productsOutOfStock as $post) {
-                $allIds[] = $post->postId;
-            }
+            $productsOutOfStock = $wpdb->get_results($sql, OBJECT_K);
+            $allIds = array_merge($allIds, array_keys($productsOutOfStock));
+//            foreach ($productsOutOfStock as $post) {
+//                $allIds[] = $post->postId;
+//            }
             $args =array(
                 'post_type' => 'product',
                 'orderby' => 'post__in',
