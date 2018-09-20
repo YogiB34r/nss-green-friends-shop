@@ -1,37 +1,40 @@
 <?php
 $sexyShopCat = get_term_by('slug', 'sexy-shop', 'product_cat');
 $queriedObject = get_queried_object_id();
-$sexyShopChildren = get_term_children($sexyShopCat->term_id, 'product_cat');
-if (($queriedObject == $sexyShopCat->term_id || in_array($queriedObject, $sexyShopChildren)) && !in_array('nss-sex-shop-agreement',$_COOKIE)): ?>
-    <script type="text/javascript">
-        jQuery(document).ready(function () {
-            function deleteCookie(name) {
-                document.cookie = name +"=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-            }
-            function getCookie(name) {
-                var match = document.cookie.match(RegExp('(?:^|;\\s*)' + name + '=([^;]*)'));
-                return match ? match[1] : null;
-            }
+if ($sexyShopCat){
+    $sexyShopChildren = get_term_children($sexyShopCat->term_id, 'product_cat');
+    if (($queriedObject == $sexyShopCat->term_id || in_array($queriedObject, $sexyShopChildren)) && !in_array('nss-sex-shop-agreement', $_COOKIE)): ?>
+        <script type="text/javascript">
+            jQuery(document).ready(function () {
+                function deleteCookie(name) {
+                    document.cookie = name + "=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+                }
 
-            function deleteCookie(name) {
-                document.cookie = name + "=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-            }
+                function getCookie(name) {
+                    var match = document.cookie.match(RegExp('(?:^|;\\s*)' + name + '=([^;]*)'));
+                    return match ? match[1] : null;
+                }
 
-            function hideBody() {
-                document.getElementsByTagName("BODY")[0].style.display = "none";
+                function deleteCookie(name) {
+                    document.cookie = name + "=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+                }
+
+                function hideBody() {
+                    document.getElementsByTagName("BODY")[0].style.display = "none";
+                }
+            });
+            if (confirm('Da bi ste videli sadržaj ovog odeljka morate se složiti sa uslovima i prihvatiti da imate preko 18 godina.')
+                == true) {
+                var expiryDate = new Date();
+                expiryDate.setMonth(expiryDate.getMonth() + 6);
+                document.cookie = 'name = nss-sex-shop-agreement; path=/; expires =' + expiryDate;
+                document.getElementsByTagName("BODY")[0].style.display = "block";
+            } else {
+                document.location.href = "/";
             }
-        });
-        if (confirm('Da bi ste videli sadržaj ovog odeljka morate se složiti sa uslovima i prihvatiti da imate preko 18 godina.')
-            == true) {
-            var expiryDate = new Date();
-            expiryDate.setMonth(expiryDate.getMonth() + 6);
-            document.cookie = 'name = nss-sex-shop-agreement; path=/; expires =' + expiryDate;
-            document.getElementsByTagName("BODY")[0].style.display = "block";
-        } else {
-            document.location.href = "/";
-        }
-    </script>
-<?php endif;?>
+        </script>
+    <?php endif;
+} ?>
 <div class="row">
     <div class="col-3 list-unstyled gf-sidebar">
         <div class="gf-left-sidebar-wrapper">
