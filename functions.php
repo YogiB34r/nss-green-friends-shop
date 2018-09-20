@@ -404,6 +404,17 @@ function custom_woo_product_loop()
     }
 }
 
+function gf_custom_search_output($sortedProducts)
+{
+    if ($sortedProducts->have_posts()) :
+//        wc_setup_loop();
+        while ($sortedProducts->have_posts()) : $sortedProducts->the_post();
+            do_action('woocommerce_shop_loop');
+            wc_get_template_part('content', 'product');
+        endwhile;
+        wp_reset_postdata();
+    endif;
+}
 
 function gf_custom_search()
 {
@@ -411,8 +422,6 @@ function gf_custom_search()
 
     if (is_shop()) { // Only run on shop archive pages, not single products or other pages
         global $wpdb;
-
-        $allIds = [];
         $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
 
         //@TODO add category
@@ -437,7 +446,7 @@ function gf_custom_search()
             }
         }
 
-        echo $sql = "SELECT 
+        $sql = "SELECT 
             postId,
             {$customOrdering}  
             FROM wp_gf_products
@@ -449,7 +458,7 @@ function gf_custom_search()
 
         $productsSale = $wpdb->get_results($sql, OBJECT_K);
 
-        echo $sql = "SELECT 
+        $sql = "SELECT 
                 postId,
                 {$customOrdering}
             FROM wp_gf_products
@@ -462,25 +471,28 @@ function gf_custom_search()
         var_dump('regular count: ' . count($productsNotOnSale));
         var_dump('sale count: ' . count($productsSale));
         $allIds = array_merge(array_keys($productsSale), array_keys($productsNotOnSale));
+        var_dump('count: ' . count($allIds));
+
+        $currrentPage = (get_query_var('paged')) ? get_query_var('paged') : 1;
 
         $args = array(
             'post_type' => 'product',
             'orderby' => 'post__in',
             'post__in' => $allIds,
             'posts_per_page' => $per_page,
-            'paged' => (get_query_var('paged')) ? get_query_var('paged') : 1,
+            'paged' => $currrentPage,
         );
+
+//        wc_set_loop_prop('total', count($allIds));
+//        wc_set_loop_prop('per_page', $per_page);
+//        wc_set_loop_prop('current_page', $currrentPage);
+//        wc_set_loop_prop('total_pages', ceil(count($allIds) / $per_page));
+//        var_dump($GLOBALS['woocommerce_loop']);
+
         $sortedProducts = new WP_Query($args);
-        if ($sortedProducts->have_posts()) :
-            while ($sortedProducts->have_posts()) : $sortedProducts->the_post();
-                do_action('woocommerce_shop_loop');
-                wc_get_template_part('content', 'product');
-            endwhile;
-            wp_reset_postdata();
-        endif;
+
+        return $sortedProducts;
     }
-
-
 }
 
 function custom_woo_product_loop_backup()
