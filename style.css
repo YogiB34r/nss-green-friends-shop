@@ -218,6 +218,10 @@ img.gf-header-logo {
   display: none;
 }
 
+.mobile-search {
+  min-width: 100%;
+}
+
 .gf-search-form--mobile {
   text-align: center;
   display: flex;
@@ -1850,7 +1854,7 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
   }
 
   .gf-search-form--mobile {
-    display: block;
+    display: flex;
   }
 
   .gf-search-form--mobile .search-field {
