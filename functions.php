@@ -413,7 +413,7 @@ function gf_custom_search_output($sortedProducts)
 
 function gf_custom_search($input)
 {
-    //cleanup input
+    //@TODO cleanup input
     $input = $input;
 
     global $wpdb;
@@ -430,11 +430,24 @@ function gf_custom_search($input)
                 $searchCondition .= " OR ";
             }
             $searchCondition .= " productName LIKE '%{$word}%' OR description LIKE '%{$word}%' 
-                OR shortDescription LIKE '%{$word}%' OR attributes LIKE '%{$word}%'";
-            $customOrdering .= " CASE WHEN productName LIKE '%{$word}%' THEN 3 ELSE 0 END
-             + CASE WHEN description LIKE '%{$word}%' THEN 1 ELSE 0 END 
-             + CASE WHEN shortDescription LIKE '%{$word}%' THEN 1 ELSE 0 END
-             + CASE WHEN attributes LIKE '%{$word}%' THEN 2 ELSE 0 END ";
+                OR shortDescription LIKE '%{$word}%' OR attributes LIKE '%{$word}%' OR categories LIKE '%{$word}%'";
+            $customOrdering .= " 
+            CASE 
+                WHEN productName LIKE '% {$word} %' THEN 5 
+                WHEN productName LIKE '%{$word}%' THEN 2
+                ELSE 0 
+            END
+            + CASE 
+                WHEN categories LIKE '%{$word}%' THEN 10
+                ELSE 0 
+            END
+            + CASE 
+                WHEN description LIKE '% {$word} %' THEN 2 
+                WHEN description LIKE '%{$word}%' THEN 1
+                ELSE 0 
+            END 
+            + CASE WHEN shortDescription LIKE '%{$word}%' THEN 1 ELSE 0 END
+            + CASE WHEN attributes LIKE '%{$word}%' THEN 5 ELSE 0 END ";
             if ($key === count($explodedInput) - 1) {
                 $customOrdering .= " as o ";
             } else {
@@ -447,28 +460,30 @@ function gf_custom_search($input)
         postId,
         {$customOrdering}  
         FROM wp_gf_products
-        WHERE salePrice > 0
-        AND stockStatus = 1
+        WHERE stockStatus = 1 
+#        AND salePrice > 0 
         AND status = 1
         AND ({$searchCondition}) 
         ORDER BY o DESC, createdAt DESC";
 
     $productsSale = $wpdb->get_results($sql, OBJECT_K);
 
-    $sql = "SELECT 
-            postId,
-            {$customOrdering}
-        FROM wp_gf_products
-        WHERE salePrice = 0
-        AND stockStatus = 1
-        AND status = 1
-        AND ({$searchCondition})
-     ORDER BY o dESC, createdAt DESC";
-    $productsNotOnSale = $wpdb->get_results($sql, OBJECT_K);
-    var_dump('regular count: ' . count($productsNotOnSale));
-    var_dump('sale count: ' . count($productsSale));
-    $allIds = array_merge(array_keys($productsSale), array_keys($productsNotOnSale));
-    var_dump('count: ' . count($allIds));
+    $allIds = array_keys($productsSale);
+
+//    $sql = "SELECT
+//            postId,
+//            {$customOrdering}
+//        FROM wp_gf_products
+//        WHERE salePrice = 0
+//        AND stockStatus = 1
+//        AND status = 1
+//        AND ({$searchCondition})
+//     ORDER BY o dESC, createdAt DESC";
+//    $productsNotOnSale = $wpdb->get_results($sql, OBJECT_K);
+//    var_dump('regular count: ' . count($productsNotOnSale));
+//    var_dump('sale count: ' . count($productsSale));
+//    $allIds = array_merge(array_keys($productsSale), array_keys($productsNotOnSale));
+//    var_dump('count: ' . count($allIds));
 
     $currrentPage = (get_query_var('paged')) ? get_query_var('paged') : 1;
 
