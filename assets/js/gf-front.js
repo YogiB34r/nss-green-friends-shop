@@ -88,11 +88,11 @@ jQuery(document).ready(function () {
     jQuery('.gf-hamburger-menu').click(function () {
         jQuery('.gf-mobile-menu').slideToggle();
     });
-
-    // jQuery('.gf-search-toggle').click(function() {
-    //   jQuery('.search-input-wrapper').toggle();
-    //   jQuery('.gf-search-toggle i').toggleClass('fa-times fa-search');
-    // });
+// za search togle na mobilnom ako treba
+//     jQuery('.gf-search-toggle').click(function() {
+//       jQuery('.search-input-wrapper').toggle();
+//       jQuery('.gf-search-toggle i').toggleClass('fa-times fa-search');
+//     });
 
     jQuery('.category-item a').hover(function (e) {
 
