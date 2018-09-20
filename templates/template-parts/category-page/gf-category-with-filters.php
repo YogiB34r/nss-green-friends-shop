@@ -62,7 +62,16 @@
             ?>
         </header>
         <?php
-        if ( woocommerce_product_loop() ) {
+        if (woocommerce_product_loop()) {
+            if (wc_get_loop_prop('total')) {
+                if (isset($_GET['s'])){
+                    $sortedProducts = gf_custom_search();
+                } else {
+//                    custom_woo_product_loop();
+                }
+            }
+
+
             /**
              * Hook: woocommerce_before_shop_loop.
              *
@@ -85,7 +94,7 @@
         woocommerce_product_loop_start();
         if ( wc_get_loop_prop( 'total' ) ) {
             if(isset($_GET['s'])){
-                gf_custom_search();
+                gf_custom_search_output($sortedProducts);
             }else{
                 custom_woo_product_loop();
             }
