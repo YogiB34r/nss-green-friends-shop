@@ -2123,7 +2123,7 @@ a#cn-accept-cookie {
   color: #fff;
   text-transform: uppercase;
 }
-a.#cn-more-info {
+a#cn-more-info {
   background: #fff;
   color: #f45411;
   text-transform: uppercase;
@@ -2750,7 +2750,7 @@ a#cn-accept-cookie {
   text-transform: uppercase;
 }
 
-a.#cn-more-info {
+a#cn-more-info {
   background: #fff;
   color: #f45411;
   text-transform: uppercase;
