@@ -1858,7 +1858,7 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
   }
 
   .gf-search-form--mobile .search-field {
-    width: 83%;
+    width: 100%;
     color: #1d1d1d;
     background: #f6f6f6;
     text-align: left;
@@ -1889,7 +1889,8 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
   }
 
   .gf-content-wrapper {
-    padding: 25px 0;
+    padding: 0;
+    margin-top: -24px;
   }
 
   .woocommerce ul.products li.product .button,
