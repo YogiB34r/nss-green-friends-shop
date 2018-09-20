@@ -11,6 +11,7 @@
   </div>
   <div class="gf-content-wrapper col-md-9 col-sm-12">
     <div class="gf-row row list-unstyled">
+        <a href="#" data-user-id="<?=get_current_user_id()?>" class="gf-ajax">Test Ajaxx</a>
       <?php dynamic_sidebar('gf-homepage-row-1'); ?>
     </div>
     <div class="gf-row row list-unstyled">

@@ -741,6 +741,16 @@ function custom_woo_product_loop_backup()
     }
 }
 
+//ajax test
+//for loged in users
+add_action( 'wp_ajax_ajax_test','gf_ajax_test' );
 
+// for logged out users
+add_action('wp_ajax_nopriv_ajax_test','gf_ajax_test' );
+
+function gf_ajax_test(){
+    echo 123;
+    echo $userId = $_POST['user_id'];
+}
 
 
