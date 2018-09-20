@@ -326,8 +326,14 @@ function custom_woo_product_loop()
         global $wpdb;
         $allIds = [];
         $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
+        var_dump(get_query_var('taxonomy'));
+        var_dump(get_query_var('term'));
+        die();
+
         if (get_query_var('taxonomy') === 'product_cat') { // Za kategorije
             $category = get_term_by('slug', get_query_var('term'), 'product_cat');
+            var_dump($category);
+            die();
 
             $sql = "SELECT postId FROM wp_gf_products WHERE salePrice > 0 AND stockStatus = 1 AND status = 1
                 AND categoryIds LIKE '%{$category->term_id}%' ORDER BY createdAt";
@@ -405,48 +411,64 @@ function gf_custom_search()
 
     if (is_shop()) { // Only run on shop archive pages, not single products or other pages
         global $wpdb;
-        
+
         $allIds = [];
         $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
 
         //@TODO add category
 
-        $sql = "SELECT postId FROM wp_gf_products
-                    WHERE salePrice > 0
-                    AND stockStatus = 1
-                    AND status = 1
-                    AND (productName LIKE '%{$input}%' OR description LIKE '%{$input}%' OR shortDescription LIKE '%{$input}%')";
-
-        $productsSale = $wpdb->get_results($sql);
-        foreach ($productsSale as $post) {
-            $allIds[] = $post->postId;
+        $searchCondition = "";
+        $customOrdering = "";
+        $explodedInput = explode(' ', $input);
+        foreach ($explodedInput as $key => $word) {
+            if (strlen($word) > 3) {
+                if ($key > 0) {
+                    $searchCondition .= " OR ";
+                }
+                $searchCondition .= " productName LIKE '%{$word}%' OR description LIKE '%{$word}%' OR shortDescription LIKE '%{$word}%' ";
+                $customOrdering .= " CASE WHEN productName LIKE '%{$word}%' THEN 3 ELSE 0 END
+                 + CASE WHEN description LIKE '%{$word}%' THEN 1 ELSE 0 END 
+                 + CASE WHEN shortDescription LIKE '%{$word}%' THEN 1 ELSE 0 END ";
+                if ($key === count($explodedInput) - 1) {
+                    $customOrdering .= " as o ";
+                } else {
+                    $customOrdering .= " + ";
+                }
+            }
         }
 
-        $sql = "SELECT postId FROM wp_gf_products
-                    WHERE salePrice > 0
-                    AND stockStatus = 1
-                    AND status = 1
-                    AND (productName LIKE '%{$input}%' OR description LIKE '%{$input}%' OR shortDescription LIKE '%{$input}%')";
-        $productsNotOnSale = $wpdb->get_results($sql);
-        foreach ($productsNotOnSale as $post) {
-            $allIds[] = $post->postId;
-        }
+        echo $sql = "SELECT 
+            postId,
+            {$customOrdering}  
+            FROM wp_gf_products
+            WHERE salePrice > 0
+            AND stockStatus = 1
+            AND status = 1
+            AND ({$searchCondition}) 
+            ORDER BY o DESC, createdAt DESC";
 
-        $sql = "SELECT postId FROM wp_gf_products
-                    WHERE stockStatus = 0
-                    AND status = 1
-                    AND (productName LIKE '%{$input}%' OR description LIKE '%{$input}%' OR shortDescription LIKE '%{$input}%')";
-        $productsOutOfStock = $wpdb->get_results($sql);
-        foreach ($productsOutOfStock as $post) {
-            $allIds[] = $post->postId;
-        }
+        $productsSale = $wpdb->get_results($sql, OBJECT_K);
+
+        echo $sql = "SELECT 
+                postId,
+                {$customOrdering}
+            FROM wp_gf_products
+            WHERE salePrice = 0
+            AND stockStatus = 1
+            AND status = 1
+            AND ({$searchCondition})
+         ORDER BY o dESC, createdAt DESC";
+        $productsNotOnSale = $wpdb->get_results($sql, OBJECT_K);
+        var_dump('regular count: ' . count($productsNotOnSale));
+        var_dump('sale count: ' . count($productsSale));
+        $allIds = array_merge(array_keys($productsSale), array_keys($productsNotOnSale));
+
         $args = array(
             'post_type' => 'product',
             'orderby' => 'post__in',
             'post__in' => $allIds,
             'posts_per_page' => $per_page,
             'paged' => (get_query_var('paged')) ? get_query_var('paged') : 1,
-            'showposts' => -1
         );
         $sortedProducts = new WP_Query($args);
         if ($sortedProducts->have_posts()) :
