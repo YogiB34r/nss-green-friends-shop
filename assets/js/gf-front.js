@@ -20,7 +20,7 @@ jQuery(document).ready(function () {
         radio.prop('checked', !radio.prop('checked'));
     });
 
-    jQuery('.gf-category-box__item h5').each(function (index, element) {
+    jQuery('.gf-category-box__item h5, .slider-item h5').each(function (index, element) {
         $clamp(element, {clamp: 3, useNativeClamp: false});
     });
     jQuery('.woocommerce-loop-product__title').each(function (index, element) {

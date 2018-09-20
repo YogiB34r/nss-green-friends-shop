@@ -218,8 +218,15 @@ img.gf-header-logo {
   display: none;
 }
 
+.mobile-search {
+  min-width: 100%;
+}
+
 .gf-search-form--mobile {
   text-align: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .gf-radio-search-wrapper {
@@ -230,12 +237,15 @@ img.gf-header-logo {
   display: none;
 }
 
-
-
 .search-input-wrapper {
   width: 100%;
   float: unset;
   margin-top: 15px;
+}
+
+.gf-search-form--mobile .search-input-wrapper {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .search-field {
@@ -1844,7 +1854,7 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
   }
 
   .gf-search-form--mobile {
-    display: block;
+    display: flex;
   }
 
   .gf-search-form--mobile .search-field {
@@ -1978,6 +1988,10 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
 
   .gf-footer-images li img{
     height: 70% !important;
+  }
+
+  .cookie-notice-container {
+    flex-wrap: wrap;
   }
 }
 
