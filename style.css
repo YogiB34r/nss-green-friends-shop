@@ -1979,6 +1979,10 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
   .gf-footer-images li img{
     height: 70% !important;
   }
+
+  .cookie-notice-container {
+    flex-wrap: wrap;
+  }
 }
 
 @media only screen and (max-width: 380px) {
