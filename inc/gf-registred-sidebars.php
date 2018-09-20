@@ -24,6 +24,11 @@ function gf_register_sidebars() {
             'description'   => '',
         ),
         array(
+            'name'          => __('Search form mobile', ''.$theme->get('TextDomain').''),
+            'id'            => 'gf-search-form-mobile',
+            'description'   => '',
+        ),
+        array(
             'name'          => __('Homepage row 1', ''.$theme->get('TextDomain').''),
             'id'            => 'gf-homepage-row-1',
             'description'   => '',
