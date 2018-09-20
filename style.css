@@ -220,6 +220,9 @@ img.gf-header-logo {
 
 .gf-search-form--mobile {
   text-align: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .gf-radio-search-wrapper {
@@ -230,12 +233,15 @@ img.gf-header-logo {
   display: none;
 }
 
-
-
 .search-input-wrapper {
   width: 100%;
   float: unset;
   margin-top: 15px;
+}
+
+.gf-search-form--mobile .search-input-wrapper {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .search-field {
