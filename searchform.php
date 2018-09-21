@@ -1,12 +1,9 @@
 <form role="search" method="get" class="gf-search-form"
       action="/pretraga/">
     <span class="screen-reader-text"><?php _x('Search for:', 'label') ?></span>
-    <input type="search"
-           class="search-field"
+    <input type="search" autocomplete="off" class="search-field" name="query"
            placeholder="<?=esc_attr_x('Unesite frazu pretrage &hellip;', '')?>"
-           value="<?= get_search_query() ?>"
-           name="query"
-           id="gf-search-box"/>
+           value="<?= get_search_query() ?>" id="gf-search-box" />
     <button type="submit" class="search-submit"><i class="fa fa-search"></i></button>
     <div id="suggesstion-box" class="gf-autocomplete-results"></div>
 </form>

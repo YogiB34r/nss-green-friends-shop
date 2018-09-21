@@ -28,11 +28,12 @@ jQuery(document).ready(function(){
                 data:{'keyword': jQuery(this).val(), action:'ajax_gf_autocomplete'},
                 minLength: 0,
                 beforeSend: function(){
-                    jQuery("#gf-search-box").css("background","#fafafa url(wp-content/themes/nss-green-firends-shop/assets/images/LoaderIcon.gif)no-repeat 36px");
+                    jQuery("#gf-search-box").css("background","#fafafa url(/wp-content/themes/nss-green-friends-shop/assets/images/LoaderIcon.gif)no-repeat 36px");
                 },
                 success: function(data){
-                    jQuery("#suggesstion-box").show();
-                    jQuery("#suggesstion-box").html(data);
+                    jQuery("#gf-search-box").css("background","none");
+                    jQuery("#suggesstion-box").html(data.slice(0, -1));
+                    jQuery("#suggesstion-box").fadeIn();
                     jQuery("#search-box").css("background","#eee");
                 }
             });

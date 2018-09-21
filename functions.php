@@ -765,7 +765,6 @@ add_action('wp_ajax_ajax_gf_autocomplete', 'gf_ajax_search_autocomplete');
 
 // for logged out users
 add_action('wp_ajax_nopriv_ajax_gf_autocomplete', 'gf_ajax_search_autocomplete');
-
 function gf_ajax_search_autocomplete()
 {
     if (isset($_POST['keyword'])) {
@@ -779,30 +778,31 @@ function gf_ajax_search_autocomplete()
         $sql_product = "SELECT `productName`, `postId` FROM wp_gf_products WHERE `productName` LIKE '%{$keyword}%' LIMIT 5";
         $product_results = $wpdb->get_results($sql_product);
 
-        echo '<span>Kategorije</span>';
-        echo '<ul>';
+        $html = '<span>Kategorije</span>';
+        $html .= '<ul>';
         if (!empty($cat_results)) {
             foreach ($cat_results as $category) {
                 $category_link = get_term_link((int)$category->term_id);
-                echo '<li><a href="' . $category_link . '">' . $category->name . '</a></li>';
+                $html .= '<li><a href="' . $category_link . '">' . $category->name . '</a></li>';
             }
         } else {
-            echo '<li>Nema rezultata</li>';
+            $html .= '<li>Nema rezultata</li>';
         }
-        echo '</ul>';
+        $html .= '</ul>';
 
-        echo '<span>Proizvodi</span>';
-        echo '<ul>';
+        $html .= '<span>Proizvodi</span>';
+        $html .= '<ul>';
         if (!empty($product_results)) {
             foreach ($product_results as $product) {
                 $product_link = get_permalink((int)$product->postId);
-                echo '<li><a href="' . $product_link . '">' . $product->productName . '</a></li>';
+                $html .= '<li><a href="' . $product_link . '">' . $product->productName . '</a></li>';
             }
         } else {
-            echo '<li>Nema rezultata</li>';
+            $html .= '<li>Nema rezultata</li>';
         }
+        $html .= '</ul>';
 
-        echo '</ul>';
+        echo $html;
     }
 }
 
