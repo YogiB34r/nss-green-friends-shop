@@ -28,7 +28,7 @@ jQuery(document).ready(function(){
                 data:{'keyword': jQuery(this).val(), action:'ajax_gf_autocomplete'},
                 minLength: 0,
                 beforeSend: function(){
-                    jQuery("#gf-search-box").css("background","#f6f6f6 url(LoaderIcon.gif) no-repeat 165px");
+                    jQuery("#gf-search-box").css("background","#fafafa url(wp-content/themes/nss-green-firends-shop/assets/images/LoaderIcon.gif)no-repeat 36px");
                 },
                 success: function(data){
                     jQuery("#suggesstion-box").show();
@@ -39,5 +39,4 @@ jQuery(document).ready(function(){
         }
 
     });
-
 });
