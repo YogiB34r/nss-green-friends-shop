@@ -456,7 +456,7 @@ function gf_custom_search($input)
                     $searchCondition .= " OR ";
                     $customOrdering .= " + ";
                 }
-                $searchCondition .= " MATCH(attributes) AGAINST('{$word}') ";
+                $searchCondition .= " attributes LIKE '%{$word}%' ";
                 $customOrdering .= "
                 CASE
                     WHEN MATCH(productName) AGAINST('{$word}') THEN 15
