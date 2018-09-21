@@ -415,13 +415,19 @@ function parseAttributes()
 {
 //    var_dump(get_terms( 'pa_boja' ));
 //    var_dump(get_terms( 'pa_velicina' ));
-    $atributes = [];
-    foreach (get_terms( 'pa_boja' ) as $term) {
-        $atributes[] = rtrim($term->name, 'aeiou');
+    $redis = new GF_Cache();
+    $atributes = unserialize($redis->redis->get('atributes-collection'));
+    if ($atributes === false) {
+        $atributes = [];
+        foreach (get_terms( 'pa_boja' ) as $term) {
+            $atributes[] = rtrim($term->name, 'aeiou');
+        }
+        foreach (get_terms( 'pa_velicina' ) as $term) {
+            $atributes[] = rtrim($term->name, 'aeiou');
+        }
+        $redis->redis->set('attributes-collection', serialize($atributes));
     }
-    foreach (get_terms( 'pa_velicina' ) as $term) {
-        $atributes[] = rtrim($term->name, 'aeiou');
-    }
+
     return $atributes;
 }
 
@@ -479,30 +485,11 @@ function gf_custom_search($input)
                 END
                 + CASE WHEN attributes LIKE ('%{$word}%') THEN 10 ELSE 0 END ";
             }
-
-//            $searchCondition .= " productName LIKE '%{$word}%' OR description LIKE '%{$word}%'
-//                OR attributes LIKE '%{$word}%' OR categories LIKE '%{$word}%'";
-//            $customOrdering .= "
-//            CASE
-//                WHEN productName LIKE '% {$word} %' THEN 5
-//                WHEN productName LIKE '%{$word}%' THEN 4
-//                ELSE 0
-//            END
-//            + CASE
-//                WHEN categories LIKE '%{$word}%' THEN 7
-//                ELSE 0
-//            END
-//            + CASE
-//                WHEN description LIKE '% {$word} %' THEN 3
-//                WHEN description LIKE '%{$word}%' THEN 1
-//                ELSE 0
-//            END
-//            + CASE WHEN attributes LIKE '%{$word}%' THEN 7 ELSE 0 END ";
         }
     }
     $limiter = $limiter * 7;
 
-    echo $sql = "SELECT 
+    $sql = "SELECT 
         postId,
         {$customOrdering}  as o
         FROM wp_gf_products
