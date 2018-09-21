@@ -2770,3 +2770,34 @@ a#cn-more-info {
   text-transform: uppercase;
   border: none;
 }
+
+/*searchform autocomplete*/
+
+.gf-autocomplete-results{
+  position: absolute !important;
+  width: 67% !important;
+  background: #fff;
+  border: 1px solid #ccc;
+}
+.gf-autocomplete-results ul {
+  margin-bottom: 10px;
+  margin-top: 5px;
+  padding-left: 5px;
+  color: #eee;
+}
+.gf-autocomplete-results li{
+  display: list-item;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 5px;
+}
+.gf-autocomplete-results span{
+  margin-bottom: 6px;
+  display: block;
+  background-color: #f6f6f6;
+  padding: 5px 0px;
+  padding-left: 5px;
+  font-weight: 400;
+}
+.gf-autocomplete-results a{
+  font-weight: normal;
+}
