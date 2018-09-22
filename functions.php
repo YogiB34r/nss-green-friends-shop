@@ -344,7 +344,7 @@ function custom_woo_product_loop()
             $productsOutOfStock = $wpdb->get_results($sql, OBJECT_K);
             $allIds = array_merge($allIds, array_keys($productsOutOfStock));
 
-            $args =array(
+            $args = array(
                 'post_type' => 'product',
                 'orderby' => 'post__in',
                 'post__in' => $allIds,
@@ -411,6 +411,26 @@ function gf_custom_search_output($sortedProducts)
     endif;
 }
 
+function parseAttributes()
+{
+//    var_dump(get_terms( 'pa_boja' ));
+//    var_dump(get_terms( 'pa_velicina' ));
+    $redis = new GF_Cache();
+    $atributes = unserialize($redis->redis->get('atributes-collection'));
+    if ($atributes === false) {
+        $atributes = [];
+        foreach (get_terms('pa_boja') as $term) {
+            $atributes[] = rtrim($term->name, 'aeiou');
+        }
+        foreach (get_terms('pa_velicina') as $term) {
+            $atributes[] = rtrim($term->name, 'aeiou');
+        }
+        $redis->redis->set('attributes-collection', serialize($atributes));
+    }
+
+    return $atributes;
+}
+
 function gf_custom_search($input)
 {
     //@TODO cleanup input
@@ -424,69 +444,69 @@ function gf_custom_search($input)
     $searchCondition = "";
     $customOrdering = "";
     $explodedInput = explode(' ', $input);
+    $attributes = parseAttributes();
+    $limiter = 0;
     foreach ($explodedInput as $key => $word) {
         if (strlen($word) > 3) {
-            if ($key > 0) {
-                $searchCondition .= " OR ";
-            }
-            $searchCondition .= " productName LIKE '%{$word}%' OR description LIKE '%{$word}%' 
-                OR shortDescription LIKE '%{$word}%' OR attributes LIKE '%{$word}%' OR categories LIKE '%{$word}%'";
-            $customOrdering .= " 
-            CASE 
-                WHEN productName LIKE '% {$word} %' THEN 5 
-                WHEN productName LIKE '%{$word}%' THEN 2
-                ELSE 0 
-            END
-            + CASE 
-                WHEN categories LIKE '%{$word}%' THEN 10
-                ELSE 0 
-            END
-            + CASE 
-                WHEN description LIKE '% {$word} %' THEN 2 
-                WHEN description LIKE '%{$word}%' THEN 1
-                ELSE 0 
-            END 
-            + CASE WHEN shortDescription LIKE '%{$word}%' THEN 1 ELSE 0 END
-            + CASE WHEN attributes LIKE '%{$word}%' THEN 5 ELSE 0 END ";
-            if ($key === count($explodedInput) - 1) {
-                $customOrdering .= " as o ";
+            $limiter++;
+            //query is attribute
+            if (in_array(rtrim($word, 'aeiou'), $attributes)) {
+//                $word = rtrim($word, 'aeiou');
+                if ($key > 0) {
+                    $searchCondition .= " OR ";
+                    $customOrdering .= " + ";
+                }
+                $searchCondition .= " attributes LIKE '%{$word}%' ";
+                $customOrdering .= "
+                CASE
+                    WHEN MATCH(productName) AGAINST('{$word}') THEN 15
+                    ELSE 0
+                END +
+                CASE WHEN MATCH(description) AGAINST('{$word}') THEN 10 ELSE 0 END 
+                ";
             } else {
-                $customOrdering .= " + ";
+                if ($key > 0) {
+                    $searchCondition .= " OR ";
+                    $customOrdering .= " + ";
+                }
+                $searchCondition .= " productName LIKE '%{$word}%' OR MATCH(description) AGAINST('{$word}') 
+                OR attributes LIKE ('%{$word}%') OR categories LIKE ('%{$word}%')";
+                $customOrdering .= "
+                CASE
+                    WHEN productName LIKE '% {$word} %' THEN 15
+                    WHEN productName LIKE '%{$word}%' THEN 10
+                    ELSE 0
+                END
+                + CASE
+                    WHEN categories LIKE ('%{$word}%') THEN 10 ELSE 0
+                END
+                + CASE
+                    WHEN MATCH(description) AGAINST('{$word}') THEN 4 ELSE 0
+                END
+                + CASE WHEN attributes LIKE ('%{$word}%') THEN 10 ELSE 0 END ";
             }
         }
     }
+    $limiter = $limiter * 7;
 
-    echo $sql = "SELECT 
+    $sql = "SELECT 
         postId,
-        {$customOrdering}  
+        {$customOrdering}  as o
         FROM wp_gf_products
         WHERE stockStatus = 1 
-#        AND salePrice > 0 
         AND status = 1
         AND ({$searchCondition}) 
+        HAVING o > {$limiter}
         ORDER BY o DESC, createdAt DESC";
 
-    $productsSale = $wpdb->get_results($sql, OBJECT_K);
-
-    $allIds = array_keys($productsSale);
-
-//    $sql = "SELECT
-//            postId,
-//            {$customOrdering}
-//        FROM wp_gf_products
-//        WHERE salePrice = 0
-//        AND stockStatus = 1
-//        AND status = 1
-//        AND ({$searchCondition})
-//     ORDER BY o dESC, createdAt DESC";
-//    $productsNotOnSale = $wpdb->get_results($sql, OBJECT_K);
-//    var_dump('regular count: ' . count($productsNotOnSale));
-//    var_dump('sale count: ' . count($productsSale));
-//    $allIds = array_merge(array_keys($productsSale), array_keys($productsNotOnSale));
-//    var_dump('count: ' . count($allIds));
+    $products = $wpdb->get_results($sql, OBJECT_K);
+    $allIds = array_keys($products);
+    $resultCount = count($allIds);
+    if ($resultCount === 0) {
+        return false;
+    }
 
     $currrentPage = (get_query_var('paged')) ? get_query_var('paged') : 1;
-
     $args = array(
         'post_type' => 'product',
         'orderby' => 'post__in',
@@ -495,12 +515,10 @@ function gf_custom_search($input)
         'paged' => $currrentPage,
     );
 
-    wc_set_loop_prop('total', count($allIds));
+    wc_set_loop_prop('total', $resultCount);
     wc_set_loop_prop('per_page', $per_page);
     wc_set_loop_prop('current_page', $currrentPage);
-    wc_set_loop_prop('total_pages', ceil(count($allIds) / $per_page));
-//        var_dump($GLOBALS['woocommerce_loop']);
-
+    wc_set_loop_prop('total_pages', ceil($resultCount / $per_page));
     $sortedProducts = new WP_Query($args);
 
     return $sortedProducts;
@@ -743,14 +761,49 @@ function custom_woo_product_loop_backup()
 
 //ajax test
 //for loged in users
-add_action( 'wp_ajax_ajax_test','gf_ajax_test' );
+add_action('wp_ajax_ajax_gf_autocomplete', 'gf_ajax_search_autocomplete');
 
 // for logged out users
-add_action('wp_ajax_nopriv_ajax_test','gf_ajax_test' );
+add_action('wp_ajax_nopriv_ajax_gf_autocomplete', 'gf_ajax_search_autocomplete');
+function gf_ajax_search_autocomplete()
+{
+    if (isset($_POST['keyword'])) {
+        global $wpdb;
 
-function gf_ajax_test(){
-    echo 123;
-    echo $userId = $_POST['user_id'];
+        $keyword = $_POST['keyword'];
+
+        $sql_cat = "SELECT `name`,`term_id` FROM .wp_terms t JOIN wp_term_taxonomy tt USING (term_id) WHERE t.name LIKE '%{$keyword}%' AND tt.taxonomy = 'product_cat' LIMIT 5";
+        $cat_results = $wpdb->get_results($sql_cat);
+
+        $sql_product = "SELECT `productName`, `postId` FROM wp_gf_products WHERE `productName` LIKE '%{$keyword}%' LIMIT 5";
+        $product_results = $wpdb->get_results($sql_product);
+
+        $html = '<span>Kategorije</span>';
+        $html .= '<ul>';
+        if (!empty($cat_results)) {
+            foreach ($cat_results as $category) {
+                $category_link = get_term_link((int)$category->term_id);
+                $html .= '<li><a href="' . $category_link . '">' . $category->name . '</a></li>';
+            }
+        } else {
+            $html .= '<li>Nema rezultata</li>';
+        }
+        $html .= '</ul>';
+
+        $html .= '<span>Proizvodi</span>';
+        $html .= '<ul>';
+        if (!empty($product_results)) {
+            foreach ($product_results as $product) {
+                $product_link = get_permalink((int)$product->postId);
+                $html .= '<li><a href="' . $product_link . '">' . $product->productName . '</a></li>';
+            }
+        } else {
+            $html .= '<li>Nema rezultata</li>';
+        }
+        $html .= '</ul>';
+
+        echo $html;
+    }
 }
 
 

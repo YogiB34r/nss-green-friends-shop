@@ -56,62 +56,47 @@ function custom_body_class($classes) {
             ?>
         </header>
         <?php
-//        if (woocommerce_product_loop()) {
-//            if (wc_get_loop_prop('total')) {
-//                if (isset($_GET['query'])){
-                    $sortedProducts = gf_custom_search($_GET['query']);
-//                } else {
-//                    custom_woo_product_loop();
-//                }
-//            }
+            $sortedProducts = gf_custom_search($_GET['query']);
+            if ($sortedProducts) {
+                /**
+                 * Hook: woocommerce_before_shop_loop.
+                 *
+                 * @hooked wc_print_notices - 10
+                 * @hooked woocommerce_result_count - 20
+                 * @hooked woocommerce_catalog_ordering - 30
+                 */
+                echo '<div class="gf-product-controls">';
+                do_action('woocommerce_before_shop_loop');
+                echo '</div>';
+                ?>
+                <?php
+                /**
+                 * Hook: woocommerce_before_shop_loop.
+                 *
+                 * @hooked wc_print_notices - 10
+                 * @hooked woocommerce_result_count - 20
+                 * @hooked woocommerce_catalog_ordering - 30
+                 */
+                woocommerce_product_loop_start();
+                gf_custom_search_output($sortedProducts);
+                woocommerce_product_loop_end();
 
-
-            /**
-             * Hook: woocommerce_before_shop_loop.
-             *
-             * @hooked wc_print_notices - 10
-             * @hooked woocommerce_result_count - 20
-             * @hooked woocommerce_catalog_ordering - 30
-             */
-            echo '<div class="gf-product-controls">';
-            do_action('woocommerce_before_shop_loop');
-            echo '</div>';
-            ?>
-            <?php
-            /**
-             * Hook: woocommerce_before_shop_loop.
-             *
-             * @hooked wc_print_notices - 10
-             * @hooked woocommerce_result_count - 20
-             * @hooked woocommerce_catalog_ordering - 30
-             */
-            woocommerce_product_loop_start();
-//            if ( wc_get_loop_prop( 'total' ) ) {
-//                if(isset($_GET['s'])){
-                    gf_custom_search_output($sortedProducts);
-//                }else{
-//                    custom_woo_product_loop();
-//                }
-//            }
-
-            woocommerce_product_loop_end();
-
-            /**
-             * Hook: woocommerce_after_shop_loop.
-             *
-             * @hooked woocommerce_pagination - 10
-             */
-            echo '<div class="gf-product-controls gf-product-controls--bottom">';
-            do_action( 'woocommerce_after_shop_loop' );
-            echo '</div>';
-//        } else {
+                /**
+                 * Hook: woocommerce_after_shop_loop.
+                 *
+                 * @hooked woocommerce_pagination - 10
+                 */
+                echo '<div class="gf-product-controls gf-product-controls--bottom">';
+                do_action( 'woocommerce_after_shop_loop' );
+                echo '</div>';
+            } else {
             /**
              * Hook: woocommerce_no_products_found.
              *
              * @hooked wc_no_products_found - 10
              */
-//            do_action( 'woocommerce_no_products_found' );
-//        }
+            do_action( 'woocommerce_no_products_found' );
+        }
 
         /**
          * Hook: woocommerce_after_main_content.
