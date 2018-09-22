@@ -1950,6 +1950,10 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
 }
 
 @media only screen and (max-width: 576px) {
+    body{
+        min-width: 100%;
+        overflow-x: hidden;
+    }
   .widget_gf_image_banners_widget {
     display: block;
   }
@@ -1997,6 +2001,10 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
 }
 
 @media only screen and (max-width: 380px) {
+    body{
+        min-width: 100%;
+        overflow-x: hidden;
+    }
   .gf-primary-navigation,
   .gf-search {
     width: 90%;
