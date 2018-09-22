@@ -2788,6 +2788,7 @@ a#cn-more-info {
   display: list-item;
   border-bottom: 1px solid #eee;
   padding-bottom: 5px;
+  padding-top: 5px;
 }
 .gf-autocomplete-results span{
   margin-bottom: 6px;
