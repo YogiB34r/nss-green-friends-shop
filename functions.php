@@ -328,19 +328,19 @@ function custom_woo_product_loop()
         $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
 
         if (get_query_var('taxonomy') === 'product_cat') { // Za kategorije
-            $category = get_term_by('slug', get_query_var('term'), 'product_cat');
+            $term = get_query_var('term');
 
             $sql = "SELECT postId FROM wp_gf_products WHERE salePrice > 0 AND stockStatus = 1 AND status = 1
-                AND categoryIds LIKE '%{$category->term_id}%' ORDER BY createdAt";
+                AND categories LIKE '%{$term}%' ORDER BY createdAt";
             $productsSale = $wpdb->get_results($sql, OBJECT_K);
 
             $sql = "SELECT postId FROM wp_gf_products WHERE salePrice = 0 AND stockStatus = 1 AND status = 1
-                AND categoryIds LIKE '%{$category->term_id}%' ORDER BY createdAt";
+                AND categories LIKE '%{$term}%' ORDER BY createdAt";
             $productsNotOnSale = $wpdb->get_results($sql, OBJECT_K);
             $allIds = array_merge(array_keys($productsSale), array_keys($productsNotOnSale));
 
             $sql = "SELECT postId FROM wp_gf_products WHERE stockStatus = 0 AND status = 1
-                AND categoryIds LIKE '%{$category->term_id}%' ORDER BY createdAt";
+                AND categories LIKE '%{$term}%' ORDER BY createdAt";
             $productsOutOfStock = $wpdb->get_results($sql, OBJECT_K);
             $allIds = array_merge($allIds, array_keys($productsOutOfStock));
 
@@ -436,6 +436,10 @@ function gf_custom_search($input, $limit = 0)
 
     $input = addslashes($input);
     $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
+    if (isset($_POST['ppp'])) {
+        $per_page = ($_POST['ppp'] > 48) ? 48 : $_POST['ppp'];
+    }
+    $currentPage = (get_query_var('paged')) ? get_query_var('paged') : 1;
     $searchCondition = "";
     $customOrdering = "";
     $explodedInput = explode(' ', $input);
@@ -483,16 +487,53 @@ function gf_custom_search($input, $limit = 0)
         }
     }
     $gradeCount = $gradeCount * 7;
+    $priceOrdering = " CASE
+        WHEN salePrice > 0 THEN salePrice
+        ELSE regularPrice 
+     END as priceOrder ";
+
+    switch (get_query_var('orderby')) {
+        case 'popularity':
+            $orderBy = " ORDER BY viewCount DESC ";
+
+            break;
+
+        case 'rating':
+            $orderBy = " ORDER BY rating DESC ";
+
+            break;
+
+        case 'date':
+            $orderBy = " ORDER BY o DESC, createdAt DESC ";
+
+            break;
+
+        case 'price-desc':
+            $orderBy = " ORDER BY priceOrder DESC ";
+
+            break;
+
+        case 'price':
+            $orderBy = " ORDER BY priceOrder ";
+
+            break;
+
+        default:
+            $orderBy = " ORDER BY o DESC, createdAt DESC ";
+
+            break;
+    }
 
     $sql = "SELECT 
         postId,
-        {$customOrdering}  as o
+        {$customOrdering}  as o,
+        {$priceOrdering}
         FROM wp_gf_products
         WHERE stockStatus = 1 
         AND status = 1
         AND ({$searchCondition}) 
         HAVING o > {$gradeCount}
-        ORDER BY o DESC, createdAt DESC";
+        {$orderBy}";
     if ($limit) {
         $sql .= " LIMIT {$limit} ";
     }
@@ -503,8 +544,10 @@ function gf_custom_search($input, $limit = 0)
     if ($resultCount === 0) {
         return false;
     }
-
-    $currentPage = (get_query_var('paged')) ? get_query_var('paged') : 1;
+    $totalPages = ceil($resultCount / $per_page);
+    if ($currentPage > $totalPages) {
+        $currentPage = $totalPages;
+    }
     $args = array(
         'post_type' => 'product',
         'orderby' => 'post__in',
@@ -516,7 +559,7 @@ function gf_custom_search($input, $limit = 0)
     wc_set_loop_prop('total', $resultCount);
     wc_set_loop_prop('per_page', $per_page);
     wc_set_loop_prop('current_page', $currentPage);
-    wc_set_loop_prop('total_pages', ceil($resultCount / $per_page));
+    wc_set_loop_prop('total_pages', $totalPages);
     $sortedProducts = new WP_Query($args);
 
     return $sortedProducts;
