@@ -1946,9 +1946,17 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
   .gf-inner-navigation__link {
     font-size: 16px;
   }
+  body {
+    min-width: 100%;
+    overflow-x:hidden ;
+  }
 }
 
 @media only screen and (max-width: 576px) {
+  body {
+    min-width: 100%;
+    overflow-x:hidden ;
+  }
   .widget_gf_image_banners_widget {
     display: block;
   }
