@@ -413,8 +413,6 @@ function gf_custom_search_output($sortedProducts)
 
 function parseAttributes()
 {
-//    var_dump(get_terms( 'pa_boja' ));
-//    var_dump(get_terms( 'pa_velicina' ));
     $redis = new GF_Cache();
     $atributes = unserialize($redis->redis->get('atributes-collection'));
     if ($atributes === false) {
@@ -431,27 +429,23 @@ function parseAttributes()
     return $atributes;
 }
 
-function gf_custom_search($input)
+//@TODO implement category as filter
+function gf_custom_search($input, $limit = 0)
 {
-    //@TODO cleanup input
-    $input = $input;
-
     global $wpdb;
+
+    $input = addslashes($input);
     $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
-
-    //@TODO add category
-
     $searchCondition = "";
     $customOrdering = "";
     $explodedInput = explode(' ', $input);
     $attributes = parseAttributes();
-    $limiter = 0;
+    $gradeCount = 0;
     foreach ($explodedInput as $key => $word) {
         if (strlen($word) > 3) {
-            $limiter++;
+            $gradeCount++;
             //query is attribute
             if (in_array(rtrim($word, 'aeiou'), $attributes)) {
-//                $word = rtrim($word, 'aeiou');
                 if ($key > 0) {
                     $searchCondition .= " OR ";
                     $customOrdering .= " + ";
@@ -465,6 +459,7 @@ function gf_custom_search($input)
                 CASE WHEN MATCH(description) AGAINST('{$word}') THEN 10 ELSE 0 END 
                 ";
             } else {
+                $word = rtrim($word, 'aeiou');
                 if ($key > 0) {
                     $searchCondition .= " OR ";
                     $customOrdering .= " + ";
@@ -487,7 +482,7 @@ function gf_custom_search($input)
             }
         }
     }
-    $limiter = $limiter * 7;
+    $gradeCount = $gradeCount * 7;
 
     $sql = "SELECT 
         postId,
@@ -496,8 +491,11 @@ function gf_custom_search($input)
         WHERE stockStatus = 1 
         AND status = 1
         AND ({$searchCondition}) 
-        HAVING o > {$limiter}
+        HAVING o > {$gradeCount}
         ORDER BY o DESC, createdAt DESC";
+    if ($limit) {
+        $sql .= " LIMIT {$limit} ";
+    }
 
     $products = $wpdb->get_results($sql, OBJECT_K);
     $allIds = array_keys($products);
@@ -506,18 +504,18 @@ function gf_custom_search($input)
         return false;
     }
 
-    $currrentPage = (get_query_var('paged')) ? get_query_var('paged') : 1;
+    $currentPage = (get_query_var('paged')) ? get_query_var('paged') : 1;
     $args = array(
         'post_type' => 'product',
         'orderby' => 'post__in',
         'post__in' => $allIds,
         'posts_per_page' => $per_page,
-        'paged' => $currrentPage,
+        'paged' => $currentPage,
     );
 
     wc_set_loop_prop('total', $resultCount);
     wc_set_loop_prop('per_page', $per_page);
-    wc_set_loop_prop('current_page', $currrentPage);
+    wc_set_loop_prop('current_page', $currentPage);
     wc_set_loop_prop('total_pages', ceil($resultCount / $per_page));
     $sortedProducts = new WP_Query($args);
 
@@ -759,43 +757,49 @@ function custom_woo_product_loop_backup()
     }
 }
 
-//ajax test
 //for loged in users
 add_action('wp_ajax_ajax_gf_autocomplete', 'gf_ajax_search_autocomplete');
-
-// for logged out users
+//for logged out users
 add_action('wp_ajax_nopriv_ajax_gf_autocomplete', 'gf_ajax_search_autocomplete');
 function gf_ajax_search_autocomplete()
 {
     if (isset($_POST['keyword'])) {
         global $wpdb;
 
-        $keyword = $_POST['keyword'];
+        $query = addslashes($_POST['keyword']);
 
-        $sql_cat = "SELECT `name`,`term_id` FROM .wp_terms t JOIN wp_term_taxonomy tt USING (term_id) WHERE t.name LIKE '%{$keyword}%' AND tt.taxonomy = 'product_cat' LIMIT 5";
-        $cat_results = $wpdb->get_results($sql_cat);
+        $cache = new GF_Cache();
+        $key = 'category-search-' . md5($query);
+        $cat_results = unserialize($cache->redis->get($key));
+        if ($cat_results === false || $cat_results === '') {
+            $sql_cat = "SELECT `name`,`term_id` FROM wp_terms t JOIN wp_term_taxonomy tt USING (term_id) WHERE t.name LIKE '{$query}%' AND tt.taxonomy = 'product_cat' LIMIT 4";
+            $cat_results = $wpdb->get_results($sql_cat);
+            if (!empty($cat_results)) {
+                $cache->redis->set($key, serialize($cat_results));
+            }
+        }
 
-        $sql_product = "SELECT `productName`, `postId` FROM wp_gf_products WHERE `productName` LIKE '%{$keyword}%' LIMIT 5";
-        $product_results = $wpdb->get_results($sql_product);
+//        $sql_product = "SELECT `productName`, `postId` FROM wp_gf_products WHERE `productName` LIKE '%{$keyword}%' LIMIT 4";
+//        $product_results = $wpdb->get_results($sql_product);
+        $product_results = gf_custom_search($query, 4);
 
-        $html = '<span>Kategorije</span>';
-        $html .= '<ul>';
+        $html = '';
         if (!empty($cat_results)) {
+            $html = '<span>Kategorije</span>';
+            $html .= '<ul>';
             foreach ($cat_results as $category) {
-                $category_link = get_term_link((int)$category->term_id);
+                $category_link = get_term_link((int) $category->term_id);
                 $html .= '<li><a href="' . $category_link . '">' . $category->name . '</a></li>';
             }
-        } else {
-            $html .= '<li>Nema rezultata</li>';
+            $html .= '</ul>';
         }
-        $html .= '</ul>';
 
         $html .= '<span>Proizvodi</span>';
         $html .= '<ul>';
-        if (!empty($product_results)) {
-            foreach ($product_results as $product) {
-                $product_link = get_permalink((int)$product->postId);
-                $html .= '<li><a href="' . $product_link . '">' . $product->productName . '</a></li>';
+        if ($product_results) {
+            foreach ($product_results->get_posts() as $post) {
+                $product_link = get_permalink((int) $post->ID);
+                $html .= '<li><a href="' . $product_link . '">' . $post->post_title . '</a></li>';
             }
         } else {
             $html .= '<li>Nema rezultata</li>';
