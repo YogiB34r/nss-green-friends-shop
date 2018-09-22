@@ -474,7 +474,7 @@ function gf_custom_search($input)
                 $customOrdering .= "
                 CASE
                     WHEN productName LIKE '% {$word} %' THEN 15
-                    WHEN productName LIKE '%{$word}%' THEN 10
+                    WHEN productName LIKE '%{$word}%' THEN 7
                     ELSE 0
                 END
                 + CASE

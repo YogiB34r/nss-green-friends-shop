@@ -19,25 +19,32 @@
 // });
 
 jQuery(document).ready(function(){
-    jQuery("#gf-search-box").keyup(function(){
-        if(jQuery(this).val().length >= 3)
-        {
-            jQuery.ajax({
-                type: "POST",
-                url: ajax_object.ajax_url,
-                data:{'keyword': jQuery(this).val(), action:'ajax_gf_autocomplete'},
-                minLength: 0,
-                beforeSend: function(){
-                    jQuery("#gf-search-box").css("background","#fafafa url(/wp-content/themes/nss-green-friends-shop/assets/images/LoaderIcon.gif)no-repeat 36px");
-                },
-                success: function(data){
-                    jQuery("#gf-search-box").css("background","none");
-                    jQuery("#suggesstion-box").html(data.slice(0, -1));
-                    jQuery("#suggesstion-box").fadeIn();
-                    jQuery("#search-box").css("background","#eee");
-                }
-            });
+    var timer, delay = 500;
+    jQuery("#gf-search-box").bind('keydown blur change', function(e) {
+        if(jQuery(this).val().length >= 3) {
+            var _this = jQuery(this);
+            clearTimeout(timer);
+            timer = setTimeout(function() {
+                ajaxSearch(_this.val());
+            }, delay );
         }
-
     });
 });
+
+function ajaxSearch(value) {
+    jQuery.ajax({
+        type: "POST",
+        url: ajax_object.ajax_url,
+        data:{'keyword': value, action:'ajax_gf_autocomplete'},
+        minLength: 0,
+        beforeSend: function(){
+            jQuery("#gf-search-box").css("background","#fafafa url(/wp-content/themes/nss-green-friends-shop/assets/images/LoaderIcon.gif)no-repeat 36px");
+        },
+        success: function(response){
+            jQuery("#gf-search-box").css("background","none");
+            jQuery("#suggesstion-box").html(response.slice(0, -1));
+            jQuery("#suggesstion-box").fadeIn();
+            jQuery("#search-box").css("background","#eee");
+        }
+    });
+}
