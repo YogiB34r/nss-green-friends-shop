@@ -1946,9 +1946,21 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
   .gf-inner-navigation__link {
     font-size: 16px;
   }
+  body {
+    min-width: 100%;
+    overflow-x:hidden ;
+  }
 }
 
 @media only screen and (max-width: 576px) {
+  body {
+    min-width: 100%;
+    overflow-x:hidden ;
+  }
+    body{
+        min-width: 100%;
+        overflow-x: hidden;
+    }
   .widget_gf_image_banners_widget {
     display: block;
   }
@@ -1996,6 +2008,10 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
 }
 
 @media only screen and (max-width: 380px) {
+    body{
+        min-width: 100%;
+        overflow-x: hidden;
+    }
   .gf-primary-navigation,
   .gf-search {
     width: 90%;
@@ -2788,6 +2804,7 @@ a#cn-more-info {
   display: list-item;
   border-bottom: 1px solid #eee;
   padding-bottom: 5px;
+  padding-top: 5px;
 }
 .gf-autocomplete-results span{
   margin-bottom: 6px;
