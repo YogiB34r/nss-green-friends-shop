@@ -99,8 +99,8 @@ if ($sexyShopCat){
         <?php
         if (woocommerce_product_loop()) {
             if (wc_get_loop_prop('total')) {
-                if (isset($_GET['s'])) {
-                    $sortedProducts = gf_custom_search();
+                if (isset($_GET['query'])) {
+                    $sortedProducts = gf_custom_search($_GET['query']);
                 } else {
 //                    custom_woo_product_loop();
                 }

@@ -424,7 +424,7 @@ function gf_custom_search($input, $limit = 0)
     $attributes = parseAttributes();
     $gradeCount = 0;
     foreach ($explodedInput as $key => $word) {
-        if (strlen($word) > 3) {
+        if (strlen($word) > 2) {
             $gradeCount++;
             //query is attribute
             if (in_array(rtrim($word, 'aeiou'), $attributes)) {
