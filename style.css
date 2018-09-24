@@ -262,9 +262,8 @@ img.gf-header-logo {
 
 .search-submit,
 .gf-search-toggle {
-  padding: 13px 14px;
+  padding: 15px 14px;
   border: 1px solid #e2e2e2;
-  border-left: none;
   border-top-right-radius: 2px;
   border-bottom-right-radius: 2px;
   background: #f6f6f6;
@@ -1870,7 +1869,6 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
   .gf-search-form--mobile .search-submit {
     padding: 13px 14px;
     border: 2px solid #e2e2e2;
-    border-left: none;
     border-top-right-radius: 2px;
     border-bottom-right-radius: 2px;
     background: #f6f6f6;
@@ -2830,4 +2828,7 @@ a#cn-more-info {
 }
 .gf-autocomplete-results a{
   font-weight: normal;
+}
+.gf-search-wrapper input{
+  max-height: 46px;
 }
