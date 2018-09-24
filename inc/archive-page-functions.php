@@ -122,3 +122,10 @@ add_action( 'woocommerce_before_shop_loop', 'woocommerce_catalog_ordering', 26);
 add_action( 'woocommerce_after_shop_loop', 'woocommerce_catalog_ordering', 26 );
 add_action( 'woocommerce_before_shop_loop', 'woocommerce_pagination', 27 );
 add_action( 'woocommerce_after_shop_loop', 'woocommerce_pagination', 27 );
+
+//function wpa_98244_filter_short_description(  ){
+//    if (is_shop() || is_product_category()){
+//        return '';
+//    }
+//}
+//add_filter( 'woocommerce_short_description', 'wpa_98244_filter_short_description' );
