@@ -450,23 +450,23 @@ function gf_custom_search($input, $limit = 0)
                 OR attributes LIKE '%{$word}%' OR categories LIKE '%{$word}%'";
                 $customOrdering .= "
                 CASE
-                    WHEN productName LIKE '% {$word} %' THEN 15
-                    WHEN productName LIKE '{$word} %' THEN 18
+                    WHEN productName LIKE '% {$word} %' THEN 16
+                    WHEN productName LIKE '{$word} %' THEN 15
                     WHEN productName LIKE '{$word}%' THEN 12
-                    WHEN productName LIKE '%{$word}%' THEN 7
+                    WHEN productName LIKE '%{$word}%' THEN 9
                     ELSE 0
                 END
                 + CASE
-                    WHEN categories LIKE '%{$word}%' THEN 10 ELSE 0
+                    WHEN categories LIKE '%{$word}%' THEN 14 ELSE 0
                 END
                 + CASE
                     WHEN description LIKE '%{$word}%' THEN 4 ELSE 0
                 END
-                + CASE WHEN attributes LIKE '%{$word}%' THEN 10 ELSE 0 END ";
+                + CASE WHEN attributes LIKE '%{$word}%' THEN 13 ELSE 0 END ";
             }
         }
     }
-    $gradeCount = $gradeCount * 6;
+    $gradeCount = $gradeCount * 7;
     $priceOrdering = " CASE
         WHEN salePrice > 0 THEN salePrice
         ELSE regularPrice 
@@ -508,7 +508,7 @@ function gf_custom_search($input, $limit = 0)
             break;
     }
 
-    $sql = "SELECT 
+    echo $sql = "SELECT 
         postId,
         {$customOrdering}  as o,
         {$priceOrdering}
