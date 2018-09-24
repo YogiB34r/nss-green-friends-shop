@@ -1803,6 +1803,9 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
   .gf-search-wrapper {
     padding-left: 25px;
   }
+  .gf-search-form--mobile{
+    display: none;
+  }
 }
 
 @media only screen and (max-width: 767px) {
