@@ -153,9 +153,10 @@ function gf_mobile_nav_menu_shortcode()
 <!--            </div>-->
             <span class="screen-reader-text"><?php _x('Search for:', 'label') ?></span>
             <div class="search-input-wrapper">
-                <input type="search" class="search-field" placeholder="<?php echo esc_attr_x('Search &hellip;', '') ?>"
+                <input type="search" class="search-field gf-search-box" placeholder="<?php echo esc_attr_x('Search &hellip;', '') ?>"
                        value="<?php echo get_search_query() ?>" name="s"/>
                 <button type="submit" class="search-submit"><i class="fa fa-search"></i></button>
+                <div class="gf-autocomplete-results suggesstion-box"></div>
             </div>
         </form>
         <div class="gf-radio-search-wrapper gf-radio-search-wrapper--mobile">
@@ -171,7 +172,19 @@ function gf_mobile_nav_menu_shortcode()
             <span>Pretraga celog sajta</span>
         </label>
     <?php endif; ?>
-        </div><?php
+        </div>
+        <script type="text/javascript">
+            jQuery(document).ready(function($){
+                var radioValue='';
+                $(".gf-search-form--mobile").submit(function () {
+                    var radioValue = $('input[name=search-radiobutton]:checked').val();
+                    if (radioValue === 'category'){
+                        $(".gf-search-form--mobile").attr("action", "");
+                    }
+                });
+            });
+        </script>
+        <?php
     }
 }
 

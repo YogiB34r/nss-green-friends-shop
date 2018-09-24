@@ -262,7 +262,7 @@ jQuery(document).ready(function () {
     }
 
     var timer, delay = 500;
-    jQuery("#gf-search-box").bind('keydown', function(e) {
+    jQuery(".gf-search-box").bind('keydown', function(e) {
         if(jQuery(this).val().length >= 3) {
             var _this = jQuery(this);
             clearTimeout(timer);
@@ -272,9 +272,9 @@ jQuery(document).ready(function () {
         }
     });
     jQuery(document).click(function(event) {
-        if(!jQuery(event.target).closest('#suggesstion-box').length) {
-            if(jQuery('#suggesstion-box').is(":visible")) {
-                jQuery('#suggesstion-box').hide();
+        if(!jQuery(event.target).closest('.suggesstion-box').length) {
+            if(jQuery('.suggesstion-box').is(":visible")) {
+                jQuery('.suggesstion-box').hide();
             }
         }
     });
@@ -302,13 +302,13 @@ function ajaxSearch(value) {
         data:{'keyword': value, action:'ajax_gf_autocomplete'},
         minLength: 0,
         beforeSend: function(){
-            jQuery("#gf-search-box").css("background","#fafafa url(/wp-content/themes/nss-green-friends-shop/assets/images/LoaderIcon.gif)no-repeat 36px");
+            jQuery(".gf-search-box").css("background","#fafafa url(/wp-content/themes/nss-green-friends-shop/assets/images/LoaderIcon.gif)no-repeat 36px");
         },
         success: function(response){
-            jQuery("#gf-search-box").css("background","none");
-            jQuery("#suggesstion-box").html(response.slice(0, -1));
-            jQuery("#suggesstion-box").fadeIn(200);
-            jQuery("#search-box").css("background","#eee");
+            jQuery(".gf-search-box").css("background","none");
+            jQuery(".suggesstion-box").html(response.slice(0, -1));
+            jQuery(".suggesstion-box").fadeIn(200);
+            jQuery(".search-box").css("background","#eee");
         }
     });
 }
