@@ -302,7 +302,7 @@ function ajaxSearch(value) {
         data:{'keyword': value, action:'ajax_gf_autocomplete'},
         minLength: 0,
         beforeSend: function(){
-            jQuery(".gf-search-box").css("background","#fafafa url(/wp-content/themes/nss-green-friends-shop/assets/images/LoaderIcon.gif)no-repeat 36px");
+            jQuery(".gf-search-box").css("background","#fafafa url(/wp-content/themes/nss-green-friends-shop/assets/images/LoaderIcon.gif)no-repeat center");
         },
         success: function(response){
             jQuery(".gf-search-box").css("background","none");
