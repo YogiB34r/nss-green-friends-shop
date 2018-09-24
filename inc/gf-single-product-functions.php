@@ -72,7 +72,7 @@ function gf_display_offer_notice(){
 }
 
 add_filter( 'woocommerce_get_price_html', 'change_displayed_sale_price_html', 10, 2 );
-function change_displayed_sale_price_html( $price, $product ) {
+function change_displayed_sale_price_html( $price, WC_Product $product ) {
     // Only on sale products on frontend
     // Get product prices
     if( $product->is_on_sale() && ! is_admin()){
@@ -171,8 +171,8 @@ function woo_custom_description_tab( $tabs ) {
 
 function woo_custom_description_tab_content() {
     global $product;
-    global $post;
+//    global $post;
     echo '<p>'.$product->get_description().'</p>';
-    echo '<p>&nbsp</p>';
-    echo nl2br('<p>'.get_post_meta($post->ID,'features',true).'</p>');
+//    echo '<p>&nbsp</p>';
+//    echo nl2br('<p>'.get_post_meta($post->ID,'features',true).'</p>');
 }

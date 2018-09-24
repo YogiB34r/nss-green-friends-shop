@@ -2790,6 +2790,7 @@ a#cn-more-info {
 /*searchform autocomplete*/
 
 .gf-autocomplete-results{
+  display:none;
   position: absolute !important;
   width: 67% !important;
   background: #fff;
