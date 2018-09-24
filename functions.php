@@ -229,52 +229,6 @@ function upload_dir_filter($uploads)
 
 add_filter('upload_dir', 'upload_dir_filter');
 
-//ne brisati ovo zatrebace mozda <3 Vlada
-//function advanced_search_query($query) {
-//
-//    if($query->is_search()) {
-//        // category terms search.
-//        if (isset($_GET['search-checkbox']) && !empty($_GET['search-checkbox']) && $_GET['search-checkbox'] != 'shop') {
-//            $query->set('tax_query', array(array(
-//                'taxonomy' => 'product_cat',
-//                'field' => 'slug',
-//                'terms' => array($_GET['search-checkbox']))
-//            ));
-//        }
-//    }
-//    return $query;
-//}
-//add_action('pre_get_posts', 'advanced_search_query', 1000);
-
-
-//add_action( 'pre_get_posts', function ( $q ) {
-//    if (   !is_admin()                 // Target only front end
-//        && $q->is_main_query()        // Only target the main query
-//        && $q->is_post_type_archive() // Change to suite your needs
-//    ) {
-//        $q->set( 'meta_key', '_stock_status' );
-//        $q->set( 'orderby',  'meta_value'    );
-//        $q->set( 'order',    'ASC'           );
-//        $q->set( 'orderby',  'date'    );
-//        $q->set( 'order',    'ASC'           );
-//    }
-//}, PHP_INT_MAX );
-
-//
-//add_filter('posts_clauses', 'order_by_test');
-//function order_by_test($posts_clauses)
-//{
-//    global $wpdb;
-//    // only change query on WooCommerce loops
-////    if (is_woocommerce() && (is_shop() || is_product_category() || is_product_tag() || is_product_taxonomy())) {
-//    if (is_shop() || is_product_category()) {
-//        $posts_clauses['join'] .= " INNER JOIN $wpdb->postmeta istockstatus ON ($wpdb->posts.ID = istockstatus.post_id) ";
-//        $posts_clauses['orderby'] = " istockstatus.meta_value ASC, " . $posts_clauses['orderby'];
-//        $posts_clauses['where'] = " AND istockstatus.meta_key = '_stock_status' AND istockstatus.meta_value <> '' " . $posts_clauses['where'];
-//    }
-//    return $posts_clauses;
-//}
-
 // custom breadcrumbs based on wc breadcrumbs
 function woocommerce_breadcrumb($args = array())
 {
@@ -401,13 +355,19 @@ function custom_woo_product_loop()
 
 function gf_custom_search_output($sortedProducts)
 {
-    if ($sortedProducts->have_posts()) :
+//    echo 'loop start ' . date('s') . PHP_EOL;
+    if ($sortedProducts->have_posts()):
         wc_setup_loop();
+//        echo 'loop setup ' . date('s') . PHP_EOL;
+        woocommerce_product_loop_start();
+//        echo 'wc loop start ' . date('s') . PHP_EOL;
         while ($sortedProducts->have_posts()) : $sortedProducts->the_post();
-            do_action('woocommerce_shop_loop');
+//            echo 'loop item ' . date('s') . PHP_EOL;
+//            do_action('woocommerce_shop_loop');
             wc_get_template_part('content', 'product');
         endwhile;
         wp_reset_postdata();
+        woocommerce_product_loop_end();
     endif;
 }
 
@@ -457,10 +417,10 @@ function gf_custom_search($input, $limit = 0)
                 $searchCondition .= " attributes LIKE '%{$word}%' ";
                 $customOrdering .= "
                 CASE
-                    WHEN MATCH(productName) AGAINST('{$word}') THEN 15
+                    WHEN productName LIKE '%{$word}%' THEN 15
                     ELSE 0
                 END +
-                CASE WHEN MATCH(description) AGAINST('{$word}') THEN 10 ELSE 0 END 
+                CASE WHEN description LIKE '%{$word}%' THEN 10 ELSE 0 END 
                 ";
             } else {
                 $word = rtrim($word, 'aeiou');
@@ -468,25 +428,27 @@ function gf_custom_search($input, $limit = 0)
                     $searchCondition .= " OR ";
                     $customOrdering .= " + ";
                 }
-                $searchCondition .= " productName LIKE '%{$word}%' OR MATCH(description) AGAINST('{$word}') 
-                OR attributes LIKE ('%{$word}%') OR categories LIKE ('%{$word}%')";
+                $searchCondition .= " productName LIKE '%{$word}%' OR description LIKE '%{$word}%' 
+                OR attributes LIKE '%{$word}%' OR categories LIKE '%{$word}%'";
                 $customOrdering .= "
                 CASE
                     WHEN productName LIKE '% {$word} %' THEN 15
+                    WHEN productName LIKE '{$word} %' THEN 18
+                    WHEN productName LIKE '{$word}%' THEN 12
                     WHEN productName LIKE '%{$word}%' THEN 7
                     ELSE 0
                 END
                 + CASE
-                    WHEN categories LIKE ('%{$word}%') THEN 10 ELSE 0
+                    WHEN categories LIKE '%{$word}%' THEN 10 ELSE 0
                 END
                 + CASE
-                    WHEN MATCH(description) AGAINST('{$word}') THEN 4 ELSE 0
+                    WHEN description LIKE '%{$word}%' THEN 4 ELSE 0
                 END
-                + CASE WHEN attributes LIKE ('%{$word}%') THEN 10 ELSE 0 END ";
+                + CASE WHEN attributes LIKE '%{$word}%' THEN 10 ELSE 0 END ";
             }
         }
     }
-    $gradeCount = $gradeCount * 7;
+    $gradeCount = $gradeCount * 6;
     $priceOrdering = " CASE
         WHEN salePrice > 0 THEN salePrice
         ELSE regularPrice 

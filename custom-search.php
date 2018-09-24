@@ -68,18 +68,9 @@ function custom_body_class($classes) {
                 echo '<div class="gf-product-controls">';
                 do_action('woocommerce_before_shop_loop');
                 echo '</div>';
-                ?>
-                <?php
-                /**
-                 * Hook: woocommerce_before_shop_loop.
-                 *
-                 * @hooked wc_print_notices - 10
-                 * @hooked woocommerce_result_count - 20
-                 * @hooked woocommerce_catalog_ordering - 30
-                 */
-                woocommerce_product_loop_start();
+
                 gf_custom_search_output($sortedProducts);
-                woocommerce_product_loop_end();
+
 
                 /**
                  * Hook: woocommerce_after_shop_loop.
