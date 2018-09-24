@@ -1,5 +1,4 @@
 <?php
-
 function gf_wc_breadcrumbs_single_product(){
     woocommerce_breadcrumb();
 }
@@ -176,3 +175,37 @@ function woo_custom_description_tab_content() {
 //    echo '<p>&nbsp</p>';
 //    echo nl2br('<p>'.get_post_meta($post->ID,'features',true).'</p>');
 }
+/**
+ * Temporarily enable hide out of stock items.
+ *
+ * @param string $template_name
+ * @param string $template_path
+ * @param bool $located
+ * @param array $args
+ */
+function gf_enable_hide_out_of_stock_items( $template_name, $template_path, $located, $args ) {
+    if( $template_name !== "single-product/related.php" ) {
+        return;
+    }
+
+    add_filter( 'pre_option_woocommerce_hide_out_of_stock_items', function( $option ) { return "yes"; }, 10, 1 );
+}
+
+/**
+ * Temporarily disable hide out of stock items.
+ *
+ * @param string $template_name
+ * @param string $template_path
+ * @param bool $located
+ * @param array $args
+ */
+function gf_disable_hide_out_of_stock_items( $template_name, $template_path, $located, $args ) {
+    if( $template_name !== "single-product/related.php" ) {
+        return;
+    }
+
+    add_filter( 'pre_option_woocommerce_hide_out_of_stock_items', function( $option ) { return "no"; }, 10, 1 );
+}
+
+add_action( 'woocommerce_before_template_part', 'gf_enable_hide_out_of_stock_items', 10, 4 );
+add_action( 'woocommerce_after_template_part', 'gf_disable_hide_out_of_stock_items', 10, 4 );
