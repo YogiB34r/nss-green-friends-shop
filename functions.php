@@ -508,7 +508,19 @@ function gf_custom_search($input, $limit = 0)
             break;
     }
 
-
+    $sql = "SELECT 
+        postId,
+        {$customOrdering}  as o,
+        {$priceOrdering}
+        FROM wp_gf_products
+        WHERE stockStatus = 1 
+        AND status = 1
+        AND ({$searchCondition}) 
+        HAVING o > {$gradeCount}
+        {$orderBy}";
+    if ($limit) {
+        $sql .= " LIMIT {$limit} ";
+    }
 
     $products = $wpdb->get_results($sql, OBJECT_K);
     $allIds = array_keys($products);
