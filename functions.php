@@ -337,7 +337,7 @@ function custom_woo_product_loop()
                 ELSE regularPrice 
             END as priceOrder ";
 
-            echo $sql = "SELECT postId, {$priceOrdering} FROM wp_gf_products WHERE salePrice > 0 AND stockStatus = 1 AND status = 1
+            $sql = "SELECT postId, {$priceOrdering} FROM wp_gf_products WHERE salePrice > 0 AND stockStatus = 1 AND status = 1
                 AND categories LIKE '%{$cat->name}%' AND categoryIds LIKE '%{$cat->term_id}%' ORDER BY $orderBy";
             $productsSale = $wpdb->get_results($sql, OBJECT_K);
 
