@@ -146,7 +146,7 @@ function gf_mobile_nav_menu_shortcode()
     function gf_mobile_search_form()
     {
         ?>
-        <form role="search" method="get" class="gf-search-form gf-search-form--mobile"
+        <form role="search" method="get" class="gf-search-form--mobile"
               action="<?php echo esc_url(get_permalink(wc_get_page_id('shop'))) ?>">
 <!--            <div class="search-toggle-wrapper"> ako zatreba treba doraditi-->
 <!--                <div class="gf-search-toggle"><i class="fa fa-search"></i></div>-->
