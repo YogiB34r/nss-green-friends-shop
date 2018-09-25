@@ -2851,3 +2851,6 @@ ul.products.columns-4.list li {
 ul.products.columns-4.list li > .loop-short-description{
   display: block;
 }
+ul.products.columns-4.list li > .price {
+  display: block;
+}
