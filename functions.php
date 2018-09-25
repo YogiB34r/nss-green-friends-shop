@@ -378,14 +378,20 @@ function custom_woo_product_loop()
 function gf_custom_search_output($sortedProducts)
 {
     if ($sortedProducts->have_posts()):
+        global $sw;
         wc_setup_loop();
         woocommerce_product_loop_start();
-        while ($sortedProducts->have_posts()) : $sortedProducts->the_post();
+        while ($sortedProducts->have_posts()) :
+            $sortedProducts->the_post();
 //            do_action('woocommerce_shop_loop');
+            $sw->start('wc_get_template_part');
             wc_get_template_part('content', 'product');
+            $sw->stop('wc_get_template_part');
         endwhile;
+        $sw->start('loop_end');
         wp_reset_postdata();
         woocommerce_product_loop_end();
+        $sw->stop('loop_end');
     endif;
 }
 

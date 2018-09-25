@@ -22,13 +22,16 @@ global $product;
 if (empty($product) || !$product->is_visible()) {
     return;
 }
+ob_start();
+wc_product_class();
+$classes = ob_get_clean();
 ?>
-<li <?php wc_product_class(); ?>>
+<li <?=$classes?>>
     <a href="<?php echo get_permalink($product->get_id()) ?>"
        title="<?php echo esc_attr($product->get_title() ? $product->get_title() : $product->get_id()); ?>">
-        <?php woocommerce_show_product_sale_flash('', $product);
-        add_stickers_to_products_new();
-        add_stickers_to_products_soldout()
+        <?php woocommerce_show_product_sale_flash('', '', '', $classes);
+        add_stickers_to_products_new($product);
+        add_stickers_to_products_soldout($classes);
         ?>
         <?php if (has_post_thumbnail($product->get_id())) echo get_the_post_thumbnail($product->get_id(), 'shop_catalog'); else echo '<img src="' . wc_placeholder_img_src() . '" alt="Placeholder" width="300px" height="300px" />'; ?>
     </a>
