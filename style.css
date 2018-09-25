@@ -145,6 +145,7 @@ img.gf-header-logo {
 	left: 0;
   overflow: scroll;
   padding: 10px;
+  padding-top: 50px;
 	z-index: 1000;
 	background: #fff;
 	width: 65%;
@@ -152,7 +153,6 @@ img.gf-header-logo {
 	box-shadow: 3px 0 13px #1d1d1d;
 	transition: width 0.5s;
 }
-
 .gf-category-accordion__item {
   margin: 0;
   padding: 10px 0;
@@ -1948,6 +1948,12 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
 }
 
 @media only screen and (max-width: 576px) {
+  .products .columns-4 .grid {
+    margin-bottom: -30px;
+  }
+  .gf-product-controls--bottom {
+    margin-bottom: 20px;
+  }
   body {
     min-width: 100%;
     overflow-x:hidden ;
