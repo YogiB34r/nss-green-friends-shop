@@ -1948,11 +1948,15 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
 }
 
 @media only screen and (max-width: 576px) {
+  .gf-product-controls {
+    display: none;
+  }
   .products .columns-4 .grid {
     margin-bottom: -30px;
   }
   .gf-product-controls--bottom {
     margin-bottom: 20px;
+    display: block;
   }
   body {
     min-width: 100%;
