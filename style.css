@@ -2841,3 +2841,13 @@ a#cn-more-info {
 .gf-search-wrapper input{
   max-height: 46px;
 }
+
+ul.products.columns-4.list li {
+  display: block;
+}
+.loop-short-description {
+  display: none;
+}
+ul.products.columns-4.list li > .loop-short-description{
+  display: block;
+}
