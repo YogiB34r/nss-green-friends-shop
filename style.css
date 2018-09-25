@@ -1712,7 +1712,9 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
 
 @media only screen and (max-width: 1200px) {
   .gf-product-controls {
-    display: none;
+    padding-left: 0;
+    flex-wrap: wrap;
+    flex-flow: row wrap;
   }
 
   .woocommerce .woocommerce-result-count {
