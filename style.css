@@ -698,7 +698,7 @@ h1.product_title.entry-title {
 .woocommerce-page ul.products.list li,
 .woocommerce ul.products[class*="columns-"] li.product,
 .woocommerce-page ul.products[class*="columns-"] li.product {
-  border-bottom: solid 1px #666;
+  border-bottom: solid 1px #ccc;
 }
 
 .pswp__bg {
@@ -1538,7 +1538,7 @@ body.home .gf-navblock{
 .gf-sidebar .widget .woocommerce ul.products li.product .price {
   color: #666;
   text-decoration: none;
-  margin: 0;
+  padding-bottom: 10px;
 }
 
 .gf-sidebar .widget .woocommerce-Price-amount {
@@ -2854,3 +2854,4 @@ ul.products.columns-4.list li > .loop-short-description{
 ul.products.columns-4.list li > .price {
   display: block;
 }
+
