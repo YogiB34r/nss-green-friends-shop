@@ -529,7 +529,6 @@ input[type="radio"]:checked + span::before {
 
 .woocommerce .woocommerce-breadcrumb {
   color: #f45411;
-  padding: 0 0 10px;
 }
 
 .woocommerce .woocommerce-breadcrumb a {
@@ -1713,9 +1712,7 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
 
 @media only screen and (max-width: 1200px) {
   .gf-product-controls {
-    padding-left: 0;
-    flex-wrap: wrap;
-    flex-flow: row wrap;
+    display: none;
   }
 
   .woocommerce .woocommerce-result-count {
@@ -1841,8 +1838,8 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
 
   .gf-radio-search-wrapper--mobile {
     display: block;
-	  text-align: center;
-	  margin-top: 15px;
+	  margin: 15px auto;
+      text-align: center;
   }
 
   .gf-search {
