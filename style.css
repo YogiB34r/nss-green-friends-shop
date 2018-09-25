@@ -2388,7 +2388,7 @@ a#cn-more-info {
 
 .gf-product-slider__header a.gf-product-slider__header-control {
   padding: 4px 14px;
-  font-size: 15px;
+  font-size: 15px !important;
   border: solid 2px #c2c2c2;
   border-radius: 4px;
   color: #c2c2c2;
