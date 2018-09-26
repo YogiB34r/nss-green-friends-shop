@@ -694,6 +694,8 @@ h1.product_title.entry-title {
 .woocommerce-page ul.products.grid li {
     display: flex;
     flex-flow: column;
+    height: 360px;
+    position: relative;
 }
 
 .woocommerce-page ul.products.grid li,
@@ -793,6 +795,8 @@ body.single-product .summary del {
     font-weight: 600;
     margin: 15px 0 5px;
     font-size: 1rem;
+    position: absolute;
+    bottom: 0;
 }
 
 .woocommerce ul.products li.product ins .price {
@@ -2929,4 +2933,7 @@ ul.products.columns-4.list li > .price {
 
 .slider-item .price ins{
     margin-right: 10px;
+}
+h5{
+    font-size: 14px;
 }
