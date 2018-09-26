@@ -66,7 +66,6 @@ function gf_display_categories_on_archive_page()
             'taxonomy' => get_queried_object()->taxonomy,
             'parent' => get_queried_object_id(),
         ]);
-        var_dump($categories);
         if (count($categories) != 0) {
             echo '<div class="row gf-category-expander">';
             echo '<div class="gf-jos-kategorija"><p>Još kategorija</p></div>';
