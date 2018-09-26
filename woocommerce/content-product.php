@@ -33,7 +33,7 @@ $classes = ob_get_clean();
         add_stickers_to_products_new($product);
         add_stickers_to_products_soldout($classes);
         ?>
-        <?php if (has_post_thumbnail($product->get_id())) echo get_the_post_thumbnail($product->get_id(), 'shop_catalog'); else echo '<img src="' . wc_placeholder_img_src() . '" alt="Placeholder" width="300px" height="300px" />'; ?>
+        <?php if (has_post_thumbnail($product->get_id())) echo get_the_post_thumbnail($product->get_id()); else echo '<img src="' . wc_placeholder_img_src() . '" alt="Placeholder" width="300px" height="300px" />'; ?>
     </a>
     <a href="<?php echo get_permalink($product->get_id()) ?>"
        title="<?php echo esc_attr($product->get_title() ? $product->get_title() : $product->get_id()); ?>">
