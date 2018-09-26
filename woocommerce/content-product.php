@@ -34,7 +34,7 @@ if (empty($product) || !$product->is_visible()) {
     </a>
     <a href="<?php echo get_permalink($product->get_id()) ?>"
        title="<?php echo esc_attr($product->get_title() ? $product->get_title() : $product->get_id()); ?>">
-        <h5><?php the_title(); ?></h5>
+        <h5><?php the_title();?></h5>
     </a>
     <span class="price"><?php echo $product->get_price_html(); ?></span>
     <div class="loop-short-description"><?=$product->get_short_description()?></div>
