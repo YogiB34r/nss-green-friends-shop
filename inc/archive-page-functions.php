@@ -58,6 +58,7 @@ function gf_check_for_second_level_categories()
 
 
 add_action('woocommerce_archive_description', 'gf_display_categories_on_archive_page', 15);
+//Na nekim kategorijama $categories lepo uhvati kategorije a na nekima ne vraca nista 
 function gf_display_categories_on_archive_page()
 {
     if (is_product_category()) {
