@@ -172,8 +172,8 @@ function woo_custom_description_tab_content() {
     global $product;
 //    global $post;
     echo '<p>'.$product->get_description().'</p>';
-//    echo '<p>&nbsp</p>';
-//    echo nl2br('<p>'.get_post_meta($post->ID,'features',true).'</p>');
+    echo '<p>&nbsp</p>';
+    echo nl2br('<p>'.get_post_meta($product->get_id(),'features',true).'</p>');
 }
 /**
  * Temporarily enable hide out of stock items.
