@@ -703,8 +703,6 @@ h1.product_title.entry-title {
 .woocommerce ul.products[class*="columns-"] li.product,
 .woocommerce-page ul.products[class*="columns-"] li.product {
     border-bottom: solid 1px #ccc;
-    position: relative;
-    height: 310px;
 }
 
 .pswp__bg {
@@ -797,8 +795,6 @@ body.single-product .summary del {
     font-weight: 600;
     margin: 15px 0 5px;
     font-size: 1rem;
-    position: absolute;
-    bottom: 0;
 }
 
 .woocommerce ul.products li.product ins .price {
