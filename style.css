@@ -529,6 +529,7 @@ input[type="radio"]:checked + span::before {
 
 .woocommerce .woocommerce-breadcrumb {
   color: #f45411;
+  margin-bottom: 10px;
 }
 
 .woocommerce .woocommerce-breadcrumb a {
@@ -679,7 +680,7 @@ h1.product_title.entry-title {
 }
 
 .woocommerce ul.products.grid {
-  margin: 20px 0;
+  margin: 10px 0;
   display: flex !important;
   flex-wrap: wrap;
 }
@@ -789,7 +790,7 @@ body.single-product .summary del {
   color: #ed0f08;
   text-align: center;
   font-weight: 600;
-  margin: 20px 0;
+  margin: 15px 0 5px;
   font-size: 1rem;
 }
 
@@ -867,6 +868,7 @@ ul.list .saved-sale {
 .saved-sale {
   order: 3;
   font-size: 0.9em;
+  margin-top: 5px;
 }
 
 body.home .saved-sale {
@@ -1221,8 +1223,7 @@ body.home .saved-sale {
   overflow: hidden;
   border: solid 1px #e2e2e2;
   border-radius: 9px;
-  margin-bottom: 20px;
-  margin: 20px 0 20px;
+  margin: 10px 0 10px;
   transition: height 0.4s;
 }
 
@@ -1741,7 +1742,7 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
   }
 
   .woocommerce .woocommerce-result-count {
-    margin: 20px 0;
+    margin: 10px 0;
     padding-top: 0;
   }
 
@@ -1801,6 +1802,11 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
   }
 }
 
+li.product {
+  margin: 0 0.3em 10px 0.3em !important;
+  width: 23.7% !important;
+}
+
 @media only screen and (max-width: 767px) {
 
   #wpadminbar {
@@ -1808,7 +1814,7 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
   }
 
   .gf-main-content-container {
-    width: 95%;
+    width: 98%;
   }
 
   .gf-logo-wrapper {
@@ -1905,6 +1911,7 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
 
   .woocommerce .woocommerce-breadcrumb {
     padding-left: 0;
+    margin: 15px 0 0 5px;
   }
 
   .gf-sidebar .widget_price_filter {
@@ -1934,6 +1941,12 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
   }
   .gf-footer-images li {
     margin: 0;
+  }
+  li.product {
+    margin: 0 2px !important;
+  }
+  .woocommerce-products-header__title {
+    margin-left: 5px;
   }
 }
 
@@ -2854,6 +2867,7 @@ ul.products.columns-4.list li > .loop-short-description{
 ul.products.columns-4.list li > .price {
   display: block;
 }
-li.product {
-  margin: 7px 0 !important;
+.gf-radio-search-wrapper label {
+  color: #f45411;
+  cursor: pointer;
 }
