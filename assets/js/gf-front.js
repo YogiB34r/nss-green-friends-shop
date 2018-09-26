@@ -297,7 +297,6 @@ jQuery(document).ready(function () {
             data:{'postId': jQuery('div.type-product').attr('id').split('-')[1], action:'ajax_gf_view_count'},
             minLength: 0,
             success: function(response){
-                console.log(response);
             }
         });
     }
