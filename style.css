@@ -703,6 +703,8 @@ h1.product_title.entry-title {
 .woocommerce ul.products[class*="columns-"] li.product,
 .woocommerce-page ul.products[class*="columns-"] li.product {
     border-bottom: solid 1px #ccc;
+    position: relative;
+    height: 310px;
 }
 
 .pswp__bg {
