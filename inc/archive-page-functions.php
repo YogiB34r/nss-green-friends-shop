@@ -65,72 +65,67 @@ function gf_display_categories_on_archive_page()
             'taxonomy' => get_queried_object()->taxonomy,
             'parent' => get_queried_object_id(),
         ]);
-
-        echo '<div class="row gf-category-expander">';
-        if (count($categories) < 10){
-            echo '<div class="gf-jos-kategorija"><p>Još kategorija</p></div>';
-        }
         $second_lvl_cat_ids = [];
-        foreach ($categories as $category) {
-            $child_args = array(
-                'taxonomy' => 'product_cat',
-                'hide_empty' => false,
-                'parent' => $category->term_id
-            );
+        if (count($second_lvl_cat_ids) != 0) {
+            echo '<div class="row gf-category-expander">';
+            echo '<div class="gf-jos-kategorija"><p>Još kategorija</p></div>';
+            foreach ($categories as $category) {
+                $child_args = array(
+                    'taxonomy' => 'product_cat',
+                    'hide_empty' => false,
+                    'parent' => $category->term_id
+                );
 
-            $second_lvl_cat_ids[] = $category->term_id;
+                $second_lvl_cat_ids[] = $category->term_id;
 
-            $child_cats = get_terms($child_args);
-            echo '<div class="col-12 col-sm-6 col-md-3 gf-category-expander__col">';
-            if (count($categories) < 10){
-                echo '<a class="gf-category-expander__col__category" href="' . get_term_link($category) . '">' . $category->name . '</a>
-                <ul class="gf-expander__subcategory-list">';
-            }else {
+                $child_cats = get_terms($child_args);
+                echo '<div class="col-12 col-sm-6 col-md-3 gf-category-expander__col">';
                 echo '<ul class="gf-expander__subcategory-list">';
                 echo '<li>
                      <a class="gf-category-expander__col__category" href="' . get_term_link($category) . '">' . $category->name . '</a>
                   </li>';
-            }
-            foreach ($child_cats as $child_cat) {
-                echo '<li>
+                foreach ($child_cats as $child_cat) {
+                    echo '<li>
                      <a class="gf-category-expander__col__subcategory" href="' . get_term_link($child_cat) . '">' . $child_cat->name . '</a>
                   </li>';
-            }
-            echo '</ul>
+                }
+                echo '</ul>
               </div>';
-        }
-        $args = array(
-            'taxonomy' => 'product_cat',
-            'childless' => 1,
-            'hidde_empty' => false
-        );
-        $childless_cats = get_terms($args);
-        $childless_cats_ids = [];
-        foreach ($childless_cats as $cat){
-            $childless_cats_ids[] = $cat->term_id;
-        }
-        $result = false;
-        foreach ($second_lvl_cat_ids as $second_lvl_cat_id){
-            if(!in_array($second_lvl_cat_id, $childless_cats_ids)){
-                $result = true;
-                break;
             }
+            $args = array(
+                'taxonomy' => 'product_cat',
+                'childless' => 1,
+                'hidde_empty' => false
+            );
+            $childless_cats = get_terms($args);
+            $childless_cats_ids = [];
+            foreach ($childless_cats as $cat) {
+                $childless_cats_ids[] = $cat->term_id;
+            }
+            $result = false;
+            foreach ($second_lvl_cat_ids as $second_lvl_cat_id) {
+                if (!in_array($second_lvl_cat_id, $childless_cats_ids)) {
+                    $result = true;
+                    break;
+                }
+            }
+            if (!in_array(get_queried_object_id(), $childless_cats_ids) && $result === true || count($categories) > 10) {
+                echo '<div class="gf-category-expander__footer"><span class="fas fa-angle-down"></span></div>';
+            }
+            echo '</div>';
         }
-        if(!in_array(get_queried_object_id(), $childless_cats_ids) && $result === true || count($categories) > 10){
-            echo '<div class="gf-category-expander__footer"><span class="fas fa-angle-down"></span></div>';
-        }
-    echo '</div>';
     }
 }
-remove_action( 'woocommerce_before_shop_loop', 'wc_print_notices', 10 );
-remove_action( 'woocommerce_before_shop_loop', 'woocommerce_catalog_ordering', 30 );
-remove_action( 'woocommerce_after_shop_loop', 'woocommerce_pagination', 10 );
 
-add_action('woocommerce_before_shop_loop','woocommerce_result_count',20);
-add_action( 'woocommerce_before_shop_loop', 'woocommerce_catalog_ordering', 26);
-add_action( 'woocommerce_after_shop_loop', 'woocommerce_catalog_ordering', 26 );
-add_action( 'woocommerce_before_shop_loop', 'woocommerce_pagination', 27 );
-add_action( 'woocommerce_after_shop_loop', 'woocommerce_pagination', 27 );
+remove_action('woocommerce_before_shop_loop', 'wc_print_notices', 10);
+remove_action('woocommerce_before_shop_loop', 'woocommerce_catalog_ordering', 30);
+remove_action('woocommerce_after_shop_loop', 'woocommerce_pagination', 10);
+
+add_action('woocommerce_before_shop_loop', 'woocommerce_result_count', 20);
+add_action('woocommerce_before_shop_loop', 'woocommerce_catalog_ordering', 26);
+add_action('woocommerce_after_shop_loop', 'woocommerce_catalog_ordering', 26);
+add_action('woocommerce_before_shop_loop', 'woocommerce_pagination', 27);
+add_action('woocommerce_after_shop_loop', 'woocommerce_pagination', 27);
 
 //function wpa_98244_filter_short_description(  ){
 //    if (is_shop() || is_product_category()){
