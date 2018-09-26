@@ -298,8 +298,9 @@ jQuery(document).ready(function () {
 function ajaxSearch(value) {
     jQuery.ajax({
         type: "POST",
-        url: ajax_object.ajax_url,
-        data:{'keyword': value, action:'ajax_gf_autocomplete'},
+        // url: ajax_object.ajax_url,
+        url: '/pretraga/',
+        data:{'query': value},
         minLength: 0,
         beforeSend: function(){
             jQuery(".gf-search-box").css("background","#fafafa url(/wp-content/themes/nss-green-friends-shop/assets/images/LoaderIcon.gif)no-repeat center");
