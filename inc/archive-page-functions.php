@@ -65,14 +65,14 @@ function gf_display_categories_on_archive_page()
             'taxonomy' => get_queried_object()->taxonomy,
             'parent' => get_queried_object_id(),
         ]);
-        $second_lvl_cat_ids = [];
-        if (count($second_lvl_cat_ids) != 0) {
+        var_dump($categories);
+        if (count($categories) != 0) {
             echo '<div class="row gf-category-expander">';
             echo '<div class="gf-jos-kategorija"><p>Još kategorija</p></div>';
+            $second_lvl_cat_ids = [];
             foreach ($categories as $category) {
                 $child_args = array(
                     'taxonomy' => 'product_cat',
-                    'hide_empty' => false,
                     'parent' => $category->term_id
                 );
 
@@ -80,10 +80,8 @@ function gf_display_categories_on_archive_page()
 
                 $child_cats = get_terms($child_args);
                 echo '<div class="col-12 col-sm-6 col-md-3 gf-category-expander__col">';
-                echo '<ul class="gf-expander__subcategory-list">';
-                echo '<li>
-                     <a class="gf-category-expander__col__category" href="' . get_term_link($category) . '">' . $category->name . '</a>
-                  </li>';
+                echo '<a class="gf-category-expander__col__category" href="' . get_term_link($category) . '">' . $category->name . '</a>
+                <ul class="gf-expander__subcategory-list">';
                 foreach ($child_cats as $child_cat) {
                     echo '<li>
                      <a class="gf-category-expander__col__subcategory" href="' . get_term_link($child_cat) . '">' . $child_cat->name . '</a>
@@ -95,7 +93,6 @@ function gf_display_categories_on_archive_page()
             $args = array(
                 'taxonomy' => 'product_cat',
                 'childless' => 1,
-                'hidde_empty' => false
             );
             $childless_cats = get_terms($args);
             $childless_cats_ids = [];
@@ -109,7 +106,7 @@ function gf_display_categories_on_archive_page()
                     break;
                 }
             }
-            if (!in_array(get_queried_object_id(), $childless_cats_ids) && $result === true || count($categories) > 10) {
+            if (!in_array(get_queried_object_id(), $childless_cats_ids) && $result === true) {
                 echo '<div class="gf-category-expander__footer"><span class="fas fa-angle-down"></span></div>';
             }
             echo '</div>';
