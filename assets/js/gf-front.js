@@ -261,14 +261,20 @@ jQuery(document).ready(function () {
         });
     }
 
-    var timer, delay = 300;
-    jQuery(".gf-search-box").bind('keydown', function(e) {
+    var timer, searchQuery, delay = 300;
+    jQuery(".gf-search-form").on('keyup', '.gf-search-box', function(e) {
+        var _this = jQuery(this);
         if(jQuery(this).val().length >= 3) {
-            var _this = jQuery(this);
-            clearTimeout(timer);
-            timer = setTimeout(function() {
-                ajaxSearch(_this.val());
-            }, delay );
+            if (searchQuery !== _this.val()) {
+                searchQuery = _this.val();
+                clearTimeout(timer);
+                timer = setTimeout(function() {
+                    ajaxSearch(_this.val());
+                }, delay );
+            }
+        }
+        if(_this.val().length === 0) {
+            jQuery('.suggesstion-box').hide();
         }
     });
     jQuery(document).click(function(event) {

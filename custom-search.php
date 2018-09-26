@@ -11,10 +11,11 @@ if (isset($_POST['query'])) {
         $query = addslashes($_POST['query']);
 
         $cache = new GF_Cache();
-        $key = 'category-search-' . md5($query);
+        $key = 'category-search#' . md5($query);
         $cat_results = unserialize($cache->redis->get($key));
         if ($cat_results === false || $cat_results === '') {
-            $sql_cat = "SELECT `name`,`term_id` FROM wp_terms t JOIN wp_term_taxonomy tt USING (term_id) WHERE t.name LIKE '{$query}%' AND tt.taxonomy = 'product_cat' LIMIT 4";
+            $sql_cat = "SELECT `name`,`term_id`, `count` FROM wp_terms t JOIN wp_term_taxonomy tt USING (term_id) 
+            WHERE t.name LIKE '%{$query}%' AND tt.taxonomy = 'product_cat' ORDER BY `count` DESC LIMIT 4";
             $cat_results = $wpdb->get_results($sql_cat);
             if (!empty($cat_results)) {
                 $cache->redis->set($key, serialize($cat_results));
@@ -31,7 +32,7 @@ if (isset($_POST['query'])) {
             $html .= '<ul>';
             foreach ($cat_results as $category) {
                 $category_link = get_term_link((int) $category->term_id);
-                $html .= '<li><a href="' . $category_link . '">' . $category->name . '</a></li>';
+                $html .= '<li><a href="' . $category_link . '">' . $category->name . ' ('.$category->count.')</a></li>';
             }
             $html .= '</ul>';
         }
