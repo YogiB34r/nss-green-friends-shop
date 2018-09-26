@@ -7,53 +7,52 @@ $sw = new \Symfony\Component\Stopwatch\Stopwatch();
 $sw->start('gfmain');
 
 if (isset($_POST['query'])) {
-    if (isset($_POST['query'])) {
-        $query = addslashes($_POST['query']);
+    $query = addslashes($_POST['query']);
 
-        $cache = new GF_Cache();
-        $key = 'category-search#' . md5($query);
-        $cat_results = unserialize($cache->redis->get($key));
-        if ($cat_results === false || $cat_results === '') {
-            $sql_cat = "SELECT `name`,`term_id`, `count` FROM wp_terms t JOIN wp_term_taxonomy tt USING (term_id) 
-            WHERE t.name LIKE '%{$query}%' AND tt.taxonomy = 'product_cat' ORDER BY `count` DESC LIMIT 4";
-            $cat_results = $wpdb->get_results($sql_cat);
-            if (!empty($cat_results)) {
-                $cache->redis->set($key, serialize($cat_results));
-            }
+    $cache = new GF_Cache();
+    $key = 'category-search#' . md5($query);
+    $cat_results = unserialize($cache->redis->get($key));
+    if ($cat_results === false || $cat_results === '') {
+        $sql_cat = "SELECT `name`,`term_id`, `count` FROM wp_terms t JOIN wp_term_taxonomy tt USING (term_id) 
+        WHERE t.name LIKE '%{$query}%' AND tt.taxonomy = 'product_cat' ORDER BY `count` DESC LIMIT 4";
+        $cat_results = $wpdb->get_results($sql_cat);
+        if (!empty($cat_results)) {
+            $cache->redis->set($key, serialize($cat_results));
         }
+    }
 
 //        $sql_product = "SELECT `productName`, `postId` FROM wp_gf_products WHERE `productName` LIKE '%{$keyword}%' LIMIT 4";
 //        $product_results = $wpdb->get_results($sql_product);
-        $product_results = gf_custom_search($query, 4);
+    $product_results = gf_custom_search($query, 4);
 
-        $html = '';
-        if (!empty($cat_results)) {
-            $html = '<span>Kategorije</span>';
-            $html .= '<ul>';
-            foreach ($cat_results as $category) {
-                $category_link = get_term_link((int) $category->term_id);
-                $html .= '<li><a href="' . $category_link . '">' . $category->name . ' ('.$category->count.')</a></li>';
-            }
-            $html .= '</ul>';
-        }
-
-        $html .= '<span>Proizvodi</span>';
+    $html = '';
+    if (!empty($cat_results)) {
+        $html = '<span>Kategorije</span>';
         $html .= '<ul>';
-        if ($product_results) {
-            foreach ($product_results->get_posts() as $post) {
-                $product_link = get_permalink((int) $post->ID);
-                $html .= '<li><a href="' . $product_link . '">' . $post->post_title . '</a></li>';
-            }
-        } else {
-            $html .= '<li>Nema rezultata</li>';
+        foreach ($cat_results as $category) {
+            $category_link = get_term_link((int) $category->term_id);
+            $html .= '<li><a href="' . $category_link . '">' . $category->name . ' ('.$category->count.')</a></li>';
         }
         $html .= '</ul>';
-
-        echo $html;
     }
+
+    $html .= '<span>Proizvodi</span>';
+    $html .= '<ul>';
+    if ($product_results) {
+        foreach ($product_results->get_posts() as $post) {
+            $product_link = get_permalink((int) $post->ID);
+            $html .= '<li><a href="' . $product_link . '">' . $post->post_title . '</a></li>';
+        }
+    } else {
+        $html .= '<li>Nema rezultata</li>';
+    }
+    $html .= '</ul>';
+
+    echo $html;
     exit();
 }
 
+wp_reset_query();
 
 /**
  * Set custom body class in order to load proper woo commerce templates
