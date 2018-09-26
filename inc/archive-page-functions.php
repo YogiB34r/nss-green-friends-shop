@@ -67,10 +67,11 @@ function gf_display_categories_on_archive_page()
         ]);
 
         echo '<div class="row gf-category-expander">';
+        if (count($categories) < 10){
+            echo '<div class="gf-jos-kategorija"><p>Još kategorija</p></div>';
+        }
         $second_lvl_cat_ids = [];
-        $i = 0;
         foreach ($categories as $category) {
-            $i++;
             $child_args = array(
                 'taxonomy' => 'product_cat',
                 'hide_empty' => false,
@@ -81,7 +82,7 @@ function gf_display_categories_on_archive_page()
 
             $child_cats = get_terms($child_args);
             echo '<div class="col-12 col-sm-6 col-md-3 gf-category-expander__col">';
-            if ($i < 10){
+            if (count($categories) < 10){
                 echo '<a class="gf-category-expander__col__category" href="' . get_term_link($category) . '">' . $category->name . '</a>
                 <ul class="gf-expander__subcategory-list">';
             }else {

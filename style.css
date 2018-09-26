@@ -694,6 +694,8 @@ h1.product_title.entry-title {
 .woocommerce-page ul.products.grid li {
     display: flex;
     flex-flow: column;
+    height: 360px;
+    position: relative;
 }
 
 .woocommerce-page ul.products.grid li,
@@ -701,6 +703,8 @@ h1.product_title.entry-title {
 .woocommerce ul.products[class*="columns-"] li.product,
 .woocommerce-page ul.products[class*="columns-"] li.product {
     border-bottom: solid 1px #ccc;
+    position: relative;
+    height: 310px;
 }
 
 .pswp__bg {
@@ -793,6 +797,8 @@ body.single-product .summary del {
     font-weight: 600;
     margin: 15px 0 5px;
     font-size: 1rem;
+    position: absolute;
+    bottom: 0;
 }
 
 .woocommerce ul.products li.product ins .price {
@@ -1230,12 +1236,8 @@ body.home .saved-sale {
     padding: 10px;
     word-break: keep-all;
     text-overflow: ellipsis;
-}
-
-.gf-expander__subcategory-list {
     display: none;
 }
-
 .gf-category-expander__col li {
     margin-bottom: 10px;
 }
@@ -1271,6 +1273,12 @@ body.home .saved-sale {
 
 .gf-category-expander__footer .fas:hover {
     cursor: pointer;
+}
+.gf-jos-kategorija {
+    width: 100%;
+    text-align: center;
+    font-size: 18px;
+    color: #f45411;
 }
 
 /* sidebar */
@@ -2929,4 +2937,7 @@ ul.products.columns-4.list li > .price {
 
 .slider-item .price ins{
     margin-right: 10px;
+}
+h5{
+    font-size: 14px;
 }
