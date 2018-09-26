@@ -2466,8 +2466,6 @@ a.gf-product-slider__header-control.product-slider__control-prev {
     padding: 0 8px;
     width: 100%;
     display: inline-block;
-    position: relative;
-    height: 270px;
 }
 
 .slider-item-without-tabs {
@@ -2937,5 +2935,5 @@ ul.products.columns-4.list li > .price {
     margin-right: 10px;
 }
 h5{
-    font-size: 14px;
+    font-size: 18px;
 }
