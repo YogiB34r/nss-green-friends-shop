@@ -1802,12 +1802,20 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title{
   }
 }
 
-li.product {
+.woocommerce ul.products li.product, .woocommerce-page ul.products li.product {
+/*li.product {*/
   margin: 0 0.3em 10px 0.3em !important;
   width: 23.7% !important;
 }
 
+.custom-html-widget .woocommerce ul.products li.product {
+  width: 100% !important;
+}
+
 @media only screen and (max-width: 767px) {
+  .woocommerce ul.products li.product, .woocommerce-page ul.products li.product {
+    width: 46% !important;
+  }
 
   #wpadminbar {
     position: fixed;
