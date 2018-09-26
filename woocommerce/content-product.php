@@ -40,8 +40,8 @@ $classes = ob_get_clean();
         <h5><?php the_title();?></h5>
     </a>
     <span class="price"><?php echo $product->get_price_html(); ?></span>
-    <div class="loop-short-description"><?=$product->get_short_description()?></div>
-    <!-- ADD to cart button if needed, also hidden in css just in case -->
+    <div class="loop-short-description"><?=strip_tags($product->get_short_description())?></div>
+   <?php // ADD to cart button if needed, also hidden in css just in case?>
     <?php //$list_grid->gridlist_buttonwrap_open()?>
     <?php //woocommerce_template_loop_add_to_cart($product); ?>
     <?php //$list_grid->gridlist_buttonwrap_close()?>
