@@ -273,7 +273,8 @@ function gf_print_styles()
     return $result;
 }
 
-function parseOrderBy() {
+function parseOrderBy()
+{
     $order = (isset($_GET['orderby'])) ? $_GET['orderby'] : 'date';
     switch ($order) {
         //@TODO implement view count
@@ -326,7 +327,7 @@ function custom_woo_product_loop()
 
         if (get_query_var('taxonomy') === 'product_cat') { // Za kategorije
 //            $term = str_replace('-', ' ', get_query_var('term'));
-            $cat = get_term_by( 'slug', get_query_var('term'), 'product_cat');
+            $cat = get_term_by('slug', get_query_var('term'), 'product_cat');
 //            echo 'cat page';
 
             // if $_GET['query']
@@ -586,7 +587,7 @@ function gf_ajax_search_autocomplete()
             $html = '<span>Kategorije</span>';
             $html .= '<ul>';
             foreach ($cat_results as $category) {
-                $category_link = get_term_link((int) $category->term_id);
+                $category_link = get_term_link((int)$category->term_id);
                 $html .= '<li><a href="' . $category_link . '">' . $category->name . '</a></li>';
             }
             $html .= '</ul>';
@@ -596,7 +597,7 @@ function gf_ajax_search_autocomplete()
         $html .= '<ul>';
         if ($product_results) {
             foreach ($product_results->get_posts() as $post) {
-                $product_link = get_permalink((int) $post->ID);
+                $product_link = get_permalink((int)$post->ID);
                 $html .= '<li><a href="' . $product_link . '">' . $post->post_title . '</a></li>';
             }
         } else {
@@ -615,10 +616,10 @@ function gf_ajax_search_autocomplete()
 add_action('wp_ajax_nopriv_ajax_gf_view_count', 'gf_ajax_view_count');
 function gf_ajax_view_count()
 {
-    $postId = (int) $_POST['postId'];
+    $postId = (int)$_POST['postId'];
     $key = 'post-view-count#' . $postId;
     $cache = new GF_Cache();
-    $count = (int) $cache->redis->get($key);
+    $count = (int)$cache->redis->get($key);
     if ($count === 10) {
         global $wpdb;
         $wpdb->query("UPDATE wp_gf_products SET viewCount = viewCount + {$count} WHERE postId = {$postId}");
@@ -627,4 +628,37 @@ function gf_ajax_view_count()
         $count++;
         $cache->redis->set($key, $count);
     }
+}
+
+function gf_change_supplier_id_by_vendor_id()
+{
+    $failedMatchIds = [];
+    for ($i = 0; $i < 10; $i++) {
+        $products_ids = wc_get_products(array(
+            'limit' => 3000,
+            'return' => 'ids'
+        ));
+        $users = get_users();
+        foreach ($products_ids as $product_id) {
+            if (get_post_meta($product_id, 'synced',true) != 1) {
+                $supplier_id = (int)get_post_meta($product_id, 'supplier', 'true');
+                foreach ($users as $user) {
+                    $vendor_id = (int)get_user_meta($user->ID, 'vendorid', true);
+                    if ($supplier_id === $vendor_id) {
+                        update_post_meta($product_id, 'supplier', $user->ID);
+                        add_post_meta($product_id, 'synced', true);
+                    }
+                }
+            }
+            if (get_post_meta($product_id,'synced',true) === ''){
+                $failedMatchIds[]= $product_id;
+            }
+        }
+    }
+    echo 'Nisu pronadđeni parovi za sledeće proizvode:';
+    echo '<ul>';
+    foreach ($failedMatchIds as $failedMatchId){
+        echo '<li>'.$failedMatchId.'</li>';
+    }
+    echo '</ul>';
 }
