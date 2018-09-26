@@ -78,10 +78,16 @@ function gf_display_categories_on_archive_page()
             $second_lvl_cat_ids[] = $category->term_id;
 
             $child_cats = get_terms($child_args);
-            echo '<div class="col-12 col-sm-6 col-md-3 gf-category-expander__col">
-                <a class="gf-category-expander__col__category" href="' . get_term_link($category) . '">' . $category->name . '</a>
+            echo '<div class="col-12 col-sm-6 col-md-3 gf-category-expander__col">';
+            if (count($categories) < 10){
+                echo '<a class="gf-category-expander__col__category" href="' . get_term_link($category) . '">' . $category->name . '</a>
                 <ul class="gf-expander__subcategory-list">';
-
+            }else {
+                echo '<ul class="gf-expander__subcategory-list">';
+                echo '<li>
+                     <a class="gf-category-expander__col__category" href="' . get_term_link($category) . '">' . $category->name . '</a>
+                  </li>';
+            }
             foreach ($child_cats as $child_cat) {
                 echo '<li>
                      <a class="gf-category-expander__col__subcategory" href="' . get_term_link($child_cat) . '">' . $child_cat->name . '</a>
@@ -107,7 +113,7 @@ function gf_display_categories_on_archive_page()
                 break;
             }
         }
-        if(!in_array(get_queried_object_id(), $childless_cats_ids) and $result === true){
+        if(!in_array(get_queried_object_id(), $childless_cats_ids) && $result === true || count($categories) > 10){
             echo '<div class="gf-category-expander__footer"><span class="fas fa-angle-down"></span></div>';
         }
     echo '</div>';
