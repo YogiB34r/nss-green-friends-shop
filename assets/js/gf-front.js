@@ -261,7 +261,7 @@ jQuery(document).ready(function () {
         });
     }
 
-    var timer, delay = 500;
+    var timer, delay = 300;
     jQuery(".gf-search-box").bind('keydown', function(e) {
         if(jQuery(this).val().length >= 3) {
             var _this = jQuery(this);
