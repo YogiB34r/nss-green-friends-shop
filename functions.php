@@ -61,11 +61,7 @@ function gf_get_categories($exlcude = array())
 function gf_get_top_level_categories($exclude = array())
 {
     $top_level_categories = [];
-    $param = '';
-    if (isset($exclude)) {
-        $param = $exclude;
-    }
-    foreach (gf_get_categories($param) as $category) {
+    foreach (gf_get_categories($exclude) as $category) {
         if (!$category->parent) {
             $top_level_categories[] = $category;
         }
@@ -113,6 +109,33 @@ function gf_get_third_level_categories($parent_id = null)
         }
     }
     return $third_level_categories;
+}
+
+function gf_check_level_of_category($cat_id)
+{
+    $result = null;
+    $top_level_ids = [];
+    $second_level_ids = [];
+    $third_level_ids = [];
+    foreach (gf_get_top_level_categories() as $category) {
+        $top_level_ids[] = $category->term_id;
+    }
+    foreach (gf_get_second_level_categories() as $category) {
+        $second_level_ids[] = $category->term_id;
+    }
+    foreach (gf_get_third_level_categories() as $category) {
+        $third_level_ids[] = $category->term_id;
+    }
+    if (in_array($cat_id, $top_level_ids)) {
+        $result = 1;
+    }
+    if (in_array($cat_id, $second_level_ids)) {
+        $result = 2;
+    }
+    if (in_array($cat_id, $third_level_ids)) {
+        $result = 3;
+    }
+    return $result;
 }
 
 //Testira razliku array-a order sensitive
@@ -170,32 +193,7 @@ function gf_insert_in_array_by_index($array, $index, $val)
     }
 }
 
-function gf_check_level_of_category($cat_id)
-{
-    $result = null;
-    $top_level_ids = [];
-    $second_level_ids = [];
-    $third_level_ids = [];
-    foreach (gf_get_top_level_categories() as $category) {
-        $top_level_ids[] = $category->term_id;
-    }
-    foreach (gf_get_second_level_categories() as $category) {
-        $second_level_ids[] = $category->term_id;
-    }
-    foreach (gf_get_third_level_categories() as $category) {
-        $third_level_ids[] = $category->term_id;
-    }
-    if (in_array($cat_id, $top_level_ids)) {
-        $result = 1;
-    }
-    if (in_array($cat_id, $second_level_ids)) {
-        $result = 2;
-    }
-    if (in_array($cat_id, $third_level_ids)) {
-        $result = 3;
-    }
-    return $result;
-}
+
 
 //add_filter('pre_get_posts', 'order_by_stock_status');
 function order_by_stock_status($posts_clauses)

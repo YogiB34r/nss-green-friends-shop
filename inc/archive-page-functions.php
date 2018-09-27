@@ -65,6 +65,7 @@ function gf_display_categories_on_archive_page()
         $categories = get_terms([
             'taxonomy' => get_queried_object()->taxonomy,
             'parent' => get_queried_object_id(),
+            'hide_empty' => true
         ]);
         if (count($categories) != 0) {
             echo '<div class="row gf-category-expander">';
@@ -106,9 +107,7 @@ function gf_display_categories_on_archive_page()
                     break;
                 }
             }
-            if (!in_array(get_queried_object_id(), $childless_cats_ids) && $result === true) {
-                echo '<div class="gf-category-expander__footer"><span class="fas fa-angle-down"></span></div>';
-            }
+            echo '<div class="gf-category-expander__footer"><span class="fas fa-angle-down"></span></div>';
             echo '</div>';
         }
     }
