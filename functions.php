@@ -660,3 +660,14 @@ function gf_change_supplier_id_by_vendor_id()
     }
     echo '</ul>';
 }
+//3149 knjige
+//3238 kamp oprema
+function gf_set_product_categories($product_id, $category_ids){
+    $product = wc_get_product($product_id);
+    $product_categories = $product->get_category_ids();
+    $diff = array_diff($category_ids, $product_categories);
+    $merge = array_merge($product_categories, $diff);
+    $product->set_category_ids($merge);
+
+    //maybe need to save product? $product->save()
+}
