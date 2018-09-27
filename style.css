@@ -229,11 +229,6 @@ img.gf-header-logo {
     flex-wrap: wrap;
     justify-content: flex-end;
 }
-
-.gf-radio-search-wrapper {
-    margin-left: 50px;
-}
-
 .gf-radio-search-wrapper--mobile {
     display: none;
 }
@@ -307,7 +302,9 @@ input[type="radio"]:checked + span::before {
 .gf-search-wrapper .gf-search-toggle-wrapper {
     width: 100%;
 }
-
+.gf-search {
+    text-align: center;
+}
 .gf-search-wrapper .gf-search-toggle {
     display: none;
     float: right;
@@ -1799,10 +1796,6 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title {
 }
 
 @media only screen and (min-width: 767px) {
-    .gf-search-wrapper {
-        padding-left: 25px;
-    }
-
     .gf-search-form--mobile {
         display: none;
     }
