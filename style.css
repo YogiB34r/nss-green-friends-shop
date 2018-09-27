@@ -2918,8 +2918,6 @@ ul.products.columns-4.list li > .price {
     justify-content: space-between;
     margin-bottom: 0px;
     color: #ed0f08;
-    position: absolute;
-    bottom: 0;
 }
 
 .slider-item .price ins{
