@@ -861,7 +861,11 @@ ul.grid .saved-sale {
 }
 
 ul.list .saved-sale {
-    margin: 0;
+    margin: 5px 0 1px;
+}
+
+ul.products.list li.product img {
+    margin-bottom: 0 !important;
 }
 
 .saved-sale {
