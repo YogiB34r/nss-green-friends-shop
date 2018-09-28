@@ -698,3 +698,20 @@ function gf_set_product_categories($product_id, $category_ids)
     //maybe need to save product? $product->save()
 }
 
+
+add_filter('the_title', 'shorten_woo_product_title', 10, 2);
+function shorten_woo_product_title($title, $id)
+{
+    $limit = 47;
+    if(!is_single()){
+        if(strlen($title) < 47) {
+            return $title;
+        }else{
+            return substr($title, 0, 47) . ' ...'; // change last number to the number of characters you want
+        }
+    }else{
+        return $title;
+    }
+}
+
+
