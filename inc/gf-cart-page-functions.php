@@ -197,3 +197,4 @@ function gf_translate_shipping($name, $package)
 }
 
 add_filter('woocommerce_shipping_package_name', 'gf_translate_shipping', 10, 3);
+
