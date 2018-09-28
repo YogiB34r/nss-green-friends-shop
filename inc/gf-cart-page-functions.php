@@ -25,7 +25,7 @@ function gf_cart_display_seller_info()
 add_filter('woocommerce_package_rates', 'bbloomer_woocommerce_tiered_shipping', 10, 2);
 function bbloomer_woocommerce_tiered_shipping($rates, $package)
 {
-    if (WC()->cart->cart_contents_weight < 0.5) {
+    if (WC()->cart->cart_contents_weight <= 0.5) {
         if (isset($rates['flat_rate:3']))
             unset(
                 $rates['flat_rate:4'],
@@ -190,7 +190,7 @@ function wc_empty_cart_redirect_url()
 add_filter('woocommerce_return_to_shop_redirect', 'wc_empty_cart_redirect_url');
 
 //They only way to translate shipping
-function gf_translate_shipping($i, $package)
+function gf_translate_shipping($name, $package)
 {
 //    return sprintf( _nx( 'Dostava', 'Dostava %d', ( $i + 1 ), 'shipping packages', 'green-friends' ), ( $i + 1 ) );
     return 'Dostava';

@@ -702,7 +702,6 @@ function gf_set_product_categories($product_id, $category_ids)
 add_filter('the_title', 'shorten_woo_product_title', 10, 2);
 function shorten_woo_product_title($title, $id)
 {
-    $limit = 47;
     if(!is_single()){
         if(strlen($title) < 47) {
             return $title;
