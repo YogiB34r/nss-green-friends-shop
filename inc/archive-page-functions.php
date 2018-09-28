@@ -69,7 +69,7 @@ function gf_display_categories_on_archive_page()
         ]);
         if (count($categories) != 0) {
             echo '<div class="row gf-category-expander">';
-            echo '<div class="gf-jos-kategorija"><p>Još kategorija</p></div>';
+//            echo '<div class="gf-jos-kategorija"><p>Još kategorija</p></div>';
             $second_lvl_cat_ids = [];
             foreach ($categories as $category) {
                 $child_args = array(
