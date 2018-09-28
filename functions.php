@@ -194,7 +194,6 @@ function gf_insert_in_array_by_index($array, $index, $val)
 }
 
 
-
 //add_filter('pre_get_posts', 'order_by_stock_status');
 function order_by_stock_status($posts_clauses)
 {
@@ -638,7 +637,7 @@ function gf_change_supplier_id_by_vendor_id()
         ));
         $users = get_users();
         foreach ($products_ids as $product_id) {
-            if (get_post_meta($product_id, 'synced',true) != 1) {
+            if (get_post_meta($product_id, 'synced', true) != 1) {
                 $supplier_id = (int)get_post_meta($product_id, 'supplier', 'true');
                 foreach ($users as $user) {
                     $vendor_id = (int)get_user_meta($user->ID, 'vendorid', true);
@@ -648,21 +647,22 @@ function gf_change_supplier_id_by_vendor_id()
                     }
                 }
             }
-            if (get_post_meta($product_id,'synced',true) === ''){
-                $failedMatchIds[]= $product_id;
+            if (get_post_meta($product_id, 'synced', true) === '') {
+                $failedMatchIds[] = $product_id;
             }
         }
     }
     echo 'Nisu pronadđeni parovi za sledeće proizvode:';
     echo '<ul>';
-    foreach ($failedMatchIds as $failedMatchId){
-        echo '<li>'.$failedMatchId.'</li>';
+    foreach ($failedMatchIds as $failedMatchId) {
+        echo '<li>' . $failedMatchId . '</li>';
     }
     echo '</ul>';
 }
-//3149 knjige
-//3238 kamp oprema
-function gf_set_product_categories($product_id, $category_ids){
+
+
+function gf_set_product_categories($product_id, $category_ids)
+{
     $product = wc_get_product($product_id);
     $product_categories = $product->get_category_ids();
     $diff = array_diff($category_ids, $product_categories);
@@ -671,3 +671,4 @@ function gf_set_product_categories($product_id, $category_ids){
 
     //maybe need to save product? $product->save()
 }
+
