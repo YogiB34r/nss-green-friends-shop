@@ -335,27 +335,44 @@ function custom_woo_product_loop()
                 ELSE regularPrice 
             END as priceOrder ";
 
+            $priceCondition = "";
+            if (isset($_GET['min_price'])) {
+                $minPrice = (int) $_GET['min_price'];
+                $maxPrice = (int) $_GET['max_price'];
+                $priceCondition = " HAVING priceOrder > {$minPrice} AND priceOrder < {$maxPrice} ";
+            }
+
             $sql = "SELECT postId, {$priceOrdering} FROM wp_gf_products WHERE salePrice > 0 AND stockStatus = 1 AND status = 1
-                AND categories LIKE '%{$cat->name}%' AND categoryIds LIKE '%{$cat->term_id}%' ORDER BY $orderBy";
+                AND categories LIKE '%{$cat->name}%' AND categoryIds LIKE '%{$cat->term_id}%' {$priceCondition} ORDER BY $orderBy ";
             $productsSale = $wpdb->get_results($sql, OBJECT_K);
 
             $sql = "SELECT postId, {$priceOrdering} FROM wp_gf_products WHERE salePrice = 0 AND stockStatus = 1 AND status = 1
-                AND categories LIKE '%{$cat->name}%' AND categoryIds LIKE '%{$cat->term_id}%' ORDER BY $orderBy";
+                AND categories LIKE '%{$cat->name}%' AND categoryIds LIKE '%{$cat->term_id}%' {$priceCondition} ORDER BY $orderBy ";
             $productsNotOnSale = $wpdb->get_results($sql, OBJECT_K);
             $allIds = array_merge(array_keys($productsSale), array_keys($productsNotOnSale));
 
             $sql = "SELECT postId, {$priceOrdering} FROM wp_gf_products WHERE stockStatus = 0 AND status = 1
-                AND categories LIKE '%{$cat->name}%' AND categoryIds LIKE '%{$cat->term_id}%' ORDER BY $orderBy";
+                AND categories LIKE '%{$cat->name}%' AND categoryIds LIKE '%{$cat->term_id}%' {$priceCondition} ORDER BY $orderBy ";
             $productsOutOfStock = $wpdb->get_results($sql, OBJECT_K);
             $allIds = array_merge($allIds, array_keys($productsOutOfStock));
+            $currentPage = (get_query_var('paged')) ? get_query_var('paged') : 1;
+            $resultCount = count($allIds);
+            $totalPages = ceil($resultCount / $per_page);
+            if ($currentPage > $totalPages) {
+                $currentPage = $totalPages;
+            }
 
             $args = array(
                 'post_type' => 'product',
                 'orderby' => 'post__in',
                 'post__in' => $allIds,
                 'posts_per_page' => $per_page,
-                'paged' => (get_query_var('paged')) ? get_query_var('paged') : 1,
+                'paged' => $currentPage,
             );
+            wc_set_loop_prop('total', $resultCount);
+            wc_set_loop_prop('per_page', $per_page);
+            wc_set_loop_prop('current_page', $currentPage);
+            wc_set_loop_prop('total_pages', $totalPages);
             $sortedProducts = new WP_Query($args);
             if ($sortedProducts->have_posts()) :
                 while ($sortedProducts->have_posts()) : $sortedProducts->the_post();
@@ -470,6 +487,13 @@ function gf_custom_search($input, $limit = 0)
             }
         }
     }
+    $priceCondition = "";
+    if (isset($_GET['min_price'])) {
+        $minPrice = (int) $_GET['min_price'];
+        $maxPrice = (int) $_GET['max_price'];
+        $priceCondition = " AND priceOrder > {$minPrice} AND priceOrder < {$maxPrice} ";
+    }
+
     $gradeCount = $gradeCount * 7;
     $priceOrdering = " CASE
         WHEN salePrice > 0 THEN salePrice
@@ -521,11 +545,13 @@ function gf_custom_search($input, $limit = 0)
         AND status = 1
         AND ({$searchCondition}) 
         HAVING o > {$gradeCount}
+        {$priceCondition}
         {$orderBy}";
     if ($limit) {
         $sql .= " LIMIT {$limit} ";
     }
 
+//    echo $sql;
     $products = $wpdb->get_results($sql, OBJECT_K);
     $allIds = array_keys($products);
     $resultCount = count($allIds);
