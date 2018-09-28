@@ -2934,4 +2934,6 @@ ul.products.list li.product img{
     max-width: 23.7% !important;
 }
 
-
+ul.products.list li.product h3, ul.products.list li.product .woocommerce-product-details__short-description, ul.products.list li.product .price, ul.products.list li.product .gridlist-buttonwrap{
+    float: none !important;
+}
