@@ -7,8 +7,7 @@
     <button type="submit" class="search-submit"><i class="fa fa-search"></i></button>
     <div class="gf-autocomplete-results suggesstion-box"></div>
 </form>
-<div class="gf-radio-search-wrapper">echo 123
-    <?php var_dump(get_query_var('id'));var_dump(get_query_var('post_id'))?>
+<div class="gf-radio-search-wrapper">
   <?php if (get_queried_object() && is_product_category()): ?>
       <input class="search-radio-box" type="radio" id="search-radiobutton-cat" name="search-radiobutton" checked="checked" value="category" />
       <label for="search-radiobutton-cat"><?= get_queried_object()->name ?></label>
