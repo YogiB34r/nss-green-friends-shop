@@ -245,7 +245,7 @@ img.gf-header-logo {
 }
 
 .search-field {
-    width: 75%;
+    width: 70%;
     color: #1d1d1d;
     background: #f6f6f6;
     text-align: left;
@@ -303,7 +303,7 @@ input[type="radio"]:checked + span::before {
     width: 100%;
 }
 .gf-search {
-    /*text-align: center;*/
+    text-align: center;
 }
 .gf-search-wrapper .gf-search-toggle {
     display: none;
@@ -2859,11 +2859,12 @@ a#cn-more-info {
 
 .gf-autocomplete-results {
     display: none;
-    position: absolute !important;
+    /*position: absolute !important;*/
     width: 75% !important;
     background: #fff;
     border: 1px solid #ccc;
     z-index: 9999;
+    margin: 0 auto;
 }
 
 .gf-autocomplete-results ul {
@@ -2946,4 +2947,8 @@ ul.products.list li.product h3, ul.products.list li.product .woocommerce-product
     max-height: 32px;      /* fallback */
     -webkit-line-clamp: 2; /* number of lines to show */
     -webkit-box-orient: vertical;
+}
+.gf-widht-100{
+    width: 100%;
+    text-align: center;
 }
