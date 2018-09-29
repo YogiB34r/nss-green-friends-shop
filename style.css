@@ -2859,12 +2859,12 @@ a#cn-more-info {
 
 .gf-autocomplete-results {
     display: none;
-    /*position: absolute !important;*/
+    position: absolute !important;
     width: 75% !important;
     background: #fff;
     border: 1px solid #ccc;
     z-index: 9999;
-    margin: 0 auto;
+    left: 12%;
 }
 
 .gf-autocomplete-results ul {
