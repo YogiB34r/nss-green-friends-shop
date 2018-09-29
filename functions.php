@@ -325,10 +325,9 @@ function custom_woo_product_loop()
         if (get_query_var('taxonomy') === 'product_cat') { // Za kategorije
 //            $term = str_replace('-', ' ', get_query_var('term'));
             $cat = get_term_by('slug', get_query_var('term'), 'product_cat');
-//            echo 'cat page';
 
+            $searchCondition = " 1=1 ";
             if (isset($_GET['query'])) {
-//                var_dump('caooo');
                 $searchCondition = "";
                 $customOrdering = "";
                 $input = addslashes($_GET['query']);
@@ -374,16 +373,22 @@ function custom_woo_product_loop()
             }
 
             $sql = "SELECT postId, {$priceOrdering} FROM wp_gf_products WHERE salePrice > 0 AND stockStatus = 1 AND status = 1
-                AND categories LIKE '%{$cat->name}%' AND categoryIds LIKE '%{$cat->term_id}%' {$priceCondition} ORDER BY $orderBy ";
+                AND categories LIKE '%{$cat->name}%' AND categoryIds LIKE '%{$cat->term_id}%'
+                AND ({$searchCondition})
+                {$priceCondition} ORDER BY $orderBy ";
             $productsSale = $wpdb->get_results($sql, OBJECT_K);
 
             $sql = "SELECT postId, {$priceOrdering} FROM wp_gf_products WHERE salePrice = 0 AND stockStatus = 1 AND status = 1
-                AND categories LIKE '%{$cat->name}%' AND categoryIds LIKE '%{$cat->term_id}%' {$priceCondition} ORDER BY $orderBy ";
+                AND categories LIKE '%{$cat->name}%' AND categoryIds LIKE '%{$cat->term_id}%' 
+                AND ({$searchCondition})
+                {$priceCondition} ORDER BY $orderBy ";
             $productsNotOnSale = $wpdb->get_results($sql, OBJECT_K);
             $allIds = array_merge(array_keys($productsSale), array_keys($productsNotOnSale));
 
             $sql = "SELECT postId, {$priceOrdering} FROM wp_gf_products WHERE stockStatus = 0 AND status = 1
-                AND categories LIKE '%{$cat->name}%' AND categoryIds LIKE '%{$cat->term_id}%' {$priceCondition} ORDER BY $orderBy ";
+                AND categories LIKE '%{$cat->name}%' AND categoryIds LIKE '%{$cat->term_id}%' 
+                AND ({$searchCondition})
+                {$priceCondition} ORDER BY $orderBy ";
             $productsOutOfStock = $wpdb->get_results($sql, OBJECT_K);
             $allIds = array_merge($allIds, array_keys($productsOutOfStock));
             $currentPage = (get_query_var('paged')) ? get_query_var('paged') : 1;
