@@ -2956,3 +2956,7 @@ ul.products.list li.product h3, ul.products.list li.product .woocommerce-product
     width: 100%;
     text-align: center;
 }
+
+.woocommerce ul.products li.product a img{
+    max-height: 199.55px;
+}
