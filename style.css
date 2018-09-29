@@ -245,7 +245,7 @@ img.gf-header-logo {
 }
 
 .search-field {
-    width: 63%;
+    width: 75%;
     color: #1d1d1d;
     background: #f6f6f6;
     text-align: left;
@@ -303,7 +303,7 @@ input[type="radio"]:checked + span::before {
     width: 100%;
 }
 .gf-search {
-    text-align: center;
+    /*text-align: center;*/
 }
 .gf-search-wrapper .gf-search-toggle {
     display: none;
@@ -2860,7 +2860,7 @@ a#cn-more-info {
 .gf-autocomplete-results {
     display: none;
     position: absolute !important;
-    width: 67% !important;
+    width: 75% !important;
     background: #fff;
     border: 1px solid #ccc;
     z-index: 9999;
@@ -2930,5 +2930,20 @@ ul.products.columns-4.list li > .price {
 h5{
     font-size: 16px;
 }
+ul.products.list li.product img{
+    max-width: 23.7% !important;
+}
 
+ul.products.list li.product h3, ul.products.list li.product .woocommerce-product-details__short-description, ul.products.list li.product .price, ul.products.list li.product .gridlist-buttonwrap{
+    float: none !important;
+}
 
+.woocommerce ul.products li.product h5, body.home h5 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    line-height: 16px;     /* fallback */
+    max-height: 32px;      /* fallback */
+    -webkit-line-clamp: 2; /* number of lines to show */
+    -webkit-box-orient: vertical;
+}

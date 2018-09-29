@@ -730,19 +730,39 @@ function gf_set_product_categories($product_id, $category_ids)
 }
 
 
-add_filter('the_title', 'shorten_woo_product_title', 10, 2);
-function shorten_woo_product_title($title, $id)
-{
-    $limit = 47;
-    if(!is_single()){
-        if(strlen($title) < 47) {
-            return $title;
-        }else{
-            return substr($title, 0, 47) . ' ...'; // change last number to the number of characters you want
-        }
-    }else{
-        return $title;
+//Custom addd to cart message
+add_filter( 'wc_add_to_cart_message_html', '__return_null' );
+add_filter( 'wc_add_to_cart_message_html','gf_custom_add_to_cart_message', 10, 2 );
+function gf_custom_add_to_cart_message( $message, $products ) {
+    $titles = array();
+    $count  = 0;
+    $show_qty = true;
+    if ( ! is_array( $products ) ) {
+        $products = array( $products => 1 );
+        $show_qty = false;
     }
+    if ( ! $show_qty ) {
+        $products = array_fill_keys( array_keys( $products ), 1 );
+    }
+    foreach ( $products as $product_id => $qty ) {
+        $titles[] = ( $qty > 1 ? absint( $qty ) . ' &times; ' : '' ) . sprintf( _x( '&ldquo;%s&rdquo;', 'Item name in quotes', 'woocommerce' ), strip_tags( get_the_title( $product_id ) ) );
+        $count += $qty;
+    }
+    $titles     = array_filter( $titles );
+    $added_text = sprintf( _n( '%s has been added to your cart.', '%s have been added to your cart.', $count, 'woocommerce' ), wc_format_list_of_items( $titles ) );
+    // Output success messages.
+    if ( 'yes' === get_option( 'woocommerce_cart_redirect_after_add' ) ) {
+        $return_to = apply_filters( 'woocommerce_continue_shopping_redirect', wc_get_raw_referer() ? wp_validate_redirect( wc_get_raw_referer(), false ) : wc_get_page_permalink( 'shop' ) );
+        $message   = sprintf( '<a href="%s" class="button wc-forward">%s</a> %s', esc_url( $return_to ), esc_html__( 'Continue shopping', 'woocommerce' ), esc_html( $added_text ) );
+    } else {
+        $message = sprintf( '<a href="%s" class="button wc-forward">%s</a> %s', esc_url( wc_get_page_permalink( 'cart' ) ), esc_html__( 'View cart', 'woocommerce' ), esc_html( $added_text ) );
+    }
+
+    if ( has_filter( 'wc_add_to_cart_message' ) ) {
+        wc_deprecated_function( 'The wc_add_to_cart_message filter', '3.0', 'wc_add_to_cart_message_html' );
+        $message = apply_filters( 'wc_add_to_cart_message', $message, $product_id );
+    }
+    return $message;
 }
 
 
