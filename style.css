@@ -2961,3 +2961,19 @@ ul.products.list li.product h3, ul.products.list li.product .woocommerce-product
 .woocommerce ul.products li.product a img{
     max-height: 199.55px;
 }
+
+.gf-height-test{
+    max-height: 52px;
+}
+
+@media only screen and (max-width: 1200px) {
+    .gf-height-test {
+        max-height: 60px;
+    }
+}
+
+@media only screen and (max-width: 767px) {
+    .gf-height-test {
+        max-height: 40px;
+    }
+}
