@@ -2938,7 +2938,7 @@ ul.products.list li.product h3, ul.products.list li.product .woocommerce-product
     float: none !important;
 }
 
-.woocommerce ul.products.grid li.product a{
+.woocommerce ul.products.grid li.product a h5{
     height: 40px;
 }
 
