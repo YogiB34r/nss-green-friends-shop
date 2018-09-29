@@ -327,7 +327,38 @@ function custom_woo_product_loop()
             $cat = get_term_by('slug', get_query_var('term'), 'product_cat');
 //            echo 'cat page';
 
-            // if $_GET['query']
+            if (isset($_GET['query'])) {
+//                var_dump('caooo');
+                $searchCondition = "";
+                $customOrdering = "";
+                $input = addslashes($_GET['query']);
+                $explodedInput = explode(' ', $input);
+                $gradeCount = 0;
+                foreach ($explodedInput as $key => $word) {
+                    if ($key > 0) {
+                        $searchCondition .= " OR ";
+                        $customOrdering .= " + ";
+                    }
+                    $searchCondition .= " productName LIKE '%{$word}%' OR description LIKE '%{$word}%' 
+                OR attributes LIKE '%{$word}%' OR categories LIKE '%{$word}%'";
+                    $customOrdering .= "
+                CASE
+                    WHEN productName LIKE '% {$word} %' THEN 16
+                    WHEN productName LIKE '{$word} %' THEN 15
+                    WHEN productName LIKE '{$word}%' THEN 12
+                    WHEN productName LIKE '%{$word}%' THEN 9
+                    ELSE 0
+                END
+                + CASE
+                    WHEN categories LIKE '%{$word}%' THEN 14 ELSE 0
+                END
+                + CASE
+                    WHEN description LIKE '%{$word}%' THEN 4 ELSE 0
+                END
+                + CASE WHEN attributes LIKE '%{$word}%' THEN 13 ELSE 0 END ";
+                }
+                $gradeCount = $gradeCount * 7;
+            }
 
             $orderBy = parseOrderBy();
             $priceOrdering = " CASE
@@ -538,7 +569,7 @@ function gf_custom_search($input, $limit = 0)
 
     $sql = "SELECT 
         postId,
-        {$customOrdering}  as o,
+        {$customOrdering} as o,
         {$priceOrdering}
         FROM wp_gf_products
         WHERE stockStatus = 1 
