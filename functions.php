@@ -339,7 +339,7 @@ function custom_woo_product_loop()
                         $customOrdering .= " + ";
                     }
                     $searchCondition .= " productName LIKE '%{$word}%' OR description LIKE '%{$word}%' 
-                OR attributes LIKE '%{$word}%' OR categories LIKE '%{$word}%'";
+                OR attributes LIKE '%{$word}%'";
                     $customOrdering .= "
                 CASE
                     WHEN productName LIKE '% {$word} %' THEN 16

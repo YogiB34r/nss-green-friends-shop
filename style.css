@@ -691,7 +691,7 @@ h1.product_title.entry-title {
 .woocommerce-page ul.products.grid li {
     display: flex;
     flex-flow: column;
-    height: 330px;
+    height: 315px;
     position: relative;
 }
 
