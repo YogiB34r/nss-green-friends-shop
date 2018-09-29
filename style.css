@@ -1233,7 +1233,7 @@ body.home .saved-sale {
     padding: 10px;
     word-break: keep-all;
     text-overflow: ellipsis;
-    display: none;
+    /*display: none;*/
 }
 .gf-category-expander__col li {
     margin-bottom: 10px;
@@ -1241,6 +1241,7 @@ body.home .saved-sale {
 
 .gf-category-expander__col ul {
     margin-top: 10px;
+    display: none;
 }
 
 .gf-category-expander__col__category,
