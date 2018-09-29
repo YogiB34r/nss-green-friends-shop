@@ -68,7 +68,9 @@ function gf_display_categories_on_archive_page()
             'hide_empty' => true
         ]);
         if (count($categories) != 0) {
-            echo '<div class="row gf-category-expander">';
+            if(!wp_is_mobile()){
+                echo '<div id="gf-expander-id" class="row gf-category-expander gf-height-test">';
+            }
 //            echo '<div class="gf-jos-kategorija"><p>Još kategorija</p></div>';
             $second_lvl_cat_ids = [];
             foreach ($categories as $category) {
@@ -107,8 +109,9 @@ function gf_display_categories_on_archive_page()
                     break;
                 }
             }
-            echo '<div class="gf-category-expander__footer"><span class="fas fa-angle-down"></span></div>';
             echo '</div>';
+            echo '<div class="gf-category-expander__footer"><span class="fas fa-angle-down"></span></div>';
+
         }
     }
 }
