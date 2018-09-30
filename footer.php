@@ -31,7 +31,30 @@
       </div>
       <div class="row list-unstyled gf-footer gf-footer-images-wrapper">
         <div class="gf-footer-images">
-          <?php dynamic_sidebar('gf-footer-row-3-column-1') ?>
+            <?php $theme_dir = get_template_directory_uri();?>
+            <ul class="row">
+                <li class="col-md col-sm">
+                    <img src="<?=$theme_dir?>/assets/images/footer_card_1.png" alt="Verified by Visa">
+                </li>
+                <li class="col-md col-sm">
+                    <img src="<?=$theme_dir?>/assets/images/footer_card_2.png" alt="MasterCard SecureCode">
+                </li>
+                <li class="col-md col-sm">
+                    <img src="<?=$theme_dir?>/assets/images/footer_card_3.png" alt="Visa">
+                </li>
+                <li class="col-md col-sm">
+                    <img src="<?=$theme_dir?>/assets/images/footer_card_4.png" alt="mastercard">
+                </li>
+                <li class="col-md col-sm">
+                    <img src="<?=$theme_dir?>/assets/images/footer_card_5.png" alt="maestrocard">
+                </li>
+                <li class="col-md col-sm">
+                    <img src="<?=$theme_dir?>/assets/images/footer_card_6.png" alt="American Express">
+                </li>
+                <li class="col-md col-sm">
+                    <img src="<?=$theme_dir?>/assets/images/footer_card_7.png" alt="Banca Intesa">
+                </li>
+            </ul>
         </div>
       </div>
     </div>
