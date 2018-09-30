@@ -2984,3 +2984,10 @@ ul.products.list li.product h3, ul.products.list li.product .woocommerce-product
         max-height: 40px;
     }
 }
+.my-footer-images{
+    width: 100%;
+}
+.my-footer-images li {
+    padding: 0px 5px;
+}
+
