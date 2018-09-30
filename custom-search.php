@@ -3,6 +3,26 @@
 
 global $wpdb;
 
+if (isset($_GET['import'])) {
+//    require (__DIR__ . '/../../plugins/nss-feed-import/classes/Importer.php');
+    if(!function_exists('wp_get_current_user')) {
+        require_once(ABSPATH . 'wp-admin/includes/image.php');
+        require_once(ABSPATH . 'wp-admin/includes/media.php');
+        require_once(ABSPATH . 'wp-admin/includes/file.php');
+    }
+
+    $perPage = 100;
+    $offset = $_POST['page'] * $perPage;
+    $supplierId = 666;
+    $stats = gf_start_import($wpdb, $supplierId, $offset, $perPage);
+    if ($stats['keyRemoveCount'] === 0 && $stats['importCount'] === 0) {
+        //nothing to do
+        echo 0;
+    }
+    echo 1;
+    exit();
+}
+
 $sw = new \Symfony\Component\Stopwatch\Stopwatch();
 $sw->start('gfmain');
 
