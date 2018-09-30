@@ -315,13 +315,12 @@ function custom_woo_product_loop()
 {
     if (is_shop() || is_product_category() || is_product_tag()) { // Only run on shop archive pages, not single products or other pages
         global $wpdb;
-//        $allIds = [];
+        $allIds = [];
 //        $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
         $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
         if (isset($_POST['ppp'])) {
             $per_page = ($_POST['ppp'] > 48) ? 48 : $_POST['ppp'];
         }
-
         if (get_query_var('taxonomy') === 'product_cat') { // Za kategorije
 //            $term = str_replace('-', ' ', get_query_var('term'));
             $cat = get_term_by('slug', get_query_var('term'), 'product_cat');
@@ -367,8 +366,8 @@ function custom_woo_product_loop()
 
             $priceCondition = "";
             if (isset($_GET['min_price'])) {
-                $minPrice = (int) $_GET['min_price'];
-                $maxPrice = (int) $_GET['max_price'];
+                $minPrice = (int)$_GET['min_price'];
+                $maxPrice = (int)$_GET['max_price'];
                 $priceCondition = " HAVING priceOrder > {$minPrice} AND priceOrder < {$maxPrice} ";
             }
 
@@ -397,7 +396,6 @@ function custom_woo_product_loop()
             if ($currentPage > $totalPages) {
                 $currentPage = $totalPages;
             }
-
             $args = array(
                 'post_type' => 'product',
                 'orderby' => 'post__in',
@@ -405,6 +403,7 @@ function custom_woo_product_loop()
                 'posts_per_page' => $per_page,
                 'paged' => $currentPage,
             );
+
             wc_set_loop_prop('total', $resultCount);
             wc_set_loop_prop('per_page', $per_page);
             wc_set_loop_prop('current_page', $currentPage);
@@ -413,6 +412,7 @@ function custom_woo_product_loop()
             if ($sortedProducts->have_posts()) :
                 while ($sortedProducts->have_posts()) : $sortedProducts->the_post();
 //                    do_action('woocommerce_shop_loop');
+
                     wc_get_template_part('content', 'product');
                 endwhile;
                 wp_reset_postdata();
@@ -525,8 +525,8 @@ function gf_custom_search($input, $limit = 0)
     }
     $priceCondition = "";
     if (isset($_GET['min_price'])) {
-        $minPrice = (int) $_GET['min_price'];
-        $maxPrice = (int) $_GET['max_price'];
+        $minPrice = (int)$_GET['min_price'];
+        $maxPrice = (int)$_GET['max_price'];
         $priceCondition = " AND priceOrder > {$minPrice} AND priceOrder < {$maxPrice} ";
     }
 
@@ -736,36 +736,56 @@ function gf_set_product_categories($product_id, $category_ids)
 
 
 //Custom addd to cart message
-add_filter( 'wc_add_to_cart_message_html', '__return_null' );
-add_filter( 'wc_add_to_cart_message_html','gf_custom_add_to_cart_message', 10, 2 );
-function gf_custom_add_to_cart_message( $message, $products ) {
+add_filter('wc_add_to_cart_message_html', '__return_null');
+add_filter('wc_add_to_cart_message_html', 'gf_test_message', 10, 2);
+function gf_test_message($message)
+{
+    if (isset($_POST['quantity']) && isset($_POST['add-to-cart'])) {
+        $qty = $_POST['quantity'];
+        $product_id = $_POST['add-to-cart'];
+        $product_title = wc_get_product($product_id)->get_name();
+        if ($qty <= 1) {
+            $message = '&ldquo;' . $product_title . '&rdquo; je dodat u Vašu korpu.';
+        } else {
+            $message = $qty . ' &times; ' . '&ldquo;' . $product_title . '&rdquo; je dodat u Vašu korpu.';
+        }
+    }
+    $cart_link = '<a href = "'.wc_get_page_permalink('cart').'" class="button wc-forward" >Pogledaj korpu</a >';
+    $message .= $cart_link;
+
+    return $message;
+
+}
+
+function gf_custom_add_to_cart_message($message, $products)
+{
     $titles = array();
-    $count  = 0;
+    $count = 0;
     $show_qty = true;
-    if ( ! is_array( $products ) ) {
-        $products = array( $products => 1 );
+    if (!is_array($products)) {
+        $products = array($products => 1);
         $show_qty = false;
     }
-    if ( ! $show_qty ) {
-        $products = array_fill_keys( array_keys( $products ), 1 );
+    if (!$show_qty) {
+        $products = array_fill_keys(array_keys($products), 1);
     }
-    foreach ( $products as $product_id => $qty ) {
-        $titles[] = ( $qty > 1 ? absint( $qty ) . ' &times; ' : '' ) . sprintf( _x( '&ldquo;%s&rdquo;', 'Item name in quotes', 'woocommerce' ), strip_tags( get_the_title( $product_id ) ) );
+    foreach ($products as $product_id => $qty) {
+        $titles[] = ($qty > 1 ? absint($qty) . ' &times; ' : '') . sprintf(_x('&ldquo;%s&rdquo;', 'Item name in quotes', 'woocommerce'), strip_tags(get_the_title($product_id)));
         $count += $qty;
     }
-    $titles     = array_filter( $titles );
-    $added_text = sprintf( _n( '%s has been added to your cart.', '%s have been added to your cart.', $count, 'woocommerce' ), wc_format_list_of_items( $titles ) );
+    $titles = array_filter($titles);
+    $added_text = sprintf(_n('%s has been added to your cart.', '%s have been added to your cart.', $count, 'woocommerce'), wc_format_list_of_items($titles));
     // Output success messages.
-    if ( 'yes' === get_option( 'woocommerce_cart_redirect_after_add' ) ) {
-        $return_to = apply_filters( 'woocommerce_continue_shopping_redirect', wc_get_raw_referer() ? wp_validate_redirect( wc_get_raw_referer(), false ) : wc_get_page_permalink( 'shop' ) );
-        $message   = sprintf( '<a href="%s" class="button wc-forward">%s</a> %s', esc_url( $return_to ), esc_html__( 'Continue shopping', 'woocommerce' ), esc_html( $added_text ) );
+    if ('yes' === get_option('woocommerce_cart_redirect_after_add')) {
+        $return_to = apply_filters('woocommerce_continue_shopping_redirect', wc_get_raw_referer() ? wp_validate_redirect(wc_get_raw_referer(), false) : wc_get_page_permalink('shop'));
+        $message = sprintf('<a href="%s" class="button wc-forward">%s</a> %s', esc_url($return_to), esc_html__('Continue shopping', 'woocommerce'), esc_html($added_text));
     } else {
-        $message = sprintf( '<a href="%s" class="button wc-forward">%s</a> %s', esc_url( wc_get_page_permalink( 'cart' ) ), esc_html__( 'View cart', 'woocommerce' ), esc_html( $added_text ) );
+        $message = sprintf('<a href="%s" class="button wc-forward">%s</a> %s', esc_url(wc_get_page_permalink('cart')), esc_html__('View cart', 'woocommerce'), esc_html($added_text));
     }
 
-    if ( has_filter( 'wc_add_to_cart_message' ) ) {
-        wc_deprecated_function( 'The wc_add_to_cart_message filter', '3.0', 'wc_add_to_cart_message_html' );
-        $message = apply_filters( 'wc_add_to_cart_message', $message, $product_id );
+    if (has_filter('wc_add_to_cart_message')) {
+        wc_deprecated_function('The wc_add_to_cart_message filter', '3.0', 'wc_add_to_cart_message_html');
+        $message = apply_filters('wc_add_to_cart_message', $message, $product_id);
     }
     return $message;
 }
