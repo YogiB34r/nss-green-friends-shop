@@ -133,9 +133,17 @@ jQuery(document).ready(function () {
 
     jQuery('.gf-category-expander__footer .fas ').click(function () {
         jQuery('.gf-jos-kategorija').slideToggle();
-        jQuery('.gf-category-expander__col').slideToggle();
-        // jQuery('.gf-expander__subcategory-list').slideToggle();
+
+        // jQuery('.gf-category-expander__col').slideToggle();
+        jQuery('.gf-expander__subcategory-list').slideToggle();
         jQuery(this).toggleClass('fa-angle-down fa-angle-up');
+    });
+    jQuery('.gf-category-expander__footer .fas ').click(function () {
+        if (jQuery('#gf-expander-id').hasClass('gf-height-test')) {
+            jQuery('#gf-expander-id').removeClass('gf-height-test');
+        }else {
+            jQuery('#gf-expander-id').addClass('gf-height-test');
+        }
     });
 
     if (jQuery('body').is('.archive, .single-product')) {
