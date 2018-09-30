@@ -14,7 +14,7 @@ function gf_cart_display_seller_info()
     echo '<div class="gf-seller-info">
            <p>' . _e('Prodavac:', 'green-fiends') . ' 
                 <span class="gf-seller-info-title">Non Stop Shop</span>
-                <img src="https://nss-devel.ha.rs/wp-content/uploads/2018/06/NonStopShop-logo-okacen1-copy.png" alt="Non Stop Shop">
+                <img src="/wp-content/themes/nss-green-friends-shop/assets/images/logo.png" alt="Non Stop Shop">
            </p>
           </div>';
 }
@@ -152,7 +152,7 @@ function gf_button_proceed_to_checkout()
 {
     echo '<div class="gf-button-proceed-to-checkout">
             <a href="' . wc_get_checkout_url() . '">
-                <img src="/wp-content/uploads/2018/06/btn_order.png" alt="">
+                <img src="/wp-content/themes/nss-green-friends-shop/assets/images/btn_order.png" alt="">
             </a>
           </div>';
 }
@@ -171,7 +171,7 @@ function custom_wc_empty_cart_message()
                                         ' . __('Proizvod se dodaje u korpu klikom na dugme "Stavi u korpu" koje se nalazi na stranici
                                         svakog proizvoda.') . ' </p><br>
                                     
-                                    <img src="/wp-content/uploads/2018/07/btn_add_to_cart.png" alt="dodaj u korpu">
+                                    <img src="/wp-content/themes/nss-green-friends-shop/assets/images/btn_add_to_cart.png" alt="dodaj u korpu">
                                                                     
                                     <p class="cartText3 intro-text"><strong>napomena:</strong><br>
                                         ' . __('Pre nego što započnete sa naručivanjem potrebno je da se "registrujete". Link za registraciju se 
