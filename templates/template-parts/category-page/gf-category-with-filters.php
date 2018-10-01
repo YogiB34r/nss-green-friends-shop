@@ -1,4 +1,5 @@
 <?php
+
 $sexyShopCat = get_term_by('slug', 'sexy-shop', 'product_cat');
 $queriedObject = get_queried_object_id();
 if ($sexyShopCat){
@@ -97,16 +98,8 @@ if ($sexyShopCat){
             ?>
         </header>
         <?php
-        if (woocommerce_product_loop()) {
-            if (wc_get_loop_prop('total')) {
-                if (isset($_GET['query'])) {
-                    $sortedProducts = gf_custom_search($_GET['query']);
-                } else {
-//                    custom_woo_product_loop();
-                }
-            }
-
-
+        $sortedProducts = gf_get_category_query();
+        if ($sortedProducts) {
             /**
              * Hook: woocommerce_before_shop_loop.
              *
@@ -127,13 +120,13 @@ if ($sexyShopCat){
              * @hooked woocommerce_catalog_ordering - 30
              */
             woocommerce_product_loop_start();
-            if (wc_get_loop_prop('total')) {
-                if (isset($_GET['s'])) {
-                    gf_custom_search_output($sortedProducts);
-                } else {
-                    custom_woo_product_loop();
-                }
-            }
+//            if (wc_get_loop_prop('total')) {
+//                if (isset($_GET['s'])) {
+//                    gf_custom_search_output($sortedProducts);
+//                } else {
+                    custom_woo_product_loop($sortedProducts);
+//                }
+//            }
 
             woocommerce_product_loop_end();
 

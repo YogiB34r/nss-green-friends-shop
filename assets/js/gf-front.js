@@ -271,20 +271,31 @@ jQuery(document).ready(function () {
         });
     }
 
-    var timer, searchQuery, delay = 300;
+    var preventSearch = false, timer, searchQuery, delay = 300;
     jQuery(".gf-search-form").on('keyup', '.gf-search-box', function(e) {
         var _this = jQuery(this);
+        console.log(e.keyCode);
+        // prevent search
+        if (e.keyCode === 13 || e.keyCode === 99) {
+            preventSearch = true;
+            console.log('prevent search');
+            return false;
+        }
+
         if(jQuery(this).val().length >= 3) {
             if (searchQuery !== _this.val()) {
                 searchQuery = _this.val();
                 clearTimeout(timer);
                 timer = setTimeout(function() {
-                    ajaxSearch(_this.val());
+                    if (!preventSearch) {
+                        ajaxSearch(_this.val());
+                    }
                 }, delay );
             }
         }
         if(_this.val().length === 0) {
             jQuery('.suggesstion-box').hide();
+            return false;
         }
     });
     jQuery(document).click(function(event) {
