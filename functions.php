@@ -311,35 +311,31 @@ function parseOrderBy()
     return $orderBy;
 }
 
-function custom_woo_product_loop()
+function gf_get_category_query()
 {
-    if (is_shop() || is_product_category() || is_product_tag()) { // Only run on shop archive pages, not single products or other pages
-        global $wpdb;
-        $allIds = [];
-//        $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
-        $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
-        if (isset($_POST['ppp'])) {
-            $per_page = ($_POST['ppp'] > 48) ? 48 : $_POST['ppp'];
-        }
-        if (get_query_var('taxonomy') === 'product_cat') { // Za kategorije
-//            $term = str_replace('-', ' ', get_query_var('term'));
-            $cat = get_term_by('slug', get_query_var('term'), 'product_cat');
-
-            $searchCondition = " 1=1 ";
-            if (isset($_GET['query'])) {
-                $searchCondition = "";
-                $customOrdering = "";
-                $input = addslashes($_GET['query']);
-                $explodedInput = explode(' ', $input);
-                $gradeCount = 0;
-                foreach ($explodedInput as $key => $word) {
-                    if ($key > 0) {
-                        $searchCondition .= " OR ";
-                        $customOrdering .= " + ";
-                    }
-                    $searchCondition .= " productName LIKE '%{$word}%' OR description LIKE '%{$word}%' 
+    global $wpdb;
+    $cat = get_term_by('slug', get_query_var('term'), 'product_cat');
+    $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
+    if (isset($_POST['ppp'])) {
+        $per_page = ($_POST['ppp'] > 48) ? 48 : $_POST['ppp'];
+    }
+    $orderBy = parseOrderBy();
+    $searchCondition = " 1=1 ";
+    $customOrdering = " 1=1 ";
+    if (isset($_GET['query'])) {
+        $searchCondition = "";
+        $customOrdering = "";
+        $input = addslashes($_GET['query']);
+        $explodedInput = explode(' ', $input);
+        $gradeCount = 0;
+        foreach ($explodedInput as $key => $word) {
+            if ($key > 0) {
+                $searchCondition .= " OR ";
+                $customOrdering .= " + ";
+            }
+            $searchCondition .= " productName LIKE '%{$word}%' OR description LIKE '%{$word}%' 
                 OR attributes LIKE '%{$word}%'";
-                    $customOrdering .= "
+            $customOrdering .= "
                 CASE
                     WHEN productName LIKE '% {$word} %' THEN 16
                     WHEN productName LIKE '{$word} %' THEN 15
@@ -354,77 +350,83 @@ function custom_woo_product_loop()
                     WHEN description LIKE '%{$word}%' THEN 4 ELSE 0
                 END
                 + CASE WHEN attributes LIKE '%{$word}%' THEN 13 ELSE 0 END ";
-                }
-                $gradeCount = $gradeCount * 7;
-            }
+        }
+        $customOrdering .= " as o ";
+        $orderBy .= " , o DESC ";
+        $gradeCount = $gradeCount * 7;
+    }
 
-            $orderBy = parseOrderBy();
-            $priceOrdering = " CASE
+    $priceOrdering = " CASE
                 WHEN salePrice > 0 THEN salePrice
                 ELSE regularPrice 
             END as priceOrder ";
 
-            $priceCondition = "";
-            if (isset($_GET['min_price'])) {
-                $minPrice = (int)$_GET['min_price'];
-                $maxPrice = (int)$_GET['max_price'];
-                $priceCondition = " HAVING priceOrder > {$minPrice} AND priceOrder < {$maxPrice} ";
-            }
+    $priceCondition = "";
+    if (isset($_GET['min_price'])) {
+        $minPrice = (int)$_GET['min_price'];
+        $maxPrice = (int)$_GET['max_price'];
+        $priceCondition = " HAVING priceOrder > {$minPrice} AND priceOrder < {$maxPrice} ";
+    }
 
-            $sql = "SELECT postId, {$priceOrdering} FROM wp_gf_products WHERE salePrice > 0 AND stockStatus = 1 AND status = 1
+    $sql = "SELECT postId, {$priceOrdering}, {$customOrdering} FROM wp_gf_products WHERE salePrice > 0 AND stockStatus = 1 AND status = 1
                 AND categories LIKE '%{$cat->name}%' AND categoryIds LIKE '%{$cat->term_id}%'
                 AND ({$searchCondition})
-                {$priceCondition} ORDER BY $orderBy ";
-            $productsSale = $wpdb->get_results($sql, OBJECT_K);
+                {$priceCondition} 
+                ORDER BY $orderBy ";
+    $productsSale = $wpdb->get_results($sql, OBJECT_K);
 
-            $sql = "SELECT postId, {$priceOrdering} FROM wp_gf_products WHERE salePrice = 0 AND stockStatus = 1 AND status = 1
+    $sql = "SELECT postId, {$priceOrdering}, {$customOrdering} FROM wp_gf_products WHERE salePrice = 0 AND stockStatus = 1 AND status = 1
                 AND categories LIKE '%{$cat->name}%' AND categoryIds LIKE '%{$cat->term_id}%' 
                 AND ({$searchCondition})
                 {$priceCondition} ORDER BY $orderBy ";
-            $productsNotOnSale = $wpdb->get_results($sql, OBJECT_K);
-            $allIds = array_merge(array_keys($productsSale), array_keys($productsNotOnSale));
+    $productsNotOnSale = $wpdb->get_results($sql, OBJECT_K);
+    $allIds = array_merge(array_keys($productsSale), array_keys($productsNotOnSale));
 
-            $sql = "SELECT postId, {$priceOrdering} FROM wp_gf_products WHERE stockStatus = 0 AND status = 1
+    $sql = "SELECT postId, {$priceOrdering}, {$customOrdering} FROM wp_gf_products WHERE stockStatus = 0 AND status = 1
                 AND categories LIKE '%{$cat->name}%' AND categoryIds LIKE '%{$cat->term_id}%' 
                 AND ({$searchCondition})
                 {$priceCondition} ORDER BY $orderBy ";
-            $productsOutOfStock = $wpdb->get_results($sql, OBJECT_K);
-            $allIds = array_merge($allIds, array_keys($productsOutOfStock));
-            $currentPage = (get_query_var('paged')) ? get_query_var('paged') : 1;
-            $resultCount = count($allIds);
-            $totalPages = ceil($resultCount / $per_page);
-            if ($currentPage > $totalPages) {
-                $currentPage = $totalPages;
-            }
-            var_dump($resultCount);
-            var_dump($per_page);
-            var_dump($totalPages);
-            $paged = ( get_query_var( 'paged' ) ) ? get_query_var( 'paged' ) : 1;
-            var_dump($paged);
-            $args = array(
-                'post_type' => 'product',
-                'orderby' => 'post__in',
-                'post__in' => $allIds,
-                'posts_per_page' => $per_page,
-                'paged' => $paged,
-            );
+    $productsOutOfStock = $wpdb->get_results($sql, OBJECT_K);
+    $allIds = array_merge($allIds, array_keys($productsOutOfStock));
+    $currentPage = (get_query_var('paged')) ? get_query_var('paged') : 1;
+    $resultCount = count($allIds);
+    $totalPages = ceil($resultCount / $per_page);
+    if ($currentPage > $totalPages) {
+        $currentPage = $totalPages;
+    }
+    $paged = ( get_query_var( 'paged' ) ) ? get_query_var( 'paged' ) : 1;
+    $args = array(
+        'post_type' => 'product',
+        'orderby' => 'post__in',
+        'post__in' => $allIds,
+        'posts_per_page' => $per_page,
+        'paged' => $paged,
+    );
 
-            wc_set_loop_prop('total', $resultCount);
-            wc_set_loop_prop('per_page', $per_page);
-            wc_set_loop_prop('current_page', $currentPage);
-            wc_set_loop_prop('total_pages', $totalPages);
-            $sortedProducts = new WP_Query($args);
+    $sortedProducts = new WP_Query($args);
+    wc_set_loop_prop('total', $resultCount);
+    wc_set_loop_prop('per_page', $per_page);
+    wc_set_loop_prop('current_page', $currentPage);
+    wc_set_loop_prop('total_pages', $totalPages);
+
+    return $sortedProducts;
+}
+
+function custom_woo_product_loop($sortedProducts)
+{
+    if (is_tax() || is_product_category() || is_product_tag()) {
+        global $wpdb;
+
+        if (get_query_var('taxonomy') === 'product_cat') { // Za kategorije
             if ($sortedProducts->have_posts()) :
                 while ($sortedProducts->have_posts()) : $sortedProducts->the_post();
 //                    do_action('woocommerce_shop_loop');
-
                     wc_get_template_part('content', 'product');
                 endwhile;
                 wp_reset_postdata();
             endif;
         } else { // Za main shop
-            echo 'other page';
-
+//            echo 'other page';
         }
     } else { //za ostale page-eve
         woocommerce_content();
