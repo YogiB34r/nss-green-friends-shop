@@ -2989,5 +2989,10 @@ ul.products.list li.product h3, ul.products.list li.product .woocommerce-product
 }
 .my-footer-images li {
     padding: 0px 5px;
+    text-align: center;
+    width: auto;
+}
+.my-footer-images img {
+    max-width: unset !important;
 }
 
