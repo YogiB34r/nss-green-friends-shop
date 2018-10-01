@@ -664,7 +664,7 @@ h1.product_title.entry-title {
 .woocommerce ul.products {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
+    justify-content: flex-start;
 }
 
 .woocommerce ul.products li.product {
