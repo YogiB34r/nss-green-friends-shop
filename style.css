@@ -664,7 +664,7 @@ h1.product_title.entry-title {
 .woocommerce ul.products {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
+    justify-content: flex-start;
 }
 
 .woocommerce ul.products li.product {
@@ -2825,7 +2825,7 @@ GF PRODUCT STICKERS
 }
 
 .gf-sticker--loop-list {
-    width: 30.75% !important;
+    width: 100% !important;
 }
 
 .gf-sticker--loop-list img {
@@ -2938,7 +2938,7 @@ ul.products.columns-4.list li > .price {
     margin-right: 10px;
 }
 h5{
-    font-size: 16px;
+    font-size: 18px;
 }
 ul.products.list li.product img{
     max-width: 23.7% !important;
