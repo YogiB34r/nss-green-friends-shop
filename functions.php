@@ -365,7 +365,7 @@ function gf_get_category_query()
     if (isset($_GET['min_price'])) {
         $minPrice = (int)$_GET['min_price'];
         $maxPrice = (int)$_GET['max_price'];
-        $priceCondition = " HAVING priceOrder > {$minPrice} AND priceOrder < {$maxPrice} ";
+        $priceCondition = " HAVING priceOrder >= {$minPrice} AND priceOrder <= {$maxPrice} ";
     }
 
     $sql = "SELECT postId, {$priceOrdering}, {$customOrdering} FROM wp_gf_products WHERE salePrice > 0 AND stockStatus = 1 AND status = 1
@@ -534,7 +534,7 @@ function gf_custom_search($input, $limit = 0)
     if (isset($_GET['min_price'])) {
         $minPrice = (int)$_GET['min_price'];
         $maxPrice = (int)$_GET['max_price'];
-        $priceCondition = " AND priceOrder > {$minPrice} AND priceOrder < {$maxPrice} ";
+        $priceCondition = " AND priceOrder >= {$minPrice} AND priceOrder <= {$maxPrice} ";
     }
 
     $gradeCount = $gradeCount * 7;

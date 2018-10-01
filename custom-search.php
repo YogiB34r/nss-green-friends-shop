@@ -18,8 +18,9 @@ if (isset($_GET['import'])) {
     if ($stats['keyRemoveCount'] === 0 && $stats['importCount'] === 0) {
         //nothing to do
         echo 0;
+    } else {
+        echo 1;
     }
-    echo 1;
     exit();
 }
 
