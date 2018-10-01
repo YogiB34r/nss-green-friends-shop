@@ -129,8 +129,8 @@ get_header();
             ?>
         </header>
         <?php
-            $sortedProducts = gf_custom_search($_GET['query']);
-            if ($sortedProducts) {
+        $sortedProducts = gf_custom_search($_GET['query']);
+        if ($sortedProducts) {
                 /**
                  * Hook: woocommerce_before_shop_loop.
                  *
@@ -155,7 +155,7 @@ get_header();
                 echo '<div class="gf-product-controls gf-product-controls--bottom">';
                 do_action( 'woocommerce_after_shop_loop' );
                 echo '</div>';
-            } else {
+        } else {
             /**
              * Hook: woocommerce_no_products_found.
              *

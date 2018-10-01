@@ -686,7 +686,8 @@ function gf_ajax_view_count()
     $key = 'post-view-count#' . $postId;
     $cache = new GF_Cache();
     $count = (int)$cache->redis->get($key);
-    if ($count === 10) {
+//    if ($count == 10) {
+    if ($count > 0) {
         global $wpdb;
         $wpdb->query("UPDATE wp_gf_products SET viewCount = viewCount + {$count} WHERE postId = {$postId}");
         $cache->redis->set($key, 0);
