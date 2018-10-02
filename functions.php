@@ -390,6 +390,9 @@ function gf_get_category_query()
     $allIds = array_merge($allIds, array_keys($productsOutOfStock));
     $currentPage = (get_query_var('paged')) ? get_query_var('paged') : 1;
     $resultCount = count($allIds);
+    if ($resultCount === 0) {
+        $allIds[] = 0;
+    }
     $totalPages = ceil($resultCount / $per_page);
     if ($currentPage > $totalPages) {
         $currentPage = $totalPages;
@@ -401,9 +404,11 @@ function gf_get_category_query()
         'post__in' => $allIds,
         'posts_per_page' => $per_page,
         'paged' => $paged,
+        'suppress_filters' => true,
+        'no_found_rows' => true
     );
-
     $sortedProducts = new WP_Query($args);
+
     wc_set_loop_prop('total', $resultCount);
     wc_set_loop_prop('per_page', $per_page);
     wc_set_loop_prop('current_page', $currentPage);
@@ -598,6 +603,9 @@ function gf_custom_search($input, $limit = 0)
     $products = $wpdb->get_results($sql, OBJECT_K);
     $allIds = array_keys($products);
     $resultCount = count($allIds);
+    if ($resultCount === 0) {
+        $allIds[] = 0;
+    }
     if ($resultCount === 0) {
         return false;
     }

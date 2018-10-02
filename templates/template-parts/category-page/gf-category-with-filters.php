@@ -99,7 +99,7 @@ if ($sexyShopCat){
         </header>
         <?php
         $sortedProducts = gf_get_category_query();
-        if ($sortedProducts) {
+        if ($sortedProducts->have_posts()) {
             /**
              * Hook: woocommerce_before_shop_loop.
              *

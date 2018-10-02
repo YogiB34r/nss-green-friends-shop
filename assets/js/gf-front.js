@@ -274,11 +274,9 @@ jQuery(document).ready(function () {
     var preventSearch = false, timer, searchQuery, delay = 300;
     jQuery(".gf-search-form").on('keyup', '.gf-search-box', function(e) {
         var _this = jQuery(this);
-        console.log(e.keyCode);
-        // prevent search
+        // prevent further search when enter detected
         if (e.keyCode === 13 || e.keyCode === 99) {
             preventSearch = true;
-            console.log('prevent search');
             return false;
         }
 

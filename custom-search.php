@@ -11,7 +11,7 @@ if (isset($_GET['import'])) {
         require_once(ABSPATH . 'wp-admin/includes/file.php');
     }
 
-    $perPage = 50;
+    $perPage = 100;
     $offset = $_POST['page'] * $perPage;
     $supplierId = 666;
     $stats = gf_start_import($wpdb, $supplierId, $offset, $perPage);
@@ -130,7 +130,7 @@ get_header();
         </header>
         <?php
         $sortedProducts = gf_custom_search($_GET['query']);
-        if ($sortedProducts) {
+        if ($sortedProducts->have_posts()) {
                 /**
                  * Hook: woocommerce_before_shop_loop.
                  *
