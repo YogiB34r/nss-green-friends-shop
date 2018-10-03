@@ -3002,3 +3002,10 @@ p.woocommerce-thankyou-order-received {
     margin-bottom: 30px;
     font-size: 18px;
 }
+/*Checkout fields*/
+#billing_pib_field {
+    display: none;
+}
+#billing_company_field{
+    display: none;
+}
