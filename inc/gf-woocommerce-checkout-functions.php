@@ -7,7 +7,7 @@ function gf_woocommerce_billing_field_checkbox($fields)
         'required' => false,
         'clear' => true,
         'type' => 'checkbox',
-        'class' => array('gf-company-checkbox')
+        'class' => array('gf-company-checkbox'),
     );
 
     return $fields;
@@ -17,11 +17,10 @@ function gf_woocommerce_billing_field_pib($fields)
 {
     $fields['billing']['billing_pib'] = array(
         'label' => __('PIB', 'woocommerce'),
-        'placeholder' =>__('Unesite pib firme'),
         'required' => false,
         'clear' => true, //
         'type' => 'text',
-        'class' => array('gf-billing-field-pib')
+        'class' => array('gf-billing-field-pib'),
     );
 
     return $fields;
@@ -62,8 +61,16 @@ function gf_order_meta_keys( $keys ) {
     $keys[] = '_billing_pib';
     return $keys;
 }
-add_action('woocommerce_checkout_process', 'gf_billing_field_pib_process');
-function gf_billing_field_pib_process() {
-    if ( strlen($_POST['billing_pib']) != 8 && strlen($_POST['billing_pib']) != 0 )
-        wc_add_notice( __( 'PIB mora imati tacno osam cifara' ), 'error' );
+add_action('woocommerce_checkout_process', 'gf_checbox_for_company');
+function gf_checbox_for_company() {
+    if (isset($_POST['billing_company_checkbox'])){
+        if ( strlen($_POST['billing_pib']) != 8 && strlen($_POST['billing_pib']) != 0)
+            wc_add_notice( __( 'PIB mora imati tacno osam cifara' ), 'error' );
+        if (strlen($_POST['billing_pib']) === 0){
+            wc_add_notice(__('Pib je obavezno polje'),'error');
+        }
+        if (strlen($_POST['billing_company']) === 0){
+            wc_add_notice(__('Ime firme je obavezno polje'),'error');
+        }
+    }
 }
