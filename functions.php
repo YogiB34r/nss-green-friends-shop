@@ -811,5 +811,15 @@ function gf_custom_add_to_cart_message($message)
 //    }
 //    return $message;
 //}
-
+function gf_get_sex_shop_categories(){
+    $sexyShopCat = get_term_by('slug', 'sexy-shop', 'product_cat');
+    if ($sexyShopCat){
+        $sexyShopChildren = get_term_children($sexyShopCat->term_id, 'product_cat');
+        $sexyShopCats[] = $sexyShopCat->term_id;
+        foreach ($sexyShopChildren as $sexyShopChild){
+            $sexyShopCats[] = $sexyShopChild;
+        }
+    }
+    return $sexyShopCats;
+}
 

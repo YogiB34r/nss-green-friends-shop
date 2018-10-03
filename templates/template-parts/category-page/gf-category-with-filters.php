@@ -1,29 +1,9 @@
 <?php
-
-$sexyShopCat = get_term_by('slug', 'sexy-shop', 'product_cat');
-$queriedObject = get_queried_object_id();
-if ($sexyShopCat){
-    $sexyShopChildren = get_term_children($sexyShopCat->term_id, 'product_cat');
-    if (($queriedObject == $sexyShopCat->term_id || in_array($queriedObject, $sexyShopChildren)) && !in_array('nss-sex-shop-agreement', $_COOKIE)): ?>
+$queriedObjectId = get_queried_object_id();
+$sexyShopCats = gf_get_sex_shop_categories();
+if ($sexyShopCats){
+    if ((in_array($queriedObjectId, $sexyShopCats) || in_array($queriedObjectId, $sexyShopCats)) && !in_array('nss-sex-shop-agreement', $_COOKIE)): ?>
         <script type="text/javascript">
-            jQuery(document).ready(function () {
-                function deleteCookie(name) {
-                    document.cookie = name + "=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-                }
-
-                function getCookie(name) {
-                    var match = document.cookie.match(RegExp('(?:^|;\\s*)' + name + '=([^;]*)'));
-                    return match ? match[1] : null;
-                }
-
-                function deleteCookie(name) {
-                    document.cookie = name + "=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-                }
-
-                function hideBody() {
-                    document.getElementsByTagName("BODY")[0].style.display = "none";
-                }
-            });
             if (confirm('Da bi ste videli sadržaj ovog odeljka morate se složiti sa uslovima i prihvatiti da imate preko 18 godina.')
                 == true) {
                 var expiryDate = new Date();
