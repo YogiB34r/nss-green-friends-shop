@@ -50,7 +50,7 @@ if (is_singular('product')) {
                 'field' => 'id',
                 'terms' => $cats_array,
                 'parent' => 0,
-//                'exclude' => $exclude_cats_ids,
+                'exclude' => $exclude_cats_ids,
             )));
 
     $r = new WP_Query($query_args);
