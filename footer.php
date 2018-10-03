@@ -34,6 +34,8 @@
                     <?php $theme_dir = get_template_directory_uri(); ?>
                     <div class="row">
                         <div class="col-md d-flex gf-justify justify-content-center mt-3 px-4">
+                    <ul class="row">
+                        <div class="col-md  d-flex gf-justify justify-content-center mt-3 px-4">
                             <li>
                                 <img src="<?= $theme_dir ?>/assets/images/footer_card_3.png" alt="Visa">
                             </li>
