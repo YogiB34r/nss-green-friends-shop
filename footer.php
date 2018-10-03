@@ -33,7 +33,7 @@
                 <div class="my-footer-images">
                     <?php $theme_dir = get_template_directory_uri(); ?>
                     <ul class="row">
-                        <div class="col d-flex gf-justify justify-content-center mt-3 px-4">
+                        <div class="col-md  d-flex gf-justify justify-content-center mt-3 px-4">
                             <li>
                                 <img src="<?= $theme_dir ?>/assets/images/footer_card_3.png" alt="Visa">
                             </li>
@@ -47,7 +47,7 @@
                                 <img src="<?= $theme_dir ?>/assets/images/footer_card_6.png" alt="American Express">
                             </li>
                         </div>
-                        <div class="col-md d-flex justify-content-center mt-3 px-4">
+                        <div class="col d-flex justify-content-center mt-3 px-4">
                             <li>
                                 <a href="https://www.visa.ca/en_CA/run-your-business/merchant-resources/verified-by-visa.html">
                                     <img src="<?= $theme_dir ?>/assets/images/footer_card_1.png" alt="Verified by Visa">
