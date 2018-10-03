@@ -3,8 +3,30 @@
 
 global $wpdb;
 
-$sw = new \Symfony\Component\Stopwatch\Stopwatch();
-$sw->start('gfmain');
+if (isset($_GET['import'])) {
+//    require (__DIR__ . '/../../plugins/nss-feed-import/classes/Importer.php');
+    if(!function_exists('wp_get_current_user')) {
+        require_once(ABSPATH . 'wp-admin/includes/image.php');
+        require_once(ABSPATH . 'wp-admin/includes/media.php');
+        require_once(ABSPATH . 'wp-admin/includes/file.php');
+    }
+
+    $perPage = 100;
+    $offset = $_POST['page'] * $perPage;
+    $supplierId = 666;
+    $supplierId = 308;
+    $stats = gf_start_import($wpdb, $supplierId, $offset, $perPage);
+    if ($stats['keyRemoveCount'] === 0 && $stats['importCount'] === 0) {
+        //nothing to do
+        echo 0;
+    } else {
+        echo 1;
+    }
+    exit();
+}
+
+//$sw = new \Symfony\Component\Stopwatch\Stopwatch();
+//$sw->start('gfmain');
 
 if (isset($_POST['query'])) {
     $query = addslashes($_POST['query']);
@@ -68,10 +90,7 @@ function custom_body_class($classes) {
 
     return array_merge(array_diff($classes, $classesToRemove), $classesToAdd);
 }
-$sw->start('heder');
 get_header();
-$sw->stop('heder');
-//$sw->stopSection('gfheader');
 ?>
 <div id="primary" class="content-area">
     <main id="main" class="site-main" role="main">
@@ -82,9 +101,7 @@ $sw->stop('heder');
                         <div class="gf-category-sidebar-toggle">Kategorije</div>
                         <span class="fas fa-angle-up"></span>
                     </div>
-                    <?php $sw->start('gfsidebar'); ?>
                     <?php dynamic_sidebar('gf-category-sidebar')?>
-                    <?php $sw->stop('gfsidebar'); ?>
                 </div>
             </div>
             <div class="gf-content-wrapper col-md-9 col-sm-12">
@@ -113,8 +130,8 @@ $sw->stop('heder');
             ?>
         </header>
         <?php
-            $sortedProducts = gf_custom_search($_GET['query']);
-            if ($sortedProducts) {
+        $sortedProducts = gf_custom_search($_GET['query']);
+        if ($sortedProducts->have_posts()) {
                 /**
                  * Hook: woocommerce_before_shop_loop.
                  *
@@ -126,9 +143,9 @@ $sw->stop('heder');
                 do_action('woocommerce_before_shop_loop');
                 echo '</div>';
 
-                $sw->start('searchoutput');
+//                $sw->start('searchoutput');
                 gf_custom_search_output($sortedProducts);
-                $sw->stop('searchoutput');
+//                $sw->stop('searchoutput');
 
 
                 /**
@@ -139,7 +156,7 @@ $sw->stop('heder');
                 echo '<div class="gf-product-controls gf-product-controls--bottom">';
                 do_action( 'woocommerce_after_shop_loop' );
                 echo '</div>';
-            } else {
+        } else {
             /**
              * Hook: woocommerce_no_products_found.
              *
@@ -160,20 +177,24 @@ $sw->stop('heder');
     </main>
 </div>
 <?php
-$sw->stop('gfmain');
-/* @var \Symfony\Component\Stopwatch\Section $section */
-/* @var \Symfony\Component\Stopwatch\StopwatchEvent $event */
-/* @var \Symfony\Component\Stopwatch\StopwatchPeriod $period */
-foreach ($sw->getSections() as $section) {
-    foreach ($section->getEvents() as $name => $event) {
-        var_dump($name);
-        foreach ($event->getPeriods() as $period) {
+//$sw->stop('gfmain');
+
+//performanceDebug($sw);
+
+function performanceDebug($sw) {
+    /* @var \Symfony\Component\Stopwatch\Section $section */
+    /* @var \Symfony\Component\Stopwatch\StopwatchEvent $event */
+    /* @var \Symfony\Component\Stopwatch\StopwatchPeriod $period */
+    foreach ($sw->getSections() as $section) {
+        foreach ($section->getEvents() as $name => $event) {
+            var_dump($name);
+            foreach ($event->getPeriods() as $period) {
 //            echo '<p>start time : ' . $period->getStartTime() . '</p>';
 //            echo '<p>end time : ' . $period->getEndTime() . '</p>';
-            echo '<p>duration : ' . ($period->getEndTime() - $period->getStartTime()) . '</p>';
+                echo '<p>duration : ' . ($period->getEndTime() - $period->getStartTime()) . '</p>';
+            }
         }
     }
 }
-//var_dump($sw->getSections());
-?>
-<?php get_footer(); ?>
+
+get_footer(); ?>

@@ -194,7 +194,6 @@ function gf_insert_in_array_by_index($array, $index, $val)
 }
 
 
-
 //add_filter('pre_get_posts', 'order_by_stock_status');
 function order_by_stock_status($posts_clauses)
 {
@@ -312,52 +311,118 @@ function parseOrderBy()
     return $orderBy;
 }
 
-function custom_woo_product_loop()
+function gf_get_category_query()
 {
-    if (is_shop() || is_product_category() || is_product_tag()) { // Only run on shop archive pages, not single products or other pages
-        global $wpdb;
-//        $allIds = [];
-//        $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
-        $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
-        if (isset($_POST['ppp'])) {
-            $per_page = ($_POST['ppp'] > 48) ? 48 : $_POST['ppp'];
+    global $wpdb;
+    $cat = get_term_by('slug', get_query_var('term'), 'product_cat');
+    $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
+    if (isset($_POST['ppp'])) {
+        $per_page = ($_POST['ppp'] > 48) ? 48 : $_POST['ppp'];
+    }
+    $orderBy = parseOrderBy();
+    $searchCondition = " 1=1 ";
+    $customOrdering = " 1=1 ";
+    if (isset($_GET['query'])) {
+        $searchCondition = "";
+        $customOrdering = "";
+        $input = addslashes($_GET['query']);
+        $explodedInput = explode(' ', $input);
+        $gradeCount = 0;
+        foreach ($explodedInput as $key => $word) {
+            if ($key > 0) {
+                $searchCondition .= " OR ";
+                $customOrdering .= " + ";
+            }
+            $searchCondition .= " productName LIKE '%{$word}%' OR description LIKE '%{$word}%' 
+                OR attributes LIKE '%{$word}%'";
+            $customOrdering .= "
+                CASE
+                    WHEN productName LIKE '% {$word} %' THEN 16
+                    WHEN productName LIKE '{$word} %' THEN 15
+                    WHEN productName LIKE '{$word}%' THEN 12
+                    WHEN productName LIKE '%{$word}%' THEN 9
+                    ELSE 0
+                END
+                + CASE
+                    WHEN categories LIKE '%{$word}%' THEN 14 ELSE 0
+                END
+                + CASE
+                    WHEN description LIKE '%{$word}%' THEN 4 ELSE 0
+                END
+                + CASE WHEN attributes LIKE '%{$word}%' THEN 13 ELSE 0 END ";
         }
+        $customOrdering .= " as o ";
+        $orderBy .= " , o DESC ";
+        $gradeCount = $gradeCount * 7;
+    }
 
-        if (get_query_var('taxonomy') === 'product_cat') { // Za kategorije
-//            $term = str_replace('-', ' ', get_query_var('term'));
-            $cat = get_term_by('slug', get_query_var('term'), 'product_cat');
-//            echo 'cat page';
-
-            // if $_GET['query']
-
-            $orderBy = parseOrderBy();
-            $priceOrdering = " CASE
+    $priceOrdering = " CASE
                 WHEN salePrice > 0 THEN salePrice
                 ELSE regularPrice 
             END as priceOrder ";
 
-            $sql = "SELECT postId, {$priceOrdering} FROM wp_gf_products WHERE salePrice > 0 AND stockStatus = 1 AND status = 1
-                AND categories LIKE '%{$cat->name}%' AND categoryIds LIKE '%{$cat->term_id}%' ORDER BY $orderBy";
-            $productsSale = $wpdb->get_results($sql, OBJECT_K);
+    $priceCondition = "";
+    if (isset($_GET['min_price'])) {
+        $minPrice = (int)$_GET['min_price'];
+        $maxPrice = (int)$_GET['max_price'];
+        $priceCondition = " HAVING priceOrder >= {$minPrice} AND priceOrder <= {$maxPrice} ";
+    }
 
-            $sql = "SELECT postId, {$priceOrdering} FROM wp_gf_products WHERE salePrice = 0 AND stockStatus = 1 AND status = 1
-                AND categories LIKE '%{$cat->name}%' AND categoryIds LIKE '%{$cat->term_id}%' ORDER BY $orderBy";
-            $productsNotOnSale = $wpdb->get_results($sql, OBJECT_K);
-            $allIds = array_merge(array_keys($productsSale), array_keys($productsNotOnSale));
+    $sql = "SELECT postId, {$priceOrdering}, {$customOrdering} FROM wp_gf_products WHERE salePrice > 0 AND stockStatus = 1 AND status = 1
+                AND categories LIKE '%{$cat->name}%' AND categoryIds LIKE '%{$cat->term_id}%'
+                AND ({$searchCondition})
+                {$priceCondition} 
+                ORDER BY $orderBy ";
+    $productsSale = $wpdb->get_results($sql, OBJECT_K);
 
-            $sql = "SELECT postId, {$priceOrdering} FROM wp_gf_products WHERE stockStatus = 0 AND status = 1
-                AND categories LIKE '%{$cat->name}%' AND categoryIds LIKE '%{$cat->term_id}%' ORDER BY $orderBy";
-            $productsOutOfStock = $wpdb->get_results($sql, OBJECT_K);
-            $allIds = array_merge($allIds, array_keys($productsOutOfStock));
+    $sql = "SELECT postId, {$priceOrdering}, {$customOrdering} FROM wp_gf_products WHERE salePrice = 0 AND stockStatus = 1 AND status = 1
+                AND categories LIKE '%{$cat->name}%' AND categoryIds LIKE '%{$cat->term_id}%' 
+                AND ({$searchCondition})
+                {$priceCondition} ORDER BY $orderBy ";
+    $productsNotOnSale = $wpdb->get_results($sql, OBJECT_K);
+    $allIds = array_merge(array_keys($productsSale), array_keys($productsNotOnSale));
 
-            $args = array(
-                'post_type' => 'product',
-                'orderby' => 'post__in',
-                'post__in' => $allIds,
-                'posts_per_page' => $per_page,
-                'paged' => (get_query_var('paged')) ? get_query_var('paged') : 1,
-            );
-            $sortedProducts = new WP_Query($args);
+    $sql = "SELECT postId, {$priceOrdering}, {$customOrdering} FROM wp_gf_products WHERE stockStatus = 0 AND status = 1
+                AND categories LIKE '%{$cat->name}%' AND categoryIds LIKE '%{$cat->term_id}%' 
+                AND ({$searchCondition})
+                {$priceCondition} ORDER BY $orderBy ";
+    $productsOutOfStock = $wpdb->get_results($sql, OBJECT_K);
+    $allIds = array_merge($allIds, array_keys($productsOutOfStock));
+    $currentPage = (get_query_var('paged')) ? get_query_var('paged') : 1;
+    $resultCount = count($allIds);
+    if ($resultCount === 0) {
+        $allIds[] = 0;
+    }
+    $totalPages = ceil($resultCount / $per_page);
+    if ($currentPage > $totalPages) {
+        $currentPage = $totalPages;
+    }
+    $paged = ( get_query_var( 'paged' ) ) ? get_query_var( 'paged' ) : 1;
+    $args = array(
+        'post_type' => 'product',
+        'orderby' => 'post__in',
+        'post__in' => $allIds,
+        'posts_per_page' => $per_page,
+        'paged' => $paged,
+        'suppress_filters' => true,
+        'no_found_rows' => true
+    );
+    $sortedProducts = new WP_Query($args);
+
+    wc_set_loop_prop('total', $resultCount);
+    wc_set_loop_prop('per_page', $per_page);
+    wc_set_loop_prop('current_page', $currentPage);
+    wc_set_loop_prop('total_pages', $totalPages);
+
+    return $sortedProducts;
+}
+
+function custom_woo_product_loop($sortedProducts)
+{
+    if (is_tax() || is_product_category() || is_product_tag()) {
+        global $wpdb;
+
+        if (get_query_var('taxonomy') === 'product_cat') { // Za kategorije
             if ($sortedProducts->have_posts()) :
                 while ($sortedProducts->have_posts()) : $sortedProducts->the_post();
 //                    do_action('woocommerce_shop_loop');
@@ -366,8 +431,7 @@ function custom_woo_product_loop()
                 wp_reset_postdata();
             endif;
         } else { // Za main shop
-            echo 'other page';
-
+//            echo 'other page';
         }
     } else { //za ostale page-eve
         woocommerce_content();
@@ -471,6 +535,13 @@ function gf_custom_search($input, $limit = 0)
             }
         }
     }
+    $priceCondition = "";
+    if (isset($_GET['min_price'])) {
+        $minPrice = (int)$_GET['min_price'];
+        $maxPrice = (int)$_GET['max_price'];
+        $priceCondition = " AND priceOrder >= {$minPrice} AND priceOrder <= {$maxPrice} ";
+    }
+
     $gradeCount = $gradeCount * 7;
     $priceOrdering = " CASE
         WHEN salePrice > 0 THEN salePrice
@@ -515,21 +586,26 @@ function gf_custom_search($input, $limit = 0)
 
     $sql = "SELECT 
         postId,
-        {$customOrdering}  as o,
+        {$customOrdering} as o,
         {$priceOrdering}
         FROM wp_gf_products
         WHERE stockStatus = 1 
         AND status = 1
         AND ({$searchCondition}) 
         HAVING o > {$gradeCount}
+        {$priceCondition}
         {$orderBy}";
     if ($limit) {
         $sql .= " LIMIT {$limit} ";
     }
 
+//    echo $sql;
     $products = $wpdb->get_results($sql, OBJECT_K);
     $allIds = array_keys($products);
     $resultCount = count($allIds);
+    if ($resultCount === 0) {
+        $allIds[] = 0;
+    }
     if ($resultCount === 0) {
         return false;
     }
@@ -618,7 +694,8 @@ function gf_ajax_view_count()
     $key = 'post-view-count#' . $postId;
     $cache = new GF_Cache();
     $count = (int)$cache->redis->get($key);
-    if ($count === 10) {
+//    if ($count == 10) {
+    if ($count > 0) {
         global $wpdb;
         $wpdb->query("UPDATE wp_gf_products SET viewCount = viewCount + {$count} WHERE postId = {$postId}");
         $cache->redis->set($key, 0);
@@ -638,7 +715,7 @@ function gf_change_supplier_id_by_vendor_id()
         ));
         $users = get_users();
         foreach ($products_ids as $product_id) {
-            if (get_post_meta($product_id, 'synced',true) != 1) {
+            if (get_post_meta($product_id, 'synced', true) != 1) {
                 $supplier_id = (int)get_post_meta($product_id, 'supplier', 'true');
                 foreach ($users as $user) {
                     $vendor_id = (int)get_user_meta($user->ID, 'vendorid', true);
@@ -648,15 +725,85 @@ function gf_change_supplier_id_by_vendor_id()
                     }
                 }
             }
-            if (get_post_meta($product_id,'synced',true) === ''){
-                $failedMatchIds[]= $product_id;
+            if (get_post_meta($product_id, 'synced', true) === '') {
+                $failedMatchIds[] = $product_id;
             }
         }
     }
     echo 'Nisu pronadđeni parovi za sledeće proizvode:';
     echo '<ul>';
-    foreach ($failedMatchIds as $failedMatchId){
-        echo '<li>'.$failedMatchId.'</li>';
+    foreach ($failedMatchIds as $failedMatchId) {
+        echo '<li>' . $failedMatchId . '</li>';
     }
     echo '</ul>';
 }
+
+
+function gf_set_product_categories($product_id, $category_ids)
+{
+    $product = wc_get_product($product_id);
+    $product_categories = $product->get_category_ids();
+    $diff = array_diff($category_ids, $product_categories);
+    $merge = array_merge($product_categories, $diff);
+    $product->set_category_ids($merge);
+
+    //maybe need to save product? $product->save()
+}
+
+
+//Custom addd to cart message
+add_filter('wc_add_to_cart_message_html', '__return_null');
+add_filter('wc_add_to_cart_message_html', 'gf_custom_add_to_cart_message', 10, 2);
+function gf_custom_add_to_cart_message($message)
+{
+    if (isset($_POST['quantity']) && isset($_POST['add-to-cart'])) {
+        $qty = $_POST['quantity'];
+        $product_id = $_POST['add-to-cart'];
+        $product_title = wc_get_product($product_id)->get_name();
+        if ($qty <= 1) {
+            $message = '&ldquo;' . $product_title . '&rdquo; je dodat u Vašu korpu.';
+        } else {
+            $message = $qty . ' &times; ' . '&ldquo;' . $product_title . '&rdquo; je dodat u Vašu korpu.';
+        }
+    }
+    $cart_link = '<a href = "'.wc_get_page_permalink('cart').'" class="button wc-forward" >Pogledaj korpu</a >';
+    $message .= $cart_link;
+
+    return $message;
+
+}
+//maybe we will need this function...
+//function gf_custom_add_to_cart_message($message, $products)
+//{
+//    $titles = array();
+//    $count = 0;
+//    $show_qty = true;
+//    if (!is_array($products)) {
+//        $products = array($products => 1);
+//        $show_qty = false;
+//    }
+//    if (!$show_qty) {
+//        $products = array_fill_keys(array_keys($products), 1);
+//    }
+//    foreach ($products as $product_id => $qty) {
+//        $titles[] = ($qty > 1 ? absint($qty) . ' &times; ' : '') . sprintf(_x('&ldquo;%s&rdquo;', 'Item name in quotes', 'woocommerce'), strip_tags(get_the_title($product_id)));
+//        $count += $qty;
+//    }
+//    $titles = array_filter($titles);
+//    $added_text = sprintf(_n('%s has been added to your cart.', '%s have been added to your cart.', $count, 'woocommerce'), wc_format_list_of_items($titles));
+//    // Output success messages.
+//    if ('yes' === get_option('woocommerce_cart_redirect_after_add')) {
+//        $return_to = apply_filters('woocommerce_continue_shopping_redirect', wc_get_raw_referer() ? wp_validate_redirect(wc_get_raw_referer(), false) : wc_get_page_permalink('shop'));
+//        $message = sprintf('<a href="%s" class="button wc-forward">%s</a> %s', esc_url($return_to), esc_html__('Continue shopping', 'woocommerce'), esc_html($added_text));
+//    } else {
+//        $message = sprintf('<a href="%s" class="button wc-forward">%s</a> %s', esc_url(wc_get_page_permalink('cart')), esc_html__('View cart', 'woocommerce'), esc_html($added_text));
+//    }
+//
+//    if (has_filter('wc_add_to_cart_message')) {
+//        wc_deprecated_function('The wc_add_to_cart_message filter', '3.0', 'wc_add_to_cart_message_html');
+//        $message = apply_filters('wc_add_to_cart_message', $message, $product_id);
+//    }
+//    return $message;
+//}
+
+

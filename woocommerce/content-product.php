@@ -33,7 +33,17 @@ $classes = ob_get_clean();
         add_stickers_to_products_new($product);
         add_stickers_to_products_soldout($classes);
         ?>
-        <?php if (has_post_thumbnail($product->get_id())) echo get_the_post_thumbnail($product->get_id()); else echo '<img src="' . wc_placeholder_img_src() . '" alt="Placeholder" width="300px" height="300px" />'; ?>
+        <?php if (has_post_thumbnail($product->get_id())):
+//            $image = wp_get_attachment_image_src(get_post_thumbnail_id($product->get_id()), 'single-post-thumbnail');
+//            get_the_post_thumbnail_url($product->get_id(), 'single-post-thumbnail');
+            ?>
+            <img src="<?=get_the_post_thumbnail_url($product->get_id(), 'shop_catalog')?>" class="attachment-post-thumbnail size-post-thumbnail wp-post-image"
+                 alt="<?=$product->get_title()?>" width="200" height="200" />
+<?php // srcset="https://nss.ha.rs/wp-content/uploads/2018/10/02/34/2960630.jpg 500w, https://nss.ha.rs/wp-content/uploads/2018/10/02/34/2960630-150x150.jpg 150w, https://nss.ha.rs/wp-content/uploads/2018/10/02/34/2960630-300x300.jpg 300w, https://nss.ha.rs/wp-content/uploads/2018/10/02/34/2960630-100x100.jpg 100w" sizes="(max-width: 500px) 100vw, 500px" ';
+//            echo get_the_post_thumbnail($product->get_id());
+        else:
+            echo '<img src="' . wc_placeholder_img_src() . '" alt="Placeholder" width="300px" height="300px" />';
+        endif; ?>
     </a>
     <a href="<?php echo get_permalink($product->get_id()) ?>"
        title="<?php echo esc_attr($product->get_title() ? $product->get_title() : $product->get_id()); ?>">

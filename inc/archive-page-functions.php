@@ -68,8 +68,10 @@ function gf_display_categories_on_archive_page()
             'hide_empty' => true
         ]);
         if (count($categories) != 0) {
-            echo '<div class="row gf-category-expander">';
-            echo '<div class="gf-jos-kategorija"><p>Još kategorija</p></div>';
+            if(!wp_is_mobile()){
+                echo '<div id="gf-expander-id" class="row gf-category-expander gf-height-test">';
+            }
+//            echo '<div class="gf-jos-kategorija"><p>Još kategorija</p></div>';
             $second_lvl_cat_ids = [];
             foreach ($categories as $category) {
                 $child_args = array(
@@ -107,8 +109,9 @@ function gf_display_categories_on_archive_page()
                     break;
                 }
             }
-            echo '<div class="gf-category-expander__footer"><span class="fas fa-angle-down"></span></div>';
             echo '</div>';
+            echo '<div class="gf-category-expander__footer"><span class="fas fa-angle-down"></span></div>';
+
         }
     }
 }
@@ -119,7 +122,7 @@ remove_action('woocommerce_after_shop_loop', 'woocommerce_pagination', 10);
 
 add_action('woocommerce_before_shop_loop', 'woocommerce_result_count', 20);
 add_action('woocommerce_before_shop_loop', 'woocommerce_catalog_ordering', 26);
-add_action('woocommerce_after_shop_loop', 'woocommerce_catalog_ordering', 26);
+//add_action('woocommerce_after_shop_loop', 'woocommerce_catalog_ordering', 26);
 add_action('woocommerce_before_shop_loop', 'woocommerce_pagination', 27);
 add_action('woocommerce_after_shop_loop', 'woocommerce_pagination', 27);
 
