@@ -14,6 +14,7 @@ if (isset($_GET['import'])) {
     $perPage = 100;
     $offset = $_POST['page'] * $perPage;
     $supplierId = 666;
+    $supplierId = 308;
     $stats = gf_start_import($wpdb, $supplierId, $offset, $perPage);
     if ($stats['keyRemoveCount'] === 0 && $stats['importCount'] === 0) {
         //nothing to do
