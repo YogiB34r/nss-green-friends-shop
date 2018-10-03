@@ -1,67 +1,79 @@
 <?php
 
-if ( ! defined( 'ABSPATH' ) ) {
+if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
 
-if ( is_singular('product') ) {
+if (is_singular('product')) {
     global $post;
 // get categories
 
+    $parent_id = get_term_by('slug', 'specijalne-promocije', 'product_cat')->term_id;
     $slider_sub_cats_args = array(
-        'parent' => 2059,
+        'parent' => $parent_id,
     );
     $slider_sub_cats = get_terms('product_cat', $slider_sub_cats_args);
     $exclude_cats_ids = [];
 
-    foreach ($slider_sub_cats as $slider_sub_cat){
+    foreach ($slider_sub_cats as $slider_sub_cat) {
         $exclude_cats_ids[] = $slider_sub_cat->term_id;
     }
 
     $parent_cats_args = array(
-            'parent' => 0
+        'parent' => 0
     );
     $parent_cats = get_terms('product_cat', $parent_cats_args);
-    foreach ($parent_cats as $parent_cat){
+    foreach ($parent_cats as $parent_cat) {
         $exclude_cats_ids[] = $parent_cat->term_id;
     }
 
     $args = array(
         'exclude' => $exclude_cats_ids,
     );
-    $terms = wp_get_post_terms( $post->ID, 'product_cat', $args);
-    foreach ( $terms as $term ) {
-        $children = get_term_children( $term->term_id, 'product_cat' );
-        if ( !sizeof( $children ) )
+    $terms = wp_get_post_terms($post->ID, 'product_cat', $args);
+    foreach ($terms as $term) {
+        $children = get_term_children($term->term_id, 'product_cat');
+        if (!sizeof($children))
             $cats_array[] = $term->term_id;
     }
 
-    $query_args = array('orderby' => 'rand', 'post__not_in' => array( $post->ID ), 'posts_per_page' => 4, 'no_found_rows' => 1, 'post_status' => 'publish', 'post_type' => 'product', 'tax_query' => array(
-        array(
-            'taxonomy' => 'product_cat',
-            'field' => 'id',
-            'terms' => $cats_array,
-            'parent' => 0,
-            'exclude' => 2064,
-        )));
+    $query_args = array(
+        'orderby' => 'rand',
+        'post__not_in' => array($post->ID),
+        'posts_per_page' => 4,
+        'no_found_rows' => 1,
+        'post_status' => 'publish',
+        'post_type' => 'product',
+        'tax_query' => array(
+            array(
+                'taxonomy' => 'product_cat',
+                'field' => 'id',
+                'terms' => $cats_array,
+                'parent' => 0,
+//                'exclude' => $exclude_cats_ids,
+            )));
 
     $r = new WP_Query($query_args);
     if ($r->have_posts()) { ?>
 
 
-
         <div class="related products">
-            <h2><?php _e( 'Slični proizvodi', 'woocommerce' ); ?></h2>
+            <h2><?php _e('Slični proizvodi', 'woocommerce'); ?></h2>
 
-            <?php woocommerce_product_loop_start(); ?>
+            <?php woocommerce_product_loop_start();
 
-            <?php while ($r->have_posts()) : $r->the_post(); global $product; ?>
+            while ($r->have_posts()) : $r->the_post();
+                global $product;
 
-                <?php wc_get_template_part( 'content', 'product' ); ?>
 
-            <?php endwhile; // end of the loop. ?>
+                if ($product->get_stock_status() === 'instock'){
+                    wc_get_template_part('content', 'product');
+                };
 
-            <?php woocommerce_product_loop_end(); ?>
+
+            endwhile; // end of the loop.
+
+            woocommerce_product_loop_end(); ?>
 
         </div>
 
