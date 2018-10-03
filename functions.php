@@ -316,6 +316,7 @@ function gf_get_category_query()
     global $wpdb;
     $cat = get_term_by('slug', get_query_var('term'), 'product_cat');
     $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
+    $currentPage = (get_query_var('paged')) ? get_query_var('paged') : 1;
     if (isset($_POST['ppp'])) {
         $per_page = ($_POST['ppp'] > 48) ? 48 : $_POST['ppp'];
     }
@@ -323,6 +324,12 @@ function gf_get_category_query()
     $searchCondition = " 1=1 ";
     $customOrdering = " 1=1 ";
     if (isset($_GET['query'])) {
+        var_dump($_COOKIE['searchQuery']);
+        if (!isset($_COOKIE['searchQuery']) || isset($_COOKIE['searchQuery']) && $_COOKIE['searchQuery'] != $_GET['query']) {
+            setcookie('searchQuery', $_GET['query'], 30 * 60, COOKIEPATH, COOKIE_DOMAIN );
+            $currentPage = 1;
+        }
+
         $searchCondition = "";
         $customOrdering = "";
         $input = addslashes($_GET['query']);
@@ -388,7 +395,6 @@ function gf_get_category_query()
                 {$priceCondition} ORDER BY $orderBy ";
     $productsOutOfStock = $wpdb->get_results($sql, OBJECT_K);
     $allIds = array_merge($allIds, array_keys($productsOutOfStock));
-    $currentPage = (get_query_var('paged')) ? get_query_var('paged') : 1;
     $resultCount = count($allIds);
     if ($resultCount === 0) {
         $allIds[] = 0;

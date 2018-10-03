@@ -105,7 +105,7 @@ function gf_cart_shortcode()
 add_shortcode('gf-mobile-nav-menu', 'gf_mobile_nav_menu_shortcode');
 function gf_mobile_nav_menu_shortcode()
 {
-    if (wp_is_mobile()) {
+//    if (wp_is_mobile()) {
         echo '<div class="gf-hamburger-menu"><i class="fas fa-bars"></i></div>';
 
         echo '<div class="gf-mobile-menu">';
@@ -141,7 +141,7 @@ function gf_mobile_nav_menu_shortcode()
         </li>
         <?php
         echo '</div>';
-    }
+//    }
     add_shortcode('gf-mobile-search', 'gf_mobile_search_form');
     function gf_mobile_search_form()
     {

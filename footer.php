@@ -47,7 +47,7 @@
                                 <img src="<?= $theme_dir ?>/assets/images/footer_card_6.png" alt="American Express">
                             </li>
                         </div>
-                        <div class="col d-flex justify-content-center mt-3 px-4">
+                        <div class="col-md d-flex justify-content-center mt-3 px-4">
                             <li>
                                 <a href="https://www.visa.ca/en_CA/run-your-business/merchant-resources/verified-by-visa.html">
                                     <img src="<?= $theme_dir ?>/assets/images/footer_card_1.png" alt="Verified by Visa">
@@ -75,5 +75,6 @@
 </div>
 <!-- #page -->
 <?php wp_footer(); ?>
+<!-- Facebook Pixel Code --> <script> !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod? n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n; n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0; t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window, document,'script','https://connect.facebook.net/en_US/fbevents.js'); fbq('init', '125798604755023'); // Insert your pixel ID here. fbq('track', 'PageView'); </script> <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=125798604755023&ev=PageView&noscript=1" /></noscript> <!-- DO NOT MODIFY --> <!-- End Facebook Pixel Code -->
 </body>
 </html>

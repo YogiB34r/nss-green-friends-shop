@@ -45,10 +45,10 @@
     <div id="content" class="site-content" tabindex="-1">
         <div class="col-full">
             <div class="gf-main-content-container">
-                <?php if (wp_is_mobile()): ?>
+<!--                --><?php //if (wp_is_mobile()): ?>
                     <div class="row list-unstyled">
                         <div class="mobile-search">
                             <?php dynamic_sidebar('gf-search-form-mobile') ?>
                         </div>
                     </div>
-                <?php endif; ?>
+<!--                --><?php //endif; ?>
