@@ -33,40 +33,38 @@
                 <div class="my-footer-images">
                     <?php $theme_dir = get_template_directory_uri(); ?>
                     <div class="row">
-                        <div class="col-md d-flex gf-justify justify-content-center mt-3 px-4">
-                    <ul class="row">
-                        <div class="col-md  d-flex gf-justify justify-content-center mt-3 px-4">
+                        <ul class="col-md d-flex gf-justify justify-content-center mt-3 px-4">
                             <li>
-                                <img src="<?= $theme_dir ?>/assets/images/footer_card_3.png" alt="Visa">
+                                <img src="<?= $theme_dir ?>/assets/images/footer_card_3.png" alt="Visa" height="40" width="66">
                             </li>
                             <li>
-                                <img src="<?= $theme_dir ?>/assets/images/footer_card_4.png" alt="mastercard">
+                                <img src="<?= $theme_dir ?>/assets/images/footer_card_4.png" alt="mastercard" height="40" width="62">
                             </li>
                             <li>
-                                <img src="<?= $theme_dir ?>/assets/images/footer_card_5.png" alt="maestrocard">
+                                <img src="<?= $theme_dir ?>/assets/images/footer_card_5.png" alt="maestrocard" height="40" width="62">
                             </li>
                             <li>
-                                <img src="<?= $theme_dir ?>/assets/images/footer_card_6.png" alt="American Express">
+                                <img src="<?= $theme_dir ?>/assets/images/footer_card_6.png" alt="American Express"  height="40" width="40">
                             </li>
-                        </div>
-                        <div class="col d-flex justify-content-center mt-3 px-4">
+                        </ul>
+                        <ul class="col d-flex justify-content-center mt-3 px-4">
                             <li>
                                 <a href="https://www.visa.ca/en_CA/run-your-business/merchant-resources/verified-by-visa.html">
-                                    <img src="<?= $theme_dir ?>/assets/images/footer_card_1.png" alt="Verified by Visa">
+                                    <img src="<?= $theme_dir ?>/assets/images/footer_card_1.png" alt="Verified by Visa" height="40" width="68">
                                 </a>
                             </li>
                             <li>
                                 <a href="https://www.mastercard.us/en-us/merchants/safety-security/securecode.html">
                                     <img src="<?= $theme_dir ?>/assets/images/footer_card_2.png"
-                                         alt="MasterCard SecureCode">
+                                         alt="MasterCard SecureCode" height="40" width="75">
                                 </a>
                             </li>
                             <li>
                                 <a href="http://www.bancaintesa.rs/pocetna.1.html">
-                                    <img src="<?= $theme_dir ?>/assets/images/footer_card_7.jpg" alt="Banca Intesa">
+                                    <img src="<?= $theme_dir ?>/assets/images/footer_card_7.jpg" alt="Banca Intesa"  height="40" width="267">
                                 </a>
                             </li>
-                        </div>
+                        </ul>
                     </div>
                 </div>
             </div>
