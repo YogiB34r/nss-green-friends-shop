@@ -1346,6 +1346,7 @@ body.home .gf-navblock {
 .gf-sidebar .woocommerce ul.products li.product {
     text-align: center;
     margin-bottom: 0.4em;
+    width: 100% !important;
 }
 
 .gf-sidebar .woocommerce ul.products li.product a img {

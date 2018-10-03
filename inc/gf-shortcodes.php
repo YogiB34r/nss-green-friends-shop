@@ -189,3 +189,38 @@ function gf_mobile_nav_menu_shortcode()
 }
 
 
+add_shortcode('gf-best-selling-products', 'gf_display_best_selling_products');
+function gf_display_best_selling_products(){
+    $args = array(
+        'post_type' => 'product',
+        'post_status' => 'publish',
+        'posts_per_page' => '3',
+        'meta_query' => array(
+            array(
+                'key' => '_stock_status',
+                'value' => 'instock',
+                'compare' => '=',
+            )
+        ),
+        'meta_key' => 'total_sales',
+        'orderby' => 'meta_value_num',
+        'order' => 'DESC',
+    );
+
+    $query = new WP_Query($args);
+
+    echo '<div class="woocommerce columns-1">';
+    echo '<ul class ="products columns-1">';
+        if($query->have_posts($args)) :
+            while($query->have_posts()) : $query->the_post();
+
+                wc_get_template_part('content', 'product');
+
+            endwhile;
+            wp_reset_postdata();
+        endif;
+    echo '</ul>';
+    echo '</div>';
+}
+
+
