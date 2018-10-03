@@ -64,6 +64,6 @@ function gf_order_meta_keys( $keys ) {
 }
 add_action('woocommerce_checkout_process', 'gf_billing_field_pib_process');
 function gf_billing_field_pib_process() {
-    if ( strlen($_POST['billing_pib']) != 8  )
+    if ( strlen($_POST['billing_pib']) != 8 && strlen($_POST['billing_pib']) != 0 )
         wc_add_notice( __( 'PIB mora imati tacno osam cifara' ), 'error' );
 }
