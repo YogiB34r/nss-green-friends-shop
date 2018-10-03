@@ -129,16 +129,16 @@ function gf_add_theme_and_plugins_backend_scripts_and_styles() {
     wp_enqueue_style('gf-admin-style', get_stylesheet_directory_uri() . '/admin.css');
 }
 
-function add_defer_attribute($tag, $handle) {
+function add_async_attribute($tag, $handle) {
     $scripts_to_defer = array('gf-front-js');
     foreach($scripts_to_defer as $defer_script) {
         if ($defer_script === $handle) {
-            return str_replace(' src', ' defer="defer" src', $tag);
+            return str_replace(' src', ' async="async" src', $tag);
         }
     }
     return $tag;
 }
-add_filter('script_loader_tag', 'add_defer_attribute', 10, 2);
+add_filter('script_loader_tag', 'add_async_attribute', 10, 2);
 
 add_action('customize_register', 'gf_theme_customizer_setup');
 /**
