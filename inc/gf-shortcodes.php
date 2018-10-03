@@ -208,7 +208,7 @@ function gf_display_best_selling_products(){
     );
 
     $query = new WP_Query($args);
-
+    echo '<h2>Najprodavaniji proizvodi</h2>';
     echo '<div class="woocommerce columns-1">';
     echo '<ul class ="products columns-1">';
         if($query->have_posts($args)) :
