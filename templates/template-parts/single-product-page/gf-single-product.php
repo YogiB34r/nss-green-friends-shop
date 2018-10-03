@@ -1,3 +1,26 @@
+<?php
+$sexyShopCats = gf_get_sex_shop_categories();
+$product_cats = wc_get_product(get_queried_object_id())->get_category_ids();
+$result = false;
+foreach ($product_cats as $product_cat){
+    if (in_array($product_cat,$sexyShopCats)){
+        $result = true;
+        break;
+    }
+}
+    if ($result && !in_array('nss-sex-shop-agreement', $_COOKIE)): ?>
+        <script type="text/javascript">
+            if (confirm('Da bi ste videli sadržaj ovog odeljka morate se složiti sa uslovima i prihvatiti da imate preko 18 godina.')
+                == true) {
+                var expiryDate = new Date();
+                expiryDate.setMonth(expiryDate.getMonth() + 6);
+                document.cookie = 'name = nss-sex-shop-agreement; path=/; expires =' + expiryDate;
+                document.getElementsByTagName("BODY")[0].style.display = "block";
+            } else {
+                document.location.href = "/";
+            }
+        </script>
+    <?php endif;?>
 <div class="row">
     <div class="col-3 list-unstyled gf-sidebar">
       <div class="gf-left-sidebar-wrapper">
