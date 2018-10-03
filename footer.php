@@ -47,7 +47,7 @@
                                 <img src="<?= $theme_dir ?>/assets/images/footer_card_6.png" alt="American Express">
                             </li>
                         </div>
-                        <div class="col d-flex justify-content-center mt-3 px-4">
+                        <div class="col-md d-flex justify-content-center mt-3 px-4">
                             <li>
                                 <a href="https://www.visa.ca/en_CA/run-your-business/merchant-resources/verified-by-visa.html">
                                     <img src="<?= $theme_dir ?>/assets/images/footer_card_1.png" alt="Verified by Visa">
