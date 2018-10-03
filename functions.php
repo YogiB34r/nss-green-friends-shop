@@ -324,11 +324,11 @@ function gf_get_category_query()
     $searchCondition = " 1=1 ";
     $customOrdering = " 1=1 ";
     if (isset($_GET['query'])) {
-        var_dump($_COOKIE['searchQuery']);
-        if (!isset($_COOKIE['searchQuery']) || isset($_COOKIE['searchQuery']) && $_COOKIE['searchQuery'] != $_GET['query']) {
-            setcookie('searchQuery', $_GET['query'], 30 * 60, COOKIEPATH, COOKIE_DOMAIN );
-            $currentPage = 1;
-        }
+//        var_dump($_COOKIE['searchQuery']);
+//        if (!isset($_COOKIE['searchQuery']) || isset($_COOKIE['searchQuery']) && $_COOKIE['searchQuery'] != $_GET['query']) {
+//            setcookie('searchQuery', $_GET['query'], 30 * 60, COOKIEPATH, COOKIE_DOMAIN );
+//            $currentPage = 1;
+//        }
 
         $searchCondition = "";
         $customOrdering = "";
