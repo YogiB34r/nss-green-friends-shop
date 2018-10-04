@@ -118,6 +118,8 @@ function gf_theme_and_plugins_frontend_scripts_and_styles()
 //    wp_dequeue_style('woocommerce-layout');
 //    wp_dequeue_style('woocommerce-smallscreen');
 
+    wp_dequeue_script('cookie');
+    wp_dequeue_script('grid-list-scripts');
 
     wp_enqueue_script('gf-front-js', get_stylesheet_directory_uri() . '/assets/js/gf-front.js', [], '', true);
     //required in order for ajax to work !?
