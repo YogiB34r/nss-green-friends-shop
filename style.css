@@ -3004,9 +3004,9 @@ ul.products.list li.product h3, ul.products.list li.product .woocommerce-product
     text-align: center;
     width: auto;
 }
-.my-footer-images img {
-    max-width: 100% !important;
-}
+/*.my-footer-images img {*/
+    /*max-width: 100% !important;*/
+/*}*/
 
 p.woocommerce-thankyou-order-received {
     font-weight: bold;
