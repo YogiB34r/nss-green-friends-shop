@@ -38,7 +38,7 @@ if (is_singular('product')) {
     }
 
     $query_args = array(
-        'orderby' => 'rand',
+//        'orderby' => 'rand',
         'post__not_in' => array($post->ID),
         'posts_per_page' => 4,
         'no_found_rows' => 1,
@@ -61,10 +61,9 @@ if (is_singular('product')) {
             <h2><?php _e('Slični proizvodi', 'woocommerce'); ?></h2>
 
             <?php woocommerce_product_loop_start();
-
             while ($r->have_posts()) : $r->the_post();
-                global $product;
 
+                global $product;
 
                 if ($product->get_stock_status() === 'instock'){
                     wc_get_template_part('content', 'product');
