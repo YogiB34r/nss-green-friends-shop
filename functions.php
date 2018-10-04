@@ -860,15 +860,30 @@ function gf_check_if_user_is_migrated($user, $password)
             $sql = "SELECT user_pass FROM wp_users WHERE ID = '{$user->ID}'";
             $password_in_db = $wpdb->get_results($sql)[0]->user_pass;
 
-            var_dump($passwordHash);
-            var_dump($password_in_db);
+//            var_dump($passwordHash);
+//            var_dump($password_in_db);
+//            var_dump($user);
+//            die();
 
             if ($passwordHash === $password_in_db) {
                 return $user;
+            } else {
+                return new WP_Error( 'incorrect_password',
+                    sprintf(
+                    /* translators: %s: user name */
+                        __( '<strong>ERROR</strong>: The password you entered for the username %s is incorrect.' ),
+                        '<strong>' . $user->user_login . '</strong>'
+                    ) .
+                    ' <a href="' . wp_lostpassword_url() . '">' .
+                    __( 'Lost your password?' ) .
+                    '</a>'
+                );
             }
         }
     }
+
+    return false;
 }
 
-add_filter('wp_authenticate_user', 'gf_check_if_user_is_migrated', 10, 2);
+//add_filter('wp_authenticate_user', 'gf_check_if_user_is_migrated', 10, 2);
 
