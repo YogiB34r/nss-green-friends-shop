@@ -11,9 +11,11 @@
 </form>
 <div class="gf-radio-search-wrapper">
   <?php if (get_queried_object() && is_product_category()): ?>
+  <form>
       <input class="search-radio-box" type="radio" id="search-radiobutton-cat" name="search-radiobutton" checked="checked" value="category" />
       <label for="search-radiobutton-cat"><?= get_queried_object()->name ?></label>
-      <input class="search-radio-box" type="radio" id="search-radiobutton-main" name="search-radiobutton" value="shop" />
+      <input class="search-radio-box" type="radio" id="search-radiobutton-main" name="search-radiobutton-main" value="shop" />
     	<label for="search-radiobutton-main">Pretraga celog sajta</label>
+  </form>
   <?php endif ;?>
 </div>
