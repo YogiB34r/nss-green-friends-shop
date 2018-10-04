@@ -145,12 +145,12 @@ function gf_add_theme_and_plugins_backend_scripts_and_styles() {
 
 function add_async_attribute($tag, $handle) {
     $scripts_to_defer = array('gf-front-js');
-    foreach($scripts_to_defer as $defer_script) {
-        if ($defer_script === $handle) {
+//    foreach($scripts_to_defer as $defer_script) {
+//        if ($defer_script === $handle) {
             return str_replace(' src', ' async="async" src', $tag);
-        }
-    }
-    return $tag;
+//        }
+//    }
+//    return $tag;
 }
 add_filter('script_loader_tag', 'add_async_attribute', 10, 2);
 
