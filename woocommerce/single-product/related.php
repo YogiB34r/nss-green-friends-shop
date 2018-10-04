@@ -59,7 +59,7 @@ if (is_singular('product')) {
         )));
 
     $r = new WP_Query($query_args);
-    $i = 0;
+    
     if ($r->have_posts()) { ?>
 
 
