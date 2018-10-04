@@ -17,14 +17,3 @@
     	<label for="search-radiobutton-main">Pretraga celog sajta</label>
   <?php endif ;?>
 </div>
-<script type="text/javascript">
-    jQuery(document).ready(function($){
-        var radioValue='';
-        $(".gf-search-form").submit(function () {
-            var radioValue = $('input[name=search-radiobutton]:checked').val();
-            if (radioValue === 'category'){
-                $(".gf-search-form").attr("action", "");
-            }
-        });
-    });
-</script>

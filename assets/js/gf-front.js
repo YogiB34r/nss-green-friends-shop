@@ -370,13 +370,21 @@ jQuery(document).ready(function () {
             }
         });
     }
+
+    // set default search radio button value
+    jQuery(".gf-search-form").submit(function () {
+        var radioValue = jQuery('input[name=search-radiobutton]:checked').val();
+        if (radioValue === 'category'){
+            jQuery(".gf-search-form").attr("action", "");
+        }
+    });
 });
 
 // grid view
-jQuery(document).ready(function($) {
-    if ($.cookie( 'gridcookie' ) == null) {
-        $( 'ul.products' ).addClass( 'grid' );
-        $( '.gridlist-toggle #grid' ).addClass( 'active' );
+jQuery(document).ready(function(jQuery) {
+    if (jQuery.cookie( 'gridcookie' ) == null) {
+        jQuery( 'ul.products' ).addClass( 'grid' );
+        jQuery( '.gridlist-toggle #grid' ).addClass( 'active' );
     }
 });
 
