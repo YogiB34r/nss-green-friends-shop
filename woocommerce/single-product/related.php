@@ -38,7 +38,7 @@ if (is_singular('product')) {
     }
 
     $query_args = array(
-//        'orderby' => 'rand',
+        'orderby' => 'rand',
         'post__not_in' => array($post->ID),
         'posts_per_page' => 4,
         'no_found_rows' => 1,
@@ -51,9 +51,15 @@ if (is_singular('product')) {
                 'terms' => $cats_array,
                 'parent' => 0,
                 'exclude' => $exclude_cats_ids,
-            )));
+            )),
+        'meta_query' => array(array(
+            'key' => '_stock_status',
+            'value' => 'outofstock',
+            'compare' => 'NOT IN'
+        )));
 
     $r = new WP_Query($query_args);
+    $i = 0;
     if ($r->have_posts()) { ?>
 
 
@@ -65,9 +71,7 @@ if (is_singular('product')) {
 
                 global $product;
 
-                if ($product->get_stock_status() === 'instock'){
-                    wc_get_template_part('content', 'product');
-                };
+                wc_get_template_part('content', 'product');
 
 
             endwhile; // end of the loop.
@@ -79,5 +83,5 @@ if (is_singular('product')) {
         <?php
 
         wp_reset_query();
-    }
+    };
 }
