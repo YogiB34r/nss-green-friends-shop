@@ -88,11 +88,19 @@ add_theme_support( 'html5',array(
     ) );
 }
 
-function remove_stubborn_assets() {
+function remove_stubborn_css() {
     wp_dequeue_style('newsletter');
     wp_deregister_style('newsletter');
 }
-add_action('wp_print_styles', 'remove_stubborn_assets', 99999);
+add_action('wp_print_styles', 'remove_stubborn_css', 99999);
+
+function remove_stubborn_js() {
+    wp_dequeue_script('cookie');
+    wp_deregister_script('cookie');
+    wp_dequeue_script('grid-list-scripts');
+    wp_deregister_script('grid-list-scripts');
+}
+add_action('wp_print_scripts', 'remove_stubborn_js', 99999);
 
 add_action('wp_enqueue_scripts', 'gf_theme_and_plugins_frontend_scripts_and_styles');
 function gf_theme_and_plugins_frontend_scripts_and_styles()
@@ -118,8 +126,6 @@ function gf_theme_and_plugins_frontend_scripts_and_styles()
 //    wp_dequeue_style('woocommerce-layout');
 //    wp_dequeue_style('woocommerce-smallscreen');
 
-    wp_dequeue_script('cookie');
-    wp_dequeue_script('grid-list-scripts');
 
     wp_enqueue_script('gf-front-js', get_stylesheet_directory_uri() . '/assets/js/gf-front.js', [], '', true);
     //required in order for ajax to work !?

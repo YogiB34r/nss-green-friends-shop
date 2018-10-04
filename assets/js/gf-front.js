@@ -372,6 +372,15 @@ jQuery(document).ready(function () {
     }
 });
 
+// grid view
+jQuery(document).ready(function($) {
+    if ($.cookie( 'gridcookie' ) == null) {
+        $( 'ul.products' ).addClass( 'grid' );
+        $( '.gridlist-toggle #grid' ).addClass( 'active' );
+    }
+});
+
+
 function ajaxSearch(value) {
     jQuery.ajax({
         type: "POST",
