@@ -403,7 +403,7 @@ function gf_get_category_query()
     if ($currentPage > $totalPages) {
         $currentPage = $totalPages;
     }
-    $paged = ( get_query_var( 'paged' ) ) ? get_query_var( 'paged' ) : 1;
+    $paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
     $args = array(
         'post_type' => 'product',
         'orderby' => 'post__in',
@@ -772,12 +772,13 @@ function gf_custom_add_to_cart_message($message)
             $message = $qty . ' &times; ' . '&ldquo;' . $product_title . '&rdquo; je dodat u Vašu korpu.';
         }
     }
-    $cart_link = '<a href = "'.wc_get_page_permalink('cart').'" class="button wc-forward" >Pogledaj korpu</a >';
+    $cart_link = '<a href = "' . wc_get_page_permalink('cart') . '" class="button wc-forward" >Pogledaj korpu</a >';
     $message .= $cart_link;
 
     return $message;
 
 }
+
 //maybe we will need this function...
 //function gf_custom_add_to_cart_message($message, $products)
 //{
@@ -811,15 +812,78 @@ function gf_custom_add_to_cart_message($message)
 //    }
 //    return $message;
 //}
-function gf_get_sex_shop_categories(){
+function gf_get_sex_shop_categories()
+{
     $sexyShopCat = get_term_by('slug', 'sexy-shop', 'product_cat');
-    if ($sexyShopCat){
+    if ($sexyShopCat) {
         $sexyShopChildren = get_term_children($sexyShopCat->term_id, 'product_cat');
         $sexyShopCats[] = $sexyShopCat->term_id;
-        foreach ($sexyShopChildren as $sexyShopChild){
+        foreach ($sexyShopChildren as $sexyShopChild) {
             $sexyShopCats[] = $sexyShopChild;
         }
     }
     return $sexyShopCats;
 }
+
+function gf_add_custom_meta_to_users()
+{
+    $users = get_users(array('fields' => array('ID')));
+//    var_dump(get_users());
+    foreach ($users as $user) {
+        update_user_meta($user->ID, 'migrated', '0');
+    }
+}
+
+//function gf_check_if_user_is_migrated($user_id)
+//{
+//    $users = get_users(array('fields' => array('ID')));
+//    foreach ($users as $user) {
+//        update_user_meta($user->ID, 'migrated', '0');
+//        if (get_user_meta($user->ID, 'migrated') == 1) {
+//            //uradi nestooo
+//
+//        }
+//    }
+//}
+function gf_check_if_user_is_migrated($user, $password)
+{
+    if (!empty($user)) {
+        if (get_user_meta($user->ID, 'migrated', true) != 0) {
+
+            global $wpdb;
+
+            //skloniti posle testiranja, promenjeno je trenutno za usera 'admin'
+//        update_user_meta($user->ID, 'migrated', '1');
+
+            $salt = 'd@uy/o%b^';
+            $passwordHash = $salt . md5($salt, $password);
+            $sql = "SELECT user_pass FROM wp_users WHERE ID = '{$user->ID}'";
+            $password_in_db = $wpdb->get_results($sql)[0]->user_pass;
+
+//            var_dump($passwordHash);
+//            var_dump($password_in_db);
+//            var_dump($user);
+//            die();
+
+            if ($passwordHash === $password_in_db) {
+                return $user;
+            } else {
+                return new WP_Error( 'incorrect_password',
+                    sprintf(
+                    /* translators: %s: user name */
+                        __( '<strong>ERROR</strong>: The password you entered for the username %s is incorrect.' ),
+                        '<strong>' . $user->user_login . '</strong>'
+                    ) .
+                    ' <a href="' . wp_lostpassword_url() . '">' .
+                    __( 'Lost your password?' ) .
+                    '</a>'
+                );
+            }
+        }
+    }
+
+    return false;
+}
+
+//add_filter('wp_authenticate_user', 'gf_check_if_user_is_migrated', 10, 2);
 
