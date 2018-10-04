@@ -35,36 +35,44 @@
                     <div class="row">
                         <ul class="col-md d-flex gf-justify justify-content-center mt-3 px-4">
                             <li>
-                                <img src="<?= $theme_dir ?>/assets/images/footer_card_3.png" alt="Visa">
+                                <img src="<?= $theme_dir ?>/assets/images/footer_card_3.png" alt="Visa" width="66"
+                                     height="40">
                             </li>
                             <li>
-                                <img src="<?= $theme_dir ?>/assets/images/footer_card_4.png" alt="mastercard">
+                                <img src="<?= $theme_dir ?>/assets/images/footer_card_4.png" alt="mastercard" width="62"
+                                     height="40">
                             </li>
                             <li>
-                                <img src="<?= $theme_dir ?>/assets/images/footer_card_5.png" alt="maestrocard">
+                                <img src="<?= $theme_dir ?>/assets/images/footer_card_5.png" alt="maestrocard"
+                                     width="62" height="40">
                             </li>
                             <li>
-                                <img src="<?= $theme_dir ?>/assets/images/footer_card_6.png" alt="American Express">
+                                <img src="<?= $theme_dir ?>/assets/images/footer_card_6.png" alt="American Express"
+                                     width="40" height="40">
                             </li>
                         </ul>
-                        <ul class="col d-flex justify-content-center mt-3 px-4">
-                            <li>
-                                <a href="https://www.visa.ca/en_CA/run-your-business/merchant-resources/verified-by-visa.html">
-                                    <img src="<?= $theme_dir ?>/assets/images/footer_card_1.png" alt="Verified by Visa">
-                                </a>
-                            </li>
-                            <li>
-                                <a href="https://www.mastercard.us/en-us/merchants/safety-security/securecode.html">
-                                    <img src="<?= $theme_dir ?>/assets/images/footer_card_2.png"
-                                         alt="MasterCard SecureCode">
-                                </a>
-                            </li>
-                            <li>
-                                <a href="http://www.bancaintesa.rs/pocetna.1.html">
-                                    <img src="<?= $theme_dir ?>/assets/images/footer_card_7.jpg" alt="Banca Intesa">
-                                </a>
-                            </li>
-                        </ul>
+                        <div class="col d-flex justify-content-center mt-3 px-4">
+                            <div class="row">
+                                <div class="col-md col-sm col-xs text-center">
+                                    <a href="https://www.visa.ca/en_CA/run-your-business/merchant-resources/verified-by-visa.html">
+                                        <img src="<?= $theme_dir ?>/assets/images/footer_card_1.png" alt="Verified by Visa"
+                                             width="68" height="40">
+                                    </a>
+
+
+                                    <a href="https://www.mastercard.us/en-us/merchants/safety-security/securecode.html">
+                                        <img src="<?= $theme_dir ?>/assets/images/footer_card_2.png" alt="MasterCard SecureCode"
+                                             width="75" height="40">
+                                    </a>
+                                </div>
+                                <div class="col-md col-sm col-xs  text-center">
+                                    <a href="http://www.bancaintesa.rs/pocetna.1.html">
+                                        <img src="<?= $theme_dir ?>/assets/images/footer_card_7.jpg" alt="Banca Intesa"
+                                             width="267" height="40">
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -76,23 +84,43 @@
 <!-- #page -->
 <?php wp_footer(); ?>
 <script type="text/javascript">
-/*
-    // Add a script element as a child of the body
-    function downloadJSAtOnload() {
-        var element = document.createElement("script");
-        element.src = "deferredfunctions.js";
-        document.body.appendChild(element);
-    }
+    /*
+        // Add a script element as a child of the body
+        function downloadJSAtOnload() {
+            var element = document.createElement("script");
+            element.src = "deferredfunctions.js";
+            document.body.appendChild(element);
+        }
 
-    // Check for browser support of event handling capability
-    if (window.addEventListener)
-        window.addEventListener("load", downloadJSAtOnload, false);
-    else if (window.attachEvent)
-        window.attachEvent("onload", downloadJSAtOnload);
-    else window.onload = downloadJSAtOnload;
-*/
+        // Check for browser support of event handling capability
+        if (window.addEventListener)
+            window.addEventListener("load", downloadJSAtOnload, false);
+        else if (window.attachEvent)
+            window.attachEvent("onload", downloadJSAtOnload);
+        else window.onload = downloadJSAtOnload;
+    */
 </script>
-<!-- Facebook Pixel Code --> <script> !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod? n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n; n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0; t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window, document,'script','https://connect.facebook.net/en_US/fbevents.js'); fbq('init', '125798604755023'); // Insert your pixel ID here. fbq('track', 'PageView'); </script> <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=125798604755023&ev=PageView&noscript=1" /></noscript> <!-- DO NOT MODIFY --> <!-- End Facebook Pixel Code -->
+<!-- Facebook Pixel Code -->
+<script> !function (f, b, e, v, n, t, s) {
+        if (f.fbq) return;
+        n = f.fbq = function () {
+            n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+        };
+        if (!f._fbq) f._fbq = n;
+        n.push = n;
+        n.loaded = !0;
+        n.version = '2.0';
+        n.queue = [];
+        t = b.createElement(e);
+        t.async = !0;
+        t.src = v;
+        s = b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t, s)
+    }(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '125798604755023'); // Insert your pixel ID here. fbq('track', 'PageView'); </script>
+<noscript><img height="1" width="1" style="display:none"
+               src="https://www.facebook.com/tr?id=125798604755023&ev=PageView&noscript=1"/>
+</noscript> <!-- DO NOT MODIFY --> <!-- End Facebook Pixel Code -->
 </body>
 </html>
 
