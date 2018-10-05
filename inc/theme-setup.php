@@ -88,12 +88,6 @@ add_theme_support( 'html5',array(
     ) );
 }
 
-function remove_stubborn_css() {
-    wp_dequeue_style('newsletter');
-    wp_deregister_style('newsletter');
-}
-//add_action('wp_print_styles', 'remove_stubborn_css', 99999);
-
 function remove_stubborn_js() {
     wp_dequeue_script('cookie');
     wp_deregister_script('cookie');
@@ -105,6 +99,8 @@ function remove_stubborn_js() {
 add_action('wp_enqueue_scripts', 'gf_theme_and_plugins_frontend_scripts_and_styles');
 function gf_theme_and_plugins_frontend_scripts_and_styles()
 {
+    wp_enqueue_style('font-awesome', 'https://use.fontawesome.com/releases/v5.1.1/css/all.css');
+
     wp_enqueue_script('jquery', '', [], false, true);
     wp_enqueue_script('bootstrap-js', 'https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js', array(), '', 'true');
     wp_enqueue_script('bootstrap-popper', 'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js', array(), '', 'true');
@@ -142,10 +138,11 @@ function gf_add_theme_and_plugins_backend_scripts_and_styles() {
 }
 
 //add_action('wp_enqueue_style', 'merge_all_styles', 999 );
+add_action('wp_print_styles', 'merge_all_styles', 99999);
 function merge_all_styles() {
     global $wp_styles;
 
-    die('*****');
+//    die('*****');
 
     /**
         #1. Reorder the handles based on its dependency,
@@ -156,6 +153,9 @@ function merge_all_styles() {
     $merged_script	= '';
     $httpClient = new GuzzleHttp\Client();
     foreach($wp_styles->to_do as $handle) {
+        if (in_array($handle, ['font-awesome'])) {
+            continue;
+        }
         // Clean up url
         $src = strtok($wp_styles->registered[$handle]->src, '?');
         $merged_script .= PHP_EOL .'/** '. $handle .' */'. PHP_EOL;
@@ -166,7 +166,7 @@ function merge_all_styles() {
             if (strpos($src, $site_url) !== false) {
                 $js_file_path = str_replace($site_url, '', $src);
                 if (file_exists(ABSPATH . $js_file_path)) {
-                    $merged_script .= PHP_EOL . file_get_contents(ABSPATH .'..'. $js_file_path) . ';' . PHP_EOL;
+                    $merged_script .= PHP_EOL . file_get_contents(ABSPATH .'..'. $js_file_path) . PHP_EOL;
                 } else {
                     throw new \Exception('file not found. ' . $js_file_path);
                 }
@@ -178,11 +178,13 @@ function merge_all_styles() {
         } else {
             $js_file_path = ltrim($src, '/');
             if (file_exists(ABSPATH . $js_file_path)) {
-                $merged_script .= PHP_EOL . file_get_contents(ABSPATH . $js_file_path) . ';' . PHP_EOL;
+                $merged_script .= PHP_EOL . file_get_contents(ABSPATH . $js_file_path) . PHP_EOL;
             } else {
                 throw new \Exception('file not found. ' . $js_file_path);
             }
         }
+        wp_dequeue_style($handle);
+        wp_deregister_style($handle);
     }
 //    var_dump('****');
 //    die();
@@ -191,8 +193,8 @@ function merge_all_styles() {
     // try enqueuing earlier ?
     wp_enqueue_style('merged-styles',  get_stylesheet_directory_uri() . '/../../uploads/compiled.css');
     foreach($wp_styles->to_do as $handle) {
-        wp_dequeue_style($handle);
-//        wp_deregister_script($handle);
+//        wp_dequeue_style($handle);
+//        wp_deregister_style($handle);
     }
 }
 
