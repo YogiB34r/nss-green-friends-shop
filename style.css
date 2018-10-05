@@ -3031,3 +3031,12 @@ p.woocommerce-thankyou-order-received {
 .gf-image-banners{
     margin: 0;
 }
+.fa-user {
+    padding: 0;
+}
+.gf-category-mobile-toggle .fa-bars {
+    margin-right: 3px;
+}
+.gf-search-icon .fa-search{
+    margin-right: 20px;
+}

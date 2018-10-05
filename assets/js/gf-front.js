@@ -209,6 +209,7 @@ jQuery(document).ready(function () {
     jQuery(document).mouseup(function (e) {
         var category_list_accordion = jQuery('.gf-category-accordion');
         var category_list_toggle = jQuery('.gf-category-mobile-toggle');
+        var category_list_toogle_hamburger_icon = jQuery('.gf-category-mobile-toggle');
 
         if (category_list_toggle.is(e.target)) {
             category_list_accordion.slideToggle();
