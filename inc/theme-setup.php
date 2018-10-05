@@ -158,11 +158,12 @@ function merge_all_styles() {
         }
         // Clean up url
         $src = strtok($wp_styles->registered[$handle]->src, '?');
+        $js_file_path = $src;
         $merged_script .= PHP_EOL .'/** '. $handle .' */'. PHP_EOL;
-        if (strpos($src, 'http') !== false) {
+        if (strpos($src, 'http') !== false || strpos($src, '//') !== false) {
             $site_url = site_url();
-            $js_file_path = $src;
-            $js_file_path = ltrim($js_file_path, '/');
+
+//            $js_file_path = ltrim($js_file_path, '/');
             if (strpos($src, $site_url) !== false) {
                 $js_file_path = str_replace($site_url, '', $src);
                 if (file_exists(ABSPATH . $js_file_path)) {
@@ -176,7 +177,7 @@ function merge_all_styles() {
             }
 //            $js_file_path = ltrim($js_file_path, '/');
         } else {
-            $js_file_path = ltrim($src, '/');
+//            $js_file_path = ltrim($src, '/');
             if (file_exists(ABSPATH . $js_file_path)) {
                 $merged_script .= PHP_EOL . file_get_contents(ABSPATH . $js_file_path) . PHP_EOL;
             } else {
