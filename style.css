@@ -3098,3 +3098,4 @@ p.woocommerce-thankyou-order-received {
     float: left;
     width: 48%;
 }
+#grid em, #list em { display: none;}
