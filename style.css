@@ -2236,8 +2236,9 @@ a#cn-more-info {
 
 /*GF BANNER WIDGET*/
 .gf-image-banners__item {
-    padding: 5px;
+    padding: 0px 5px;
     margin: 10px 0 0;
+    margin-top: 0px;
 }
 
 .gf-image-banners__item img {
