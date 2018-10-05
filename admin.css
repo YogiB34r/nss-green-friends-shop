@@ -15,7 +15,9 @@
     margin-top: 10px;
     border-bottom: 1px solid #eeeeee;
 }
-
+.gf-image-preview-wrapper img {
+    width: 100%;
+}
 /*GF PRODUCT SLIDER*/
 .gf-product-slider-wrapper input{
     margin-bottom: 12px;

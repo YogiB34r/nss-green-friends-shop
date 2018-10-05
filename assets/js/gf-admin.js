@@ -42,6 +42,7 @@ jQuery(document).ready(function ($) {
     $('#gf-homepage-row-1').on('click', '.gf-upload-image-3', function (e) {
         clickHandler(e, $('.image_3_value'), $('#widget-41_gf_image_slider_widget-5 input[name="savewidget"]'));
     });
+    //remove image
     $('#gf-homepage-row-1').on('click', '#gf-remove-image-1', function () {
         if (confirm("Da li ste sigurni da želite da obrišete sliku ?")) {
             $('.image_1_value').val('');
@@ -62,7 +63,9 @@ jQuery(document).ready(function ($) {
     });
 
 
-//GF - image banners
+
+//GF - image banners *************************
+
     $('#gf-homepage-row-1').on('click', '.gf-upload-banner-image-1', function (e) {
         clickHandler(e, $('.image_banner_1_value'), $('#widget-gf_image_banners_widget-2-savewidget'));
     });
@@ -74,6 +77,49 @@ jQuery(document).ready(function ($) {
     });
     $('#gf-homepage-row-1').on('click', '.gf-upload-banner-image-4', function (e) {
         clickHandler(e, $('.image_banner_4_value'), $('#widget-gf_image_banners_widget-2-savewidget'));
+    });
+    $('#gf-homepage-row-1').on('click', '.gf-upload-banner-image-5', function (e) {
+        clickHandler(e, $('.image_banner_5_value'), $('#widget-gf_image_banners_widget-2-savewidget'));
+    });
+    $('#gf-homepage-row-1').on('click', '.gf-upload-banner-image-6', function (e) {
+        clickHandler(e, $('.image_banner_6_value'), $('#widget-gf_image_banners_widget-2-savewidget'));
+    });
+    //remove image
+    $('#gf-homepage-row-1').on('click', '#gf-remove-image-banner-1', function () {
+        if (confirm("Da li ste sigurni da želite da obrišete sliku ?")) {
+            $('.image_banner_1_value').val('');
+            $('#widget-gf_image_banners_widget-2-savewidget').click();
+        }
+    });
+    $('#gf-homepage-row-1').on('click', '#gf-remove-image-banner-2', function () {
+        if (confirm("Da li ste sigurni da želite da obrišete sliku ?")) {
+            $('.image_banner_2_value').val('');
+            $('#widget-gf_image_banners_widget-2-savewidget').click();
+        }
+    });
+    $('#gf-homepage-row-1').on('click', '#gf-remove-image-banner-3', function () {
+        if (confirm("Da li ste sigurni da želite da obrišete sliku ?")) {
+            $('.image_banner_3_value').val('');
+            $('#widget-gf_image_banners_widget-2-savewidget').click();
+        }
+    });
+    $('#gf-homepage-row-1').on('click', '#gf-remove-image-banner-4', function () {
+        if (confirm("Da li ste sigurni da želite da obrišete sliku ?")) {
+            $('.image_banner_4_value').val('');
+            $('#widget-gf_image_banners_widget-2-savewidget').click();
+        }
+    });
+    $('#gf-homepage-row-1').on('click', '#gf-remove-image-banner-5', function () {
+        if (confirm("Da li ste sigurni da želite da obrišete sliku ?")) {
+            $('.image_banner_5_value').val('');
+            $('#widget-gf_image_banners_widget-2-savewidget').click();
+        }
+    });
+    $('#gf-homepage-row-1').on('click', '#gf-remove-image-banner-6', function () {
+        if (confirm("Da li ste sigurni da želite da obrišete sliku ?")) {
+            $('.image_banner_6_value').val('');
+            $('#widget-gf_image_banners_widget-2-savewidget').click();
+        }
     });
 
 
