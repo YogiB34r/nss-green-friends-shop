@@ -4,23 +4,18 @@ function gf_register_sidebars() {
     $theme= wp_get_theme();
     $my_sidebars = array(
         array(
-            'name'          => __('Header row 1', ''.$theme->get('TextDomain').''),
+            'name'          => __('Header Text/Registracija/Prijava', ''.$theme->get('TextDomain').''),
             'id'            => 'gf-header-row-1',
             'description'   => '',
         ),
         array(
-            'name'          => __('Header row 2 col 1', ''.$theme->get('TextDomain').''),
+            'name'          => __('Header Logo', ''.$theme->get('TextDomain').''),
             'id'            => 'gf-header-row-2-col-1',
             'description'   => '',
         ),
         array(
-            'name'          => __('Header row 2 col 2', ''.$theme->get('TextDomain').''),
+            'name'          => __('Header Search form (desktop)', ''.$theme->get('TextDomain').''),
             'id'            => 'gf-header-row-2-col-2',
-            'description'   => '',
-        ),
-        array(
-            'name'          => __('Header row 2 col 3', ''.$theme->get('TextDomain').''),
-            'id'            => 'gf-header-row-2-col-3',
             'description'   => '',
         ),
         array(
@@ -29,33 +24,47 @@ function gf_register_sidebars() {
             'description'   => '',
         ),
         array(
-            'name'          => __('Homepage row 1', ''.$theme->get('TextDomain').''),
+            'name'          => __('Header cart/account/mobile navigation', ''.$theme->get('TextDomain').''),
+            'id'            => 'gf-header-row-2-col-3',
+            'description'   => '',
+        ),
+        array(
+            'name'          => __('Home images slider/banners(desktop)', ''.$theme->get('TextDomain').''),
             'id'            => 'gf-homepage-row-1',
             'description'   => '',
         ),
         array(
-            'name'          => __('Homepage row 2', ''.$theme->get('TextDomain').''),
-            'id'            => 'gf-homepage-row-2',
+            'name'          => __('Home images slider/banners(mobile)', ''.$theme->get('TextDomain').''),
+            'id'            => 'gf-homepage-row-1-mobile',
             'description'   => '',
-
         ),
         array(
-            'name'          => __('Footer row 1 column 1', ''.$theme->get('TextDomain').''),
+            'name'          => __('Homepage product sliders', ''.$theme->get('TextDomain').''),
+            'id'            => 'gf-homepage-row-2',
+            'description'   => '',
+        ),
+        array(
+            'name'          => __('Homepage product sliders (mobile)', ''.$theme->get('TextDomain').''),
+            'id'            => 'gf-homepage-row-3',
+            'description'   => '',
+        ),
+        array(
+            'name'          => __('Footer Newsletter', ''.$theme->get('TextDomain').''),
             'id'            => 'gf-footer-row-1-column-1',
             'description'   => 'First footer row column 1',
         ),
         array(
-            'name'          => __('Footer row 1 column 2', ''.$theme->get('TextDomain').''),
+            'name'          => __('Footer O kompaniji', ''.$theme->get('TextDomain').''),
             'id'            => 'gf-footer-row-1-column-2',
             'description'   => 'First footer row column 2',
         ),
         array(
-            'name'          => __('Footer row 1 column 3', ''.$theme->get('TextDomain').''),
+            'name'          => __('Footer Podrška', ''.$theme->get('TextDomain').''),
             'id'            => 'gf-footer-row-1-column-3',
             'description'   => 'First footer row column 3',
         ),
         array(
-            'name'          => __('Footer row 1 column 4', ''.$theme->get('TextDomain').''),
+            'name'          => __('Footer Uslovi korišćenja', ''.$theme->get('TextDomain').''),
             'id'            => 'gf-footer-row-1-column-4',
             'description'   => 'First footer row column 4',
         ),
@@ -70,7 +79,7 @@ function gf_register_sidebars() {
             'description'   => 'Second footer row column 2',
         ),
         array(
-            'name'          => __('Footer row 3 column 1', ''.$theme->get('TextDomain').''),
+            'name'          => __('Footer Cards Images', ''.$theme->get('TextDomain').''),
             'id'            => 'gf-footer-row-3-column-1',
             'description'   => 'Third footer row column 1',
         ),

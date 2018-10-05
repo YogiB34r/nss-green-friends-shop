@@ -2019,9 +2019,7 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title {
         overflow-x: hidden;
     }
 
-    .widget_gf_image_banners_widget {
-        display: block;
-    }
+
 
     body.home .widget_gf_newsletter_widget {
         display: none;
@@ -3063,4 +3061,30 @@ p.woocommerce-thankyou-order-received {
     overflow: hidden;
     margin: 0;
     padding: 0;
+}
+
+
+.gf-product-sliders-mobile-version{
+    display: none;
+}
+.gf-image-slider-banners-mobile{
+    display: none;
+}
+@media only screen and (max-width: 767px){
+    .gf-product-sliders-desktop-version{
+        display: none;
+    }
+    .gf-product-sliders-mobile-version{
+        display: block;
+    }
+
+    .gf-image-slider-banners-desktop{
+        display: none;
+    }
+    .gf-image-slider-banners-mobile{
+        display: block;
+    }
+    .widget_gf_image_banners_widget {
+        display: block;
+    }
 }
