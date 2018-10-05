@@ -110,9 +110,15 @@ function gf_theme_and_plugins_frontend_scripts_and_styles()
 //    wp_enqueue_script('gf-ajax', get_stylesheet_directory_uri() . '/assets/js/ajax.js');
 
     wp_enqueue_style('bootstrap 4.1', 'https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css');
+    wp_enqueue_style('woocommerce-layout');
+    wp_enqueue_style('woocommerce-smallscreen');
+    wp_enqueue_style('woocommerce-general');
     wp_enqueue_style('gf-style-reset', get_stylesheet_directory_uri() . '/assets/css/reset.css');
 //    wp_enqueue_style('gf-style-compiled', get_stylesheet_directory_uri() . '/assets/css/compiled.css');
-    wp_enqueue_style('gf-style', get_stylesheet_directory_uri() . '/style.css');
+    wp_enqueue_style('gf-style', get_stylesheet_directory_uri() . '/style.css', ['woocommerce-layout']);
+
+    wp_enqueue_style( 'grid-list-layout', plugins_url( '/woocommerce-grid-list-toggle/assets/css/style.css'));
+    wp_enqueue_style( 'grid-list-button', plugins_url( '/woocommerce-grid-list-toggle/assets/css/button.css'));
 
 //    wp_dequeue_style('searchandfilter');
 //    wp_deregister_style('searchandfilter');
