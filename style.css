@@ -130,7 +130,7 @@ img.gf-header-logo {
 }
 
 .gf-category-mobile-toggle {
-    margin-right: 20px;
+    margin-left: 20px;
     font-weight: 600;
 }
 
@@ -145,7 +145,7 @@ img.gf-header-logo {
     left: 0;
     overflow: scroll;
     padding: 10px;
-    padding-top: 50px;
+    padding-top: 10px;
     z-index: 1000;
     background: #fff;
     width: 65%;
@@ -158,7 +158,7 @@ img.gf-header-logo {
     margin: 0;
     padding: 10px 0;
     display: none;
-    border-bottom: #666;
+    border-bottom: 1px solid #eee;
     padding-left: 0.9em;
     width: 100%;
     font-size: 0.8rem;
@@ -224,11 +224,11 @@ img.gf-header-logo {
     display: none;
 }
 
-@media only screen and (max-width: 767px){
-    .mobile-search{
-        display: block;
-    }
-}
+/*@media only screen and (max-width: 767px){*/
+    /*.mobile-search{*/
+        /*display: block;*/
+    /*}*/
+/*}*/
 
 .gf-search-form--mobile {
     text-align: center;
@@ -1891,6 +1891,7 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title {
 
     .gf-search-form--mobile {
         display: flex;
+        padding: 0px 10px;
     }
 
     .gf-search-form--mobile .search-field {
@@ -1898,7 +1899,7 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title {
         color: #1d1d1d;
         background: #f6f6f6;
         text-align: left;
-        border-radius: 0px;
+        border-radius: 15px;
         border: 2px solid #e2e2e2;
         padding: 13px 14px;
         font-size: 14px;
@@ -2236,8 +2237,9 @@ a#cn-more-info {
 
 /*GF BANNER WIDGET*/
 .gf-image-banners__item {
-    padding: 5px;
+    padding: 0px 5px;
     margin: 10px 0 0;
+    margin-top: 0px;
 }
 
 .gf-image-banners__item img {
@@ -3004,9 +3006,9 @@ ul.products.list li.product h3, ul.products.list li.product .woocommerce-product
     text-align: center;
     width: auto;
 }
-/*.my-footer-images img {*/
-    /*max-width: 100% !important;*/
-/*}*/
+.my-footer-images img {
+    max-width: unset !important;
+}
 
 p.woocommerce-thankyou-order-received {
     font-weight: bold;
@@ -3019,4 +3021,39 @@ p.woocommerce-thankyou-order-received {
 }
 #billing_company_field{
     display: none;
+}
+
+.gf-image-banners-wider{
+    padding: 10px 20px;
+}
+.gf-image-banners-wider img {
+    width: 100%;
+}
+.gf-image-banners{
+    margin: 0;
+}
+.gf-search-icon{
+    display: none;
+}
+@media only screen and (max-width: 767px){
+    .fa-user{
+        padding: 0;
+    }
+    .gf-search-icon{
+        display: block;
+    }
+    #carouselExample{
+        margin-top: 10px;
+    }
+    .site-header{
+        position: fixed;
+    }
+    .site-content{
+        padding-top: 80px;
+    }
+}
+
+
+.gf-search-icon .fa-search{
+    margin-right: 20px;
 }

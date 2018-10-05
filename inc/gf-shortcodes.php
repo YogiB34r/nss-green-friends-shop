@@ -106,7 +106,8 @@ add_shortcode('gf-mobile-nav-menu', 'gf_mobile_nav_menu_shortcode');
 function gf_mobile_nav_menu_shortcode()
 {
 //    if (wp_is_mobile()) {
-        echo '<div class="gf-hamburger-menu"><i class="fas fa-bars"></i></div>';
+        echo '<div class="gf-search-icon" id="my-search-icon-toggle"><i class="fas fa-search"></i></div>';
+        echo '<div class="gf-hamburger-menu"><i class="fas fa-user"></i></div>';
 
         echo '<div class="gf-mobile-menu">';
         global $woocommerce ?>
@@ -155,7 +156,7 @@ function gf_mobile_nav_menu_shortcode()
             <div class="search-input-wrapper">
                 <input type="search" class="search-field gf-search-box" placeholder="<?php echo esc_attr_x('Search &hellip;', '') ?>"
                        value="<?php echo get_search_query() ?>" name="s"/>
-                <button type="submit" class="search-submit"><i class="fa fa-search"></i></button>
+<!--                <button type="submit" class="search-submit"><i class="fa fa-search"></i></button>-->
                 <div class="gf-autocomplete-results suggesstion-box"></div>
             </div>
         </form>
