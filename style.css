@@ -3053,7 +3053,14 @@ p.woocommerce-thankyou-order-received {
     }
 }
 
-
 .gf-search-icon .fa-search{
     margin-right: 20px;
+}
+
+.slick-list {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
 }
