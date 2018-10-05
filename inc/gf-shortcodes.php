@@ -106,7 +106,7 @@ add_shortcode('gf-mobile-nav-menu', 'gf_mobile_nav_menu_shortcode');
 function gf_mobile_nav_menu_shortcode()
 {
 //    if (wp_is_mobile()) {
-        echo '<div class="gf-search-icon"><i class="fas fa-search"></i></div>';
+        echo '<div class="gf-search-icon" id="my-search-icon-toggle"><i class="fas fa-search"></i></div>';
         echo '<div class="gf-hamburger-menu"><i class="fas fa-user"></i></div>';
 
         echo '<div class="gf-mobile-menu">';
