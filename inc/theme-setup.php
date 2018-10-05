@@ -105,7 +105,7 @@ function gf_theme_and_plugins_frontend_scripts_and_styles()
     wp_enqueue_script('bootstrap-js', 'https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js', array(), '', 'true');
     wp_enqueue_script('bootstrap-popper', 'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js', array(), '', 'true');
     wp_enqueue_script('clamp', get_stylesheet_directory_uri() . '/assets/js/3rd-party/clamp.min.js');
-    wp_enqueue_script('jQuery-ui', 'https://code.jquery.com/ui/1.12.1/jquery-ui.min.js');
+//    wp_enqueue_script('jQuery-ui', 'https://code.jquery.com/ui/1.12.1/jquery-ui.min.js');
     wp_enqueue_script('cookie', get_stylesheet_directory_uri() . '/assets/js/jquery.cookie.js');
 //    wp_enqueue_script('gf-ajax', get_stylesheet_directory_uri() . '/assets/js/ajax.js');
 
@@ -114,17 +114,10 @@ function gf_theme_and_plugins_frontend_scripts_and_styles()
     wp_enqueue_style('woocommerce-smallscreen');
     wp_enqueue_style('woocommerce-general');
     wp_enqueue_style('gf-style-reset', get_stylesheet_directory_uri() . '/assets/css/reset.css');
-//    wp_enqueue_style('gf-style-compiled', get_stylesheet_directory_uri() . '/assets/css/compiled.css');
     wp_enqueue_style('gf-style', get_stylesheet_directory_uri() . '/style.css', ['woocommerce-layout']);
 
     wp_enqueue_style( 'grid-list-layout', plugins_url( '/woocommerce-grid-list-toggle/assets/css/style.css'));
     wp_enqueue_style( 'grid-list-button', plugins_url( '/woocommerce-grid-list-toggle/assets/css/button.css'));
-
-//    wp_dequeue_style('searchandfilter');
-//    wp_deregister_style('searchandfilter');
-//    wp_dequeue_style('to-top');
-//    wp_deregister_style('to-top');
-
 
 //    wp_dequeue_script('jquery');
 //    wp_deregister_script('jquery');
@@ -132,6 +125,8 @@ function gf_theme_and_plugins_frontend_scripts_and_styles()
 //    wp_deregister_script('jquery-core');
 //    wp_dequeue_script('jquery-migrate');
 //    wp_deregister_script('jquery-migrate');
+    wp_enqueue_script('grid-list-scripts', plugins_url( '/woocommerce-grid-list-toggle/assets/js/jquery.gridlistview.min.js'), ['jquery-ui-tabs']);
+
 
     wp_enqueue_script('gf-front-js', get_stylesheet_directory_uri() . '/assets/js/gf-front.js', [], '', true);
     //required in order for ajax to work !?
@@ -143,13 +138,16 @@ function gf_add_theme_and_plugins_backend_scripts_and_styles() {
     wp_enqueue_style('gf-admin-style', get_stylesheet_directory_uri() . '/admin.css');
 }
 
-//add_action('wp_enqueue_style', 'merge_all_styles', 999 );
-add_action('wp_print_styles', 'merge_all_styles', 99999);
+$userData = get_userdata(get_current_user_id());
+if ($userData && in_array('administrator', $userData->roles)) {
+
+} else {
+    add_action('wp_print_styles', 'merge_all_styles', 999999);
+    add_action('wp_enqueue_scripts', 'merge_all_scripts', 999999);
+}
+
 function merge_all_styles() {
     global $wp_styles;
-
-//    die('*****');
-
     /**
         #1. Reorder the handles based on its dependency,
             The result will be saved in the to_do property ($wp_scripts->to_do)
@@ -168,8 +166,6 @@ function merge_all_styles() {
         $merged_script .= PHP_EOL .'/** '. $handle .' */'. PHP_EOL;
         if (strpos($src, 'http') !== false || strpos($src, '//') !== false) {
             $site_url = site_url();
-
-//            $js_file_path = ltrim($js_file_path, '/');
             if (strpos($src, $site_url) !== false) {
                 $js_file_path = str_replace($site_url, '', $src);
                 if (file_exists(ABSPATH . $js_file_path)) {
@@ -181,9 +177,7 @@ function merge_all_styles() {
                 $response = $httpClient->send(new \GuzzleHttp\Psr7\Request('GET', $js_file_path));
                 $merged_script .= PHP_EOL . $response->getBody()->getContents() . PHP_EOL;
             }
-//            $js_file_path = ltrim($js_file_path, '/');
         } else {
-//            $js_file_path = ltrim($src, '/');
             if (file_exists(ABSPATH . $js_file_path)) {
                 $merged_script .= PHP_EOL . file_get_contents(ABSPATH . $js_file_path) . PHP_EOL;
             } else {
@@ -193,19 +187,11 @@ function merge_all_styles() {
         wp_dequeue_style($handle);
         wp_deregister_style($handle);
     }
-//    var_dump('****');
-//    die();
 
     file_put_contents($merged_file_location , $merged_script);
-    // try enqueuing earlier ?
-    wp_enqueue_style('merged-styles',  get_stylesheet_directory_uri() . '/../../uploads/compiled.css');
-    foreach($wp_styles->to_do as $handle) {
-//        wp_dequeue_style($handle);
-//        wp_deregister_style($handle);
-    }
+    wp_enqueue_style('merged-styles',  get_stylesheet_directory_uri() . '/../../uploads/compiled.css', [], '1');
 }
 
-//add_action( 'wp_enqueue_scripts', 'merge_all_scripts', 9999 );
 function merge_all_scripts() {
     global $wp_scripts, $wc_queued_js;
 
@@ -214,33 +200,29 @@ function merge_all_scripts() {
             The result will be saved in the to_do property ($wp_scripts->to_do)
     */
     $wp_scripts->all_deps($wp_scripts->queue);
-    $merged_file_location = ABSPATH . '/wp-content/uploads/merged-script.js';
+    $targetFile = "uploads/compiled.js";
+    $merged_file_location = ABSPATH . '/wp-content/' . $targetFile;
     $merged_script	= '';
-
     $httpClient = new GuzzleHttp\Client();
+    $ignoredScripts = [
+        'jquery-ui-core', 'jquery-core', 'admin-bar', 'query-monitor', 'jquery-ui-widget', 'wc-add-to-cart',
+        'wp-util', 'wc-add-to-cart-variation', 'jquery', 'wc-single-product'
+    ];
 
     // Loop javascript files and save to $merged_script variable
     foreach( $wp_scripts->to_do as $handle) {
+
+        if (in_array($handle, $ignoredScripts)) {
+            continue;
+        }
         // Clean up url
         $src = strtok($wp_scripts->registered[$handle]->src, '?');
         $merged_script .= PHP_EOL .'/** '. $handle .' */'. PHP_EOL;
 
-        // If src is url http / https
         if (strpos($src, 'http') !== false) {
             $site_url = site_url();
 
-            /*
-                If we are on local server, then change url to relative path,
-                e.g. http://webdevzoom.com/wordpress/wp-content/plugins/wpnewsman/css/menuicon.css
-                become: /wp-content/plugins/wpnewsman/css/menuicon.css,
-                this is for reduse the HTTP Request
-
-                if not, e.g. https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css,
-                then leave as is (we'll skip it)
-            */
             $js_file_path = $src;
-            $js_file_path = ltrim($js_file_path, '/');
-
             if (strpos($src, $site_url) !== false) {
                 $js_file_path = str_replace($site_url, '', $src);
                 // Check for wp_localize_script
@@ -257,9 +239,6 @@ function merge_all_scripts() {
                 $response = $httpClient->send(new \GuzzleHttp\Psr7\Request('GET', $js_file_path));
                 $merged_script .= PHP_EOL . $response->getBody()->getContents() . PHP_EOL;
             }
-
-//            $js_file_path = ltrim($js_file_path, '/');
-
         } else {
             $js_file_path = ltrim($src, '/');
             // Check for wp_localize_script
@@ -274,32 +253,27 @@ function merge_all_scripts() {
             }
 
         }
+        wp_dequeue_script($handle);
+        wp_deregister_script($handle);
     }
-//    wc_print_js();
-//    var_dump('****');
-//    die();
     $merged_script .= $wc_queued_js . PHP_EOL;
     $wc_queued_js = '';
 
     file_put_contents ($merged_file_location , $merged_script);
     // try enqueuing earlier ?
-    wp_enqueue_script('merged-script',  get_stylesheet_directory_uri() . '/../../uploads/merged-script.js');
-    foreach( $wp_scripts->to_do as $handle ) {
-        wp_dequeue_script($handle);
-//        wp_deregister_script($handle);
-    }
+    wp_enqueue_script('merged-script',  get_stylesheet_directory_uri() . '/../../' . $targetFile);
 }
 
 function add_async_attribute($tag, $handle) {
-    $scripts_to_defer = array('gf-front-js');
-//    foreach($scripts_to_defer as $defer_script) {
-//        if ($defer_script === $handle) {
+    $scripts_to_defer = array('merged-script');
+    foreach($scripts_to_defer as $defer_script) {
+        if ($defer_script === $handle) {
             return str_replace(' src', ' async="async" src', $tag);
-//        }
-//    }
-//    return $tag;
+        }
+    }
+    return $tag;
 }
-//add_filter('script_loader_tag', 'add_async_attribute', 10, 2);
+add_filter('script_loader_tag', 'add_async_attribute', 10, 2);
 
 add_action('customize_register', 'gf_theme_customizer_setup');
 /**
