@@ -29,15 +29,24 @@ function gf_register_sidebars() {
             'description'   => '',
         ),
         array(
-            'name'          => __('Homepage images slider/banners', ''.$theme->get('TextDomain').''),
+            'name'          => __('Home images slider/banners(desktop)', ''.$theme->get('TextDomain').''),
             'id'            => 'gf-homepage-row-1',
+            'description'   => '',
+        ),
+        array(
+            'name'          => __('Home images slider/banners(mobile)', ''.$theme->get('TextDomain').''),
+            'id'            => 'gf-homepage-row-1-mobile',
             'description'   => '',
         ),
         array(
             'name'          => __('Homepage product sliders', ''.$theme->get('TextDomain').''),
             'id'            => 'gf-homepage-row-2',
             'description'   => '',
-
+        ),
+        array(
+            'name'          => __('Homepage product sliders (mobile)', ''.$theme->get('TextDomain').''),
+            'id'            => 'gf-homepage-row-3',
+            'description'   => '',
         ),
         array(
             'name'          => __('Footer Newsletter', ''.$theme->get('TextDomain').''),
