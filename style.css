@@ -3022,8 +3022,11 @@ p.woocommerce-thankyou-order-received {
 }
 
 .gf-image-banners-wider{
-    padding: 5px;
+    padding: 5px 20px;
 }
 .gf-image-banners-wider img {
     width: 100%;
+}
+.gf-image-banners{
+    margin: 0;
 }
