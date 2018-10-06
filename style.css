@@ -1228,12 +1228,17 @@ body.home .saved-sale {
     font-weight: 400;
 }
 
+#gf-expander-id {
+    transition: max-height 0.6s linear;
+}
+
 .gf-category-expander {
     overflow: hidden;
     border: solid 1px #e2e2e2;
     border-radius: 9px;
     margin: 10px 0 10px;
-    transition: height 0.4s;
+    /*transition: height 0.4s;*/
+
 }
 
 .gf-category-expander__col {

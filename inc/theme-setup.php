@@ -105,9 +105,7 @@ function gf_theme_and_plugins_frontend_scripts_and_styles()
     wp_enqueue_script('bootstrap-js', 'https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js', array(), '', 'true');
     wp_enqueue_script('bootstrap-popper', 'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js', array(), '', 'true');
     wp_enqueue_script('clamp', get_stylesheet_directory_uri() . '/assets/js/3rd-party/clamp.min.js');
-//    wp_enqueue_script('jQuery-ui', 'https://code.jquery.com/ui/1.12.1/jquery-ui.min.js');
     wp_enqueue_script('cookie', get_stylesheet_directory_uri() . '/assets/js/jquery.cookie.js');
-//    wp_enqueue_script('gf-ajax', get_stylesheet_directory_uri() . '/assets/js/ajax.js');
 
     wp_enqueue_style('bootstrap 4.1', 'https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css');
     wp_enqueue_style('woocommerce-layout');
@@ -115,19 +113,10 @@ function gf_theme_and_plugins_frontend_scripts_and_styles()
     wp_enqueue_style('woocommerce-general');
     wp_enqueue_style('gf-style-reset', get_stylesheet_directory_uri() . '/assets/css/reset.css');
     wp_enqueue_style('gf-style', get_stylesheet_directory_uri() . '/style.css', ['woocommerce-layout']);
-
     wp_enqueue_style( 'grid-list-layout', plugins_url( '/woocommerce-grid-list-toggle/assets/css/style.css'));
     wp_enqueue_style( 'grid-list-button', plugins_url( '/woocommerce-grid-list-toggle/assets/css/button.css'));
 
-//    wp_dequeue_script('jquery');
-//    wp_deregister_script('jquery');
-//    wp_dequeue_script('jquery-core');
-//    wp_deregister_script('jquery-core');
-//    wp_dequeue_script('jquery-migrate');
-//    wp_deregister_script('jquery-migrate');
     wp_enqueue_script('grid-list-scripts', plugins_url( '/woocommerce-grid-list-toggle/assets/js/jquery.gridlistview.min.js'), ['jquery-ui-tabs']);
-
-
     wp_enqueue_script('gf-front-js', get_stylesheet_directory_uri() . '/assets/js/gf-front.js', [], '', true);
     //required in order for ajax to work !?
     wp_localize_script( 'gf-front-js', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php')));
@@ -230,7 +219,7 @@ function merge_all_scripts() {
             wp_dequeue_script($handle);
             wp_deregister_script($handle);
         }
-        wp_enqueue_script('merged-styles',  get_stylesheet_directory_uri() . '/../../' . $targetFile, [], $version);
+        wp_enqueue_script('merged-script',  get_stylesheet_directory_uri() . '/../../' . $targetFile, [], $version);
         return;
     }
     $merged_script	= '';
@@ -238,7 +227,6 @@ function merge_all_scripts() {
 
     // Loop javascript files and save to $merged_script variable
     foreach($wp_scripts->to_do as $handle) {
-
         if (in_array($handle, $ignoredScripts)) {
             continue;
         }

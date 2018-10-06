@@ -142,8 +142,7 @@ jQuery(document).ready(function () {
         // jQuery('.gf-category-expander__col').slideToggle();
         jQuery('.gf-expander__subcategory-list').slideToggle();
         jQuery(this).toggleClass('fa-angle-down fa-angle-up');
-    });
-    jQuery('.gf-category-expander__footer .fas ').click(function () {
+
         if (jQuery('#gf-expander-id').hasClass('gf-height-test')) {
             jQuery('#gf-expander-id').removeClass('gf-height-test');
         } else {
