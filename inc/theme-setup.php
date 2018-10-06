@@ -138,6 +138,8 @@ function gf_add_theme_and_plugins_backend_scripts_and_styles() {
     wp_enqueue_style('gf-admin-style', get_stylesheet_directory_uri() . '/admin.css');
 }
 
+// @TODO create option from admin to reset assets
+$compileOverrideActive = false;
 $userData = get_userdata(get_current_user_id());
 if ($userData && in_array('administrator', $userData->roles)) {
 
@@ -147,13 +149,16 @@ if ($userData && in_array('administrator', $userData->roles)) {
 }
 
 function merge_all_styles() {
-    global $wp_styles;
+    global $wp_styles, $compileOverrideActive;
     /**
         #1. Reorder the handles based on its dependency,
             The result will be saved in the to_do property ($wp_scripts->to_do)
     */
     $wp_styles->all_deps($wp_styles->queue);
     $merged_file_location = ABSPATH . '/wp-content/uploads/compiled.css';
+    if (file_exists($merged_file_location) && !$compileOverrideActive) {
+        return;
+    }
     $merged_script	= '';
     $httpClient = new GuzzleHttp\Client();
     foreach($wp_styles->to_do as $handle) {
@@ -188,12 +193,12 @@ function merge_all_styles() {
         wp_deregister_style($handle);
     }
 
-    file_put_contents($merged_file_location , $merged_script);
+    file_put_contents($merged_file_location, str_replace('  ', ' ', $merged_script));
     wp_enqueue_style('merged-styles',  get_stylesheet_directory_uri() . '/../../uploads/compiled.css', [], '1');
 }
 
 function merge_all_scripts() {
-    global $wp_scripts, $wc_queued_js;
+    global $wp_scripts, $wc_queued_js, $compileOverrideActive;
 
     /*
         #1. Reorder the handles based on its dependency,
@@ -202,6 +207,9 @@ function merge_all_scripts() {
     $wp_scripts->all_deps($wp_scripts->queue);
     $targetFile = "uploads/compiled.js";
     $merged_file_location = ABSPATH . '/wp-content/' . $targetFile;
+    if (file_exists($merged_file_location) && !$compileOverrideActive) {
+        return;
+    }
     $merged_script	= '';
     $httpClient = new GuzzleHttp\Client();
     $ignoredScripts = [
@@ -231,7 +239,7 @@ function merge_all_scripts() {
                     $localize =  $wp_scripts->registered[$handle]->extra['data'] . ';';
                 }
                 if (file_exists(ABSPATH . $js_file_path)) {
-                    $merged_script .= PHP_EOL . $localize . file_get_contents(ABSPATH .'..'. $js_file_path) . ';' . PHP_EOL;
+                    $merged_script .= PHP_EOL . $localize . file_get_contents(ABSPATH .'..'. $js_file_path) . PHP_EOL;
                 } else {
                     throw new \Exception('file not found. ' . $js_file_path);
                 }
@@ -247,7 +255,7 @@ function merge_all_scripts() {
                 $localize =  $wp_scripts->registered[$handle]->extra['data'] . ';';
             }
             if (file_exists(ABSPATH . $js_file_path)) {
-                $merged_script .= PHP_EOL . $localize . file_get_contents(ABSPATH . $js_file_path) . ';' . PHP_EOL;
+                $merged_script .= PHP_EOL . $localize . file_get_contents(ABSPATH . $js_file_path) . PHP_EOL;
             } else {
                 throw new \Exception('file not found. ' . $js_file_path);
             }
@@ -259,7 +267,7 @@ function merge_all_scripts() {
     $merged_script .= $wc_queued_js . PHP_EOL;
     $wc_queued_js = '';
 
-    file_put_contents ($merged_file_location , $merged_script);
+    file_put_contents($merged_file_location, str_replace('  ', '', $merged_script));
     // try enqueuing earlier ?
     wp_enqueue_script('merged-script',  get_stylesheet_directory_uri() . '/../../' . $targetFile);
 }
