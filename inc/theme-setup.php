@@ -155,8 +155,18 @@ function merge_all_styles() {
             The result will be saved in the to_do property ($wp_scripts->to_do)
     */
     $wp_styles->all_deps($wp_styles->queue);
-    $merged_file_location = ABSPATH . '/wp-content/uploads/compiled.css';
+    $fileName = "uploads/compiled.css";
+    $version = 1;
+    $merged_file_location = ABSPATH . '/wp-content/' . $fileName;
     if (file_exists($merged_file_location) && !$compileOverrideActive) {
+        foreach($wp_styles->to_do as $handle) {
+            if (in_array($handle, ['font-awesome'])) {
+                continue;
+            }
+            wp_dequeue_style($handle);
+            wp_deregister_style($handle);
+        }
+        wp_enqueue_style('merged-styles',  get_stylesheet_directory_uri() . '/../../' . $fileName, [], $version);
         return;
     }
     $merged_script	= '';
@@ -194,7 +204,7 @@ function merge_all_styles() {
     }
 
     file_put_contents($merged_file_location, str_replace('  ', ' ', $merged_script));
-    wp_enqueue_style('merged-styles',  get_stylesheet_directory_uri() . '/../../uploads/compiled.css', [], '1');
+    wp_enqueue_style('merged-styles',  get_stylesheet_directory_uri() . '/../../' . $fileName, [], $version);
 }
 
 function merge_all_scripts() {
