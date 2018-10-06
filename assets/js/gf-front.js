@@ -160,6 +160,31 @@ jQuery(document).ready(function () {
     });
 
 
+    jQuery('#my-fancy-search').click(function (){
+        if(jQuery('#my-fancy-search').hasClass('fancy-header-icons')){
+            jQuery('#my-fancy-search').removeClass('fancy-header-icons')
+        }else {
+            jQuery('#my-fancy-search').addClass('fancy-header-icons')
+        }
+    });
+    jQuery('#my-fancy-user').click(function (){
+        if(jQuery('#my-fancy-user').hasClass('fancy-header-icons')){
+            jQuery('#my-fancy-user').removeClass('fancy-header-icons')
+        }else {
+            jQuery('#my-fancy-user').addClass('fancy-header-icons')
+        }
+    });
+    jQuery('#gf-bars-icon-toggle').click(function (){
+        if(jQuery('#gf-bars-icon-toggle').hasClass('fancy-header-icons')){
+            jQuery('#gf-bars-icon-toggle').removeClass('fancy-header-icons')
+        }else {
+            jQuery('#gf-bars-icon-toggle').addClass('fancy-header-icons')
+        }
+    });
+
+
+
+
     // jQuery('form.woocommerce-widget-layered-nav-dropdown, .widget_price_filter form').submit(function(e) {
     //   e.preventDefault();
     // });

@@ -133,8 +133,8 @@ $userData = get_userdata(get_current_user_id());
 if ($userData && in_array('administrator', $userData->roles)) {
 
 } else {
-    add_action('wp_print_styles', 'merge_all_styles', 999999);
-    add_action('wp_enqueue_scripts', 'merge_all_scripts', 999999);
+//    add_action('wp_print_styles', 'merge_all_styles', 999999);
+//    add_action('wp_enqueue_scripts', 'merge_all_scripts', 999999);
 }
 
 function merge_all_styles() {
