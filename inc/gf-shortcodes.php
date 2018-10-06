@@ -106,111 +106,110 @@ add_shortcode('gf-mobile-nav-menu', 'gf_mobile_nav_menu_shortcode');
 function gf_mobile_nav_menu_shortcode()
 {
 //    if (wp_is_mobile()) {
-        echo '<div class="gf-search-icon" id="my-search-icon-toggle"><i class="fas fa-search"></i></div>';
-        echo '<div class="gf-hamburger-menu"><i class="fas fa-user"></i></div>';
+    echo '<div class="gf-search-icon" id="my-search-icon-toggle"><i class="fas fa-search"></i></div>';
+    echo '<div class="gf-hamburger-menu"><i class="fas fa-user"></i></div>';
 
-        echo '<div class="gf-mobile-menu">';
-        global $woocommerce ?>
-        <li class="gf-mobile-menu__link">
-            <a class="gf-header-cart" href="<?php echo wc_get_cart_url(); ?>"
-               title="<?php _e('Cart View', 'green-friends'); ?>">
-                Korpa(<?php echo sprintf(_n('%d', '%d', $woocommerce->cart->cart_contents_count, 'woothemes'), $woocommerce->cart->cart_contents_count); ?>
-                )
-            </a>
-        </li>
-        <li class="gf-mobile-menu__link">
-            <?php
-            $myaccount_page = get_option('woocommerce_myaccount_page_id');
-            if ($myaccount_page) {
-                $myaccount_page_url = get_permalink($myaccount_page);
-            }
-            echo '<a href=" ' . $myaccount_page_url . '">' . __('Moj nalog') . '</a>';
-            ?>
-        </li>
-        <li class="gf-mobile-menu__link">
-            <?php
-            $menu_items = wp_get_nav_menu_items('Topbar');
-            foreach ($menu_items as $menu_item) {
-                if (is_user_logged_in() && $menu_item->post_title == 'Log Out') {
-                    echo '<a href="' . $menu_item->url . '">' . $menu_item->post_title . '</a>';
-                }
-                if (!is_user_logged_in() && $menu_item->post_title != 'Log Out') {
-                    echo '<a href="' . $menu_item->url . '">' . $menu_item->post_title . '</a>';
-                }
-            }
-            ?>
-        </li>
+    echo '<div class="gf-mobile-menu">';
+    global $woocommerce ?>
+    <li class="gf-mobile-menu__link">
+        <a class="gf-header-cart" href="<?php echo wc_get_cart_url(); ?>"
+           title="<?php _e('Cart View', 'green-friends'); ?>">
+            Korpa(<?php echo sprintf(_n('%d', '%d', $woocommerce->cart->cart_contents_count, 'woothemes'), $woocommerce->cart->cart_contents_count); ?>
+            )
+        </a>
+    </li>
+    <li class="gf-mobile-menu__link">
         <?php
-        echo '</div>';
-//    }
-    add_shortcode('gf-mobile-search', 'gf_mobile_search_form');
-    function gf_mobile_search_form()
-    {
+        $myaccount_page = get_option('woocommerce_myaccount_page_id');
+        if ($myaccount_page) {
+            $myaccount_page_url = get_permalink($myaccount_page);
+        }
+        echo '<a href=" ' . $myaccount_page_url . '">' . __('Moj nalog') . '</a>';
         ?>
-        <form role="search" method="get" class="gf-search-form--mobile"
-              action="<?php echo esc_url(get_permalink(wc_get_page_id('shop'))) ?>">
-<!--            <div class="search-toggle-wrapper"> ako zatreba treba doraditi-->
-<!--                <div class="gf-search-toggle"><i class="fa fa-search"></i></div>-->
-<!--            </div>-->
-            <span class="screen-reader-text"><?php _x('Search for:', 'label') ?></span>
-            <div class="search-input-wrapper">
-                <input type="search" class="search-field gf-search-box" placeholder="<?php echo esc_attr_x('Search &hellip;', '') ?>"
-                       value="<?php echo get_search_query() ?>" name="s"/>
-<!--                <button type="submit" class="search-submit"><i class="fa fa-search"></i></button>-->
-                <div class="gf-autocomplete-results suggesstion-box"></div>
-            </div>
-        </form>
-        <div class="gf-radio-search-wrapper gf-radio-search-wrapper--mobile">
-        <?php if (get_queried_object() && is_product_category()): ?>
-        <label for="search-checkbox">
-            <input class="search-radio-box" type="radio" name="search-radiobutton" checked="checked" value="category"
-                   hidden>
-            <span><?= get_queried_object()->name ?></span>
-        </label>
-        <span class="search-radio" type="radio" name="search-radiobutton" value="shop" hidden></span>
-        <label for="search-checkbox">
-            <input class="search-radio-box" type="radio" name="search-radiobutton" value="shop" hidden>
-            <span>Pretraga celog sajta</span>
-        </label>
-    <?php endif; ?>
-        </div>
+    </li>
+    <li class="gf-mobile-menu__link">
         <?php
-    }
+        $menu_items = wp_get_nav_menu_items('Topbar');
+        foreach ($menu_items as $menu_item) {
+            if (is_user_logged_in() && $menu_item->post_title == 'Log Out') {
+                echo '<a href="' . $menu_item->url . '">' . $menu_item->post_title . '</a>';
+            }
+            if (!is_user_logged_in() && $menu_item->post_title != 'Log Out') {
+                echo '<a href="' . $menu_item->url . '">' . $menu_item->post_title . '</a>';
+            }
+        }
+        ?>
+    </li>
+    <?php
+    echo '</div>';
+}
+
+add_shortcode('gf-mobile-search', 'gf_mobile_search_form');
+function gf_mobile_search_form()
+{
+?>
+<form role="search" method="get" class="gf-search-form gf-search-form--mobile"
+      action="/pretraga/">
+    <span class="screen-reader-text"><?php _x('Search for:', 'label') ?></span>
+    <input type="search" autocomplete="off" class="search-field gf-search-box" name="query"
+           placeholder="<?=esc_attr_x('Unesite frazu pretrage &hellip;', '')?>"
+           value="<?= get_search_query() ?>"/>
+<!--    <button type="submit" class="search-submit"><i class="fa fa-search"></i></button>-->
+    <div class="gf-widht-100">
+        <div class="gf-autocomplete-results suggesstion-box suggesstion-box-mobile"></div>
+    </div>
+</form>
+<div class="gf-radio-search-wrapper">
+    <?php if (get_queried_object() && is_product_category()): ?>
+        <form>
+            <input class="search-radio-box" type="radio" id="search-radiobutton-cat" name="search-radiobutton" checked="checked" value="category" />
+            <label for="search-radiobutton-cat"><?= get_queried_object()->name ?></label>
+            <input class="search-radio-box" type="radio" id="search-radiobutton-main" name="search-radiobutton-main" value="shop" />
+            <label for="search-radiobutton-main">Pretraga celog sajta</label>
+        </form>
+    <?php endif ;?>
+</div>
+<?php
 }
 
 
 add_shortcode('gf-best-selling-products', 'gf_display_best_selling_products');
 function gf_display_best_selling_products(){
-    $args = array(
-        'post_type' => 'product',
-        'post_status' => 'publish',
-        'posts_per_page' => '3',
-        'meta_query' => array(
-            array(
-                'key' => '_stock_status',
-                'value' => 'instock',
-                'compare' => '=',
-            )
-        ),
-        'meta_key' => 'total_sales',
-        'orderby' => 'meta_value_num',
-        'order' => 'DESC',
-    );
+$args = array(
+'post_type' => 'product',
+'post_status' => 'publish',
+'posts_per_page' => '3',
+'meta_query' => array(
+array(
+'key' => '_stock_status',
+'value' => 'instock',
+'compare' => '=',
+)
+),
+'meta_key' => 'total_sales',
+'orderby' => 'meta_value_num',
+'order' => 'DESC',
+);
 
-    $query = new WP_Query($args);
-    echo '<h2>Najprodavaniji proizvodi</h2>';
-    echo '<div class="woocommerce columns-1">';
-    echo '<ul class ="products columns-1">';
+$query = new WP_Query($args);
+echo '<h2>Najprodavaniji proizvodi</h2>';
+echo '
+<div class="woocommerce columns-1">';
+    echo '
+    <ul class="products columns-1">';
         if($query->have_posts($args)) :
-            while($query->have_posts()) : $query->the_post();
+        while($query->have_posts()) : $query->the_post();
 
-                wc_get_template_part('content', 'product');
+        wc_get_template_part('content', 'product');
 
-            endwhile;
-            wp_reset_postdata();
+        endwhile;
+        wp_reset_postdata();
         endif;
-    echo '</ul>';
-    echo '</div>';
+        echo '
+    </ul>
+    ';
+    echo '
+</div>';
 }
 
 

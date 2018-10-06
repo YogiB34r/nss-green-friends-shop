@@ -128,7 +128,7 @@ function gf_add_theme_and_plugins_backend_scripts_and_styles() {
 }
 
 // @TODO create option from admin to reset assets
-$compileOverrideActive = false;
+$compileOverrideActive = true;
 $userData = get_userdata(get_current_user_id());
 if ($userData && in_array('administrator', $userData->roles)) {
 
