@@ -214,21 +214,30 @@ function merge_all_scripts() {
         #1. Reorder the handles based on its dependency,
             The result will be saved in the to_do property ($wp_scripts->to_do)
     */
-    $wp_scripts->all_deps($wp_scripts->queue);
-    $targetFile = "uploads/compiled.js";
-    $merged_file_location = ABSPATH . '/wp-content/' . $targetFile;
-    if (file_exists($merged_file_location) && !$compileOverrideActive) {
-        return;
-    }
-    $merged_script	= '';
-    $httpClient = new GuzzleHttp\Client();
     $ignoredScripts = [
         'jquery-ui-core', 'jquery-core', 'admin-bar', 'query-monitor', 'jquery-ui-widget', 'wc-add-to-cart',
         'wp-util', 'wc-add-to-cart-variation', 'jquery', 'wc-single-product'
     ];
+    $version = 2;
+    $wp_scripts->all_deps($wp_scripts->queue);
+    $targetFile = "uploads/compiled.js";
+    $merged_file_location = ABSPATH . '/wp-content/' . $targetFile;
+    if (file_exists($merged_file_location) && !$compileOverrideActive) {
+        foreach($wp_scripts->to_do as $handle) {
+            if (in_array($handle, $ignoredScripts)) {
+                continue;
+            }
+            wp_dequeue_script($handle);
+            wp_deregister_script($handle);
+        }
+        wp_enqueue_script('merged-styles',  get_stylesheet_directory_uri() . '/../../' . $targetFile, [], $version);
+        return;
+    }
+    $merged_script	= '';
+    $httpClient = new GuzzleHttp\Client();
 
     // Loop javascript files and save to $merged_script variable
-    foreach( $wp_scripts->to_do as $handle) {
+    foreach($wp_scripts->to_do as $handle) {
 
         if (in_array($handle, $ignoredScripts)) {
             continue;
