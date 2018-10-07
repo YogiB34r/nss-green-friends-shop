@@ -106,6 +106,7 @@ function gf_theme_and_plugins_frontend_scripts_and_styles()
     wp_enqueue_script('bootstrap-popper', 'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js', array(), '', 'true');
     wp_enqueue_script('clamp', get_stylesheet_directory_uri() . '/assets/js/3rd-party/clamp.min.js');
     wp_enqueue_script('cookie', get_stylesheet_directory_uri() . '/assets/js/jquery.cookie.js');
+    wp_enqueue_script('flexslider', plugins_url() . '/woocommerce/assets/js/flexslider/jquery.flexslider.min.js');
 
     wp_enqueue_style('bootstrap 4.1', 'https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css');
     wp_enqueue_style('woocommerce-layout');
@@ -130,15 +131,16 @@ function gf_add_theme_and_plugins_backend_scripts_and_styles() {
 // @TODO create option from admin to reset assets
 $compileOverrideActive = true;
 $userData = get_userdata(get_current_user_id());
+//$userData = false;
 if ($userData && in_array('administrator', $userData->roles)) {
 
 } else {
-//    add_action('wp_print_styles', 'merge_all_styles', 999999);
-//    add_action('wp_enqueue_scripts', 'merge_all_scripts', 999999);
+    add_action('wp_print_styles', function() use ($compileOverrideActive) { merge_all_styles($compileOverrideActive); }, 999999);
+    add_action('wp_enqueue_scripts', function() use ($compileOverrideActive) { merge_all_scripts($compileOverrideActive); }, 999999);
 }
 
-function merge_all_styles() {
-    global $wp_styles, $compileOverrideActive;
+function merge_all_styles($compileOverrideActive) {
+    global $wp_styles;
     /**
         #1. Reorder the handles based on its dependency,
             The result will be saved in the to_do property ($wp_scripts->to_do)
@@ -196,8 +198,8 @@ function merge_all_styles() {
     wp_enqueue_style('merged-styles',  get_stylesheet_directory_uri() . '/../../' . $fileName, [], $version);
 }
 
-function merge_all_scripts() {
-    global $wp_scripts, $wc_queued_js, $compileOverrideActive;
+function merge_all_scripts($compileOverrideActive) {
+    global $wp_scripts, $wc_queued_js;
 
     /*
         #1. Reorder the handles based on its dependency,
