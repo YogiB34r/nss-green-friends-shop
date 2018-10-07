@@ -147,7 +147,8 @@ function merge_all_styles($compileOverrideActive) {
     */
     $wp_styles->all_deps($wp_styles->queue);
     $fileName = "uploads/compiled.css";
-    $version = 1;
+    $version = 2;
+    $version = time();
     $merged_file_location = ABSPATH . '/wp-content/' . $fileName;
     if (file_exists($merged_file_location) && !$compileOverrideActive) {
         foreach($wp_styles->to_do as $handle) {
@@ -209,7 +210,8 @@ function merge_all_scripts($compileOverrideActive) {
         'jquery-ui-core', 'jquery-core', 'admin-bar', 'query-monitor', 'jquery-ui-widget', 'wc-add-to-cart',
         'wp-util', 'wc-add-to-cart-variation', 'jquery', 'wc-single-product'
     ];
-    $version = 2;
+    $version = 3;
+    $version = time();
     $wp_scripts->all_deps($wp_scripts->queue);
     $targetFile = "uploads/compiled.js";
     $merged_file_location = ABSPATH . '/wp-content/' . $targetFile;
@@ -277,8 +279,7 @@ function merge_all_scripts($compileOverrideActive) {
     $wc_queued_js = '';
 
     file_put_contents($merged_file_location, str_replace('  ', '', $merged_script));
-    // try enqueuing earlier ?
-    wp_enqueue_script('merged-script',  get_stylesheet_directory_uri() . '/../../' . $targetFile);
+    wp_enqueue_script('merged-script',  get_stylesheet_directory_uri() . '/../../' . $targetFile, [], $version);
 }
 
 function add_async_attribute($tag, $handle) {
