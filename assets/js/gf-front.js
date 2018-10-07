@@ -325,9 +325,10 @@ function ajaxSearch(value) {
 // gf-widgets.js
 jQuery(document).ready(function ($) {
     //don't start on wrong pages
-    if (typeof gfSliderColumnCount !== "undefined") {
-
-        //@Important activate slider after tab is displayed in order to have access to proper width
+    if (jQuery('.gf-product-slider').length > 0) {
+        var gfSliderColumnCount = 4;
+    // if (typeof gfSliderColumnCount !== "undefined") {
+        // @Important activate slider after tab is displayed in order to have access to proper width
         $("#tabs").tabs({
             activate: function (event, ui) {
                 if (!$(ui.newPanel.selector).hasClass('slick-initialized')) {
@@ -341,10 +342,13 @@ jQuery(document).ready(function ($) {
     }
 
     function startSlider(selector) {
+        console.log($(selector).data('sliderItemCount'));
         $(selector).slick({
             infinite: true,
-            slidesToShow: gfSliderColumnCount,
-            slidesToScroll: gfSliderColumnCount,
+            // slidesToShow: gfSliderColumnCount,
+            slidesToShow: $(selector).data('sliderItemCount'),
+            // slidesToScroll: gfSliderColumnCount,
+            slidesToScroll: $(selector).data('sliderItemCount'),
             arrows: false,
             dots: false,
             responsive: [{
