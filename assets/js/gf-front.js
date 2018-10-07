@@ -67,10 +67,7 @@ jQuery(document).ready(function () {
         //   }
         // }
     });
-    jQuery('#my-search-icon-toggle').click(function () {
-        jQuery('.mobile-search').toggle('slow');
 
-    });
 
     jQuery(document).mouseup(function (e) {
         var category_list_accordion = jQuery('.gf-category-accordion');
@@ -90,14 +87,63 @@ jQuery(document).ready(function () {
         jQuery(this).toggleClass('fa-plus fa-minus');
     });
 
+    jQuery('#my-search-icon-toggle').click(function () {
+        jQuery('.mobile-search').toggle('slow');
+
+    });
+
     jQuery('.gf-hamburger-menu').click(function () {
         jQuery('.gf-mobile-menu').slideToggle();
     });
-// za search togle na mobilnom ako treba
-//     jQuery('.gf-search-toggle').click(function() {
-//       jQuery('.search-input-wrapper').toggle();
-//       jQuery('.gf-search-toggle i').toggleClass('fa-times fa-search');
-//     });
+
+    jQuery('#my-fancy-search').click(function () {
+        if (jQuery('#my-fancy-search').hasClass('fancy-header-icons')) {
+            jQuery('#my-fancy-search').removeClass('fancy-header-icons')
+        } else {
+            jQuery('#my-fancy-search').addClass('fancy-header-icons')
+            if (jQuery('#my-fancy-user').hasClass('fancy-header-icons')) {
+                jQuery('#my-fancy-user').removeClass('fancy-header-icons')
+                jQuery('.gf-mobile-menu').slideToggle();
+            }
+            if (jQuery('#gf-bars-icon-toggle').hasClass('fancy-header-icons')) {
+                jQuery('#gf-bars-icon-toggle').removeClass('fancy-header-icons');
+                jQuery('.gf-category-accordion').slideToggle();
+            }
+        }
+
+    });
+    jQuery('#my-fancy-user').click(function () {
+        if (jQuery('#my-fancy-user').hasClass('fancy-header-icons')) {
+            jQuery('#my-fancy-user').removeClass('fancy-header-icons')
+        } else {
+            jQuery('#my-fancy-user').addClass('fancy-header-icons')
+            if (jQuery('#gf-bars-icon-toggle').hasClass('fancy-header-icons')) {
+                jQuery('#gf-bars-icon-toggle').removeClass('fancy-header-icons');
+                jQuery('.gf-category-accordion').hide();
+            }
+            if (jQuery('#my-fancy-search').hasClass('fancy-header-icons')){
+                jQuery('#my-fancy-search').removeClass('fancy-header-icons');
+                jQuery('.mobile-search').toggle('slow');
+            }
+
+        }
+    });
+    jQuery('#gf-bars-icon-toggle').click(function () {
+        if (jQuery('#gf-bars-icon-toggle').hasClass('fancy-header-icons')) {
+            jQuery('#gf-bars-icon-toggle').removeClass('fancy-header-icons')
+        } else {
+            jQuery('#gf-bars-icon-toggle').addClass('fancy-header-icons')
+            if (jQuery('#my-fancy-user').hasClass('fancy-header-icons')) {
+                jQuery('#my-fancy-user').removeClass('fancy-header-icons');
+                jQuery('.gf-mobile-menu').slideToggle();
+            }
+            if (jQuery('#my-fancy-search').hasClass('fancy-header-icons')){
+                jQuery('#my-fancy-search').removeClass('fancy-header-icons');
+                jQuery('.mobile-search').toggle('slow');
+            }
+        }
+    });
+
 
     jQuery('.category-item a').hover(function (e) {
 
@@ -160,53 +206,6 @@ jQuery(document).ready(function () {
     });
 
 
-    jQuery('#my-fancy-search').click(function () {
-        if (jQuery('#my-fancy-search').hasClass('fancy-header-icons')) {
-            jQuery('#my-fancy-search').removeClass('fancy-header-icons')
-        } else {
-            jQuery('#my-fancy-search').addClass('fancy-header-icons')
-            if (jQuery('#my-fancy-user').hasClass('fancy-header-icons')) {
-                jQuery('#my-fancy-user').removeClass('fancy-header-icons')
-                jQuery('.gf-mobile-menu').slideToggle();
-            }
-            if (jQuery('#gf-bars-icon-toggle').hasClass('fancy-header-icons')) {
-                jQuery('#gf-bars-icon-toggle').removeClass('fancy-header-icons');
-                jQuery('.gf-category-accordion').slideToggle();
-            }
-        }
-
-    });
-    jQuery('#my-fancy-user').click(function () {
-        if (jQuery('#my-fancy-user').hasClass('fancy-header-icons')) {
-            jQuery('#my-fancy-user').removeClass('fancy-header-icons')
-        } else {
-            jQuery('#my-fancy-user').addClass('fancy-header-icons')
-            if (jQuery('#gf-bars-icon-toggle').hasClass('fancy-header-icons')) {
-                jQuery('#gf-bars-icon-toggle').removeClass('fancy-header-icons');
-                jQuery('.gf-category-accordion').hide();
-            }
-            if (jQuery('#my-fancy-search').hasClass('fancy-header-icons')){
-                jQuery('#my-fancy-search').removeClass('fancy-header-icons');
-                jQuery('.mobile-search').toggle('slow');
-            }
-
-        }
-    });
-    jQuery('#gf-bars-icon-toggle').click(function () {
-        if (jQuery('#gf-bars-icon-toggle').hasClass('fancy-header-icons')) {
-            jQuery('#gf-bars-icon-toggle').removeClass('fancy-header-icons')
-        } else {
-            jQuery('#gf-bars-icon-toggle').addClass('fancy-header-icons')
-            if (jQuery('#my-fancy-user').hasClass('fancy-header-icons')) {
-                jQuery('#my-fancy-user').removeClass('fancy-header-icons');
-                jQuery('.gf-mobile-menu').slideToggle();
-            }
-            if (jQuery('#my-fancy-search').hasClass('fancy-header-icons')){
-                jQuery('#my-fancy-search').removeClass('fancy-header-icons');
-                jQuery('.mobile-search').toggle('slow');
-            }
-        }
-    });
 
 
     // jQuery('form.woocommerce-widget-layered-nav-dropdown, .widget_price_filter form').submit(function(e) {
