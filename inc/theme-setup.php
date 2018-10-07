@@ -110,7 +110,7 @@ function gf_theme_and_plugins_frontend_scripts_and_styles()
 
     wp_enqueue_style('bootstrap 4.1', 'https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css');
     wp_enqueue_style('woocommerce-layout');
-    wp_enqueue_style('woocommerce-smallscreen');
+//    wp_enqueue_style('woocommerce-smallscreen');
     wp_enqueue_style('woocommerce-general');
     wp_enqueue_style('gf-style-reset', get_stylesheet_directory_uri() . '/assets/css/reset.css');
     wp_enqueue_style('gf-style', get_stylesheet_directory_uri() . '/style.css', ['woocommerce-layout']);
@@ -146,13 +146,22 @@ function merge_all_styles($compileOverrideActive) {
             The result will be saved in the to_do property ($wp_scripts->to_do)
     */
     $wp_styles->all_deps($wp_styles->queue);
-    $fileName = "uploads/compiled.css";
     $version = 2;
     $version = time();
+    $ignoredStyles = ['font-awesome', 'woocommerce-smallscreen'];
+    $fileName = "uploads/compiled.css";
+    if (wp_is_mobile()) {
+        $ignoredStyles = ['font-awesome'];
+        $fileName = "uploads/compiled-mobile.css";
+    } else {
+        wp_dequeue_style('woocommerce-smallscreen');
+        wp_deregister_style('woocommerce-smallscreen');
+    }
+
     $merged_file_location = ABSPATH . '/wp-content/' . $fileName;
     if (file_exists($merged_file_location) && !$compileOverrideActive) {
         foreach($wp_styles->to_do as $handle) {
-            if (in_array($handle, ['font-awesome'])) {
+            if (in_array($handle, $ignoredStyles)) {
                 continue;
             }
             wp_dequeue_style($handle);
@@ -164,7 +173,7 @@ function merge_all_styles($compileOverrideActive) {
     $merged_script	= '';
     $httpClient = new GuzzleHttp\Client();
     foreach($wp_styles->to_do as $handle) {
-        if (in_array($handle, ['font-awesome'])) {
+        if (in_array($handle, $ignoredStyles)) {
             continue;
         }
         // Clean up url
