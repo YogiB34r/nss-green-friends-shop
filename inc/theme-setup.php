@@ -107,7 +107,7 @@ function gf_theme_and_plugins_frontend_scripts_and_styles()
     wp_enqueue_script('clamp', get_stylesheet_directory_uri() . '/assets/js/3rd-party/clamp.min.js');
     wp_enqueue_script('cookie', get_stylesheet_directory_uri() . '/assets/js/jquery.cookie.js');
     wp_enqueue_script('flexslider', plugins_url() . '/woocommerce/assets/js/flexslider/jquery.flexslider.min.js');
-    wp_enqueue_script('cookie-notice-front', plugins_url('/cookie-notice/js/front.js'), array('jquery', 'cookie', 'gf-front-js'));
+//    wp_enqueue_script('cookie-notice-front', plugins_url('/cookie-notice/js/front.js'), array('jquery', 'cookie', 'gf-front-js'));
 
     wp_enqueue_style('bootstrap 4.1', 'https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css');
     wp_enqueue_style('woocommerce-layout');
@@ -218,7 +218,7 @@ function merge_all_scripts($compileOverrideActive) {
     */
     $ignoredScripts = [
         'jquery-ui-core', 'jquery-core', 'admin-bar', 'query-monitor', 'jquery-ui-widget', 'wc-add-to-cart',
-        'wp-util', 'wc-add-to-cart-variation', 'jquery', 'wc-single-product'
+        'wp-util', 'wc-add-to-cart-variation', 'jquery', 'wc-single-product', 'cookie-notice-front'
     ];
     $version = 3;
     $version = time();
