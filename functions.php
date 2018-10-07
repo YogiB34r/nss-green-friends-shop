@@ -890,15 +890,20 @@ function gf_check_if_user_is_migrated($user, $password)
 //add_filter('wp_authenticate_user', 'gf_check_if_user_is_migrated', 10, 2);
 
 
-function sv_require_wc_company_field( $fields ) {
-    unset($fields['billing']['billing_country']);
-    return $fields;
+function remove_country_field_billing( $fields ) {
+    unset($fields['billing_country']);
 }
-//add_filter( 'woocommerce_billing_fields', 'sv_require_wc_company_field' );
+add_filter( 'woocommerce_billing_fields', 'sv_require_wc_company_field' );
+function remove_country_field_shipping( $fields ) {
+    unset($fields['shipping_country']);
+}
+add_filter( 'woocommerce_shipping_fields', 'sv_require_wc_company_field' );
 
-function custom_override_checkout_fields( $fields )
+function remove_country_field_checkout( $fields )
 {
-    unset($fields['billing']['billing_country']);
+    unset($fields['billing_country']);
+    unset($fields['shipping_country']);
+
     return $fields;
 }
 add_filter('woocommerce_checkout_fields','custom_override_checkout_fields');
