@@ -896,6 +896,6 @@ function gf_check_if_user_is_migrated($user, $password)
 //add_filter('wp_authenticate_user', 'gf_check_if_user_is_migrated', 10, 2);
 
 // Disable W3TC footer comment for everyone but Admins (single site & network mode)
-if ( !current_user_can( 'activate_plugins' ) ) {
-    add_filter( 'w3tc_can_print_comment', '__return_false', 10, 1 );
+if (!current_user_can('activate_plugins')) {
+    add_filter( 'w3tc_can_print_comment', function( $w3tc_setting ) { return false; }, 10, 1 );
 }
