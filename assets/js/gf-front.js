@@ -277,7 +277,7 @@ jQuery(document).ready(function () {
     if (jQuery('body').hasClass('single-product')) {
         jQuery.ajax({
             type: "POST",
-            url: '/pretraga/?viewCount=true&postId=' + jQuery('div.type-product').attr('id').split('-')[1],
+            url: '/gf-ajax/?viewCount=true&postId=' + jQuery('div.type-product').attr('id').split('-')[1],
             minLength: 0,
             success: function (response) {
             }
@@ -306,7 +306,7 @@ function ajaxSearch(value) {
     jQuery.ajax({
         type: "POST",
         // url: ajax_object.ajax_url,
-        url: '/pretraga/',
+        url: '/gf-ajax/',
         data: {'query': value},
         minLength: 0,
         beforeSend: function () {
