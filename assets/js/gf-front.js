@@ -342,13 +342,12 @@ jQuery(document).ready(function ($) {
     }
 
     function startSlider(selector) {
-        console.log($(selector).data('sliderItemCount'));
         $(selector).slick({
             infinite: true,
             // slidesToShow: gfSliderColumnCount,
-            slidesToShow: $(selector).data('sliderItemCount'),
+            slidesToShow: $(selector).parents('.gf-product-slider').data('sliderItemCount'),
             // slidesToScroll: gfSliderColumnCount,
-            slidesToScroll: $(selector).data('sliderItemCount'),
+            slidesToScroll: $(selector).parents('.gf-product-slider').data('sliderItemCount'),
             arrows: false,
             dots: false,
             responsive: [{
