@@ -375,24 +375,32 @@ function gf_get_category_query()
         $priceCondition = " HAVING priceOrder >= {$minPrice} AND priceOrder <= {$maxPrice} ";
     }
 
+    $excludeCategories = " 1=1 ";
+    foreach (gf_get_sex_shop_categories() as $catId) {
+        if($cat->term_id != $catId){
+            $excludeCategories = "categoryIds NOT LIKE '%{$catId}%' ";
+        }
+    }
+    
     $sql = "SELECT postId, {$priceOrdering}, {$customOrdering} FROM wp_gf_products WHERE salePrice > 0 AND stockStatus = 1 AND status = 1
-                AND categories LIKE '%{$cat->name}%' AND categoryIds LIKE '%{$cat->term_id}%'
+                AND categories LIKE '%{$cat->name}%' AND categoryIds LIKE '%{$cat->term_id}%' AND {$excludeCategories}
                 AND ({$searchCondition})
                 {$priceCondition} 
                 ORDER BY $orderBy ";
     $productsSale = $wpdb->get_results($sql, OBJECT_K);
 
     $sql = "SELECT postId, {$priceOrdering}, {$customOrdering} FROM wp_gf_products WHERE salePrice = 0 AND stockStatus = 1 AND status = 1
-                AND categories LIKE '%{$cat->name}%' AND categoryIds LIKE '%{$cat->term_id}%' 
+                AND categories LIKE '%{$cat->name}%' AND categoryIds LIKE '%{$cat->term_id}%' AND {$excludeCategories}
                 AND ({$searchCondition})
                 {$priceCondition} ORDER BY $orderBy ";
     $productsNotOnSale = $wpdb->get_results($sql, OBJECT_K);
     $allIds = array_merge(array_keys($productsSale), array_keys($productsNotOnSale));
 
     $sql = "SELECT postId, {$priceOrdering}, {$customOrdering} FROM wp_gf_products WHERE stockStatus = 0 AND status = 1
-                AND categories LIKE '%{$cat->name}%' AND categoryIds LIKE '%{$cat->term_id}%' 
+                AND categories LIKE '%{$cat->name}%' AND categoryIds LIKE '%{$cat->term_id}%' AND {$excludeCategories}
                 AND ({$searchCondition})
                 {$priceCondition} ORDER BY $orderBy ";
+
     $productsOutOfStock = $wpdb->get_results($sql, OBJECT_K);
     $allIds = array_merge($allIds, array_keys($productsOutOfStock));
     $resultCount = count($allIds);
