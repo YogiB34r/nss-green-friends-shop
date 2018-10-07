@@ -895,3 +895,15 @@ function gf_check_if_user_is_migrated($user, $password)
 
 //add_filter('wp_authenticate_user', 'gf_check_if_user_is_migrated', 10, 2);
 
+function sv_require_wc_company_field( $fields ) {
+    unset($fields['billing']['billing_country']);
+    return $fields;
+}
+//add_filter( 'woocommerce_billing_fields', 'sv_require_wc_company_field' );
+
+function custom_override_checkout_fields( $fields )
+{
+    unset($fields['billing']['billing_country']);
+    return $fields;
+}
+add_filter('woocommerce_checkout_fields','custom_override_checkout_fields');
