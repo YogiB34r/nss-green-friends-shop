@@ -122,7 +122,7 @@ img.gf-header-logo {
     transition: 0.5s all;
 }
 
-.gf-hamburger-menu,
+.gf-user-account-menu,
 .gf-mobile-menu,
 .gf-category-mobile-toggle,
 .gf-category-accordion {
@@ -136,7 +136,7 @@ img.gf-header-logo {
 }
 
 .gf-category-mobile-toggle:hover,
-.gf-hamburger-menu:hover {
+.gf-user-account-menu:hover {
     cursor: pointer;
 }
 
@@ -1878,7 +1878,7 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title {
         display: none;
     }
 
-    .gf-hamburger-menu,
+    .gf-user-account-menu,
     .gf-category-mobile-toggle {
         display: block !important;
     }

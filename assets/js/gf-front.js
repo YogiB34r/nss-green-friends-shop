@@ -92,7 +92,7 @@ jQuery(document).ready(function () {
 
     });
 
-    jQuery('.gf-hamburger-menu').click(function () {
+    jQuery('.gf-user-account-menu').click(function () {
         jQuery('.gf-mobile-menu').slideToggle();
     });
 
