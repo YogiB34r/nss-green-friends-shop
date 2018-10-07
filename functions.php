@@ -22,7 +22,6 @@ function require_on_init()
 add_action('after_setup_theme', 'require_on_init');
 
 add_filter('woocommerce_currency_symbol', 'change_existing_currency_symbol', 10, 2);
-
 function change_existing_currency_symbol($currency_symbol, $currency)
 {
     $currency_symbol = 'din.';
@@ -32,20 +31,6 @@ function change_existing_currency_symbol($currency_symbol, $currency)
 
 //remove_action( 'woocommerce_before_main_content','woocommerce_breadcrumb', 20);
 
-/**
- * Show out of stock items last.
- */
-//add_filter('posts_clauses', 'order_by_stock_status');
-//function order_by_stock_status($posts_clauses) {
-//    global $wpdb;
-// only change query on WooCommerce loops
-//    if (is_woocommerce() && (is_shop() || is_product_category() || is_product_tag())) {
-//        $posts_clauses['join'] .= " INNER JOIN $wpdb->postmeta istockstatus ON ($wpdb->posts.ID = istockstatus.post_id) ";
-//        $posts_clauses['orderby'] = " istockstatus.meta_value ASC, " . $posts_clauses['orderby'];
-//        $posts_clauses['where'] = " AND istockstatus.meta_key = '_stock_status' AND istockstatus.meta_value <> '' " . $posts_clauses['where'];
-//    }
-//    return $posts_clauses;
-//}
 function gf_get_categories($exlcude = array())
 {
     $args = array(
@@ -193,21 +178,6 @@ function gf_insert_in_array_by_index($array, $index, $val)
     }
 }
 
-
-//add_filter('pre_get_posts', 'order_by_stock_status');
-function order_by_stock_status($posts_clauses)
-{
-    global $wpdb;
-
-    // only change query on WooCommerce loops
-    if (is_woocommerce() && (is_shop() || is_product_category() || is_product_tag())) {
-        $posts_clauses['join'] .= " INNER JOIN $wpdb->postmeta istockstatus ON ($wpdb->posts.ID = istockstatus.post_id) ";
-        $posts_clauses['orderby'] = " istockstatus.meta_value ASC, " . $posts_clauses['orderby'];
-        $posts_clauses['where'] = " AND istockstatus.meta_key = '_stock_status' AND istockstatus.meta_value <> '' " . $posts_clauses['where'];
-    }
-    return $posts_clauses;
-}
-
 /**
  * Saves uploads into folders organized by day.
  *
@@ -223,7 +193,6 @@ function upload_dir_filter($uploads)
 
     return $uploads;
 }
-
 add_filter('upload_dir', 'upload_dir_filter');
 
 // custom breadcrumbs based on wc breadcrumbs
@@ -237,13 +206,11 @@ function woocommerce_breadcrumb($args = array())
         'after' => '',
         'home' => _x('Home', 'breadcrumb', 'woocommerce')
     )));
-
     $breadcrumbs = new gf_breadcrumbs();
 
     if ($args['home']) {
         $breadcrumbs->add_crumb($args['home'], apply_filters('woocommerce_breadcrumb_home_url', home_url()));
     }
-
     $args['breadcrumb'] = $breadcrumbs->generate();
 
     wc_get_template('global/breadcrumb.php', $args);
@@ -276,8 +243,8 @@ function parseOrderBy()
     switch ($order) {
         //@TODO implement view count
         case 'popularity':
-//            $orderBy = " ORDER BY viewCount DESC ";
-            $orderBy = " createdAt DESC ";
+            $orderBy = " ORDER BY viewCount DESC ";
+//            $orderBy = " createdAt DESC ";
 
             break;
 
@@ -745,7 +712,6 @@ function gf_change_supplier_id_by_vendor_id()
     }
     echo '</ul>';
 }
-
 
 function gf_set_product_categories($product_id, $category_ids)
 {
