@@ -3,6 +3,11 @@
 
 global $wpdb;
 
+if (isset($_GET['viewCount'])) {
+    gf_ajax_view_count((int) $_GET['postId']);
+    exit();
+}
+
 if (isset($_GET['import'])) {
 //    require (__DIR__ . '/../../plugins/nss-feed-import/classes/Importer.php');
     if(!function_exists('wp_get_current_user')) {

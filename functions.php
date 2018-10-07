@@ -697,19 +697,12 @@ function gf_ajax_search_autocomplete()
     }
 }
 
-//for loged in users
-//add_action('wp_ajax_ajax_gf_autocomplete', 'gf_ajax_view_count');
-
-//for logged out users
-add_action('wp_ajax_nopriv_ajax_gf_view_count', 'gf_ajax_view_count');
-function gf_ajax_view_count()
+function gf_ajax_view_count($postId)
 {
-    $postId = (int)$_POST['postId'];
     $key = 'post-view-count#' . $postId;
     $cache = new GF_Cache();
-    $count = (int)$cache->redis->get($key);
-//    if ($count == 10) {
-    if ($count > 0) {
+    $count = (int) $cache->redis->get($key);
+    if ($count == 10) {
         global $wpdb;
         $wpdb->query("UPDATE wp_gf_products SET viewCount = viewCount + {$count} WHERE postId = {$postId}");
         $cache->redis->set($key, 0);
@@ -717,6 +710,7 @@ function gf_ajax_view_count()
         $count++;
         $cache->redis->set($key, $count);
     }
+    echo 1;
 }
 
 function gf_change_supplier_id_by_vendor_id()

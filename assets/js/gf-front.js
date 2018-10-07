@@ -277,8 +277,7 @@ jQuery(document).ready(function () {
     if (jQuery('body').hasClass('single-product')) {
         jQuery.ajax({
             type: "POST",
-            url: ajax_object.ajax_url,
-            data: {'postId': jQuery('div.type-product').attr('id').split('-')[1], action: 'ajax_gf_view_count'},
+            url: '/pretraga/?viewCount=true&postId=' + jQuery('div.type-product').attr('id').split('-')[1],
             minLength: 0,
             success: function (response) {
             }
