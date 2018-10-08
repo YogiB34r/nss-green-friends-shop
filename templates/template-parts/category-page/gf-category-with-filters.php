@@ -78,14 +78,15 @@ if ($sexyShopCats){
             ?>
         </header>
         <?php
-
+        $sortedProducts = false;
+        /* @TODO make it better ... */
         if (get_query_var('term') !== '') {
             $sortedProducts = gf_get_category_query();
         } else {
             $sortedProducts = gf_custom_search($_GET['query']);
         }
 
-        if ($sortedProducts->have_posts()) {
+        if ($sortedProducts && $sortedProducts->have_posts()) {
             /**
              * Hook: woocommerce_before_shop_loop.
              *
@@ -93,17 +94,12 @@ if ($sexyShopCats){
              * @hooked woocommerce_result_count - 20
              * @hooked woocommerce_catalog_ordering - 30
              */
-            echo 'category';
-
             echo '<div class="gf-product-controls">';
             do_action('woocommerce_before_shop_loop');
             echo '</div>';
 
-            echo 'category';
             woocommerce_product_loop_start();
-//                    custom_woo_product_loop($sortedProducts);
             gf_custom_search_output($sortedProducts);
-
             woocommerce_product_loop_end();
 
             /**
