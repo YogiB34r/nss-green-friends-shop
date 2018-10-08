@@ -35,40 +35,53 @@
                     <div class="row">
                         <ul class="col-md d-flex gf-justify justify-content-center mt-3 px-4">
                             <li>
-                                <img src="<?= $theme_dir ?>/assets/images/footer_card_3.png" alt="Visa" width="66"
-                                     height="40">
+<!--                                <img src="--><?//= $theme_dir ?><!--/assets/images/footer_card_3.png" alt="Visa" width="66"-->
+<!--                                     height="40">-->
+                                <div class="gffooter-card-3"></div>
                             </li>
                             <li>
-                                <img src="<?= $theme_dir ?>/assets/images/footer_card_4.png" alt="mastercard" width="62"
-                                     height="40">
+<!--                                <img src="--><?//= $theme_dir ?><!--/assets/images/footer_card_4.png" alt="mastercard" width="62"-->
+<!--                                     height="40">-->
+                                <div class="gffooter-card-4"></div>
+
                             </li>
                             <li>
-                                <img src="<?= $theme_dir ?>/assets/images/footer_card_5.png" alt="maestrocard"
-                                     width="62" height="40">
+<!--                                <img src="--><?//= $theme_dir ?><!--/assets/images/footer_card_5.png" alt="maestrocard"-->
+<!--                                     width="62" height="40">-->
+                                <div class="gffooter-card-5"></div>
+
                             </li>
                             <li>
-                                <img src="<?= $theme_dir ?>/assets/images/footer_card_6.png" alt="American Express"
-                                     width="40" height="40">
+<!--                                <img src="--><?//= $theme_dir ?><!--/assets/images/footer_card_6.png" alt="American Express"-->
+<!--                                     width="40" height="40">-->
+                                <div class="gffooter-card-6"></div>
+
                             </li>
                         </ul>
                         <div class="col d-flex justify-content-center mt-3 px-4">
                             <div class="row">
                                 <div class="col-md col-sm col-xs text-center">
                                     <a href="https://www.visa.ca/en_CA/run-your-business/merchant-resources/verified-by-visa.html">
-                                        <img src="<?= $theme_dir ?>/assets/images/footer_card_1.png" alt="Verified by Visa"
-                                             width="68" height="40">
+<!--                                        <img src="--><?//= $theme_dir ?><!--/assets/images/footer_card_1.png" alt="Verified by Visa"-->
+<!--                                             width="68" height="40">-->
+                                        <div class="gffooter-card-1"></div>
+
                                     </a>
 
 
                                     <a href="https://www.mastercard.us/en-us/merchants/safety-security/securecode.html">
-                                        <img src="<?= $theme_dir ?>/assets/images/footer_card_2.png" alt="MasterCard SecureCode"
-                                             width="75" height="40">
+<!--                                        <img src="--><?//= $theme_dir ?><!--/assets/images/footer_card_2.png" alt="MasterCard SecureCode"-->
+<!--                                             width="75" height="40">-->
+                                        <div class="gffooter-card-2"></div>
+
                                     </a>
                                 </div>
                                 <div class="col-md col-sm col-xs  text-center">
                                     <a href="http://www.bancaintesa.rs/pocetna.1.html">
-                                        <img src="<?= $theme_dir ?>/assets/images/footer_card_7.jpg" alt="Banca Intesa"
-                                             width="267" height="40">
+<!--                                        <img src="--><?//= $theme_dir ?><!--/assets/images/footer_card_7.jpg" alt="Banca Intesa"-->
+<!--                                             width="267" height="40">-->
+                                        <div class="gffooter-card-7"></div>
+
                                     </a>
                                 </div>
                             </div>
