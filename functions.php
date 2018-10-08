@@ -684,7 +684,7 @@ function gf_authenticate_username_password( $user, $username, $password ) {
     return $user;
 }
 
-function gf_custom_shop_loop($products){
+function gf_custom_shop_loop_template($products){
 
     echo '<ul class="products columns-4 grid">';
 
