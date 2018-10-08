@@ -238,47 +238,6 @@ function gf_print_styles()
     return $result;
 }
 
-function parseOrderBy()
-{
-    $order = (isset($_GET['orderby'])) ? $_GET['orderby'] : 'date';
-    switch ($order) {
-        //@TODO implement view count
-        case 'popularity':
-            $orderBy = " ORDER BY viewCount DESC ";
-//            $orderBy = " createdAt DESC ";
-
-            break;
-
-        //@TODO add sync for ratings
-        case 'rating':
-//            $orderBy = " ORDER BY rating DESC ";
-            $orderBy = " createdAt DESC ";
-
-            break;
-
-        case 'date':
-            $orderBy = " createdAt DESC ";
-
-            break;
-
-        case 'price-desc':
-            $orderBy = " priceOrder DESC ";
-
-            break;
-
-        case 'price':
-            $orderBy = " priceOrder ";
-
-            break;
-
-        default:
-            $orderBy = " createdAt DESC ";
-
-            break;
-    }
-    return $orderBy;
-}
-
 function gf_get_category_query()
 {
     $search = new GF_Search();

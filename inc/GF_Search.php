@@ -2,6 +2,48 @@
 
 class GF_Search
 {
+    public function parseOrderBy($search = false)
+    {
+        $order = (isset($_GET['orderby'])) ? $_GET['orderby'] : 'date';
+        switch ($order) {
+            case 'popularity':
+                $orderBy = " ORDER BY viewCount DESC ";
+
+                break;
+
+            //@TODO add sync for ratings
+            case 'rating':
+//            $orderBy = " ORDER BY rating DESC ";
+                $orderBy = " createdAt DESC ";
+
+                break;
+
+            case 'date':
+                $orderBy = " createdAt DESC ";
+                if ($search) {
+                    $orderBy = " ORDER BY o DESC, createdAt DESC ";
+                }
+
+                break;
+
+            case 'price-desc':
+                $orderBy = " priceOrder DESC ";
+
+                break;
+
+            case 'price':
+                $orderBy = " priceOrder ";
+
+                break;
+
+            default:
+                $orderBy = " createdAt DESC ";
+
+                break;
+        }
+        return $orderBy;
+    }
+
     public function getIdsForStandardSearch($input, $limit = 0)
     {
         global $wpdb;
@@ -73,41 +115,6 @@ class GF_Search
         ELSE regularPrice 
      END as priceOrder ";
 
-        switch (get_query_var('orderby')) {
-            case 'popularity':
-                $orderBy = " ORDER BY viewCount DESC ";
-//            $orderBy = " ORDER BY createdAt DESC ";
-
-                break;
-
-            //@TODO add sync for ratings
-            case 'rating':
-//            $orderBy = " ORDER BY rating DESC ";
-                $orderBy = " ORDER BY createdAt DESC ";
-
-                break;
-
-            case 'date':
-                $orderBy = " ORDER BY o DESC, createdAt DESC ";
-
-                break;
-
-            case 'price-desc':
-                $orderBy = " ORDER BY priceOrder DESC ";
-
-                break;
-
-            case 'price':
-                $orderBy = " ORDER BY priceOrder ";
-
-                break;
-
-            default:
-                $orderBy = " ORDER BY o DESC, createdAt DESC ";
-
-                break;
-        }
-
         $sql = "SELECT 
         postId,
         {$customOrdering} as o,
@@ -119,7 +126,7 @@ class GF_Search
         AND ({$searchCondition}) 
         HAVING o > {$gradeCount}
         {$priceCondition}
-        {$orderBy}";
+        {$this->parseOrderBy(true)}";
         if ($limit) {
             $sql .= " LIMIT {$limit} ";
         }
@@ -133,7 +140,7 @@ class GF_Search
     {
         global $wpdb;
         $cat = get_term_by('slug', $slug, 'product_cat');
-        $orderBy = parseOrderBy();
+        $orderBy = $this->parseOrderBy();
         $searchCondition = " 1=1 ";
         $customOrdering = " 1=1 ";
         if (isset($_GET['query'])) {
