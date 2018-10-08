@@ -1,6 +1,8 @@
 <?php
 
-class GF_Elastica_Search
+namespace GF\Search\Elastica;
+
+class Search
 {
     /**
      * @var \Elastica\Client
@@ -18,14 +20,14 @@ class GF_Elastica_Search
     }
 
     public function search($keywords) {
-        $search = new Elastica\Search($this->client);
+        $search = new Search($this->client);
 
         $search
             ->addIndex('nss')
             ->addType('products');
 
         $qb = new \Elastica\QueryBuilder();
-        $query = new Elastica\Query();
+        $query = new \Elastica\Query();
 
 //        $query->setQuery(
 //            $qb->query()->bool()->addMust(

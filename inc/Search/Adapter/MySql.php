@@ -1,8 +1,17 @@
 <?php
 
-class GF_Search
+namespace GF\Search\Adapter;
+
+class MySql implements \GF\Search\AdapterInterface
 {
-    public function parseOrderBy($search = false)
+    private $wpdb;
+
+    public function __construct(\wpdb $wpdb)
+    {
+        $this->wpdb = $wpdb;
+    }
+
+    private function parseOrderBy($search = false)
     {
         $order = (isset($_GET['orderby'])) ? $_GET['orderby'] : 'date';
         switch ($order) {
@@ -46,10 +55,7 @@ class GF_Search
 
     public function getIdsForStandardSearch($input, $limit = 0)
     {
-        global $wpdb;
-
         $input = addslashes($input);
-
         $searchCondition = "";
         $customOrdering = "";
         $explodedInput = explode(' ', $input);
@@ -132,13 +138,13 @@ class GF_Search
         }
 
 //    echo $sql;
-        $products = $wpdb->get_results($sql, OBJECT_K);
+        $products = $this->wpdb->get_results($sql, OBJECT_K);
+
         return array_keys($products);
     }
 
     public function getIdsForCategory($slug)
     {
-        global $wpdb;
         $cat = get_term_by('slug', $slug, 'product_cat');
         $orderBy = $this->parseOrderBy();
         $searchCondition = " 1=1 ";
@@ -201,13 +207,13 @@ class GF_Search
                 AND ({$searchCondition})
                 {$priceCondition} 
                 ORDER BY $orderBy ";
-        $productsSale = $wpdb->get_results($sql, OBJECT_K);
+        $productsSale = $this->wpdb->get_results($sql, OBJECT_K);
 
         $sql = "SELECT postId, {$priceOrdering}, {$customOrdering} FROM wp_gf_products WHERE salePrice = 0 AND stockStatus = 1 AND status = 1
                 AND categories LIKE '%{$cat->name}%' AND categoryIds LIKE '%{$cat->term_id}%' AND {$excludeCategories}
                 AND ({$searchCondition})
                 {$priceCondition} ORDER BY $orderBy ";
-        $productsNotOnSale = $wpdb->get_results($sql, OBJECT_K);
+        $productsNotOnSale = $this->wpdb->get_results($sql, OBJECT_K);
         $allIds = array_merge(array_keys($productsSale), array_keys($productsNotOnSale));
 
         $sql = "SELECT postId, {$priceOrdering}, {$customOrdering} FROM wp_gf_products WHERE stockStatus = 0 AND status = 1
@@ -215,7 +221,7 @@ class GF_Search
                 AND ({$searchCondition})
                 {$priceCondition} ORDER BY $orderBy ";
 
-        $productsOutOfStock = $wpdb->get_results($sql, OBJECT_K);
+        $productsOutOfStock = $this->wpdb->get_results($sql, OBJECT_K);
 
         return array_merge($allIds, array_keys($productsOutOfStock));
     }

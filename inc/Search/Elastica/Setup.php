@@ -1,6 +1,8 @@
 <?php
 
-class GF_Elastica_Setup
+namespace GF\Search\Elastica;
+
+class Setup
 {
     static function createIndex(\Elastica\Client $elasticaClient) {
         $elasticaIndex = $elasticaClient->getIndex('nss');

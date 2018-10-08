@@ -1,6 +1,8 @@
 <?php
 
-class GF_Elastica_Indexer
+namespace GF\Search\Elastica;
+
+class Indexer
 {
     static function index(\Elastica\Client $elasticaClient)
     {

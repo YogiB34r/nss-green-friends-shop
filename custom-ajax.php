@@ -49,6 +49,7 @@ if (isset($_POST['query'])) {
     }
 
     $product_results = gf_custom_search($query, 4);
+//    $product_results = gf_elastic_search($query, 4);
 
     $html = '';
     if (!empty($cat_results)) {

@@ -104,8 +104,11 @@ if ($sexyShopCats){
 //                if (isset($_GET['s'])) {
 //                    gf_custom_search_output($sortedProducts);
 //                } else {
-                    custom_woo_product_loop($sortedProducts);
-//                }
+
+//                    custom_woo_product_loop($sortedProducts);
+            gf_custom_search_output($sortedProducts);
+
+                    //                }
 //            }
 
             woocommerce_product_loop_end();

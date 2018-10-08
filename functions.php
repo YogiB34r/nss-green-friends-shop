@@ -19,6 +19,10 @@ function require_on_init()
     }
 }
 
+require (__DIR__ . "/inc/Search/AdapterInterface.php");
+require (__DIR__ . "/inc/Search/Adapter/MySql.php");
+require (__DIR__ . "/inc/Search/Search.php");
+
 add_action('after_setup_theme', 'require_on_init');
 
 add_filter('woocommerce_currency_symbol', 'change_existing_currency_symbol', 10, 2);
@@ -238,42 +242,53 @@ function gf_print_styles()
     return $result;
 }
 
-function gf_get_category_query()
+//@TODO implement category as filter
+/**
+ * @param $input
+ * @param int $limit
+ * @return bool|WP_Query
+ */
+function gf_custom_search($input, $limit = 0)
 {
-    $search = new GF_Search();
-    $allIds = $search->getIdsForCategory(get_query_var('term'));
+    global $wpdb;
+
+    $search = new \GF\Search\Search(new \GF\Search\Adapter\MySql($wpdb));
+    $allIds = $search->getItemIdsForSearch($input, $limit);
 
     return gf_parse_post_ids_for_list($allIds);
 }
 
-function custom_woo_product_loop($sortedProducts)
+function gf_elastic_search($input, $limit = 0)
 {
-    if (is_tax() || is_product_category() || is_product_tag()) {
-        global $wpdb;
+    $config = array(
+        'host' => 'localhost',
+        'port' => 9200
+    );
+    $elasticaSearch = new \GF\Search\Elastica\Search(new \Elastica\Client($config));
+    $search = new \GF\Search\Search(new \GF\Search\Adapter\Elastic($elasticaSearch));
+    $allIds = $search->getItemIdsForSearch($input, $limit);
 
-        if (get_query_var('taxonomy') === 'product_cat') { // Za kategorije
-            if ($sortedProducts->have_posts()) :
-                while ($sortedProducts->have_posts()) : $sortedProducts->the_post();
-//                    do_action('woocommerce_shop_loop');
-                    wc_get_template_part('content', 'product');
-                endwhile;
-                wp_reset_postdata();
-            endif;
-        } else { // Za main shop
-//            echo 'other page';
-        }
-    } else { //za ostale page-eve
-        woocommerce_content();
-    }
+    return gf_parse_post_ids_for_list($allIds);
 }
 
-function gf_custom_search_output($sortedProducts)
+
+function gf_get_category_query()
+{
+    global $wpdb;
+
+    $search = new \GF\Search\Search(new \GF\Search\Adapter\MySql($wpdb));
+    $allIds = $search->getItemIdsForCategory(get_query_var('term'));
+
+    return gf_parse_post_ids_for_list($allIds);
+}
+
+function gf_custom_search_output(WP_Query $sortedProducts)
 {
     if ($sortedProducts->have_posts()):
 //        global $sw;
         wc_setup_loop();
         woocommerce_product_loop_start();
-        while ($sortedProducts->have_posts()) :
+        while ($sortedProducts->have_posts()):
             $sortedProducts->the_post();
 //            do_action('woocommerce_shop_loop');
 //            $sw->start('wc_get_template_part');
@@ -305,6 +320,10 @@ function parseAttributes()
     return $atributes;
 }
 
+/**
+ * @param $allIds
+ * @return bool|WP_Query
+ */
 function gf_parse_post_ids_for_list($allIds)
 {
     $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
@@ -338,20 +357,6 @@ function gf_parse_post_ids_for_list($allIds)
     $sortedProducts = new WP_Query($args);
 
     return $sortedProducts;
-}
-
-//@TODO implement category as filter
-/**
- * @param $input
- * @param int $limit
- * @return bool|WP_Query
- */
-function gf_custom_search($input, $limit = 0)
-{
-    $search = new GF_Search();
-    $allIds = $search->getIdsForStandardSearch($input, $limit);
-
-    return gf_parse_post_ids_for_list($allIds);
 }
 
 //for loged in users
