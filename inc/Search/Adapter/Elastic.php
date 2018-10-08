@@ -60,7 +60,7 @@ class Elastic implements \GF\Search\AdapterInterface
 
     public function getIdsForStandardSearch($input, $limit = 0)
     {
-        $this->search->search($input);
+        $this->search->search($input, $limit);
 
         return $this->search->getIds();
 

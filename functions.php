@@ -21,7 +21,10 @@ function require_on_init()
 
 require (__DIR__ . "/inc/Search/AdapterInterface.php");
 require (__DIR__ . "/inc/Search/Adapter/MySql.php");
+require (__DIR__ . "/inc/Search/Adapter/Elastic.php");
 require (__DIR__ . "/inc/Search/Search.php");
+require (__DIR__ . "/inc/Search/Elastica/Search.php");
+
 
 add_action('after_setup_theme', 'require_on_init');
 

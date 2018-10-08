@@ -19,8 +19,8 @@ class Search
         $this->client = $elasticaClient;
     }
 
-    public function search($keywords) {
-        $search = new Search($this->client);
+    public function search($keywords, $limit = 0) {
+        $search = new \Elastica\Search($this->client);
 
         $search
             ->addIndex('nss')
@@ -85,6 +85,9 @@ class Search
 
         $search->setQuery($boolQuery);
         $search->setOption('size', 10000);
+        if ($limit) {
+            $search->setOption('size', $limit);
+        }
         $search->setOption('from', 0);
 //        $search->setOption()
 
