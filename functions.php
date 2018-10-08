@@ -344,8 +344,8 @@ function gf_get_category_query()
     }
 
     $excludeCategories = " 1=1 ";
-    foreach (gf_get_category_children_ids('sexy-shop') as $catId) {
-        if($cat->term_id != $catId){
+    if (!in_array($cat->term_id, gf_get_category_children_ids('sexy-shop'))) {
+        foreach (gf_get_category_children_ids('sexy-shop') as $catId) {
             $excludeCategories .= " AND categoryIds NOT LIKE '%{$catId}%' ";
         }
     }
@@ -792,8 +792,8 @@ function gf_get_category_children_ids($slug)
     if ($cat) {
         $catChildren = get_term_children($cat->term_id, 'product_cat');
         $childrenIds[] = $cat->term_id;
-        foreach ($catChildren as $sexyShopChild) {
-            $childrenIds[] = $sexyShopChild;
+        foreach ($catChildren as $child) {
+            $childrenIds[] = $child;
         }
     }
     return $childrenIds;
