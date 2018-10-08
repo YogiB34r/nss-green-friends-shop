@@ -1472,14 +1472,19 @@ body.home .gf-navblock {
 }
 
 .category-item:hover .mega-menu {
-    display: block;
+    /*display: block;*/
     z-index: 999;
+    visibility: visible;
+    opacity: 1;
+    transition: 0.8s ease 0.10s;
 }
 
 /* Mega Menu*/
 
 .mega-menu {
-    display: none;
+    /*display: none;*/
+    visibility: hidden;
+    opacity: 0;
     padding: 2rem;
     border: none;
     border-radius: 0;
