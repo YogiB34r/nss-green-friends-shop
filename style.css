@@ -2442,6 +2442,11 @@ a#cn-more-info {
     padding-bottom: 10px;
     align-items: baseline;
 }
+.gf-product-slider__header--without-tabs h3{
+    flex-basis: 0;
+    flex-grow: 1;
+    max-width: 100%;
+}
 
 .gf-product-slider__header__title a {
     color: #454545;
