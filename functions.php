@@ -343,7 +343,7 @@ function gf_get_category_query()
     }
 
     $excludeCategories = " 1=1 ";
-    foreach (gf_get_sex_shop_categories() as $catId) {
+    foreach (gf_get_category_children_ids('sexy-shop') as $catId) {
         if($cat->term_id != $catId){
             $excludeCategories .= " AND categoryIds NOT LIKE '%{$catId}%' ";
         }
@@ -523,7 +523,7 @@ function gf_custom_search($input, $limit = 0)
         $priceCondition = " AND priceOrder >= {$minPrice} AND priceOrder <= {$maxPrice} ";
     }
     $excludeCategories = " 1=1 ";
-    foreach (gf_get_sex_shop_categories() as $catId) {
+    foreach (gf_get_category_children_ids('sexy-shop') as $catId) {
         $excludeCategories .= " AND categoryIds NOT LIKE '%{$catId}%' ";
     }
 
@@ -785,17 +785,18 @@ function gf_custom_add_to_cart_message($message)
 //    }
 //    return $message;
 //}
-function gf_get_sex_shop_categories()
+function gf_get_category_children_ids($slug)
 {
-    $sexyShopCat = get_term_by('slug', 'sexy-shop', 'product_cat');
-    if ($sexyShopCat) {
-        $sexyShopChildren = get_term_children($sexyShopCat->term_id, 'product_cat');
-        $sexyShopCats[] = $sexyShopCat->term_id;
-        foreach ($sexyShopChildren as $sexyShopChild) {
-            $sexyShopCats[] = $sexyShopChild;
+    $cat = get_term_by('slug', $slug, 'product_cat');
+    $childrenIds = [];
+    if ($cat) {
+        $catChildren = get_term_children($cat->term_id, 'product_cat');
+        $childrenIds[] = $cat->term_id;
+        foreach ($catChildren as $sexyShopChild) {
+            $childrenIds[] = $sexyShopChild;
         }
     }
-    return $sexyShopCats;
+    return $childrenIds;
 }
 
 function gf_add_custom_meta_to_users()

@@ -153,6 +153,7 @@ class gf_breadcrumbs extends WC_Breadcrumb
         } else {
             $post = get_post($post_id);
         }
+
         if ('product' === get_post_type($post)) {
             $this->prepend_shop_page();
             $terms = wc_get_product_terms(
@@ -160,9 +161,11 @@ class gf_breadcrumbs extends WC_Breadcrumb
                     'woocommerce_breadcrumb_product_terms_args', array(
                         'orderby' => 'parent',
                         'order' => 'DESC',
+                        'exclude' => gf_get_category_children_ids('specijalne-promocije'),
                     )
                 )
             );
+            var_dump(gf_get_category_children_ids('specijalne-promocije'));
 
             if ($terms) {
                 $main_term = apply_filters('woocommerce_breadcrumb_main_term', $terms[0], $terms);
