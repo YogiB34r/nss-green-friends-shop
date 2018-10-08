@@ -2335,6 +2335,7 @@ a#cn-more-info {
     font-weight: 600;
     text-transform: uppercase;
     margin-bottom: 10px;
+    height: 40px;
 }
 
 .gf-category-box__item img {
@@ -2508,6 +2509,7 @@ a.gf-product-slider__header-control.product-slider__control-prev {
     font-weight: 700;
     text-transform: uppercase;
     margin-bottom: 10px;
+    height: 40px;
 }
 
 .slider-item .add_to_cart_button:hover {
