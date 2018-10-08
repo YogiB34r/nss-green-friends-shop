@@ -900,3 +900,43 @@ function action_woocommerce_register_form()
     <?php
 }
 add_action('woocommerce_register_form', 'action_woocommerce_register_form', 20, 10);
+
+remove_filter( 'authenticate', 'wp_authenticate_username_password' );
+add_filter( 'authenticate', 'gf_authenticate_username_password', 20, 3 );
+/**
+ * Remove Wordpress filer and write our own with changed error text.
+ */
+function gf_authenticate_username_password( $user, $username, $password ) {
+    if ( is_a($user, 'WP_User') )
+        return $user;
+
+    if ( empty( $username ) || empty( $password ) ) {
+        if ( is_wp_error( $user ) )
+            return $user;
+
+        $error = new WP_Error();
+
+        if ( empty( $username ) )
+            $error->add( 'empty_username', __('<strong>GREŠKA</strong>: Polje korisničko ime ne može biti prazno.' ) );
+
+        if ( empty( $password ) )
+            $error->add( 'empty_password', __( '<strong>GREŠKA</strong>: Polje lozinka ne može biti prazno.' ) );
+
+        return $error;
+    }
+
+    $user = get_user_by( 'login', $username );
+
+    if ( !$user )
+        return new WP_Error( 'invalid_username', sprintf( __( '<strong>GREŠKA</strong>: Ne postojeće korisničko ime ili email. <a href="%s" title="Password Lost and Found">Izgubili ste lozinku</a>?' ), wp_lostpassword_url() ) );
+
+    $user = apply_filters( 'wp_authenticate_user', $user, $password );
+    if ( is_wp_error( $user ) )
+        return $user;
+
+    if ( ! wp_check_password( $password, $user->user_pass, $user->ID ) )
+        return new WP_Error( 'incorrect_password', sprintf( __( '<strong>GREŠKA</strong>: Lozinka koju ste uneli za korisničko ime <strong>%1$s</strong> nije ispravna. <a href="%2$s" title="Password Lost and Found">Izgubili ste lozinku</a>?' ),
+            $username, wp_lostpassword_url() ) );
+
+    return $user;
+}
