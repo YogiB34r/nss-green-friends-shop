@@ -78,3 +78,43 @@ if (isset($_POST['query'])) {
     echo $html;
     exit();
 }
+
+
+include("inc/Elastica/GF_Elastica_Search.php");
+include("inc/Elastica/GF_Elastica_Indexer.php");
+include("inc/Elastica/GF_Elastica_Setup.php");
+
+if (isset($_GET['action'])) {
+    $config = array(
+        'host' => 'localhost',
+        'port' => 9200
+    );
+    $elasticaClient = new \Elastica\Client($config);
+
+    switch ($_GET['action']) {
+        case 'createIndex':
+            GF_Elastica_Setup::createIndex($elasticaClient);
+
+            break;
+
+        case 'getList':
+            $query = "test";
+            GF_Elastica_Search::search($query, $elasticaClient);
+
+            break;
+
+
+            break;
+        case 'syncIndex':
+            GF_Elastica_Indexer::index($elasticaClient);
+
+            break;
+    }
+
+}
+
+
+?>
+<a href="/gf-ajax/?action=createIndex">(re) create index</a>
+<a href="/gf-ajax/?action=syncIndex">sync index</a>
+<a href="/gf-ajax/?action=getList">test</a>
