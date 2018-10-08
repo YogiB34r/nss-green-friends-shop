@@ -23,4 +23,10 @@ class Search
     {
         return $this->adapter->getIdsForStandardSearch($input, $limit);
     }
+
+
+    public function getItemsForSearch($input, $limit = 0)
+    {
+        return $this->adapter->getItemsForStandardSearch($input, $limit);
+    }
 }

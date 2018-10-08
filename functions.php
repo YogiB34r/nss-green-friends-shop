@@ -274,6 +274,20 @@ function gf_elastic_search($input, $limit = 0)
     return gf_parse_post_ids_for_list($allIds);
 }
 
+function gf_elastic_search_with_data($input, $limit = 0)
+{
+    $config = array(
+        'host' => 'localhost',
+        'port' => 9200
+    );
+    $elasticaSearch = new \GF\Search\Elastica\Search(new \Elastica\Client($config));
+    $search = new \GF\Search\Search(new \GF\Search\Adapter\Elastic($elasticaSearch));
+    $resultSet = $search->getItemsForSearch($input, $limit);
+
+    return $resultSet;
+}
+
+
 
 function gf_get_category_query()
 {
@@ -287,7 +301,6 @@ function gf_get_category_query()
 
 function gf_custom_search_output(WP_Query $sortedProducts)
 {
-    echo 123;
     if ($sortedProducts->have_posts()):
 //        global $sw;
         wc_setup_loop();
