@@ -48,8 +48,6 @@ if (isset($_POST['query'])) {
         }
     }
 
-//        $sql_product = "SELECT `productName`, `postId` FROM wp_gf_products WHERE `productName` LIKE '%{$keyword}%' LIMIT 4";
-//        $product_results = $wpdb->get_results($sql_product);
     $product_results = gf_custom_search($query, 4);
 
     $html = '';
@@ -98,8 +96,10 @@ if (isset($_GET['action'])) {
             break;
 
         case 'getList':
-            $query = "test";
-            GF_Elastica_Search::search($query, $elasticaClient);
+            $keywords = $_GET['query'];
+            $search = new GF_Elastica_Search($elasticaClient);
+            $search->search($keywords);
+            $search->printDebug();
 
             break;
 

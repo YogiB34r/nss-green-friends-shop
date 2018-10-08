@@ -2,18 +2,27 @@
 
 class GF_Elastica_Search
 {
-    static function search($keywords, \Elastica\Client $elasticaClient) {
-        $elasticaIndex = $elasticaClient->getIndex('nss');
-        $search = new Elastica\Search($elasticaClient);
+    /**
+     * @var \Elastica\Client
+     */
+    private $client;
 
-        $keywords = $_GET['query'];
+    /**
+     * @var \Elastica\ResultSet
+     */
+    private $resultSet;
+
+    public function __construct(\Elastica\Client $elasticaClient)
+    {
+        $this->client = $elasticaClient;
+    }
+
+    public function search($keywords) {
+        $search = new Elastica\Search($this->client);
 
         $search
             ->addIndex('nss')
-//            ->addIndex($elasticaIndex) // $indexUS instanceof Elastica\Index
-
             ->addType('products');
-//            ->addType($elasticaIndex->getType('products')); // $typeTweet instanceof Elastica\Type
 
         $qb = new \Elastica\QueryBuilder();
         $query = new Elastica\Query();
@@ -73,25 +82,44 @@ class GF_Elastica_Search
         $boolQuery->addShould($q);
 
         $search->setQuery($boolQuery);
-        $search->setOption('size', 80);
+        $search->setOption('size', 10000);
         $search->setOption('from', 0);
-        $resultSet = $search->search();
+//        $search->setOption()
 
-//        foreach ($search->scanAndScroll() as $scrollId => $resultSet) {
-            // ... handle Elastica\ResultSet
-//        }
+        $this->resultSet = $search->search();
+    }
 
-        $results = $resultSet->getResults();
-        $totalResults = $resultSet->getTotalHits();
+    public function getIds()
+    {
+        $ids = [];
+        foreach ($this->resultSet->getResults() as $result) {
+            $ids[] = $result->getDocument()->getId();
+        }
 
+        return $ids;
+    }
+
+    /**
+    * @return \Elastica\ResultSet
+    */
+    public function getResultSet()
+    {
+        return $this->resultSet;
+    }
+
+    public function printDebug()
+    {
+        $totalResults = $this->resultSet->getTotalHits();
         var_dump('total results: ' . $totalResults);
-//        var_dump('total results: ' . count($results));
+        var_dump('paged results: ' . count($this->resultSet->getResults()));
 
-        echo '<table><tr><th>name</th><th>status</th><th>cat</th><th>attr</th></tr>';
+        echo '<table><tr><th>score</th><th>name</th><th width="150px">status</th><th>desc</th><th>cat</th><th>attr</th></tr>';
         /* @var \Elastica\Result $result */
-        foreach ($results as $result) {
+        foreach ($this->resultSet->getResults() as $result) {
             echo '<tr>';
+            echo '<td>' . $result->getScore() . '</td>';
             echo '<td>' . $result->getDocument()->getData()['name'] . '</td>';
+            echo '<td>' . $result->getDocument()->getData()['description'] . '</td>';
             echo '<td>' . $result->getDocument()->getData()['status'] . '</td>';
             echo '<td>';
             foreach ($result->getDocument()->getData()['category'] as $cat) {
@@ -106,6 +134,5 @@ class GF_Elastica_Search
             echo '</tr>';
         }
         echo '</table>';
-
     }
 }
