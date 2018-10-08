@@ -214,6 +214,7 @@ img.gf-header-logo {
 
 .gf-search-wrapper {
     width: 90%;
+    padding-left: 25px;
 }
 
 .gf-search-form--mobile,
@@ -313,9 +314,9 @@ input[type="radio"]:checked + span::before {
     width: 100%;
 }
 
-.gf-search {
-    text-align: center;
-}
+/*.gf-search {*/
+    /*text-align: center;*/
+/*}*/
 
 .gf-search-wrapper .gf-search-toggle {
     display: none;
@@ -2899,11 +2900,11 @@ a#cn-more-info {
 .gf-autocomplete-results {
     display: none;
     position: absolute !important;
-    width: 77% !important;
+    width: 85% !important;
     background: #fff;
     border: 1px solid #ccc;
     z-index: 9999;
-    left: 3%;
+    /*left: 3%;*/
 }
 
 .gf-autocomplete-results ul {
@@ -3010,6 +3011,7 @@ body.home h5{
 }
 
 .gf-widht-100 {
+    position: relative;
     width: 100%;
     text-align: center;
 }
