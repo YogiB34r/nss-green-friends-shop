@@ -420,10 +420,3 @@ jQuery(document).ready(function ($) {
 });
 
 
-jquery(document).ready(function ($) {
-    $('.category-item').hover(function(){
-
-        $('.mega-menu').delay(2000).show();
-
-    });
-});
