@@ -1,6 +1,6 @@
 <?php
 $queriedObjectId = get_queried_object_id();
-$sexyShopCats = gf_get_sex_shop_categories();
+$sexyShopCats = gf_get_category_children_ids('sexy-shop');
 if ($sexyShopCats){
     if ((in_array($queriedObjectId, $sexyShopCats) || in_array($queriedObjectId, $sexyShopCats)) && !in_array('nss-sex-shop-agreement', $_COOKIE)): ?>
         <script type="text/javascript">

@@ -165,8 +165,6 @@ class gf_breadcrumbs extends WC_Breadcrumb
                     )
                 )
             );
-            var_dump(gf_get_category_children_ids('specijalne-promocije'));
-
             if ($terms) {
                 $main_term = apply_filters('woocommerce_breadcrumb_main_term', $terms[0], $terms);
                 $this->term_ancestors($main_term->term_id, 'product_cat');
