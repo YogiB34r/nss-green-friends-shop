@@ -284,11 +284,12 @@ function gf_get_category_query()
 
 function gf_custom_search_output(WP_Query $sortedProducts)
 {
+    echo 123;
     if ($sortedProducts->have_posts()):
 //        global $sw;
         wc_setup_loop();
         woocommerce_product_loop_start();
-        while ($sortedProducts->have_posts()):
+        while ($sortedProducts->have_posts()) :
             $sortedProducts->the_post();
 //            do_action('woocommerce_shop_loop');
 //            $sw->start('wc_get_template_part');
