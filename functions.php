@@ -684,3 +684,34 @@ function gf_authenticate_username_password( $user, $username, $password ) {
 
     return $user;
 }
+
+function gf_custom_shop_loop_template($products){
+
+    echo '<ul class="products columns-4 grid">';
+
+
+    foreach ($products as $product){
+
+
+        $saved_price = $product->regularPrice - $product->salePrice;
+        $saved_price_precentage= $saved_price * 100 / $product->regularPrice;
+
+        echo '<li class="product type-product status-publish has-post-thumbnail first instock sale shipping-taxable purchasable product-type-simple">';
+        echo    '<a href=" '. $product->link .' " title=" '. $product->name .' " >';
+        echo        '<span class="gf-sticker gf-sticker--sale gf-sticker--left"><img src="https://nss-devel.ha.rs/wp-content/uploads/2018/09/14/49/lavo-space-akcija_94aa53990ea30e4b84c449466b7dfd91.png" alt="" height="64" width="64"></span>';
+        echo        '<img src="'.$product->image.'" class="attachment-post-thumbnail size-post-thumbnail wp-post-image" alt="'.$product->name.'" width="200" height="200">';
+        echo    '</a>';
+        echo    '<a href="'. $product->link .'" title="'.$product->name.'">';
+        echo        '<h5>'.$product->name.'</h5>';
+        echo    '</a>';
+        echo    '<span class="price">';
+        echo        '<del><span class="woocommerce-Price-amount amount">'.$product->regularPrice.'<span class="woocommerce-Price-currencySymbol">din.</span></span><del>';
+        echo        '<ins><span class="woocommerce-Price-amount amount">'.$product->salePrice.'<span class="woocommerce-Price-currencySymbol">din.</span></span></ins>';
+        echo        '<p class="saved-sale">Ušteda: <span class="woocommerce-Price-amount amount">'.$saved_price.'<span class="woocommerce-Price-currencySymbol">din.</span></span><em>'.$saved_price_precentage.'</em></p>';
+        echo    '</span>';
+        echo '</li>';
+    }
+
+
+    echo '</ul>';
+}
