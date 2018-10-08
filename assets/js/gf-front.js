@@ -419,4 +419,6 @@ jQuery(document).ready(function ($) {
     });
 });
 
-
+jQuery('.gf-archive-description-button').click(function () {
+    jQuery('.gf-archive-description p').toggleClass('test-class');
+});

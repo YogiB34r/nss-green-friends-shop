@@ -1240,10 +1240,12 @@ body.home .saved-sale {
 
 .gf-category-expander {
     overflow: hidden;
-    border: solid 1px #e2e2e2;
-    border-radius: 9px;
-    margin: 10px 0 10px;
-    /*transition: height 0.4s;*/
+    border-top: 1px solid #e2e2e2;
+    border-right: 1px solid #e2e2e2;
+    border-left: 1px solid #e2e2e2;
+    margin: 0px;
+    margin-top:10px;
+    margin-bottom: 0;
 
 }
 
@@ -1281,6 +1283,10 @@ body.home .saved-sale {
 .gf-category-expander__footer {
     text-align: center;
     width: 100%;
+    border-bottom: 1px solid #e2e2e2;
+    border-right: 1px solid #e2e2e2;
+    border-left: 1px solid #e2e2e2;
+    padding-top: 10px;
 }
 
 .gf-category-expander__footer .fas {
@@ -3214,3 +3220,28 @@ p.woocommerce-thankyou-order-received {
 .gffooter-card-4 { background-position: -2px -84px; width: 62px; height: 40px; }
 .gffooter-card-5 { background-position: -66px -84px; width: 62px; height: 40px; }
 .gffooter-card-6 { background-position: -217px -42px; width: 40px; height: 40px; }
+
+.gf-archive-description-wrapper{
+    padding: 10px 20px;
+}
+.gf-archive-description-button{
+    margin-left: auto;
+    color: #f45411;
+    cursor: pointer;
+    padding: 5px;
+}
+.gf-archive-description-button:hover{
+    color: #666;
+    transition: 0.2s;
+}
+.gf-archive-description p {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #ccc;
+}
+.test-class{
+    color: #666 !important;
+    white-space: unset !important;
+    transition: all 0.2s;
+}
