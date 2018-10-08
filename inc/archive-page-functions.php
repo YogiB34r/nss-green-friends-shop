@@ -110,8 +110,10 @@ function gf_display_categories_on_archive_page()
                 }
             }
             echo '</div>';
-            echo '<div class="gf-category-expander__footer"><span class="fas fa-angle-down"></span></div>';
-
+            var_dump(count($childless_cats_ids));
+            if(count($second_lvl_cat_ids) >= 4 && !empty($childless_cats_ids)){
+                echo '<div class="gf-category-expander__footer"><span class="fas fa-angle-down"></span></div>';
+            }
         }
     }
 }
