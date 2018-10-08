@@ -2891,11 +2891,11 @@ a#cn-more-info {
 .gf-autocomplete-results {
     display: none;
     position: absolute !important;
-    width: 75% !important;
+    width: 77% !important;
     background: #fff;
     border: 1px solid #ccc;
     z-index: 9999;
-    left: 12%;
+    left: 3%;
 }
 
 .gf-autocomplete-results ul {
