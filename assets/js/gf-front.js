@@ -121,7 +121,7 @@ jQuery(document).ready(function () {
                 jQuery('#gf-bars-icon-toggle').removeClass('fancy-header-icons');
                 jQuery('.gf-category-accordion').hide();
             }
-            if (jQuery('#my-fancy-search').hasClass('fancy-header-icons')){
+            if (jQuery('#my-fancy-search').hasClass('fancy-header-icons')) {
                 jQuery('#my-fancy-search').removeClass('fancy-header-icons');
                 jQuery('.mobile-search').toggle('slow');
             }
@@ -137,7 +137,7 @@ jQuery(document).ready(function () {
                 jQuery('#my-fancy-user').removeClass('fancy-header-icons');
                 jQuery('.gf-mobile-menu').slideToggle();
             }
-            if (jQuery('#my-fancy-search').hasClass('fancy-header-icons')){
+            if (jQuery('#my-fancy-search').hasClass('fancy-header-icons')) {
                 jQuery('#my-fancy-search').removeClass('fancy-header-icons');
                 jQuery('.mobile-search').toggle('slow');
             }
@@ -204,8 +204,6 @@ jQuery(document).ready(function () {
         jQuery('.gf-navblock').slideToggle();
         jQuery('.gf-wrapper-before span').toggleClass('fa-angle-down fa-angle-up');
     });
-
-
 
 
     // jQuery('form.woocommerce-widget-layered-nav-dropdown, .widget_price_filter form').submit(function(e) {
@@ -326,7 +324,7 @@ jQuery(document).ready(function ($) {
     //don't start on wrong pages
     if (jQuery('.gf-product-slider').length > 0) {
         var gfSliderColumnCount = 4;
-    // if (typeof gfSliderColumnCount !== "undefined") {
+        // if (typeof gfSliderColumnCount !== "undefined") {
         // @Important activate slider after tab is displayed in order to have access to proper width
         $("#tabs").tabs({
             activate: function (event, ui) {
@@ -418,5 +416,14 @@ jQuery(document).ready(function ($) {
             $('p#billing_company_field > label > span').text('*').removeClass('optional').addClass('required');
             $('p#billing_pib_field > label > span').text('*').removeClass('optional').addClass('required');
         }
+    });
+});
+
+
+jquery(document).ready(function ($) {
+    $('.category-item').hover(function(){
+
+        $('.mega-menu').delay(2000).show();
+
     });
 });
