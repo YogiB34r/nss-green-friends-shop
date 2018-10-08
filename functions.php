@@ -858,21 +858,16 @@ function gf_check_if_user_is_migrated($user, $password)
 
 function remove_country_field_billing( $fields ) {
     unset($fields['billing_country']);
+    return $fields;
+
 }
 add_filter( 'woocommerce_billing_fields', 'remove_country_field_billing' );
 function remove_country_field_shipping( $fields ) {
     unset($fields['shipping_country']);
+    return $fields;
 }
 add_filter( 'woocommerce_shipping_fields', 'remove_country_field_shipping' );
 
-function remove_country_field_checkout( $fields )
-{
-    unset($fields['billing_country']);
-    unset($fields['shipping_country']);
-
-    return $fields;
-}
-add_filter('woocommerce_checkout_fields','remove_country_field_checkout');
 
 // Disable W3TC footer comment for everyone but Admins (single site & network mode)
 if (!current_user_can('activate_plugins')) {
