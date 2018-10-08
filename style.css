@@ -212,7 +212,7 @@ img.gf-header-logo {
 }
 
 .gf-search-wrapper {
-    width: 100%;
+    width: 90%;
 }
 
 .gf-search-form--mobile,
@@ -254,7 +254,7 @@ img.gf-header-logo {
 }
 
 .search-field {
-    width: 70%;
+    width: 85%;
     color: #1d1d1d;
     background: #f6f6f6;
     text-align: left;
@@ -3175,3 +3175,10 @@ p.woocommerce-thankyou-order-received {
     display: none;
 }
 
+.gf-wc-registration-info .woocommerce-info {
+    padding: 5px;
+    margin: 10px 0px;
+}
+.gf-wc-registration-info .woocommerce-info::before{
+    content: none;
+}

@@ -193,6 +193,7 @@ function upload_dir_filter($uploads)
 
     return $uploads;
 }
+
 add_filter('upload_dir', 'upload_dir_filter');
 
 // custom breadcrumbs based on wc breadcrumbs
@@ -348,7 +349,7 @@ function gf_get_category_query()
             $excludeCategories .= " AND categoryIds NOT LIKE '%{$catId}%' ";
         }
     }
-    
+
     $sql = "SELECT postId, {$priceOrdering}, {$customOrdering} FROM wp_gf_products WHERE salePrice > 0 AND stockStatus = 1 AND status = 1
                 AND categories LIKE '%{$cat->name}%' AND categoryIds LIKE '%{$cat->term_id}%' AND {$excludeCategories}
                 AND ({$searchCondition})
@@ -534,10 +535,9 @@ function gf_custom_search($input, $limit = 0)
      END as priceOrder ";
 
     switch (get_query_var('orderby')) {
-        //@TODO implement view count
         case 'popularity':
-//            $orderBy = " ORDER BY viewCount DESC ";
-            $orderBy = " ORDER BY createdAt DESC ";
+            $orderBy = " ORDER BY viewCount DESC ";
+//            $orderBy = " ORDER BY createdAt DESC ";
 
             break;
 
@@ -673,7 +673,7 @@ function gf_ajax_view_count($postId)
 {
     $key = 'post-view-count#' . $postId;
     $cache = new GF_Cache();
-    $count = (int) $cache->redis->get($key);
+    $count = (int)$cache->redis->get($key);
     if ($count == 10) {
         global $wpdb;
         $wpdb->query("UPDATE wp_gf_products SET viewCount = viewCount + {$count} WHERE postId = {$postId}");
@@ -842,14 +842,14 @@ function gf_check_if_user_is_migrated($user, $password)
             if ($passwordHash === $password_in_db) {
                 return $user;
             } else {
-                return new WP_Error( 'incorrect_password',
+                return new WP_Error('incorrect_password',
                     sprintf(
                     /* translators: %s: user name */
-                        __( '<strong>ERROR</strong>: The password you entered for the username %s is incorrect.' ),
+                        __('<strong>ERROR</strong>: The password you entered for the username %s is incorrect.'),
                         '<strong>' . $user->user_login . '</strong>'
                     ) .
                     ' <a href="' . wp_lostpassword_url() . '">' .
-                    __( 'Lost your password?' ) .
+                    __('Lost your password?') .
                     '</a>'
                 );
             }
@@ -862,21 +862,39 @@ function gf_check_if_user_is_migrated($user, $password)
 //add_filter('wp_authenticate_user', 'gf_check_if_user_is_migrated', 10, 2);
 
 
-function remove_country_field_billing( $fields ) {
+function remove_country_field_billing($fields)
+{
     unset($fields['billing_country']);
     return $fields;
 
 }
-add_filter( 'woocommerce_billing_fields', 'remove_country_field_billing' );
-function remove_country_field_shipping( $fields ) {
+
+add_filter('woocommerce_billing_fields', 'remove_country_field_billing');
+function remove_country_field_shipping($fields)
+{
     unset($fields['shipping_country']);
     return $fields;
 }
-add_filter( 'woocommerce_shipping_fields', 'remove_country_field_shipping' );
+
+add_filter('woocommerce_shipping_fields', 'remove_country_field_shipping');
 
 
 // Disable W3TC footer comment for everyone but Admins (single site & network mode)
 if (!current_user_can('activate_plugins')) {
-    add_filter( 'w3tc_can_print_comment', function( $w3tc_setting ) { return false; }, 10, 1 );
+    add_filter('w3tc_can_print_comment', function ($w3tc_setting) {
+        return false;
+    }, 10, 1);
 }
 
+
+function action_woocommerce_register_form()
+{
+    ?>
+    <div class="gf-wc-registration-info">
+        <div class="woocommerce-info ">
+            <p>Podaci o Vašem nalogu biće poslati na unetu email adresu</p>
+        </div>
+    </div>
+    <?php
+}
+add_action('woocommerce_register_form', 'action_woocommerce_register_form', 20, 10);
