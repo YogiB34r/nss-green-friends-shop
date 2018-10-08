@@ -865,6 +865,7 @@ function gf_check_if_user_is_migrated($user, $password)
 function remove_country_field_billing($fields)
 {
     unset($fields['billing_country']);
+    unset($fields['billing_state']);
     return $fields;
 
 }
@@ -873,6 +874,7 @@ add_filter('woocommerce_billing_fields', 'remove_country_field_billing');
 function remove_country_field_shipping($fields)
 {
     unset($fields['shipping_country']);
+    unset($fields['shipping_state']);
     return $fields;
 }
 
