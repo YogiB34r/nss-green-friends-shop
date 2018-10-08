@@ -61,7 +61,7 @@ get_header();
         </header>
         <?php
         $sortedProducts = gf_custom_search($_GET['query']);
-        if ($sortedProducts->have_posts()) {
+        if ($sortedProducts && $sortedProducts->have_posts()) {
                 /**
                  * Hook: woocommerce_before_shop_loop.
                  *

@@ -345,7 +345,7 @@ function gf_get_category_query()
     $excludeCategories = " 1=1 ";
     foreach (gf_get_sex_shop_categories() as $catId) {
         if($cat->term_id != $catId){
-            $excludeCategories = "categoryIds NOT LIKE '%{$catId}%' ";
+            $excludeCategories .= " AND categoryIds NOT LIKE '%{$catId}%' ";
         }
     }
     
@@ -522,6 +522,10 @@ function gf_custom_search($input, $limit = 0)
         $maxPrice = (int)$_GET['max_price'];
         $priceCondition = " AND priceOrder >= {$minPrice} AND priceOrder <= {$maxPrice} ";
     }
+    $excludeCategories = " 1=1 ";
+    foreach (gf_get_sex_shop_categories() as $catId) {
+        $excludeCategories .= " AND categoryIds NOT LIKE '%{$catId}%' ";
+    }
 
     $gradeCount = $gradeCount * 7;
     $priceOrdering = " CASE
@@ -572,6 +576,7 @@ function gf_custom_search($input, $limit = 0)
         FROM wp_gf_products
         WHERE stockStatus = 1 
         AND status = 1
+        AND {$excludeCategories}
         AND ({$searchCondition}) 
         HAVING o > {$gradeCount}
         {$priceCondition}
