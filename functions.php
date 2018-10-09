@@ -714,8 +714,8 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products) {
         if ($product->getStockStatus() == 0) {
             $classes .= ' outofstock';
         }
-
-        $html .= '<li class="product type-product status-publish has-post-thumbnail first instock sale shipping-taxable purchasable product-type-simple">';
+        // klase koje mozda zatrebaju za <li> 'instock sale shipping-taxable purchasable product-type-simple'
+        $html .= '<li class="product type-product status-publish has-post-thumbnail first ">';
         $html .= '<a href=" ' . $product->dto['permalink'] .' " title=" '. $product->getName() .' ">';
         $html .= add_stickers_to_products_on_sale($classes);
 //        woocommerce_show_product_sale_flash('', '', '', $classes);
