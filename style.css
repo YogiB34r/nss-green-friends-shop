@@ -3293,7 +3293,7 @@ p.woocommerce-thankyou-order-received {
     color: #ccc;
 }
 
-.test-class {
+.gf-display-category-description {
     color: #666 !important;
     white-space: unset !important;
     transition: all 0.2s;
@@ -3319,3 +3319,4 @@ p.woocommerce-thankyou-order-received {
 #billing_country_field, #shipping_country_field{
     display: none;
 }
+
