@@ -746,7 +746,6 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products) {
 
 add_action('validate_password_reset', 'gf_validate_password_reset', 10, 2 );
 function gf_validate_password_reset( $errors, $user ) {
-    var_dump($_POST);
     if(strlen($_POST['password_1']) < 6  ) {
         $errors->add( 'woocommerce_password_error', __( 'Lozinka mora imati minimum 6 karaktera.' ) );
     }
