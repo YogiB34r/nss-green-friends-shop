@@ -1362,6 +1362,7 @@ body.home .gf-navblock {
     text-align: center;
     margin-bottom: 0.4em;
     width: 100% !important;
+    height: auto;
 }
 
 .gf-sidebar h2 {
@@ -3315,3 +3316,6 @@ p.woocommerce-thankyou-order-received {
     display: none;
 }
 
+#billing_country_field, #shipping_country_field{
+    display: none;
+}
