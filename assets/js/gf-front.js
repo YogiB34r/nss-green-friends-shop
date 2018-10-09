@@ -190,10 +190,11 @@ jQuery(document).ready(function () {
         jQuery(this).toggleClass('fa-angle-down fa-angle-up');
 
         if (jQuery('#gf-expander-id').hasClass('gf-height-test')) {
-            jQuery('#gf-expander-id').removeClass('gf-height-test');
+            jQuery('#gf-expander-id').removeClass('gf-height-test', {duration:500});
         } else {
-            jQuery('#gf-expander-id').addClass('gf-height-test');
+            jQuery('#gf-expander-id').addClass('gf-height-test', {duration:500});
         }
+
     });
 
     if (jQuery('body').is('.archive, .single-product')) {
