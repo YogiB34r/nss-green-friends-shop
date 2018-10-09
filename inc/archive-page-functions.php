@@ -159,10 +159,12 @@ function bbloomer_custom_action()
     global $wp_query;
     $cat_id = $wp_query->get_queried_object_id();
     $cat_desc = term_description($cat_id, 'product_cat');
-    echo '<div class="gf-archive-description-wrapper">';
-    echo '<div class="row"><div class="gf-archive-description-button">Opis</div></div>';
-    echo '<div class="row gf-archive-description">' . $cat_desc . '</div>';
-    echo '</div>';
+    if ($cat_desc !== '') {
+        echo '<div class="gf-archive-description-wrapper">';
+        echo '<div class="row"><div class="gf-archive-description-button">Opis</div></div>';
+        echo '<div class="row gf-archive-description">' . $cat_desc . '</div>';
+        echo '</div>';
+    }
 
 }
 
