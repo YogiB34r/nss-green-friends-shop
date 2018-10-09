@@ -594,7 +594,6 @@ function remove_country_field_billing($fields)
     return $fields;
 
 }
-
 add_filter('woocommerce_billing_fields', 'remove_country_field_billing');
 function remove_country_field_shipping($fields)
 {
@@ -602,8 +601,16 @@ function remove_country_field_shipping($fields)
     unset($fields['shipping_state']);
     return $fields;
 }
-
 add_filter('woocommerce_shipping_fields', 'remove_country_field_shipping');
+
+function custom_override_checkout_fields( $fields ) {
+    unset($fields['billing']['billing_country']);
+    unset($fields['shipping_country']);
+
+    return $fields;
+}
+add_filter( 'woocommerce_checkout_fields' , 'custom_override_checkout_fields' );
+
 
 
 // Disable W3TC footer comment for everyone but Admins (single site & network mode)
@@ -736,7 +743,14 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products) {
 
     echo $html;
 }
+add_filter( 'registration_errors', 'wpse8170_registration_errors', 10, 3 );
+function wpse8170_registration_errors( $errors, $sanitized_user_login, $user_email ) {
+    if ($user_email == 'test@test123.com' ) {
+        $errors->add( 'myexception_code', 'This is my message' );
+    }
 
+    return $errors;
+}
 
 //maybe we will need this function...
 //function gf_custom_add_to_cart_message($message, $products)
