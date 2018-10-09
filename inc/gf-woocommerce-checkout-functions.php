@@ -53,7 +53,7 @@ function gf_order_fields($fields) {
 add_action( 'woocommerce_admin_order_data_after_billing_address', 'gf_checkout_field_display_admin_order_meta', 10, 1 );
 
 function gf_checkout_field_display_admin_order_meta($order){
-    echo '<p><strong>'.__('Pib').':</strong> ' . get_post_meta( $order->get_id(), '_billing_pib', true ) . '</p>';
+    echo '<p class="gf-admin-orders-pib-field"><strong>'.__('Pib').':</strong> ' . get_post_meta( $order->get_id(), '_billing_pib', true ) . '</p>';
 }
 add_filter('woocommerce_email_order_meta_keys', 'gf_order_meta_keys');
 
