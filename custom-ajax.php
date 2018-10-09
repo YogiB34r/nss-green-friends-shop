@@ -85,9 +85,9 @@ if (isset($_POST['query'])) {
 }
 
 
-include("inc/Elastica/GF_Elastica_Search.php");
-include("inc/Elastica/GF_Elastica_Indexer.php");
-include("inc/Elastica/GF_Elastica_Setup.php");
+//include(__DIR__ . "/inc/Search/Elastica/Search.php");
+include(__DIR__ . "/inc/Search/Elastica/Indexer.php");
+include(__DIR__ . "/inc/Search/Elastica/Setup.php");
 
 if (isset($_GET['action'])) {
     $config = array(
@@ -98,13 +98,13 @@ if (isset($_GET['action'])) {
 
     switch ($_GET['action']) {
         case 'createIndex':
-            GF_Elastica_Setup::createIndex($elasticaClient);
+            \GF\Search\Elastica\Setup::createIndex($elasticaClient);
 
             break;
 
         case 'getList':
             $keywords = $_GET['query'];
-            $search = new GF_Elastica_Search($elasticaClient);
+            $search = new \GF\Search\Elastica\Search($elasticaClient);
             $search->search($keywords);
             $search->printDebug();
 
@@ -113,7 +113,7 @@ if (isset($_GET['action'])) {
 
             break;
         case 'syncIndex':
-            GF_Elastica_Indexer::index($elasticaClient);
+            \GF\Search\Elastica\Indexer::index($elasticaClient);
 
             break;
     }

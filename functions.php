@@ -280,14 +280,25 @@ function gf_elastic_search_with_data($input, $limit = 0)
         'host' => 'localhost',
         'port' => 9200
     );
+    $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
+    if (isset($_POST['ppp'])) {
+        $per_page = ($_POST['ppp'] > 48) ? 48 : $_POST['ppp'];
+    }
+    if ($limit) {
+        $per_page = $limit;
+    }
+    $currentPage = (get_query_var('paged')) ? get_query_var('paged') : 1;
     $elasticaSearch = new \GF\Search\Elastica\Search(new \Elastica\Client($config));
     $search = new \GF\Search\Search(new \GF\Search\Adapter\Elastic($elasticaSearch));
-    $resultSet = $search->getItemsForSearch($input, $limit);
+    $resultSet = $search->getItemsForSearch($input, $per_page, $currentPage);
+
+    wc_set_loop_prop('total', $resultSet->getTotalHits());
+    wc_set_loop_prop('per_page', $per_page);
+    wc_set_loop_prop('current_page', $currentPage);
+    wc_set_loop_prop('total_pages', ceil($resultSet->getTotalHits() / $per_page));
 
     return $resultSet;
 }
-
-
 
 function gf_get_category_query()
 {
@@ -322,14 +333,16 @@ function gf_custom_search_output(WP_Query $sortedProducts)
 function parseAttributes()
 {
     $redis = new GF_Cache();
-    $atributes = unserialize($redis->redis->get('atributes-collection'));
+    $atributes = unserialize($redis->redis->get('attributes-collection'));
     if ($atributes === false) {
         $atributes = [];
         foreach (get_terms('pa_boja') as $term) {
-            $atributes[] = rtrim($term->name, 'aeiou');
+//            $atributes[] = rtrim($term->name, 'aeiou');
+            $atributes[] = $term->name;
         }
         foreach (get_terms('pa_velicina') as $term) {
-            $atributes[] = rtrim($term->name, 'aeiou');
+//            $atributes[] = rtrim($term->name, 'aeiou');
+            $atributes[] = $term->name;
         }
         $redis->redis->set('attributes-collection', serialize($atributes));
     }
@@ -512,41 +525,7 @@ function gf_custom_add_to_cart_message($message)
 
 }
 
-//maybe we will need this function...
-//function gf_custom_add_to_cart_message($message, $products)
-//{
-//    $titles = array();
-//    $count = 0;
-//    $show_qty = true;
-//    if (!is_array($products)) {
-//        $products = array($products => 1);
-//        $show_qty = false;
-//    }
-//    if (!$show_qty) {
-//        $products = array_fill_keys(array_keys($products), 1);
-//    }
-//    foreach ($products as $product_id => $qty) {
-//        $titles[] = ($qty > 1 ? absint($qty) . ' &times; ' : '') . sprintf(_x('&ldquo;%s&rdquo;', 'Item name in quotes', 'woocommerce'), strip_tags(get_the_title($product_id)));
-//        $count += $qty;
-//    }
-//    $titles = array_filter($titles);
-//    $added_text = sprintf(_n('%s has been added to your cart.', '%s have been added to your cart.', $count, 'woocommerce'), wc_format_list_of_items($titles));
-//    // Output success messages.
-//    if ('yes' === get_option('woocommerce_cart_redirect_after_add')) {
-//        $return_to = apply_filters('woocommerce_continue_shopping_redirect', wc_get_raw_referer() ? wp_validate_redirect(wc_get_raw_referer(), false) : wc_get_page_permalink('shop'));
-//        $message = sprintf('<a href="%s" class="button wc-forward">%s</a> %s', esc_url($return_to), esc_html__('Continue shopping', 'woocommerce'), esc_html($added_text));
-//    } else {
-//        $message = sprintf('<a href="%s" class="button wc-forward">%s</a> %s', esc_url(wc_get_page_permalink('cart')), esc_html__('View cart', 'woocommerce'), esc_html($added_text));
-//    }
-//
-//    if (has_filter('wc_add_to_cart_message')) {
-//        wc_deprecated_function('The wc_add_to_cart_message filter', '3.0', 'wc_add_to_cart_message_html');
-//        $message = apply_filters('wc_add_to_cart_message', $message, $product_id);
-//    }
-//    return $message;
-//}
-function gf_get_category_children_ids($slug)
-{
+function gf_get_category_children_ids($slug) {
     $cat = get_term_by('slug', $slug, 'product_cat');
     $childrenIds = [];
     if ($cat) {
@@ -559,28 +538,14 @@ function gf_get_category_children_ids($slug)
     return $childrenIds;
 }
 
-function gf_add_custom_meta_to_users()
-{
+function gf_add_custom_meta_to_users() {
     $users = get_users(array('fields' => array('ID')));
-//    var_dump(get_users());
     foreach ($users as $user) {
         update_user_meta($user->ID, 'migrated', '0');
     }
 }
 
-//function gf_check_if_user_is_migrated($user_id)
-//{
-//    $users = get_users(array('fields' => array('ID')));
-//    foreach ($users as $user) {
-//        update_user_meta($user->ID, 'migrated', '0');
-//        if (get_user_meta($user->ID, 'migrated') == 1) {
-//            //uradi nestooo
-//
-//        }
-//    }
-//}
-function gf_check_if_user_is_migrated($user, $password)
-{
+function gf_check_if_user_is_migrated($user, $password) {
     if (!empty($user)) {
         if (get_user_meta($user->ID, 'migrated', true) != 0) {
 
@@ -701,33 +666,108 @@ function gf_authenticate_username_password( $user, $username, $password ) {
     return $user;
 }
 
-function gf_custom_shop_loop_template($products){
+function gf_custom_shop_loop(\Elastica\ResultSet $products) {
+    $html = '<ul class="products columns-4 grid">';
 
-    echo '<ul class="products columns-4 grid">';
+    $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
+    if (isset($_POST['ppp'])) {
+        $per_page = ($_POST['ppp'] > 48) ? 48 : $_POST['ppp'];
+    }
+    $currentPage = (get_query_var('paged')) ? get_query_var('paged') : 1;
+    $totalPages = ceil($products->count() / $per_page);
 
+    wc_set_loop_prop('total', $products->count());
+    wc_set_loop_prop('per_page', $per_page);
+    wc_set_loop_prop('current_page', $currentPage);
+    wc_set_loop_prop('total_pages', $totalPages);
 
-    foreach ($products as $product){
+//    var_dump($products->getResults()[0]->getData());
+    foreach ($products->getResults() as $productData){
+        $product = new \Nss\Feed\Product($productData->getData());
+        $saved_price = $product->getRegularPrice() - $product->getSalePrice();
+        $price = $product->getRegularPrice();
+        if ($product->getSalePrice() > 0) {
+            $price = $product->getSalePrice();
+        }
+        $saved_percentage = 0;
+        if ($saved_price > 0 && $product->getSalePrice() > 0) {
+            $saved_percentage = number_format($saved_price * 100 / $product->getRegularPrice(), 2);
+        }
 
+//        $product_link = get_permalink((int) $productData->getId());
+//        if (has_post_thumbnail($productData->getId())) {
+//
+//        } else {
+//            echo '<img src="' . wc_placeholder_img_src() . '" alt="Placeholder" width="200px" height="200px" />';
+//        }
+        $classes = '';
+        if ($saved_percentage > 0) {
+            $classes .= ' sale ';
+        }
+        if ($product->getStockStatus() == 0) {
+            $classes .= ' outofstock';
+        }
 
-        $saved_price = $product->regularPrice - $product->salePrice;
-        $saved_price_precentage= $saved_price * 100 / $product->regularPrice;
-
-        echo '<li class="product type-product status-publish has-post-thumbnail first instock sale shipping-taxable purchasable product-type-simple">';
-        echo    '<a href=" '. $product->link .' " title=" '. $product->name .' " >';
-        echo        '<span class="gf-sticker gf-sticker--sale gf-sticker--left"><img src="https://nss-devel.ha.rs/wp-content/uploads/2018/09/14/49/lavo-space-akcija_94aa53990ea30e4b84c449466b7dfd91.png" alt="" height="64" width="64"></span>';
-        echo        '<img src="'.$product->image.'" class="attachment-post-thumbnail size-post-thumbnail wp-post-image" alt="'.$product->name.'" width="200" height="200">';
-        echo    '</a>';
-        echo    '<a href="'. $product->link .'" title="'.$product->name.'">';
-        echo        '<h5>'.$product->name.'</h5>';
-        echo    '</a>';
-        echo    '<span class="price">';
-        echo        '<del><span class="woocommerce-Price-amount amount">'.$product->regularPrice.'<span class="woocommerce-Price-currencySymbol">din.</span></span><del>';
-        echo        '<ins><span class="woocommerce-Price-amount amount">'.$product->salePrice.'<span class="woocommerce-Price-currencySymbol">din.</span></span></ins>';
-        echo        '<p class="saved-sale">Ušteda: <span class="woocommerce-Price-amount amount">'.$saved_price.'<span class="woocommerce-Price-currencySymbol">din.</span></span><em>'.$saved_price_precentage.'</em></p>';
-        echo    '</span>';
-        echo '</li>';
+        $html .= '<li class="product type-product status-publish has-post-thumbnail first instock sale shipping-taxable purchasable product-type-simple">';
+        $html .= '<a href=" ' . $product->dto['permalink'] .' " title=" '. $product->getName() .' ">';
+        $html .= add_stickers_to_products_on_sale($classes);
+//        woocommerce_show_product_sale_flash('', '', '', $classes);
+//        add_stickers_to_products_new($product);
+        $html .= $product->dto['thumbnail'];
+        $html .= add_stickers_to_products_soldout($classes);
+        $html .= '</a>';
+        $html .= '<a href="'. $product->dto['permalink'] .'" title="'.$product->getName().'">';
+        $html .= '<h5>'.$product->getName().'</h5>';
+        $html .= '</a>';
+        $html .= '<span class="price">';
+        $html .= '<del><span class="woocommerce-Price-amount amount">'.$product->getRegularPrice()
+                     .'<span class="woocommerce-Price-currencySymbol">din.</span></span></del>';
+        if ($saved_percentage > 0) {
+            $html .= '<ins><span class="woocommerce-Price-amount amount">'.$price.
+                     '<span class="woocommerce-Price-currencySymbol">din.</span></span></ins>';
+            $html .= '<p class="saved-sale">Ušteda: <span class="woocommerce-Price-amount amount">'.$saved_price.
+                     '<span class="woocommerce-Price-currencySymbol">din.</span></span><em>'.$saved_percentage.'%</em></p>';
+        }
+        $html .= '</span>';
+        $html .= '</li>';
     }
 
+    $html .= '</ul>';
 
-    echo '</ul>';
+    echo $html;
 }
+
+
+//maybe we will need this function...
+//function gf_custom_add_to_cart_message($message, $products)
+//{
+//    $titles = array();
+//    $count = 0;
+//    $show_qty = true;
+//    if (!is_array($products)) {
+//        $products = array($products => 1);
+//        $show_qty = false;
+//    }
+//    if (!$show_qty) {
+//        $products = array_fill_keys(array_keys($products), 1);
+//    }
+//    foreach ($products as $product_id => $qty) {
+//        $titles[] = ($qty > 1 ? absint($qty) . ' &times; ' : '') . sprintf(_x('&ldquo;%s&rdquo;', 'Item name in quotes', 'woocommerce'), strip_tags(get_the_title($product_id)));
+//        $count += $qty;
+//    }
+//    $titles = array_filter($titles);
+//    $added_text = sprintf(_n('%s has been added to your cart.', '%s have been added to your cart.', $count, 'woocommerce'), wc_format_list_of_items($titles));
+//    // Output success messages.
+//    if ('yes' === get_option('woocommerce_cart_redirect_after_add')) {
+//        $return_to = apply_filters('woocommerce_continue_shopping_redirect', wc_get_raw_referer() ? wp_validate_redirect(wc_get_raw_referer(), false) : wc_get_page_permalink('shop'));
+//        $message = sprintf('<a href="%s" class="button wc-forward">%s</a> %s', esc_url($return_to), esc_html__('Continue shopping', 'woocommerce'), esc_html($added_text));
+//    } else {
+//        $message = sprintf('<a href="%s" class="button wc-forward">%s</a> %s', esc_url(wc_get_page_permalink('cart')), esc_html__('View cart', 'woocommerce'), esc_html($added_text));
+//    }
+//
+//    if (has_filter('wc_add_to_cart_message')) {
+//        wc_deprecated_function('The wc_add_to_cart_message filter', '3.0', 'wc_add_to_cart_message_html');
+//        $message = apply_filters('wc_add_to_cart_message', $message, $product_id);
+//    }
+//    return $message;
+//}

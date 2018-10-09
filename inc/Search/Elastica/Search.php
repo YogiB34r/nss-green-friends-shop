@@ -19,7 +19,7 @@ class Search
         $this->client = $elasticaClient;
     }
 
-    public function search($keywords, $limit = 0) {
+    public function search($keywords, $limit = 0, $currentPage = 1, $order = '') {
         $search = new \Elastica\Search($this->client);
 
         $search
@@ -83,14 +83,65 @@ class Search
 //        $q->setFieldFuzziness('description', 1);
         $boolQuery->addShould($q);
 
-        $search->setQuery($boolQuery);
+        $query->setQuery($boolQuery);
+        switch ($order) {
+            case 'popularity':
+                $orderBy = [
+                    'order_data.viewCount' => 'desc'
+                ];
+
+                break;
+
+            //@TODO add sync for ratings
+            case 'rating':
+                $orderBy = [
+                    'order_data.rating' => 'desc'
+                ];
+
+                break;
+
+            case 'date':
+                $orderBy = [
+                    'order_data.date' => 'asc'
+                ];
+
+                break;
+
+            case 'price-desc':
+                $orderBy = [
+                    'order_data.price' => 'desc'
+                ];
+
+                break;
+
+            case 'price':
+                $orderBy = [
+                    'order_data.price' => 'asc'
+                ];
+
+                break;
+
+            default:
+                $orderBy = [
+                    'postId' => 'asc'
+                ];
+
+                break;
+        }
+        $query->setSort($orderBy);
+
+        $search->setQuery($query);
         $search->setOption('size', 10000);
+//        $search->addOption('sort', [
+//            'name' => 'desc'
+//        ]);
         if ($limit) {
             $search->setOption('size', $limit);
         }
         $search->setOption('from', 0);
-//        $search->setOption()
-
+        if ($currentPage > 1) {
+            $search->setOption('from', ($currentPage - 1) * $limit);
+        }
         $this->resultSet = $search->search();
     }
 

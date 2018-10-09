@@ -58,14 +58,21 @@ class Elastic implements \GF\Search\AdapterInterface
         return $orderBy;
     }
 
+    public function getIdsForStandardSearch($input, $limit = 0, $currentPage = 1)
+    {
+        $this->search->search($input, $limit, $currentPage, $_GET['orderby']);
+
+        return array_keys($this->search->getIds());
+    }
+
     /**
      * @param $input
      * @param int $limit
      * @return \Elastica\ResultSet
      */
-    public function getItemsForStandardSearch($input, $limit = 0)
+    public function getItemsForStandardSearch($input, $limit = 0, $currentPage = 1)
     {
-        $this->search->search($input, $limit);
+        $this->search->search($input, $limit, $currentPage, $_GET['orderby']);
 
         return $this->search->getResultSet();
 

@@ -16,12 +16,12 @@ class Setup
                         'default' => array(
                             'type' => 'custom',
                             'tokenizer' => 'standard',
-                            'filter' => array('lowercase', 'mySnowball', 'stop') //custom_ascii_folding
+                            'filter' => array('lowercase', 'stop') //custom_ascii_folding
                         ),
                         'search' => array(
                             'type' => 'custom',
                             'tokenizer' => 'standard',
-                            'filter' => array('standard', 'lowercase', 'mySnowball', 'trim') //@TODO install icu_folding
+                            'filter' => array('standard', 'lowercase', 'trim') //@TODO install icu_folding
                         )
                     ),
                     'filter' => array(
@@ -49,38 +49,70 @@ class Setup
 
         // Set mapping
         $mapping->setProperties(array(
-            'postId' => array('type' => 'integer'),
-            'category' => array(
-                'type' => 'object',
-                'properties' => array(
-                    'id' => array('type' => 'integer'),
-                    'name' => array('type' => 'text', 'boost' => 4)
-                ),
-            ),
-            'attributes' => array(
-                'type' => 'object',
-                'properties' => array(
-                    'type' => array('type' => 'text'),
-                    'value' => array('type' => 'text', 'boost' => 4)
-                ),
-            ),
-            'name' => array('type' => 'text', 'boost' => 5),
-            'manufacturer' => array('type' => 'text', 'boost' => 5),
-            'createdAt' => array('type' => 'date'),
-            'supplierId' => array('type' => 'integer'),
-            'supplierSku' => array('type' => 'text'),
-            'description' => array('type' => 'text'),
-            'shortDescription' => array('type' => 'text'),
-            'regularPrice' => array('type' => 'integer'),
-            'salePrice' => array('type' => 'integer'),
-            'status' => array('type' => 'integer'),
-            'stockStatus' => array('type' => 'integer'),
-            'sku' => array('type' => 'text', 'boost' => 20),
-            'synced' => array('type' => 'integer'),
-            'viewCount' => array('type' => 'integer'),
-            'rating' => array('type' => 'integer'),
-            'type' => array('type' => 'text'),
-            'inputPrice' => array('type' => 'integer'), // check for float
+            'entity' => [
+                'properties' => [
+                    'postId' => array('type' => 'integer'),
+                    'category' => array(
+                        'type' => 'nested',
+                        'properties' => array(
+                            'id' => array('type' => 'integer'),
+                            'name' => array('type' => 'text', 'boost' => 4)
+                        ),
+                    ),
+                    'attributes' => array(
+                        'type' => 'nested',
+                        'properties' => array(
+                            'type' => array('type' => 'text'),
+                            'value' => array('type' => 'text', 'boost' => 4)
+                        ),
+                    ),
+                    'name' => array('type' => 'text', 'boost' => 5, 'fielddata' => true),
+                    'manufacturer' => array('type' => 'text', 'boost' => 5),
+                    'createdAt' => array('type' => 'date'),
+                    'supplierId' => array('type' => 'integer'),
+                    'supplierSku' => array('type' => 'text'),
+                    'thumbnail' => array('type' => 'text'),
+                    'permalink' => array('type' => 'text'),
+                    'description' => array('type' => 'text'),
+                    'shortDescription' => array('type' => 'text'),
+                    'regularPrice' => array('type' => 'integer'),
+                    'salePrice' => array('type' => 'integer'),
+                    'status' => array('type' => 'integer'),
+                    'stockStatus' => array('type' => 'integer'),
+                    'sku' => array('type' => 'text', 'boost' => 20),
+                    'synced' => array('type' => 'integer'),
+                    'viewCount' => array('type' => 'integer'),
+                    'rating' => array('type' => 'integer'),
+                    'product_type' => array('type' => 'text'),
+                    'inputPrice' => array('type' => 'integer'), // check for float
+                ]
+            ],
+            'order_data' => [
+                'properties' => [
+                    'price' => array('type' => 'integer'),
+                    'rating' => array('type' => 'integer'),
+                    'date' => array('type' => 'integer'),
+                    'viewCount' => array('type' => 'integer'),
+                    'stockStatus' => array('type' => 'integer'),
+                    'status' => array('type' => 'integer'),
+                    'default' => array('type' => 'integer'),
+                ]
+            ],
+            'search_data' => [
+                'properties' => [
+                    'full_text' => array('type' => 'text'),
+                    'full_text_boosted' => array('type' => 'text'),
+                ]
+            ],
+            "completion_terms" => [
+                "type" => "text",
+                "analyzer" => "search"
+            ],
+//            "suggestion_terms" => [
+//                "type" => "text",
+//                "index_analyzer" => "search",
+//                "search_analyzer" => "search"
+//            ]
         ));
 
         $response = $mapping->send();

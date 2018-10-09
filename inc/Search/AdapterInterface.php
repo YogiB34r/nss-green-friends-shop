@@ -8,5 +8,5 @@ interface AdapterInterface
 
     public function getIdsForCategory($slug);
 
-//    public function getItemsForStandardSearch($slug);
+    public function getItemsForStandardSearch($slug);
 }

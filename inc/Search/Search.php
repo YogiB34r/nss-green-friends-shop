@@ -25,8 +25,8 @@ class Search
     }
 
 
-    public function getItemsForSearch($input, $limit = 0)
+    public function getItemsForSearch($input, $limit = 0, $currentPage = 1)
     {
-        return $this->adapter->getItemsForStandardSearch($input, $limit);
+        return $this->adapter->getItemsForStandardSearch($input, $limit, $currentPage);
     }
 }

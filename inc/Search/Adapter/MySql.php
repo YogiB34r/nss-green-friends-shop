@@ -11,6 +11,12 @@ class MySql implements \GF\Search\AdapterInterface
         $this->wpdb = $wpdb;
     }
 
+    public function getItemsForStandardSearch($slug)
+    {
+        // TODO: Implement getItemsForStandardSearch() method.
+    }
+
+
     private function parseOrderBy($search = false)
     {
         $order = (isset($_GET['orderby'])) ? $_GET['orderby'] : 'date';
