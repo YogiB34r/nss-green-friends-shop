@@ -103,7 +103,7 @@ if (isset($_GET['action'])) {
             break;
 
         case 'getList':
-            $keywords = $_GET['query'];
+            $keywords = (isset($_GET['query'])) ? $_GET['query'] : 'test';
             $search = new \GF\Search\Elastica\Search($elasticaClient);
             $search->search($keywords);
             $search->printDebug();

@@ -7,6 +7,8 @@ class Setup
     static function createIndex(\Elastica\Client $elasticaClient) {
         $elasticaIndex = $elasticaClient->getIndex('nss');
 
+        $elasticaIndex->delete();
+
         $elasticaIndex->create(
             array(
                 'number_of_shards' => 4,
@@ -76,7 +78,7 @@ class Setup
                     'description' => array('type' => 'text'),
                     'shortDescription' => array('type' => 'text'),
                     'regularPrice' => array('type' => 'integer'),
-                    'salePrice' => array('type' => 'integer'),
+                    'salePrice' => array('type' => 'text'),
                     'status' => array('type' => 'integer'),
                     'stockStatus' => array('type' => 'integer'),
                     'sku' => array('type' => 'text', 'boost' => 20),
@@ -84,7 +86,7 @@ class Setup
                     'viewCount' => array('type' => 'integer'),
                     'rating' => array('type' => 'integer'),
                     'product_type' => array('type' => 'text'),
-                    'inputPrice' => array('type' => 'integer'), // check for float
+                    'inputPrice' => array('type' => 'long'),
                 ]
             ],
             'order_data' => [
@@ -93,8 +95,8 @@ class Setup
                     'rating' => array('type' => 'integer'),
                     'date' => array('type' => 'integer'),
                     'viewCount' => array('type' => 'integer'),
-                    'stockStatus' => array('type' => 'integer'),
-                    'status' => array('type' => 'integer'),
+                    'stock' => array('type' => 'integer'),
+                    'published' => array('type' => 'integer'),
                     'default' => array('type' => 'integer'),
                 ]
             ],

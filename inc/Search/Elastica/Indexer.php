@@ -10,18 +10,21 @@ class Indexer
 
         $elasticaIndex = $elasticaClient->getIndex('nss');
         $elasticaType = $elasticaIndex->getType('products');
-        $perPage = 500;
+        $perPage = 700;
+//        $perPage = 100;
 
         $documents = [];
-        for ($i = 0; $i < 42; $i++) {
+//        for ($i = 0; $i < 42; $i++) {
+        for ($i = 0; $i < 30; $i++) {
 //        for ($i = 0; $i < 2; $i++) {
             $offset = $i * $perPage;
             $sql = "SELECT ID FROM wp_posts WHERE post_type = 'product' LIMIT {$offset}, {$perPage};";
             $result = $wpdb->get_results($sql);
             foreach ($result as $value) {
                 $product = wc_get_product($value->ID);
-                if (get_class($product) !== \WC_Product::class) {
-                    var_dump('Could not find product for postId : ', $value);
+                if (!$product) {
+                    var_dump($product);
+                    var_dump('Could not find product for postId : ', $value->ID);
                     continue;
                 }
                 $documents[] = static::parseWcProduct($product);
@@ -95,7 +98,7 @@ class Indexer
             'permalink' => $product_link,
             'shortDescription' => $product->get_short_description(),
             'regularPrice' => $regularPrice,
-            'salePrice' => $salePrice,
+            'salePrice' => (string) $salePrice,
             'inputPrice' => $product->get_meta('input_price'),
             'stockStatus' => (int) $product->is_in_stock(),
             'status' => (int) $product->is_visible(),
@@ -113,8 +116,8 @@ class Indexer
                 'rating' => $product->get_meta('rating'),
                 'date' => strtotime($product->get_date_created()),
                 'viewCount' => $gfProduct->viewCount,
-                'stockStatus' => (int) $product->is_in_stock(),
-                'status' => (int) $product->is_visible(),
+                'stock' => (int) $product->is_in_stock(),
+                'published' => (int) $product->is_visible(),
                 'default' => static::calculateOrderingRating($product),
             ]
         ];
