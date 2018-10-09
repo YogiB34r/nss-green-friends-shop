@@ -277,7 +277,7 @@ function gf_elastic_search($input, $limit = 0)
 function gf_elastic_search_with_data($input, $limit = 0)
 {
     $config = array(
-        'host' => 'localhost',
+        'host' => ES_HOST,
         'port' => 9200
     );
     $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
