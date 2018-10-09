@@ -411,6 +411,7 @@ jQuery(document).ready(function ($) {
 
 });
 jQuery(document).ready(function ($) {
+    $('#ship-to-different-address-checkbox').click(); //@TODO kad se sredi css treba izbrisati
     $('#billing_company_checkbox').removeAttr('checked').click(function () {
         $('#billing_pib_field').toggle();
         $('#billing_company_field').toggle();
@@ -424,7 +425,5 @@ jQuery(document).ready(function ($) {
 });
 
 jQuery('.gf-archive-description-button').click(function () {
-    jQuery('.gf-archive-description p').toggleClass('test-class');
+    jQuery('.gf-archive-description p').toggleClass('gf-display-category-description');
 });
-
-
