@@ -183,17 +183,20 @@ jQuery(document).ready(function () {
     });
 
     jQuery('.gf-category-expander__footer .fas ').click(function () {
-        jQuery('.gf-jos-kategorija').slideToggle();
-
-        // jQuery('.gf-category-expander__col').slideToggle();
         jQuery('.gf-expander__subcategory-list').slideToggle();
+        jQuery('.gf-category-expander__col').slideToggle();
+        jQuery('.gf-expander-ul-first-line').slideToggle();
+
+
+
+
         jQuery(this).toggleClass('fa-angle-down fa-angle-up');
 
-        if (jQuery('#gf-expander-id').hasClass('gf-height-test')) {
-            jQuery('#gf-expander-id').removeClass('gf-height-test', {duration:500});
-        } else {
-            jQuery('#gf-expander-id').addClass('gf-height-test', {duration:500});
-        }
+        // if (jQuery('#gf-expander-id').hasClass('gf-height-test')) {
+        //     jQuery('#gf-expander-id').removeClass('gf-height-test');
+        // } else {
+        //     jQuery('#gf-expander-id').addClass('gf-height-test');
+        // }
 
     });
 

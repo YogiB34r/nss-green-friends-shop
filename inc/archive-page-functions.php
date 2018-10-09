@@ -68,12 +68,13 @@ function gf_display_categories_on_archive_page()
             'hide_empty' => true
         ]);
         if (count($categories) != 0) {
-            if (!wp_is_mobile()) {
-                echo '<div id="gf-expander-id" class="row gf-category-expander gf-height-test">';
-            }
-//            echo '<div class="gf-jos-kategorija"><p>Još kategorija</p></div>';
+            echo '<div id="gf-expander-id" class="row gf-category-expander">';
+
+
+            $i = 0;
             $second_lvl_cat_ids = [];
             foreach ($categories as $category) {
+                $i++;
                 $child_args = array(
                     'taxonomy' => 'product_cat',
                     'parent' => $category->term_id
@@ -82,9 +83,23 @@ function gf_display_categories_on_archive_page()
                 $second_lvl_cat_ids[] = $category->term_id;
 
                 $child_cats = get_terms($child_args);
+
+                if ($i <= 4) {
+                    echo '<div class="col-12 col-sm-6 col-md-3 gf-expander-module-first-line">';
+                    echo '<a class="gf-expander-first-line-parent" href="' . get_term_link($category) . '">' . $category->name . '</a>';
+                    echo '<ul class="gf-expander__subcategory-list">';
+                    foreach ($child_cats as $child_cat) {
+                        echo '<li>
+                     <a class="gf-category-expander__col__subcategory gf-module-first-href" href="' . get_term_link($child_cat) . '">' . $child_cat->name . '</a>
+                  </li>';
+                    }
+                    echo '</ul>
+              </div>';
+                    continue;
+                }
                 echo '<div class="col-12 col-sm-6 col-md-3 gf-category-expander__col">';
-                echo '<a class="gf-category-expander__col__category" href="' . get_term_link($category) . '">' . $category->name . '</a>
-                <ul class="gf-expander__subcategory-list">';
+                echo '<a class="gf-category-expander__col__category" href="' . get_term_link($category) . '">' . $category->name . '</a>';
+                echo '<ul class="gf-expander__subcategory-list">';
                 foreach ($child_cats as $child_cat) {
                     echo '<li>
                      <a class="gf-category-expander__col__subcategory" href="' . get_term_link($child_cat) . '">' . $child_cat->name . '</a>
@@ -109,12 +124,13 @@ function gf_display_categories_on_archive_page()
                     break;
                 }
             }
-            echo '</div>';
             if (!empty($child_cats) || count($second_lvl_cat_ids) > 4) {
                 echo '<div class="gf-category-expander__footer"><span class="fas fa-angle-down"></span></div>';
-            }else{
+            } else {
                 echo '<div class="gf-category-expander__footer"></div>';
             }
+            echo '</div>';
+
         }
     }
 }
