@@ -83,8 +83,8 @@ if ($sexyShopCats){
         if (get_query_var('term') !== '') {
             $sortedProducts = gf_get_category_query();
         } else {
-//            $sortedProducts = gf_custom_search($_GET['query']);
-            $sortedProducts = gf_elastic_search_with_data($_GET['query']);
+            $sortedProducts = gf_custom_search($_GET['query']);
+//            $sortedProducts = gf_elastic_search_with_data($_GET['query']);
         }
 
         if ($sortedProducts) {
@@ -100,11 +100,11 @@ if ($sexyShopCats){
             echo '</div>';
 
             woocommerce_product_loop_start();
-            if (get_class($sortedProducts) === \Elastica\ResultSet::class) {
-                gf_custom_shop_loop($sortedProducts);
-            } else {
+//            if (get_class($sortedProducts) === \Elastica\ResultSet::class) {
+//                gf_custom_shop_loop($sortedProducts);
+//            } else {
                 gf_custom_search_output($sortedProducts);
-            }
+//            }
 
             woocommerce_product_loop_end();
 

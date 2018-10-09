@@ -264,7 +264,7 @@ function gf_custom_search($input, $limit = 0)
 function gf_elastic_search($input, $limit = 0)
 {
     $config = array(
-        'host' => 'localhost',
+        'host' => ES_HOST,
         'port' => 9200
     );
     $elasticaSearch = new \GF\Search\Elastica\Search(new \Elastica\Client($config));
