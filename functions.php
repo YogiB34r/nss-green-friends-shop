@@ -642,10 +642,10 @@ function gf_authenticate_username_password( $user, $username, $password ) {
         $error = new WP_Error();
 
         if ( empty( $username ) )
-            $error->add( 'empty_username', __('<strong>GREŠKA</strong>: Polje korisničko ime ne može biti prazno.' ) );
+            return new WP_Error( 'invalid_username', sprintf( __( '<strong>GREŠKA</strong>: Polje korisničko ime ne može biti prazno.' ), wp_lostpassword_url() ) );
 
         if ( empty( $password ) )
-            $error->add( 'empty_password', __( '<strong>GREŠKA</strong>: Polje lozinka ne može biti prazno.' ) );
+            return new WP_Error( 'invalid_username', sprintf( __( '<strong>GREŠKA</strong>: Polje lozinka ne može biti prazno.' ), wp_lostpassword_url() ) );
 
         return $error;
     }
