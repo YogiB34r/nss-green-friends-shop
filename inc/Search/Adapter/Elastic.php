@@ -16,51 +16,10 @@ class Elastic implements \GF\Search\AdapterInterface
         $this->search = $search;
     }
 
-    private function parseOrderBy($search = false)
-    {
-        $order = (isset($_GET['orderby'])) ? $_GET['orderby'] : 'date';
-        switch ($order) {
-            case 'popularity':
-                $orderBy = " ORDER BY viewCount DESC ";
-
-                break;
-
-            //@TODO add sync for ratings
-            case 'rating':
-//            $orderBy = " ORDER BY rating DESC ";
-                $orderBy = " createdAt DESC ";
-
-                break;
-
-            case 'date':
-                $orderBy = " createdAt DESC ";
-                if ($search) {
-                    $orderBy = " ORDER BY o DESC, createdAt DESC ";
-                }
-
-                break;
-
-            case 'price-desc':
-                $orderBy = " priceOrder DESC ";
-
-                break;
-
-            case 'price':
-                $orderBy = " priceOrder ";
-
-                break;
-
-            default:
-                $orderBy = " createdAt DESC ";
-
-                break;
-        }
-        return $orderBy;
-    }
-
     public function getIdsForStandardSearch($input, $limit = 0, $currentPage = 1)
     {
-        $this->search->search($input, $limit, $currentPage, $_GET['orderby']);
+        $order = (isset($_GET['orderby'])) ? $_GET['orderby'] : 'date';
+        $this->search->search($input, $limit, $currentPage, $order);
 
         return array_keys($this->search->getIds());
     }
@@ -72,7 +31,8 @@ class Elastic implements \GF\Search\AdapterInterface
      */
     public function getItemsForStandardSearch($input, $limit = 0, $currentPage = 1)
     {
-        $this->search->search($input, $limit, $currentPage, $_GET['orderby']);
+        $order = (isset($_GET['orderby'])) ? $_GET['orderby'] : 'date';
+        $this->search->search($input, $limit, $currentPage, $order);
 
         return $this->search->getResultSet();
 

@@ -20,6 +20,10 @@ class Indexer
             $result = $wpdb->get_results($sql);
             foreach ($result as $value) {
                 $product = wc_get_product($value->ID);
+                if (get_class($product) !== \WC_Product::class) {
+                    var_dump('Could not find product for postId : ', $value);
+                    continue;
+                }
                 $documents[] = static::parseWcProduct($product);
             }
         }
