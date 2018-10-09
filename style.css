@@ -3315,3 +3315,6 @@ p.woocommerce-thankyou-order-received {
     display: none;
 }
 
+#billing_country_field, #shipping_country_field{
+    display: none;
+}

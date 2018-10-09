@@ -594,14 +594,14 @@ function remove_country_field_billing($fields)
     return $fields;
 
 }
-add_filter('woocommerce_billing_fields', 'remove_country_field_billing');
+//add_filter('woocommerce_billing_fields', 'remove_country_field_billing');
 function remove_country_field_shipping($fields)
 {
     unset($fields['shipping_country']);
     unset($fields['shipping_state']);
     return $fields;
 }
-add_filter('woocommerce_shipping_fields', 'remove_country_field_shipping');
+//add_filter('woocommerce_shipping_fields', 'remove_country_field_shipping');
 
 function custom_override_checkout_fields( $fields ) {
     unset($fields['billing']['billing_country']);
@@ -609,7 +609,7 @@ function custom_override_checkout_fields( $fields ) {
 
     return $fields;
 }
-add_filter( 'woocommerce_checkout_fields' , 'custom_override_checkout_fields' );
+//add_filter( 'woocommerce_checkout_fields' , 'custom_override_checkout_fields' );
 
 
 
@@ -708,7 +708,7 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products) {
 //            echo '<img src="' . wc_placeholder_img_src() . '" alt="Placeholder" width="200px" height="200px" />';
 //        }
         $classes = '';
-        if ($saved_percentage > 0) {
+        if ($saved_percentage > 0 && $product->getStockStatus() !== 0) {
             $classes .= ' sale ';
         }
         if ($product->getStockStatus() == 0) {
