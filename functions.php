@@ -845,11 +845,11 @@ function gf_check_if_user_is_migrated($user, $password)
                 return new WP_Error('incorrect_password',
                     sprintf(
                     /* translators: %s: user name */
-                        __('<strong>ERROR</strong>: The password you entered for the username %s is incorrect.'),
+                        __('<strong>GREŠKA</strong>: Lozinka koju ste uneli za korisničko ime %s nije ispravna.'),
                         '<strong>' . $user->user_login . '</strong>'
                     ) .
                     ' <a href="' . wp_lostpassword_url() . '">' .
-                    __('Lost your password?') .
+                    __('Izgubili ste lozinku?') .
                     '</a>'
                 );
             }
@@ -928,14 +928,14 @@ function gf_authenticate_username_password( $user, $username, $password ) {
     $user = get_user_by( 'login', $username );
 
     if ( !$user )
-        return new WP_Error( 'invalid_username', sprintf( __( '<strong>GREŠKA</strong>: Ne postojeće korisničko ime ili email. <a href="%s" title="Password Lost and Found">Izgubili ste lozinku</a>?' ), wp_lostpassword_url() ) );
+        return new WP_Error( 'invalid_username', sprintf( __( '<strong>GREŠKA</strong>: Ne postojeće korisničko ime ili email. <a href="%s" title="Lozinka izgubljena">Izgubili ste lozinku</a>?' ), wp_lostpassword_url() ) );
 
     $user = apply_filters( 'wp_authenticate_user', $user, $password );
     if ( is_wp_error( $user ) )
         return $user;
 
     if ( ! wp_check_password( $password, $user->user_pass, $user->ID ) )
-        return new WP_Error( 'incorrect_password', sprintf( __( '<strong>GREŠKA</strong>: Lozinka koju ste uneli za korisničko ime <strong>%1$s</strong> nije ispravna. <a href="%2$s" title="Password Lost and Found">Izgubili ste lozinku</a>?' ),
+        return new WP_Error( 'incorrect_password', sprintf( __( '<strong>GREŠKA</strong>: Lozinka koju ste uneli za korisničko ime <strong>%1$s</strong> nije ispravna. <a href="%2$s" title="Lozinka izgubljena">Izgubili ste lozinku</a>?' ),
             $username, wp_lostpassword_url() ) );
 
     return $user;
