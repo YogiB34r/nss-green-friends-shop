@@ -68,7 +68,7 @@ function gf_display_categories_on_archive_page()
             'hide_empty' => true
         ]);
         if (count($categories) != 0) {
-            if(!wp_is_mobile()){
+            if (!wp_is_mobile()) {
                 echo '<div id="gf-expander-id" class="row gf-category-expander gf-height-test">';
             }
 //            echo '<div class="gf-jos-kategorija"><p>Još kategorija</p></div>';
@@ -110,8 +110,11 @@ function gf_display_categories_on_archive_page()
                 }
             }
             echo '</div>';
-            echo '<div class="gf-category-expander__footer"><span class="fas fa-angle-down"></span></div>';
-
+            if (!empty($child_cats) || count($second_lvl_cat_ids) > 4) {
+                echo '<div class="gf-category-expander__footer"><span class="fas fa-angle-down"></span></div>';
+            }else{
+                echo '<div class="gf-category-expander__footer"></div>';
+            }
         }
     }
 }
@@ -132,3 +135,18 @@ add_action('woocommerce_after_shop_loop', 'woocommerce_pagination', 27);
 //    }
 //}
 //add_filter( 'woocommerce_short_description', 'wpa_98244_filter_short_description' );
+remove_action('woocommerce_archive_description', 'woocommerce_taxonomy_archive_description', 10);
+remove_action('woocommerce_archive_description', 'woocommerce_product_archive_description', 10);
+add_action('woocommerce_archive_description', 'bbloomer_custom_action', 10);
+function bbloomer_custom_action()
+{
+    global $wp_query;
+    $cat_id = $wp_query->get_queried_object_id();
+    $cat_desc = term_description($cat_id, 'product_cat');
+    echo '<div class="gf-archive-description-wrapper">';
+    echo '<div class="row"><div class="gf-archive-description-button">Opis</div></div>';
+    echo '<div class="row gf-archive-description">' . $cat_desc . '</div>';
+    echo '</div>';
+
+}
+

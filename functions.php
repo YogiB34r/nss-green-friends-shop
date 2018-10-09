@@ -19,6 +19,13 @@ function require_on_init()
     }
 }
 
+require (__DIR__ . "/inc/Search/AdapterInterface.php");
+require (__DIR__ . "/inc/Search/Adapter/MySql.php");
+require (__DIR__ . "/inc/Search/Adapter/Elastic.php");
+require (__DIR__ . "/inc/Search/Search.php");
+require (__DIR__ . "/inc/Search/Elastica/Search.php");
+
+
 add_action('after_setup_theme', 'require_on_init');
 
 add_filter('woocommerce_currency_symbol', 'change_existing_currency_symbol', 10, 2);
@@ -238,189 +245,61 @@ function gf_print_styles()
     return $result;
 }
 
-function parseOrderBy()
+//@TODO implement category as filter
+/**
+ * @param $input
+ * @param int $limit
+ * @return bool|WP_Query
+ */
+function gf_custom_search($input, $limit = 0)
 {
-    $order = (isset($_GET['orderby'])) ? $_GET['orderby'] : 'date';
-    switch ($order) {
-        //@TODO implement view count
-        case 'popularity':
-            $orderBy = " ORDER BY viewCount DESC ";
-//            $orderBy = " createdAt DESC ";
+    global $wpdb;
 
-            break;
+    $search = new \GF\Search\Search(new \GF\Search\Adapter\MySql($wpdb));
+    $allIds = $search->getItemIdsForSearch($input, $limit);
 
-        //@TODO add sync for ratings
-        case 'rating':
-//            $orderBy = " ORDER BY rating DESC ";
-            $orderBy = " createdAt DESC ";
-
-            break;
-
-        case 'date':
-            $orderBy = " createdAt DESC ";
-
-            break;
-
-        case 'price-desc':
-            $orderBy = " priceOrder DESC ";
-
-            break;
-
-        case 'price':
-            $orderBy = " priceOrder ";
-
-            break;
-
-        default:
-            $orderBy = " createdAt DESC ";
-
-            break;
-    }
-    return $orderBy;
+    return gf_parse_post_ids_for_list($allIds);
 }
+
+function gf_elastic_search($input, $limit = 0)
+{
+    $config = array(
+        'host' => 'localhost',
+        'port' => 9200
+    );
+    $elasticaSearch = new \GF\Search\Elastica\Search(new \Elastica\Client($config));
+    $search = new \GF\Search\Search(new \GF\Search\Adapter\Elastic($elasticaSearch));
+    $allIds = $search->getItemIdsForSearch($input, $limit);
+
+    return gf_parse_post_ids_for_list($allIds);
+}
+
+function gf_elastic_search_with_data($input, $limit = 0)
+{
+    $config = array(
+        'host' => 'localhost',
+        'port' => 9200
+    );
+    $elasticaSearch = new \GF\Search\Elastica\Search(new \Elastica\Client($config));
+    $search = new \GF\Search\Search(new \GF\Search\Adapter\Elastic($elasticaSearch));
+    $resultSet = $search->getItemsForSearch($input, $limit);
+
+    return $resultSet;
+}
+
+
 
 function gf_get_category_query()
 {
     global $wpdb;
-    $cat = get_term_by('slug', get_query_var('term'), 'product_cat');
-    $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
-    $currentPage = (get_query_var('paged')) ? get_query_var('paged') : 1;
-    if (isset($_POST['ppp'])) {
-        $per_page = ($_POST['ppp'] > 48) ? 48 : $_POST['ppp'];
-    }
-    $orderBy = parseOrderBy();
-    $searchCondition = " 1=1 ";
-    $customOrdering = " 1=1 ";
-    if (isset($_GET['query'])) {
-//        var_dump($_COOKIE['searchQuery']);
-//        if (!isset($_COOKIE['searchQuery']) || isset($_COOKIE['searchQuery']) && $_COOKIE['searchQuery'] != $_GET['query']) {
-//            setcookie('searchQuery', $_GET['query'], 30 * 60, COOKIEPATH, COOKIE_DOMAIN );
-//            $currentPage = 1;
-//        }
 
-        $searchCondition = "";
-        $customOrdering = "";
-        $input = addslashes($_GET['query']);
-        $explodedInput = explode(' ', $input);
-        $gradeCount = 0;
-        foreach ($explodedInput as $key => $word) {
-            if ($key > 0) {
-                $searchCondition .= " OR ";
-                $customOrdering .= " + ";
-            }
-            $searchCondition .= " productName LIKE '%{$word}%' OR description LIKE '%{$word}%' 
-                OR attributes LIKE '%{$word}%'";
-            $customOrdering .= "
-                CASE
-                    WHEN productName LIKE '% {$word} %' THEN 16
-                    WHEN productName LIKE '{$word} %' THEN 15
-                    WHEN productName LIKE '{$word}%' THEN 12
-                    WHEN productName LIKE '%{$word}%' THEN 9
-                    ELSE 0
-                END
-                + CASE
-                    WHEN categories LIKE '%{$word}%' THEN 14 ELSE 0
-                END
-                + CASE
-                    WHEN description LIKE '%{$word}%' THEN 4 ELSE 0
-                END
-                + CASE WHEN attributes LIKE '%{$word}%' THEN 13 ELSE 0 END ";
-        }
-        $customOrdering .= " as o ";
-        $orderBy .= " , o DESC ";
-        $gradeCount = $gradeCount * 7;
-    }
+    $search = new \GF\Search\Search(new \GF\Search\Adapter\MySql($wpdb));
+    $allIds = $search->getItemIdsForCategory(get_query_var('term'));
 
-    $priceOrdering = " CASE
-                WHEN salePrice > 0 THEN salePrice
-                ELSE regularPrice 
-            END as priceOrder ";
-
-    $priceCondition = "";
-    if (isset($_GET['min_price'])) {
-        $minPrice = (int)$_GET['min_price'];
-        $maxPrice = (int)$_GET['max_price'];
-        $priceCondition = " HAVING priceOrder >= {$minPrice} AND priceOrder <= {$maxPrice} ";
-    }
-
-    $excludeCategories = " 1=1 ";
-    if (!in_array($cat->term_id, gf_get_category_children_ids('sexy-shop'))) {
-        foreach (gf_get_category_children_ids('sexy-shop') as $catId) {
-            $excludeCategories .= " AND categoryIds NOT LIKE '%{$catId}%' ";
-        }
-    }
-
-    $sql = "SELECT postId, {$priceOrdering}, {$customOrdering} FROM wp_gf_products WHERE salePrice > 0 AND stockStatus = 1 AND status = 1
-                AND categories LIKE '%{$cat->name}%' AND categoryIds LIKE '%{$cat->term_id}%' AND {$excludeCategories}
-                AND ({$searchCondition})
-                {$priceCondition} 
-                ORDER BY $orderBy ";
-    $productsSale = $wpdb->get_results($sql, OBJECT_K);
-
-    $sql = "SELECT postId, {$priceOrdering}, {$customOrdering} FROM wp_gf_products WHERE salePrice = 0 AND stockStatus = 1 AND status = 1
-                AND categories LIKE '%{$cat->name}%' AND categoryIds LIKE '%{$cat->term_id}%' AND {$excludeCategories}
-                AND ({$searchCondition})
-                {$priceCondition} ORDER BY $orderBy ";
-    $productsNotOnSale = $wpdb->get_results($sql, OBJECT_K);
-    $allIds = array_merge(array_keys($productsSale), array_keys($productsNotOnSale));
-
-    $sql = "SELECT postId, {$priceOrdering}, {$customOrdering} FROM wp_gf_products WHERE stockStatus = 0 AND status = 1
-                AND categories LIKE '%{$cat->name}%' AND categoryIds LIKE '%{$cat->term_id}%' AND {$excludeCategories}
-                AND ({$searchCondition})
-                {$priceCondition} ORDER BY $orderBy ";
-
-    $productsOutOfStock = $wpdb->get_results($sql, OBJECT_K);
-    $allIds = array_merge($allIds, array_keys($productsOutOfStock));
-    $resultCount = count($allIds);
-    if ($resultCount === 0) {
-        $allIds[] = 0;
-    }
-    $totalPages = ceil($resultCount / $per_page);
-    if ($currentPage > $totalPages) {
-        $currentPage = $totalPages;
-    }
-    $paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
-    $args = array(
-        'post_type' => 'product',
-        'orderby' => 'post__in',
-        'post__in' => $allIds,
-        'posts_per_page' => $per_page,
-        'paged' => $paged,
-        'suppress_filters' => true,
-        'no_found_rows' => true
-    );
-    $sortedProducts = new WP_Query($args);
-
-    wc_set_loop_prop('total', $resultCount);
-    wc_set_loop_prop('per_page', $per_page);
-    wc_set_loop_prop('current_page', $currentPage);
-    wc_set_loop_prop('total_pages', $totalPages);
-
-    return $sortedProducts;
+    return gf_parse_post_ids_for_list($allIds);
 }
 
-function custom_woo_product_loop($sortedProducts)
-{
-    if (is_tax() || is_product_category() || is_product_tag()) {
-        global $wpdb;
-
-        if (get_query_var('taxonomy') === 'product_cat') { // Za kategorije
-            if ($sortedProducts->have_posts()) :
-                while ($sortedProducts->have_posts()) : $sortedProducts->the_post();
-//                    do_action('woocommerce_shop_loop');
-                    wc_get_template_part('content', 'product');
-                endwhile;
-                wp_reset_postdata();
-            endif;
-        } else { // Za main shop
-//            echo 'other page';
-        }
-    } else { //za ostale page-eve
-        woocommerce_content();
-    }
-}
-
-function gf_custom_search_output($sortedProducts)
+function gf_custom_search_output(WP_Query $sortedProducts)
 {
     if ($sortedProducts->have_posts()):
 //        global $sw;
@@ -458,140 +337,19 @@ function parseAttributes()
     return $atributes;
 }
 
-//@TODO implement category as filter
-function gf_custom_search($input, $limit = 0)
+/**
+ * @param $allIds
+ * @return bool|WP_Query
+ */
+function gf_parse_post_ids_for_list($allIds)
 {
-    global $wpdb;
-
-    $input = addslashes($input);
     $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
     if (isset($_POST['ppp'])) {
         $per_page = ($_POST['ppp'] > 48) ? 48 : $_POST['ppp'];
     }
     $currentPage = (get_query_var('paged')) ? get_query_var('paged') : 1;
-    $searchCondition = "";
-    $customOrdering = "";
-    $explodedInput = explode(' ', $input);
-    $attributes = parseAttributes();
-    $gradeCount = 0;
-    foreach ($explodedInput as $key => $word) {
-        if (strlen($word) > 2) {
-            $gradeCount++;
-            //query is attribute
-            if (in_array(rtrim($word, 'aeiou'), $attributes)) {
-                if ($key > 0) {
-                    $searchCondition .= " OR ";
-                    $customOrdering .= " + ";
-                }
-                $searchCondition .= " attributes LIKE '%{$word}%' ";
-                $customOrdering .= "
-                CASE
-                    WHEN productName LIKE '%{$word}%' THEN 15
-                    ELSE 0
-                END +
-                CASE WHEN description LIKE '%{$word}%' THEN 10 ELSE 0 END 
-                ";
-            } else {
-                $word = rtrim($word, 'aeiou');
-                if ($key > 0) {
-                    $searchCondition .= " OR ";
-                    $customOrdering .= " + ";
-                }
-                $searchCondition .= " productName LIKE '%{$word}%' OR description LIKE '%{$word}%' 
-                OR attributes LIKE '%{$word}%' OR categories LIKE '%{$word}%'";
-                $customOrdering .= "
-                CASE
-                    WHEN productName LIKE '% {$word} %' THEN 16
-                    WHEN productName LIKE '{$word} %' THEN 15
-                    WHEN productName LIKE '{$word}%' THEN 12
-                    WHEN productName LIKE '%{$word}%' THEN 9
-                    ELSE 0
-                END
-                + CASE
-                    WHEN categories LIKE '%{$word}%' THEN 14 ELSE 0
-                END
-                + CASE
-                    WHEN description LIKE '%{$word}%' THEN 4 ELSE 0
-                END
-                + CASE WHEN attributes LIKE '%{$word}%' THEN 13 ELSE 0 END ";
-            }
-        }
-    }
-    $priceCondition = "";
-    if (isset($_GET['min_price'])) {
-        $minPrice = (int)$_GET['min_price'];
-        $maxPrice = (int)$_GET['max_price'];
-        $priceCondition = " AND priceOrder >= {$minPrice} AND priceOrder <= {$maxPrice} ";
-    }
-    $excludeCategories = " 1=1 ";
-    foreach (gf_get_category_children_ids('sexy-shop') as $catId) {
-        $excludeCategories .= " AND categoryIds NOT LIKE '%{$catId}%' ";
-    }
 
-    $gradeCount = $gradeCount * 7;
-    $priceOrdering = " CASE
-        WHEN salePrice > 0 THEN salePrice
-        ELSE regularPrice 
-     END as priceOrder ";
-
-    switch (get_query_var('orderby')) {
-        case 'popularity':
-            $orderBy = " ORDER BY viewCount DESC ";
-//            $orderBy = " ORDER BY createdAt DESC ";
-
-            break;
-
-        //@TODO add sync for ratings
-        case 'rating':
-//            $orderBy = " ORDER BY rating DESC ";
-            $orderBy = " ORDER BY createdAt DESC ";
-
-            break;
-
-        case 'date':
-            $orderBy = " ORDER BY o DESC, createdAt DESC ";
-
-            break;
-
-        case 'price-desc':
-            $orderBy = " ORDER BY priceOrder DESC ";
-
-            break;
-
-        case 'price':
-            $orderBy = " ORDER BY priceOrder ";
-
-            break;
-
-        default:
-            $orderBy = " ORDER BY o DESC, createdAt DESC ";
-
-            break;
-    }
-
-    $sql = "SELECT 
-        postId,
-        {$customOrdering} as o,
-        {$priceOrdering}
-        FROM wp_gf_products
-        WHERE stockStatus = 1 
-        AND status = 1
-        AND {$excludeCategories}
-        AND ({$searchCondition}) 
-        HAVING o > {$gradeCount}
-        {$priceCondition}
-        {$orderBy}";
-    if ($limit) {
-        $sql .= " LIMIT {$limit} ";
-    }
-
-//    echo $sql;
-    $products = $wpdb->get_results($sql, OBJECT_K);
-    $allIds = array_keys($products);
     $resultCount = count($allIds);
-    if ($resultCount === 0) {
-        $allIds[] = 0;
-    }
     if ($resultCount === 0) {
         return false;
     }
@@ -605,6 +363,8 @@ function gf_custom_search($input, $limit = 0)
         'post__in' => $allIds,
         'posts_per_page' => $per_page,
         'paged' => $currentPage,
+        'suppress_filters' => true,
+        'no_found_rows' => true
     );
 
     wc_set_loop_prop('total', $resultCount);
@@ -939,4 +699,35 @@ function gf_authenticate_username_password( $user, $username, $password ) {
             $username, wp_lostpassword_url() ) );
 
     return $user;
+}
+
+function gf_custom_shop_loop_template($products){
+
+    echo '<ul class="products columns-4 grid">';
+
+
+    foreach ($products as $product){
+
+
+        $saved_price = $product->regularPrice - $product->salePrice;
+        $saved_price_precentage= $saved_price * 100 / $product->regularPrice;
+
+        echo '<li class="product type-product status-publish has-post-thumbnail first instock sale shipping-taxable purchasable product-type-simple">';
+        echo    '<a href=" '. $product->link .' " title=" '. $product->name .' " >';
+        echo        '<span class="gf-sticker gf-sticker--sale gf-sticker--left"><img src="https://nss-devel.ha.rs/wp-content/uploads/2018/09/14/49/lavo-space-akcija_94aa53990ea30e4b84c449466b7dfd91.png" alt="" height="64" width="64"></span>';
+        echo        '<img src="'.$product->image.'" class="attachment-post-thumbnail size-post-thumbnail wp-post-image" alt="'.$product->name.'" width="200" height="200">';
+        echo    '</a>';
+        echo    '<a href="'. $product->link .'" title="'.$product->name.'">';
+        echo        '<h5>'.$product->name.'</h5>';
+        echo    '</a>';
+        echo    '<span class="price">';
+        echo        '<del><span class="woocommerce-Price-amount amount">'.$product->regularPrice.'<span class="woocommerce-Price-currencySymbol">din.</span></span><del>';
+        echo        '<ins><span class="woocommerce-Price-amount amount">'.$product->salePrice.'<span class="woocommerce-Price-currencySymbol">din.</span></span></ins>';
+        echo        '<p class="saved-sale">Ušteda: <span class="woocommerce-Price-amount amount">'.$saved_price.'<span class="woocommerce-Price-currencySymbol">din.</span></span><em>'.$saved_price_precentage.'</em></p>';
+        echo    '</span>';
+        echo '</li>';
+    }
+
+
+    echo '</ul>';
 }

@@ -48,9 +48,10 @@ if (isset($_POST['query'])) {
         }
     }
 
-//        $sql_product = "SELECT `productName`, `postId` FROM wp_gf_products WHERE `productName` LIKE '%{$keyword}%' LIMIT 4";
-//        $product_results = $wpdb->get_results($sql_product);
-    $product_results = gf_custom_search($query, 4);
+//    $product_results = gf_custom_search($query, 4);
+    $product_results = gf_elastic_search($query, 4);
+    /* @var \Elastica\ResultSet $product_results */
+    $product_results = gf_elastic_search_with_data($query, 4);
 
     $html = '';
     if (!empty($cat_results)) {
@@ -66,9 +67,13 @@ if (isset($_POST['query'])) {
     $html .= '<span>Proizvodi</span>';
     $html .= '<ul>';
     if ($product_results) {
-        foreach ($product_results->get_posts() as $post) {
-            $product_link = get_permalink((int) $post->ID);
-            $html .= '<li><a href="' . $product_link . '">' . $post->post_title . '</a></li>';
+//        foreach ($product_results->get_posts() as $post) {
+//            $product_link = get_permalink((int) $post->ID);
+//            $html .= '<li><a href="' . $product_link . '">' . $post->post_title . '</a></li>';
+//        }
+        foreach ($product_results->getResults() as $result) {
+            $product_link = get_permalink((int) $result->getId());
+            $html .= '<li><a href="' . $product_link . '">' . $result->getData()['name'] . '</a></li>';
         }
     } else {
         $html .= '<li>Nema rezultata</li>';
@@ -78,3 +83,45 @@ if (isset($_POST['query'])) {
     echo $html;
     exit();
 }
+
+
+include("inc/Elastica/GF_Elastica_Search.php");
+include("inc/Elastica/GF_Elastica_Indexer.php");
+include("inc/Elastica/GF_Elastica_Setup.php");
+
+if (isset($_GET['action'])) {
+    $config = array(
+        'host' => 'localhost',
+        'port' => 9200
+    );
+    $elasticaClient = new \Elastica\Client($config);
+
+    switch ($_GET['action']) {
+        case 'createIndex':
+            GF_Elastica_Setup::createIndex($elasticaClient);
+
+            break;
+
+        case 'getList':
+            $keywords = $_GET['query'];
+            $search = new GF_Elastica_Search($elasticaClient);
+            $search->search($keywords);
+            $search->printDebug();
+
+            break;
+
+
+            break;
+        case 'syncIndex':
+            GF_Elastica_Indexer::index($elasticaClient);
+
+            break;
+    }
+
+}
+
+
+?>
+<a href="/gf-ajax/?action=createIndex">(re) create index</a>
+<a href="/gf-ajax/?action=syncIndex">sync index</a>
+<a href="/gf-ajax/?action=getList">test</a>
