@@ -6,13 +6,12 @@ class Setup
 {
     static function createIndex(\Elastica\Client $elasticaClient) {
         $elasticaIndex = $elasticaClient->getIndex('nss');
-
         $elasticaIndex->delete();
 
         $elasticaIndex->create(
             array(
                 'number_of_shards' => 4,
-                'number_of_replicas' => 2,
+                'number_of_replicas' => 1,
                 'analysis' => array(
                     'analyzer' => array(
                         'default' => array(
@@ -23,7 +22,7 @@ class Setup
                         'search' => array(
                             'type' => 'custom',
                             'tokenizer' => 'standard',
-                            'filter' => array('standard', 'lowercase', 'trim') //@TODO install icu_folding
+                            'filter' => array('standard', 'lowercase', 'trim', 'test') //@TODO install icu_folding
                         )
                     ),
                     'filter' => array(
