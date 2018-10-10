@@ -33,7 +33,7 @@ class gf_breadcrumbs extends WC_Breadcrumb
             return false;
         }
         if ($name == 'Pretraga'){
-            $link = '/?query='. $_GET['query'];
+            $link = '/pretraga/?query='. $_GET['query'];
         }
            $this->crumbs[] = array(
                strip_tags($name),
