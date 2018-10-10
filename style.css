@@ -2228,7 +2228,7 @@ body.single-product .product .entry-summary a.button.product_type_variable {
 }
 
 .woocommerce-product-gallery__trigger {
-    max-height: 60%;
+    max-height: 75%;
 }
 
 #cookie-notice {
