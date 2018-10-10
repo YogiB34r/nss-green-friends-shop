@@ -1457,7 +1457,8 @@ body.home .gf-navblock {
 }
 
 .category-item:hover > a:after {
-    border-left-color: #1d1d1d;
+    /*border-left-color: #1d1d1d;*/
+    display: none;
 }
 
 .category-item .child {
