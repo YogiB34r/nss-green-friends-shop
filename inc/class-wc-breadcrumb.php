@@ -32,6 +32,9 @@ class gf_breadcrumbs extends WC_Breadcrumb
         if ($name == 'Specijalne promocije'){
             return false;
         }
+        if ($name == 'Pretraga'){
+            $link = '/?query='. $_GET['query'];
+        }
            $this->crumbs[] = array(
                strip_tags($name),
                $link,
