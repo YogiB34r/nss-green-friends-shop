@@ -65,25 +65,26 @@ class Search
 //        $q->setOperator('or');
 //        $boolQuery->addMust($q);
 
-        $q = new \Elastica\Query\QueryString();
+        $q = new \Elastica\Query\Match();
 //        $q->setField('search_data.full_text', $keywords);
-        $q->setQuery($keywords)->setFields(['search_data.full_text'])->setBoost(2);
+//        $q->setQuery($keywords)->setFields(['search_data.full_text'])->setBoost(2);
 
-//        $q->setFieldQuery('search_data.full_text', $keywords);
-//        $q->setFieldOperator('search_data.full_text', 'and');
-//        $q->setFieldFuzziness('search_data.full_text', 1);
-//        $q->setFieldBoost('search_data.full_text', 15);
+        $q->setFieldQuery('search_data.full_text', $keywords);
+        $q->setFieldOperator('search_data.full_text', 'and');
+        $q->setFieldFuzziness('search_data.full_text', 1);
+        $q->setFieldBoost('search_data.full_text', 15);
         $boolQuery->addMust($q);
 
-//        $q = new \Elastica\Query\Match();
-//        $q->setFieldQuery('search_data.full_text_boosted', $keywords);
-//        $q->setFieldFuzziness('search_data.full_text_boosted', 1);
+        $q = new \Elastica\Query\Match();
+        $q->setFieldQuery('search_data.full_text_boosted', $keywords);
+        $q->setFieldFuzziness('search_data.full_text_boosted', 1);
 //        $q->setFieldOperator('search_data.full_text_boosted', 'and');
-//        $q->setFieldBoost('search_data.full_text_boosted', 20);
+        $q->setFieldBoost('search_data.full_text_boosted', 20);
 
 //        $q = new \Elastica\Query\QueryString();
-        $q = new \Elastica\Query\QueryString();
-        $q->setQuery($keywords)->setFields(['search_data.full_text_boosted'])->setBoost(5);
+//        $q = new \Elastica\Query\Match();
+//        $q->setTerm('search_data.full_text_boosted', $keywords);
+//        $q->setQuery($keywords)->setFields(['search_data.full_text_boosted'])->setBoost(5)->setFuzzyPrefixLength(3);
 //        $q->setField('search_data.full_text_boosted', $keywords);
         $boolQuery->addMust($q);
 
@@ -200,10 +201,12 @@ class Search
         var_dump('total results: ' . $totalResults);
         var_dump('paged results: ' . count($this->resultSet->getResults()));
 
-        echo '<table><tr><th></th><th>score</th><th>name</th><th width="150px">desc</th><th>cat</th><th>attr</th></tr>';
+        echo '<table><tr><th></th><th>score</th><th width="250px">name</th><th width="150px">desc</th><th>cat</th><th width="250px">attr</th>
+            <th>price</th><th>regular</th><th>sale price</th></tr>';
         /* @var \Elastica\Result $result */
         $i=0;
         foreach ($this->resultSet->getResults() as $result) {
+//            var_dump($result); die();
             $i++;
             echo '<tr>';
             echo '<td>' . $i . '</td>';
@@ -220,6 +223,9 @@ class Search
                 echo $cat['type'] .' - '. $cat['value'];
             }
             echo '</td>';
+            echo '<td>'.$result->getDocument()->getData()['order_data']['price'].'</td>';
+            echo '<td>'.$result->getDocument()->getData()['regularPrice'].'</td>';
+            echo '<td>'.$result->getDocument()->getData()['salePrice'].'</td>';
             echo '</tr>';
         }
         echo '</table>';
