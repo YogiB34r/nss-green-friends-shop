@@ -29,9 +29,9 @@ $classes = ob_get_clean();
 <li <?=$classes?>>
     <a href="<?php echo get_permalink($product->get_id()) ?>"
        title="<?php echo esc_attr($product->get_title() ? $product->get_title() : $product->get_id()); ?>">
-        <?php woocommerce_show_product_sale_flash('', '', '', $classes);
+        <?= add_stickers_to_products_on_sale($classes);
         add_stickers_to_products_new($product);
-        add_stickers_to_products_soldout($classes);
+        echo add_stickers_to_products_soldout($classes);
         ?>
         <?php if (has_post_thumbnail($product->get_id())):
 //            $image = wp_get_attachment_image_src(get_post_thumbnail_id($product->get_id()), 'single-post-thumbnail');
