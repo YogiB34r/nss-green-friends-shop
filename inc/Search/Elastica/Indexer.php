@@ -15,8 +15,8 @@ class Indexer
 
         $documents = [];
 //        for ($i = 0; $i < 42; $i++) {
-        for ($i = 0; $i < 35; $i++) {
-//        for ($i = 0; $i < 2; $i++) {
+//        for ($i = 0; $i < 35; $i++) {
+        for ($i = 0; $i < 2; $i++) {
             $offset = $i * $perPage;
             $sql = "SELECT ID FROM wp_posts WHERE post_type = 'product' LIMIT {$offset}, {$perPage};";
             $result = $wpdb->get_results($sql);
@@ -79,7 +79,7 @@ class Indexer
         $price = $regularPrice;
         if ($product->get_price() !== $regularPrice) {
             $salePrice = $product->get_price();
-            $price = $regularPrice;
+            $price = $salePrice;
         }
         $sql = "SELECT * FROM wp_gf_products WHERE postId = {$product->get_id()}";
         $gfProduct = $wpdb->get_results($sql)[0];
@@ -108,8 +108,8 @@ class Indexer
             'synced' => 1,
             'type' => $product->get_type(),
             'search_data' => [
-                'full_text' => static::extractFullTextFields($product, $attributes),
-                'full_text_boosted' => static::extractFullTextBoostedFields($product, $attributes),
+                'full_text' => static::extractFullTextFields($product, $attributes, $cats),
+                'full_text_boosted' => static::extractFullTextBoostedFields($product, $attributes, $cats),
             ],
             'order_data' => [
                 'price' => (int) $price,
@@ -126,12 +126,12 @@ class Indexer
 
     static function calculateOrderingRating(\WC_Product $product)
     {
-        $ponder = 1;
+        $ponder = 10;
         if ($product->is_on_sale()) {
-            $ponder = 5;
+            $ponder = 100;
         }
         if (!$product->is_in_stock()) {
-            $ponder = 1/10;
+            $ponder = 1;
         }
 
 
@@ -147,7 +147,7 @@ class Indexer
         ((int) !$product->is_in_stock() * $stockPonder);
     }
 
-    static function extractFullTextBoostedFields(\WC_Product $product, $attributes)
+    static function extractFullTextBoostedFields(\WC_Product $product, $attributes, $cats)
     {
         $text = $product->get_name();
         $text .= ' ' . $product->get_meta('pa_proizvodjac');
@@ -156,21 +156,27 @@ class Indexer
         $attr = '';
         if (count($attributes) > 0) {
             foreach ($attributes as $attribute) {
-                $attr .= implode(' ', $attribute);
+                $attr .= ' ' . implode(' ', $attribute) . ' ';
             }
         }
-        $text .= ' ' . $attr;
+        $categories = '';
+        if (count($cats) > 0) {
+            foreach ($cats as $cat) {
+                $categories .= ', '. $cat['name'];
+            }
+        }
+        $text .= ' ' . $attr .' '. $categories;
 
         return $text;
     }
 
-    static function extractFullTextFields(\WC_Product $product, $attributes)
+    static function extractFullTextFields(\WC_Product $product, $attributes, $cats)
     {
         $text = $product->get_name();
         $text .= ' ' . $product->get_meta('pa_proizvodjac');
         $text .= ' ' . $product->get_meta('vendor_code');
-        $text .= ' ' . $product->get_description();
-        $text .= ' ' . $product->get_short_description();
+        $text .= ' ' . strip_tags($product->get_description());
+        $text .= ' ' . strip_tags($product->get_short_description());
         $text .= ' ' . $product->get_sku();
         $attr = '';
         if (count($attributes) > 0) {
@@ -178,7 +184,13 @@ class Indexer
                 $attr .= implode(' ', $attribute);
             }
         }
-        $text .= ' ' . $attr;
+        $categories = '';
+        if (count($cats) > 0) {
+            foreach ($cats as $cat) {
+                $categories .= ', '. $cat['name'];
+            }
+        }
+        $text .= ' ' . $attr .' '. $categories;
 
         return $text;
     }
