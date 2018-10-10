@@ -587,28 +587,28 @@ function gf_check_if_user_is_migrated($user, $password) {
 //add_filter('wp_authenticate_user', 'gf_check_if_user_is_migrated', 10, 2);
 
 
-function remove_country_field_billing($fields)
-{
-    unset($fields['billing_country']);
-    unset($fields['billing_state']);
-    return $fields;
-
-}
+//function remove_country_field_billing($fields)
+//{
+//    unset($fields['billing_country']);
+//    unset($fields['billing_state']);
+//    return $fields;
+//
+//}
 //add_filter('woocommerce_billing_fields', 'remove_country_field_billing');
-function remove_country_field_shipping($fields)
-{
-    unset($fields['shipping_country']);
-    unset($fields['shipping_state']);
-    return $fields;
-}
+//function remove_country_field_shipping($fields)
+//{
+//    unset($fields['shipping_country']);
+//    unset($fields['shipping_state']);
+//    return $fields;
+//}
 //add_filter('woocommerce_shipping_fields', 'remove_country_field_shipping');
 
-function custom_override_checkout_fields( $fields ) {
-    unset($fields['billing']['billing_country']);
-    unset($fields['shipping_country']);
-
-    return $fields;
-}
+//function custom_override_checkout_fields( $fields ) {
+//    unset($fields['billing']['billing_country']);
+//    unset($fields['shipping_country']);
+//
+//    return $fields;
+//}
 //add_filter( 'woocommerce_checkout_fields' , 'custom_override_checkout_fields' );
 
 
