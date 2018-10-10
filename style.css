@@ -3337,3 +3337,6 @@ p.woocommerce-thankyou-order-received {
     /*}*/
 /*}*/
 
+.woocommerce form .form-row .required {
+    visibility: visible;
+}
