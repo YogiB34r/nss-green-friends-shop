@@ -126,13 +126,24 @@ class Indexer
 
     static function calculateOrderingRating(\WC_Product $product)
     {
+        $ponder = 0;
+        if (!$product->is_in_stock()) {
+            $ponder -= 10;
+        }
+
+        if ($product->is_on_sale()) {
+            $ponder += 5;
+        }
+        return $ponder;
+
+
         $actionPonder = 50;
         $statusPonder = 20;
-        $stockPonder = -20;
+        $stockPonder = -100;
 
         return ((int) $product->is_on_sale() * $actionPonder) +
         ((int) $product->is_visible() * $statusPonder) +
-        ((int) $product->is_in_stock() * $stockPonder);
+        ((int) !$product->is_in_stock() * $stockPonder);
     }
 
     static function extractFullTextBoostedFields(\WC_Product $product, $attributes)
@@ -155,12 +166,18 @@ class Indexer
     static function extractFullTextFields(\WC_Product $product, $attributes)
     {
         $text = $product->get_name();
-//        $text .= ' ' . $product->get_meta('pa_proizvodjac');
+        $text .= ' ' . $product->get_meta('pa_proizvodjac');
         $text .= ' ' . $product->get_meta('vendor_code');
         $text .= ' ' . $product->get_description();
         $text .= ' ' . $product->get_short_description();
         $text .= ' ' . $product->get_sku();
-//        $text .= ' ' . implode(' ', $attributes);
+        $attr = '';
+        if (count($attributes) > 0) {
+            foreach ($attributes as $attribute) {
+                $attr .= implode(' ', $attribute);
+            }
+        }
+        $text .= ' ' . $attr;
 
         return $text;
     }
