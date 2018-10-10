@@ -1479,7 +1479,7 @@ body.home .gf-navblock {
     z-index: 999;
     visibility: visible;
     opacity: 1;
-    transition: 0.8s ease 0.10s;
+    transition-delay: 0.3s;
 }
 
 /* Mega Menu*/
@@ -1498,6 +1498,8 @@ body.home .gf-navblock {
     width: 750px;
     background: #fff;
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, .16), 0 2px 10px 0 rgba(0, 0, 0, .12);
+    transition-delay: 0.3s;
+    left: 303px !important;
 }
 
 .mega-menu .mega-menu__row {
@@ -1762,6 +1764,7 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title {
     .gf-top-bar__container {
         width: 1156px;
     }
+
 }
 
 @media only screen and (max-width: 1200px) {
@@ -3318,5 +3321,18 @@ p.woocommerce-thankyou-order-received {
 
 #billing_country_field, #shipping_country_field{
     display: none;
+}
+
+
+@media only screen and (min-width: 1200px) {
+    .mega-menu{
+        left: 255px !important;
+    }
+}
+@media only screen and (min-width: 992px) {
+    .mega-menu{
+        left: 200px !important;
+        width: 100% !important;
+    }
 }
 
