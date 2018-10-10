@@ -173,7 +173,7 @@ function gf_mobile_search_form()
 }
 
 
-add_shortcode('gf-best-selling-products', 'gf_display_best_selling_products');
+//add_shortcode('gf-best-selling-products', 'gf_display_best_selling_products');
 function gf_display_best_selling_products(){
 $args = array(
 'post_type' => 'product',
