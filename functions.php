@@ -743,6 +743,19 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products) {
 
     echo $html;
 }
+
+add_action('validate_password_reset', 'gf_validate_password_reset', 10, 2 );
+function gf_validate_password_reset( $errors, $user ) {
+    if(strlen($_POST['password_1']) < 6  ) {
+        $errors->add( 'woocommerce_password_error', __( 'Lozinka mora imati minimum 6 karaktera.' ) );
+    }
+    // adding ability to set maximum allowed password chars -- uncomment the following two (2) lines to enable that
+    elseif (strlen($_POST['password_1']) > 64 )
+        $errors->add( 'woocommerce_password_error', __( 'Lozinka ne može imati više od 64 karaktera.' ) );
+    return $errors;
+}
+
+
 add_filter( 'registration_errors', 'wpse8170_registration_errors', 10, 3 );
 function wpse8170_registration_errors( $errors, $sanitized_user_login, $user_email ) {
     if ($user_email == 'test@test123.com' ) {
@@ -751,6 +764,8 @@ function wpse8170_registration_errors( $errors, $sanitized_user_login, $user_ema
 
     return $errors;
 }
+
+
 
 //maybe we will need this function...
 //function gf_custom_add_to_cart_message($message, $products)
