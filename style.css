@@ -3324,15 +3324,15 @@ p.woocommerce-thankyou-order-received {
 }
 
 
-@media only screen and (min-width: 1200px) {
-    .mega-menu{
-        left: 255px !important;
-    }
-}
-@media only screen and (min-width: 992px) {
-    .mega-menu{
-        left: 200px !important;
-        width: 100% !important;
-    }
-}
+/*@media only screen and (min-width: 1200px) {*/
+    /*.mega-menu{*/
+        /*left: 255px !important;*/
+    /*}*/
+/*}*/
+/*@media only screen and (min-width: 992px) {*/
+    /*.mega-menu{*/
+        /*left: 200px !important;*/
+        /*width: 100% !important;*/
+    /*}*/
+/*}*/
 
