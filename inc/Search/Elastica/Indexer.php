@@ -10,12 +10,12 @@ class Indexer
 
         $elasticaIndex = $elasticaClient->getIndex('nss');
         $elasticaType = $elasticaIndex->getType('products');
-        $perPage = 700;
+        $perPage = 600;
 //        $perPage = 100;
 
         $documents = [];
 //        for ($i = 0; $i < 42; $i++) {
-        for ($i = 0; $i < 30; $i++) {
+        for ($i = 0; $i < 35; $i++) {
 //        for ($i = 0; $i < 2; $i++) {
             $offset = $i * $perPage;
             $sql = "SELECT ID FROM wp_posts WHERE post_type = 'product' LIMIT {$offset}, {$perPage};";
@@ -126,14 +126,15 @@ class Indexer
 
     static function calculateOrderingRating(\WC_Product $product)
     {
-        $ponder = 0;
+        $ponder = 1;
+        if ($product->is_on_sale()) {
+            $ponder = 5;
+        }
         if (!$product->is_in_stock()) {
-            $ponder -= 10;
+            $ponder = 1/10;
         }
 
-        if ($product->is_on_sale()) {
-            $ponder += 5;
-        }
+
         return $ponder;
 
 

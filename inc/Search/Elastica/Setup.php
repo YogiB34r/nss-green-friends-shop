@@ -17,12 +17,12 @@ class Setup
                         'default' => array(
                             'type' => 'custom',
                             'tokenizer' => 'standard',
-                            'filter' => array('lowercase', 'stop') //custom_ascii_folding
+                            'filter' => array('lowercase', 'stop', 'trim', 'custom_ascii_folding') //custom_ascii_folding
                         ),
                         'search' => array(
                             'type' => 'custom',
                             'tokenizer' => 'standard',
-                            'filter' => array('standard', 'lowercase', 'trim', 'test') //@TODO install icu_folding
+                            'filter' => array('standard', 'lowercase', 'trim', 'custom_ascii_folding') //@TODO install icu_folding
                         )
                     ),
                     'filter' => array(

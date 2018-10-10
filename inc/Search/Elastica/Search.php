@@ -65,30 +65,38 @@ class Search
 //        $q->setOperator('or');
 //        $boolQuery->addMust($q);
 
-        $q = new \Elastica\Query\Match();
-        $q->setFieldQuery('search_data.full_text', $keywords);
-        $q->setFieldOperator('search_data.full_text', 'and');
-        $q->setFieldFuzziness('search_data.full_text', 1);
-        $q->setFieldBoost('search_data.full_text', 10);
+        $q = new \Elastica\Query\QueryString();
+//        $q->setField('search_data.full_text', $keywords);
+        $q->setQuery($keywords)->setFields(['search_data.full_text'])->setBoost(2);
+
+//        $q->setFieldQuery('search_data.full_text', $keywords);
+//        $q->setFieldOperator('search_data.full_text', 'and');
+//        $q->setFieldFuzziness('search_data.full_text', 1);
+//        $q->setFieldBoost('search_data.full_text', 15);
         $boolQuery->addMust($q);
 
-        $q = new \Elastica\Query\Match();
-        $q->setFieldQuery('search_data.full_text_boosted', $keywords);
+//        $q = new \Elastica\Query\Match();
+//        $q->setFieldQuery('search_data.full_text_boosted', $keywords);
 //        $q->setFieldFuzziness('search_data.full_text_boosted', 1);
 //        $q->setFieldOperator('search_data.full_text_boosted', 'and');
-        $q->setFieldBoost('search_data.full_text_boosted', 16);
+//        $q->setFieldBoost('search_data.full_text_boosted', 20);
+
+//        $q = new \Elastica\Query\QueryString();
+        $q = new \Elastica\Query\QueryString();
+        $q->setQuery($keywords)->setFields(['search_data.full_text_boosted'])->setBoost(5);
+//        $q->setField('search_data.full_text_boosted', $keywords);
         $boolQuery->addMust($q);
 
         $q = new \Elastica\Query\Match();
         $q->setFieldQuery('entity.category.name', $keywords);
-//        $q->setFieldFuzziness('entity.category.name', 1);
-        $q->setFieldBoost('entity.category.name', 15);
+        $q->setFieldFuzziness('entity.category.name', 1);
+        $q->setFieldBoost('entity.category.name', 20);
         $boolQuery->addShould($q);
 
         $q = new \Elastica\Query\Match();
         $q->setFieldQuery('entity.attribute.value', $keywords);
 //        $q->setFieldFuzziness('entity.attribute.value', 1);
-        $q->setFieldBoost('entity.attribute.value', 15);
+        $q->setFieldBoost('entity.attribute.value', 20);
         $boolQuery->addShould($q);
 
         switch ($order) {
@@ -192,14 +200,16 @@ class Search
         var_dump('total results: ' . $totalResults);
         var_dump('paged results: ' . count($this->resultSet->getResults()));
 
-        echo '<table><tr><th>score</th><th>name</th><th width="150px">status</th><th>desc</th><th>cat</th><th>attr</th></tr>';
+        echo '<table><tr><th></th><th>score</th><th>name</th><th width="150px">desc</th><th>cat</th><th>attr</th></tr>';
         /* @var \Elastica\Result $result */
+        $i=0;
         foreach ($this->resultSet->getResults() as $result) {
+            $i++;
             echo '<tr>';
+            echo '<td>' . $i . '</td>';
             echo '<td>' . $result->getScore() . '</td>';
             echo '<td>' . $result->getDocument()->getData()['name'] . '</td>';
-            echo '<td>' . $result->getDocument()->getData()['description'] . '</td>';
-            echo '<td>' . $result->getDocument()->getData()['status'] . '</td>';
+            echo '<td><textarea>' . $result->getDocument()->getData()['description'] . '</textarea></td>';
             echo '<td>';
             foreach ($result->getDocument()->getData()['category'] as $cat) {
                 echo $cat['name'] . ', ';

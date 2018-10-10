@@ -83,7 +83,7 @@ if ($sexyShopCats){
         if (get_query_var('term') !== '') {
             $sortedProducts = gf_get_category_query();
         } else {
-            $sortedProducts = gf_custom_search($_GET['query']);
+//            $sortedProducts = gf_custom_search($_GET['query']);
             $sortedProducts = gf_elastic_search_with_data($_GET['query']);
         }
 
