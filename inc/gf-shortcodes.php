@@ -173,23 +173,23 @@ function gf_mobile_search_form()
 }
 
 
-//add_shortcode('gf-best-selling-products', 'gf_display_best_selling_products');
+add_shortcode('gf-best-selling-products', 'gf_display_best_selling_products');
 function gf_display_best_selling_products(){
-$args = array(
-'post_type' => 'product',
-'post_status' => 'publish',
-'posts_per_page' => '3',
-'meta_query' => array(
-array(
-'key' => '_stock_status',
-'value' => 'instock',
-'compare' => '=',
-)
-),
-'meta_key' => 'total_sales',
-'orderby' => 'meta_value_num',
-'order' => 'DESC',
-);
+    $args = array(
+        'post_type' => 'product',
+        'post_status' => 'publish',
+        'posts_per_page' => '3',
+//        'meta_query' => array(
+//            array(
+//                'key' => '_stock_status',
+//                'value' => 'instock',
+//                'compare' => '=',
+//            )
+//        ),
+        'meta_key' => 'total_sales',
+        'orderby' => 'meta_value_num',
+        'order' => 'DESC',
+    );
 
 $query = new WP_Query($args);
 echo '<h2>Najprodavaniji proizvodi</h2>';
