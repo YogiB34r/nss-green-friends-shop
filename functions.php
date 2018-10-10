@@ -808,10 +808,10 @@ function wpse8170_registration_errors( $errors, $sanitized_user_login, $user_ema
 /*
  * Display shipping category and price
  */
-add_filter('woocommerce_package_rates', 'bbloomer_woocommerce_tiered_shipping', 10, 2);
-function bbloomer_woocommerce_tiered_shipping($rates, $package)
+add_filter('woocommerce_package_rates', 'gf_custom_shipping_rates', 10, 2);
+function gf_custom_shipping_rates($rates, $package)
 {
-    var_dump('caooo');
+
     if (WC()->cart->cart_contents_weight <= 0.5) {
         if (isset($rates['flat_rate:3']))
             unset(
@@ -907,5 +907,6 @@ function bbloomer_woocommerce_tiered_shipping($rates, $package)
         }
 
     }
+
     return $rates;
 }
