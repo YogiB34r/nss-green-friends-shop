@@ -155,8 +155,18 @@ function woocommerce_result_count() {
     $current  = wc_get_loop_prop( 'current_page');
     $first = ( $per_page * $current ) - $per_page + 1;
     $last  = min( $total, $per_page * $current );
+    // @TODO solve this properly :)
+    if ($last === 0) {
+        $first = 0;
+    }
+    $tpl = '<p class="woocommerce-result-count">Prikazano %s-%s od %s rezultata';
+    $query = addslashes($_GET['query']);
+    if (isset($query)) {
+        $tpl .= '<span>, za upit "'.$query.'"</span>';
+    }
+    $tpl .= '.</p>';
 
-    echo sprintf('<p class="woocommerce-result-count">Prikazano %s-%s od %s rezultata.</p>', $first, $last, $total);
+    echo sprintf($tpl, $first, $last, $total);
 }
 
 

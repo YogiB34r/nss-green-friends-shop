@@ -113,10 +113,10 @@ class Search
         $q->setFieldBoost('entity.attribute.value', 20);
         $boolQuery->addShould($q);
 
-        // get price range for this query, and set global values
-        $this->setPriceRange($boolQuery);
         // set filters, price, etc
         $boolQuery = $this->setFilters($boolQuery);
+        // get price range for this query, and set global values
+        $this->setPriceRange($boolQuery);
 
         $this->performSearch($boolQuery, $limit, $currentPage, $order);
     }
@@ -135,8 +135,33 @@ class Search
             ]);
             $boolQuery->addMust($q);
         }
+        $q = new Query\Range();
+        $q->addField('order_data.price', [
+            'gt' => 0
+        ]);
 
         return $boolQuery;
+    }
+
+    /**
+     * @param BoolQuery $boolQuery
+     */
+    private function setPriceRange(BoolQuery $boolQuery)
+    {
+        $mainQuery = new Query();
+        $mainQuery->setQuery($boolQuery);
+        $maxPriceAggregation = new \Elastica\Aggregation\Max('max_price');
+        $maxPriceAggregation->setField('order_data.price');
+        $minPriceAggregation = new \Elastica\Aggregation\Min('min_price');
+        $minPriceAggregation->setField('order_data.price');
+        $mainQuery->addAggregation($maxPriceAggregation);
+        $mainQuery->addAggregation($minPriceAggregation);
+
+        $search = $this->search->setQuery($mainQuery)->search();
+        $GLOBALS['gf_price_filter'] = [
+            'max_price' => (int) $search->getAggregation('max_price')['value'],
+            'min_price' => (int) $search->getAggregation('min_price')['value']
+        ];
     }
 
     /**
@@ -226,27 +251,6 @@ class Search
         }
 //        var_dump(json_encode($this->search->getQuery()->toArray()));
         $this->resultSet = $this->search->search();
-    }
-
-    /**
-     * @param BoolQuery $boolQuery
-     */
-    private function setPriceRange(BoolQuery $boolQuery)
-    {
-        $mainQuery = new Query();
-        $mainQuery->setQuery($boolQuery);
-        $maxPriceAggregation = new \Elastica\Aggregation\Max('max_price');
-        $maxPriceAggregation->setField('order_data.price');
-        $minPriceAggregation = new \Elastica\Aggregation\Min('min_price');
-        $minPriceAggregation->setField('order_data.price');
-        $mainQuery->addAggregation($maxPriceAggregation);
-        $mainQuery->addAggregation($minPriceAggregation);
-
-        $search = $this->search->setQuery($mainQuery)->search();
-        $GLOBALS['gf_price_filter'] = [
-            'max_price' => (int) $search->getAggregation('max_price')['value'],
-            'min_price' => (int) $search->getAggregation('min_price')['value']
-        ];
     }
 
     /**
