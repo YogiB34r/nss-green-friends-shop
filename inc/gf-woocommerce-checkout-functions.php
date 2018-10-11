@@ -12,6 +12,7 @@ function gf_woocommerce_billing_field_checkbox($fields)
 
     return $fields;
 }
+
 add_filter('woocommerce_checkout_fields', 'gf_woocommerce_billing_field_pib');
 function gf_woocommerce_billing_field_pib($fields)
 {
@@ -25,8 +26,10 @@ function gf_woocommerce_billing_field_pib($fields)
 
     return $fields;
 }
+
 add_filter("woocommerce_checkout_fields", "gf_order_fields");
-function gf_order_fields($fields) {
+function gf_order_fields($fields)
+{
     $order = array(
         "billing_company_checkbox",
         "billing_first_name",
@@ -41,8 +44,7 @@ function gf_order_fields($fields) {
         "billing_phone"
 
     );
-    foreach($order as $field)
-    {
+    foreach ($order as $field) {
         $ordered_fields[$field] = $fields["billing"][$field];
     }
 
@@ -50,27 +52,83 @@ function gf_order_fields($fields) {
     return $fields;
 
 }
-add_action( 'woocommerce_admin_order_data_after_billing_address', 'gf_checkout_field_display_admin_order_meta', 10, 1 );
 
-function gf_checkout_field_display_admin_order_meta($order){
-    echo '<p class="gf-admin-orders-pib-field"><strong>'.__('Pib').':</strong> ' . get_post_meta( $order->get_id(), '_billing_pib', true ) . '</p>';
+add_action('woocommerce_admin_order_data_after_billing_address', 'gf_checkout_field_display_admin_order_meta', 10, 1);
+function gf_checkout_field_display_admin_order_meta($order)
+{
+    if (!empty(get_post_meta($order->get_id(), '_billing_pib', true))) {
+        echo '<p class="gf-admin-orders-pib-field"><strong>' . __('Pib') . ':</strong> ' . get_post_meta($order->get_id(), '_billing_pib', true) . '</p>';
+    }
 }
-add_filter('woocommerce_email_order_meta_keys', 'gf_order_meta_keys');
 
-function gf_order_meta_keys( $keys ) {
-    $keys[] = '_billing_pib';
-    return $keys;
+//Action to add custom field to order emails disabled per user request do not delete maybe we will need it :)
+//add_filter('woocommerce_email_order_meta_keys', 'gf_order_meta_keys');
+
+
+add_filter('woocommerce_email_order_meta_fields', 'gf_order_meta_keys', 10, 3);
+function gf_order_meta_keys($fields, $sent_to_admin, $order)
+{
+//    $keys[] = '_billing_pib';
+//    return $keys;
+
+    $value = get_post_meta($order->id, '_billing_pib', true);
+    if (empty($value)) {
+        return;
+    }
+    $fields['meta_key'] = array(
+        'label' => __('Pib'),
+        'value' => $value,
+    );
+
+    return $fields;
 }
-add_action('woocommerce_checkout_process', 'gf_checbox_for_company');
-function gf_checbox_for_company() {
-    if (isset($_POST['billing_company_checkbox'])){
-        if ( strlen($_POST['billing_pib']) != 8 && strlen($_POST['billing_pib']) != 0)
-            wc_add_notice( __( 'PIB mora imati tacno osam cifara' ), 'error' );
-        if (strlen($_POST['billing_pib']) === 0){
-            wc_add_notice(__('Pib je obavezno polje'),'error');
+
+add_action('woocommerce_checkout_process', 'gf_checkbox_for_company');
+function gf_checkbox_for_company()
+{
+    if (isset($_POST['billing_company_checkbox'])) {
+        if (strlen($_POST['billing_pib']) != 8 && strlen($_POST['billing_pib']) != 0)
+            wc_add_notice(__('PIB mora imati tacno osam cifara'), 'error');
+        if (strlen($_POST['billing_pib']) === 0) {
+            wc_add_notice(__('Pib je obavezno polje'), 'error');
         }
-        if (strlen($_POST['billing_company']) === 0){
-            wc_add_notice(__('Ime firme je obavezno polje'),'error');
+        if (strlen($_POST['billing_company']) === 0) {
+            wc_add_notice(__('Ime firme je obavezno polje'), 'error');
         }
     }
+    if (!isset($_POST['billing_company_checkbox']) && !empty($_POST['billing_pib']) && !empty($_POST['billing_company'])) {
+        wc()->session->set('gf_billing_pib', $_POST['billing_pib']);
+        wc()->session->set('gf_billing_company', $_POST['billing_company']);
+        unset($_POST['billing_company']);
+        unset($_POST['billing_pib']);
+    }
+}
+
+add_action( 'woocommerce_order_details_after_order_table', 'nolo_custom_field_display_cust_order_meta', 10, 1 );
+
+function nolo_custom_field_display_cust_order_meta($order){
+    $value = get_post_meta($order->get_id(), '_billing_pib', true);
+    if (empty($value)) {
+        return;
+    }
+
+    echo '<p><strong>'._('Kompanija').':</strong> ' . $order->get_billing_company(). '</p>';
+    echo '<p><strong>'._('PIB').':</strong> ' . $value. '</p>';
+}
+
+
+
+add_filter( 'woocommerce_order_formatted_billing_address' , 'woo_custom_order_formatted_billing_address', 10, 2 );
+
+function woo_custom_order_formatted_billing_address( $address, $order ){
+//    $order = new WC_Order($order);
+    $address = array(
+        'first_name' => $order->get_billing_first_name(),
+        'last_name' => $order->get_billing_last_name(),
+        'address_1' => $order->get_billing_address_1(),
+        'address_2' => $order->get_billing_address_2(),
+        'postcode' => $order->get_billing_postcode(),
+    );
+
+    return $address;
 }

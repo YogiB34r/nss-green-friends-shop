@@ -24,7 +24,7 @@ require (__DIR__ . "/inc/Search/Adapter/MySql.php");
 require (__DIR__ . "/inc/Search/Adapter/Elastic.php");
 require (__DIR__ . "/inc/Search/Search.php");
 require (__DIR__ . "/inc/Search/Elastica/Search.php");
-
+require (__DIR__ . "/inc/CheckoutHelper/CheckoutHelper.php");
 
 add_action('after_setup_theme', 'require_on_init');
 
