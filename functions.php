@@ -19,11 +19,11 @@ function require_on_init()
     }
 }
 
-require (__DIR__ . "/inc/Search/AdapterInterface.php");
-require (__DIR__ . "/inc/Search/Adapter/MySql.php");
-require (__DIR__ . "/inc/Search/Adapter/Elastic.php");
-require (__DIR__ . "/inc/Search/Search.php");
-require (__DIR__ . "/inc/Search/Elastica/Search.php");
+require(__DIR__ . "/inc/Search/AdapterInterface.php");
+require(__DIR__ . "/inc/Search/Adapter/MySql.php");
+require(__DIR__ . "/inc/Search/Adapter/Elastic.php");
+require(__DIR__ . "/inc/Search/Search.php");
+require(__DIR__ . "/inc/Search/Elastica/Search.php");
 
 
 add_action('after_setup_theme', 'require_on_init');
@@ -525,7 +525,8 @@ function gf_custom_add_to_cart_message($message)
 
 }
 
-function gf_get_category_children_ids($slug) {
+function gf_get_category_children_ids($slug)
+{
     $cat = get_term_by('slug', $slug, 'product_cat');
     $childrenIds = [];
     if ($cat) {
@@ -538,14 +539,16 @@ function gf_get_category_children_ids($slug) {
     return $childrenIds;
 }
 
-function gf_add_custom_meta_to_users() {
+function gf_add_custom_meta_to_users()
+{
     $users = get_users(array('fields' => array('ID')));
     foreach ($users as $user) {
         update_user_meta($user->ID, 'migrated', '0');
     }
 }
 
-function gf_check_if_user_is_migrated($user, $password) {
+function gf_check_if_user_is_migrated($user, $password)
+{
     if (!empty($user)) {
         if (get_user_meta($user->ID, 'migrated', true) != 0) {
 
@@ -624,49 +627,52 @@ function action_woocommerce_register_form()
     </div>
     <?php
 }
+
 add_action('woocommerce_register_form', 'action_woocommerce_register_form', 20, 10);
 
-remove_filter( 'authenticate', 'wp_authenticate_username_password' );
-add_filter( 'authenticate', 'gf_authenticate_username_password', 20, 3 );
+remove_filter('authenticate', 'wp_authenticate_username_password');
+add_filter('authenticate', 'gf_authenticate_username_password', 20, 3);
 /**
  * Remove Wordpress filer and write our own with changed error text.
  */
-function gf_authenticate_username_password( $user, $username, $password ) {
-    if ( is_a($user, 'WP_User') )
+function gf_authenticate_username_password($user, $username, $password)
+{
+    if (is_a($user, 'WP_User'))
         return $user;
 
-    if ( empty( $username ) || empty( $password ) ) {
-        if ( is_wp_error( $user ) )
+    if (empty($username) || empty($password)) {
+        if (is_wp_error($user))
             return $user;
 
         $error = new WP_Error();
 
-        if ( empty( $username ) )
-            $error->add( 'empty_username', __('<strong>GREŠKA</strong>: Polje korisničko ime ne može biti prazno.' ) );
+        if (empty($username))
+            $error->add('empty_username', __('<strong>GREŠKA</strong>: Polje korisničko ime ne može biti prazno.'));
 
-        if ( empty( $password ) )
-            $error->add( 'empty_password', __( '<strong>GREŠKA</strong>: Polje lozinka ne može biti prazno.' ) );
+        if (empty($password))
+            $error->add('empty_password', __('<strong>GREŠKA</strong>: Polje lozinka ne može biti prazno.'));
 
         return $error;
     }
 
-    $user = get_user_by( 'login', $username );
+    $user = get_user_by('login', $username);
 
-    if ( !$user )
-        return new WP_Error( 'invalid_username', sprintf( __( '<strong>GREŠKA</strong>: Ne postojeće korisničko ime ili email. <a href="%s" title="Lozinka izgubljena">Izgubili ste lozinku</a>?' ), wp_lostpassword_url() ) );
+    if (!$user)
+        return new WP_Error('invalid_username', sprintf(__('<strong>GREŠKA</strong>: Ne postojeće korisničko ime ili email. <a href="%s" title="Lozinka izgubljena">Izgubili ste lozinku</a>?'), wp_lostpassword_url()));
 
-    $user = apply_filters( 'wp_authenticate_user', $user, $password );
-    if ( is_wp_error( $user ) )
+    $user = apply_filters('wp_authenticate_user', $user, $password);
+    if (is_wp_error($user))
         return $user;
 
-    if ( ! wp_check_password( $password, $user->user_pass, $user->ID ) )
-        return new WP_Error( 'incorrect_password', sprintf( __( '<strong>GREŠKA</strong>: Lozinka koju ste uneli za korisničko ime <strong>%1$s</strong> nije ispravna. <a href="%2$s" title="Lozinka izgubljena">Izgubili ste lozinku</a>?' ),
-            $username, wp_lostpassword_url() ) );
+    if (!wp_check_password($password, $user->user_pass, $user->ID))
+        return new WP_Error('incorrect_password', sprintf(__('<strong>GREŠKA</strong>: Lozinka koju ste uneli za korisničko ime <strong>%1$s</strong> nije ispravna. <a href="%2$s" title="Lozinka izgubljena">Izgubili ste lozinku</a>?'),
+            $username, wp_lostpassword_url()));
 
     return $user;
 }
 
-function gf_custom_shop_loop(\Elastica\ResultSet $products) {
+function gf_custom_shop_loop(\Elastica\ResultSet $products)
+{
     $html = '<ul class="products columns-4 grid">';
 
     $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
@@ -682,7 +688,7 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products) {
     wc_set_loop_prop('total_pages', $totalPages);
 
 //    var_dump($products->getResults()[0]->getData());
-    foreach ($products->getResults() as $productData){
+    foreach ($products->getResults() as $productData) {
         $product = new \Nss\Feed\Product($productData->getData());
         $saved_price = $product->getRegularPrice() - $product->getSalePrice();
         $price = $product->getRegularPrice();
@@ -709,24 +715,24 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products) {
         }
 
         $html .= '<li class="product type-product status-publish has-post-thumbnail first instock sale shipping-taxable purchasable product-type-simple">';
-        $html .= '<a href=" ' . $product->dto['permalink'] .' " title=" '. $product->getName() .' ">';
+        $html .= '<a href=" ' . $product->dto['permalink'] . ' " title=" ' . $product->getName() . ' ">';
         $html .= add_stickers_to_products_on_sale($classes);
 //        woocommerce_show_product_sale_flash('', '', '', $classes);
 //        add_stickers_to_products_new($product);
         $html .= $product->dto['thumbnail'];
         $html .= add_stickers_to_products_soldout($classes);
         $html .= '</a>';
-        $html .= '<a href="'. $product->dto['permalink'] .'" title="'.$product->getName().'">';
-        $html .= '<h5>'.$product->getName().'</h5>';
+        $html .= '<a href="' . $product->dto['permalink'] . '" title="' . $product->getName() . '">';
+        $html .= '<h5>' . $product->getName() . '</h5>';
         $html .= '</a>';
         $html .= '<span class="price">';
-        $html .= '<del><span class="woocommerce-Price-amount amount">'.$product->getRegularPrice()
-                     .'<span class="woocommerce-Price-currencySymbol">din.</span></span></del>';
+        $html .= '<del><span class="woocommerce-Price-amount amount">' . $product->getRegularPrice()
+            . '<span class="woocommerce-Price-currencySymbol">din.</span></span></del>';
         if ($saved_percentage > 0) {
-            $html .= '<ins><span class="woocommerce-Price-amount amount">'.$price.
-                     '<span class="woocommerce-Price-currencySymbol">din.</span></span></ins>';
-            $html .= '<p class="saved-sale">Ušteda: <span class="woocommerce-Price-amount amount">'.$saved_price.
-                     '<span class="woocommerce-Price-currencySymbol">din.</span></span><em>'.$saved_percentage.'%</em></p>';
+            $html .= '<ins><span class="woocommerce-Price-amount amount">' . $price .
+                '<span class="woocommerce-Price-currencySymbol">din.</span></span></ins>';
+            $html .= '<p class="saved-sale">Ušteda: <span class="woocommerce-Price-amount amount">' . $saved_price .
+                '<span class="woocommerce-Price-currencySymbol">din.</span></span><em>' . $saved_percentage . '%</em></p>';
         }
         $html .= '</span>';
         $html .= '</li>';
@@ -736,7 +742,17 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products) {
 
     echo $html;
 }
+add_action('validate_password_reset', 'gf_validate_password_reset', 10, 2 );
 
+function gf_validate_password_reset( $errors, $user ) {
+    if(strlen($_POST['password_3']) < 6  ) {
+        $errors->add( 'woocommerce_password_error', __( 'Lozinka mora imati minimum 6 karaktera.' ) );
+    }
+    // adding ability to set maximum allowed password chars -- uncomment the following two (2) lines to enable that
+    elseif (strlen($_POST['password_3']) > 64 )
+    $errors->add( 'woocommerce_password_error', __( 'Lozinka može imati maximum 64 karaktera.' ) );
+    return $errors;
+}
 
 //maybe we will need this function...
 //function gf_custom_add_to_cart_message($message, $products)

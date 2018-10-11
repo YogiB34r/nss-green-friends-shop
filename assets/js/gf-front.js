@@ -188,8 +188,6 @@ jQuery(document).ready(function () {
         jQuery('.gf-expander-ul-first-line').slideToggle();
 
 
-
-
         jQuery(this).toggleClass('fa-angle-down fa-angle-up');
 
         // if (jQuery('#gf-expander-id').hasClass('gf-height-test')) {
@@ -425,4 +423,8 @@ jQuery(document).ready(function ($) {
 
 jQuery('.gf-archive-description-button').click(function () {
     jQuery('.gf-archive-description p').toggleClass('test-class');
+});
+jQuery(document).ready(function ($) {
+    $('.tnp-email').attr('title','Ovo polje mora biti popunjeno').attr('onInvalid','this.setCustomValidity(\'Neispravna email adresa\')').attr('onInput','this.setCustomValidity(\'\')');
+    $('.tnp-privacy').attr('title','Da bi ste nastavili morate čekirati ovo polje').attr('onInvalid','this.setCustomValidity(\'Morate prihvatiti politiku privatnosti\')')
 });
