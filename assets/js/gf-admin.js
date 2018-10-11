@@ -245,4 +245,9 @@ jQuery(document).ready(function ($) {
         });
     }
 
+    jQuery('.edit_address').click(function () {
+        jQuery('.gf-admin-orders-pib-field').hide();
+    })
+
 });
+

@@ -19,11 +19,11 @@ function require_on_init()
     }
 }
 
-require(__DIR__ . "/inc/Search/AdapterInterface.php");
-require(__DIR__ . "/inc/Search/Adapter/MySql.php");
-require(__DIR__ . "/inc/Search/Adapter/Elastic.php");
-require(__DIR__ . "/inc/Search/Search.php");
-require(__DIR__ . "/inc/Search/Elastica/Search.php");
+require (__DIR__ . "/inc/Search/AdapterInterface.php");
+require (__DIR__ . "/inc/Search/Adapter/MySql.php");
+require (__DIR__ . "/inc/Search/Adapter/Elastic.php");
+require (__DIR__ . "/inc/Search/Search.php");
+require (__DIR__ . "/inc/Search/Elastica/Search.php");
 
 
 add_action('after_setup_theme', 'require_on_init');
@@ -264,7 +264,7 @@ function gf_custom_search($input, $limit = 0)
 function gf_elastic_search($input, $limit = 0)
 {
     $config = array(
-        'host' => 'localhost',
+        'host' => ES_HOST,
         'port' => 9200
     );
     $elasticaSearch = new \GF\Search\Elastica\Search(new \Elastica\Client($config));
@@ -525,8 +525,7 @@ function gf_custom_add_to_cart_message($message)
 
 }
 
-function gf_get_category_children_ids($slug)
-{
+function gf_get_category_children_ids($slug) {
     $cat = get_term_by('slug', $slug, 'product_cat');
     $childrenIds = [];
     if ($cat) {
@@ -539,16 +538,14 @@ function gf_get_category_children_ids($slug)
     return $childrenIds;
 }
 
-function gf_add_custom_meta_to_users()
-{
+function gf_add_custom_meta_to_users() {
     $users = get_users(array('fields' => array('ID')));
     foreach ($users as $user) {
         update_user_meta($user->ID, 'migrated', '0');
     }
 }
 
-function gf_check_if_user_is_migrated($user, $password)
-{
+function gf_check_if_user_is_migrated($user, $password) {
     if (!empty($user)) {
         if (get_user_meta($user->ID, 'migrated', true) != 0) {
 
@@ -590,23 +587,30 @@ function gf_check_if_user_is_migrated($user, $password)
 //add_filter('wp_authenticate_user', 'gf_check_if_user_is_migrated', 10, 2);
 
 
-function remove_country_field_billing($fields)
-{
-    unset($fields['billing_country']);
-    unset($fields['billing_state']);
-    return $fields;
+//function remove_country_field_billing($fields)
+//{
+//    unset($fields['billing_country']);
+//    unset($fields['billing_state']);
+//    return $fields;
+//
+//}
+//add_filter('woocommerce_billing_fields', 'remove_country_field_billing');
+//function remove_country_field_shipping($fields)
+//{
+//    unset($fields['shipping_country']);
+//    unset($fields['shipping_state']);
+//    return $fields;
+//}
+//add_filter('woocommerce_shipping_fields', 'remove_country_field_shipping');
 
-}
+//function custom_override_checkout_fields( $fields ) {
+//    unset($fields['billing']['billing_country']);
+//    unset($fields['shipping_country']);
+//
+//    return $fields;
+//}
+//add_filter( 'woocommerce_checkout_fields' , 'custom_override_checkout_fields' );
 
-add_filter('woocommerce_billing_fields', 'remove_country_field_billing');
-function remove_country_field_shipping($fields)
-{
-    unset($fields['shipping_country']);
-    unset($fields['shipping_state']);
-    return $fields;
-}
-
-add_filter('woocommerce_shipping_fields', 'remove_country_field_shipping');
 
 
 // Disable W3TC footer comment for everyone but Admins (single site & network mode)
@@ -627,52 +631,49 @@ function action_woocommerce_register_form()
     </div>
     <?php
 }
-
 add_action('woocommerce_register_form', 'action_woocommerce_register_form', 20, 10);
 
-remove_filter('authenticate', 'wp_authenticate_username_password');
-add_filter('authenticate', 'gf_authenticate_username_password', 20, 3);
+remove_filter( 'authenticate', 'wp_authenticate_username_password' );
+add_filter( 'authenticate', 'gf_authenticate_username_password', 20, 3 );
 /**
  * Remove Wordpress filer and write our own with changed error text.
  */
-function gf_authenticate_username_password($user, $username, $password)
-{
-    if (is_a($user, 'WP_User'))
+function gf_authenticate_username_password( $user, $username, $password ) {
+    if ( is_a($user, 'WP_User') )
         return $user;
 
-    if (empty($username) || empty($password)) {
-        if (is_wp_error($user))
+    if ( empty( $username ) || empty( $password ) ) {
+        if ( is_wp_error( $user ) )
             return $user;
 
         $error = new WP_Error();
 
-        if (empty($username))
-            $error->add('empty_username', __('<strong>GREŠKA</strong>: Polje korisničko ime ne može biti prazno.'));
+        if ( empty( $username ) )
+            return new WP_Error( 'invalid_username', sprintf( __( '<strong>GREŠKA</strong>: Polje korisničko ime ne može biti prazno.' ), wp_lostpassword_url() ) );
 
-        if (empty($password))
-            $error->add('empty_password', __('<strong>GREŠKA</strong>: Polje lozinka ne može biti prazno.'));
+        if ( empty( $password ) )
+            return new WP_Error( 'invalid_username', sprintf( __( '<strong>GREŠKA</strong>: Polje lozinka ne može biti prazno.' ), wp_lostpassword_url() ) );
 
         return $error;
     }
 
-    $user = get_user_by('login', $username);
+    $user = get_user_by( 'login', $username );
 
-    if (!$user)
-        return new WP_Error('invalid_username', sprintf(__('<strong>GREŠKA</strong>: Ne postojeće korisničko ime ili email. <a href="%s" title="Lozinka izgubljena">Izgubili ste lozinku</a>?'), wp_lostpassword_url()));
+    if ( !$user )
+        return new WP_Error( 'invalid_username', sprintf( __( '<strong>GREŠKA</strong>: Ne postojeće korisničko ime ili email. <a href="%s" title="Lozinka izgubljena">Izgubili ste lozinku</a>?' ), wp_lostpassword_url() ) );
 
-    $user = apply_filters('wp_authenticate_user', $user, $password);
-    if (is_wp_error($user))
+    $user = apply_filters( 'wp_authenticate_user', $user, $password );
+    if ( is_wp_error( $user ) )
         return $user;
 
-    if (!wp_check_password($password, $user->user_pass, $user->ID))
-        return new WP_Error('incorrect_password', sprintf(__('<strong>GREŠKA</strong>: Lozinka koju ste uneli za korisničko ime <strong>%1$s</strong> nije ispravna. <a href="%2$s" title="Lozinka izgubljena">Izgubili ste lozinku</a>?'),
-            $username, wp_lostpassword_url()));
+    if ( ! wp_check_password( $password, $user->user_pass, $user->ID ) )
+        return new WP_Error( 'incorrect_password', sprintf( __( '<strong>GREŠKA</strong>: Lozinka koju ste uneli za korisničko ime <strong>%1$s</strong> nije ispravna. <a href="%2$s" title="Lozinka izgubljena">Izgubili ste lozinku</a>?' ),
+            $username, wp_lostpassword_url() ) );
 
     return $user;
 }
 
-function gf_custom_shop_loop(\Elastica\ResultSet $products)
-{
+function gf_custom_shop_loop(\Elastica\ResultSet $products) {
     $html = '<ul class="products columns-4 grid">';
 
     $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
@@ -688,7 +689,7 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products)
     wc_set_loop_prop('total_pages', $totalPages);
 
 //    var_dump($products->getResults()[0]->getData());
-    foreach ($products->getResults() as $productData) {
+    foreach ($products->getResults() as $productData){
         $product = new \Nss\Feed\Product($productData->getData());
         $saved_price = $product->getRegularPrice() - $product->getSalePrice();
         $price = $product->getRegularPrice();
@@ -707,32 +708,32 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products)
 //            echo '<img src="' . wc_placeholder_img_src() . '" alt="Placeholder" width="200px" height="200px" />';
 //        }
         $classes = '';
-        if ($saved_percentage > 0) {
+        if ($saved_percentage > 0 && $product->getStockStatus() !== 0) {
             $classes .= ' sale ';
         }
         if ($product->getStockStatus() == 0) {
             $classes .= ' outofstock';
         }
-
+        // klase koje mozda zatrebaju za <li> 'instock sale shipping-taxable purchasable product-type-simple'
         $html .= '<li class="product type-product status-publish has-post-thumbnail first instock sale shipping-taxable purchasable product-type-simple">';
-        $html .= '<a href=" ' . $product->dto['permalink'] . ' " title=" ' . $product->getName() . ' ">';
+        $html .= '<a href=" ' . $product->dto['permalink'] .' " title=" '. $product->getName() .' ">';
         $html .= add_stickers_to_products_on_sale($classes);
 //        woocommerce_show_product_sale_flash('', '', '', $classes);
 //        add_stickers_to_products_new($product);
         $html .= $product->dto['thumbnail'];
         $html .= add_stickers_to_products_soldout($classes);
         $html .= '</a>';
-        $html .= '<a href="' . $product->dto['permalink'] . '" title="' . $product->getName() . '">';
-        $html .= '<h5>' . $product->getName() . '</h5>';
+        $html .= '<a href="'. $product->dto['permalink'] .'" title="'.$product->getName().'">';
+        $html .= '<h5>'.$product->getName().'</h5>';
         $html .= '</a>';
         $html .= '<span class="price">';
-        $html .= '<del><span class="woocommerce-Price-amount amount">' . $product->getRegularPrice()
-            . '<span class="woocommerce-Price-currencySymbol">din.</span></span></del>';
+        $html .= '<del><span class="woocommerce-Price-amount amount">'.$product->getRegularPrice()
+                     .'<span class="woocommerce-Price-currencySymbol">din.</span></span></del>';
         if ($saved_percentage > 0) {
-            $html .= '<ins><span class="woocommerce-Price-amount amount">' . $price .
-                '<span class="woocommerce-Price-currencySymbol">din.</span></span></ins>';
-            $html .= '<p class="saved-sale">Ušteda: <span class="woocommerce-Price-amount amount">' . $saved_price .
-                '<span class="woocommerce-Price-currencySymbol">din.</span></span><em>' . $saved_percentage . '%</em></p>';
+            $html .= '<ins><span class="woocommerce-Price-amount amount">'.$price.
+                     '<span class="woocommerce-Price-currencySymbol">din.</span></span></ins>';
+            $html .= '<p class="saved-sale">Ušteda: <span class="woocommerce-Price-amount amount">'.$saved_price.
+                     '<span class="woocommerce-Price-currencySymbol">din.</span></span><em>'.$saved_percentage.'%</em></p>';
         }
         $html .= '</span>';
         $html .= '</li>';
@@ -742,17 +743,29 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products)
 
     echo $html;
 }
-add_action('validate_password_reset', 'gf_validate_password_reset', 10, 2 );
 
+add_action('validate_password_reset', 'gf_validate_password_reset', 10, 2 );
 function gf_validate_password_reset( $errors, $user ) {
-    if(strlen($_POST['password_3']) < 6  ) {
+    if(strlen($_POST['password_1']) < 6  ) {
         $errors->add( 'woocommerce_password_error', __( 'Lozinka mora imati minimum 6 karaktera.' ) );
     }
     // adding ability to set maximum allowed password chars -- uncomment the following two (2) lines to enable that
-    elseif (strlen($_POST['password_3']) > 64 )
-    $errors->add( 'woocommerce_password_error', __( 'Lozinka može imati maximum 64 karaktera.' ) );
+    elseif (strlen($_POST['password_1']) > 64 )
+        $errors->add( 'woocommerce_password_error', __( 'Lozinka ne može imati više od 64 karaktera.' ) );
     return $errors;
 }
+
+
+add_filter( 'registration_errors', 'wpse8170_registration_errors', 10, 3 );
+function wpse8170_registration_errors( $errors, $sanitized_user_login, $user_email ) {
+    if ($user_email == 'test@test123.com' ) {
+        $errors->add( 'myexception_code', 'This is my message' );
+    }
+
+    return $errors;
+}
+
+
 
 //maybe we will need this function...
 //function gf_custom_add_to_cart_message($message, $products)
@@ -787,3 +800,113 @@ function gf_validate_password_reset( $errors, $user ) {
 //    }
 //    return $message;
 //}
+
+
+
+
+
+/*
+ * Display shipping category and price
+ */
+add_filter('woocommerce_package_rates', 'gf_custom_shipping_rates', 10, 2);
+function gf_custom_shipping_rates($rates, $package)
+{
+
+    if (WC()->cart->cart_contents_weight <= 0.5) {
+        if (isset($rates['flat_rate:3']))
+            unset(
+                $rates['flat_rate:4'],
+                $rates['flat_rate:5'],
+                $rates['flat_rate:6'],
+                $rates['flat_rate:7'],
+                $rates['flat_rate:8'],
+                $rates['flat_rate:9'],
+                $rates['flat_rate:10']);
+
+    } elseif (WC()->cart->cart_contents_weight > 0.5 and WC()->cart->cart_contents_weight <= 2) {
+        if (isset($rates['flat_rate:4']))
+            unset(
+                $rates['flat_rate:3'],
+                $rates['flat_rate:5'],
+                $rates['flat_rate:6'],
+                $rates['flat_rate:7'],
+                $rates['flat_rate:8'],
+                $rates['flat_rate:9'],
+                $rates['flat_rate:10']);
+
+    } elseif (WC()->cart->cart_contents_weight > 2 and WC()->cart->cart_contents_weight <= 5) {
+        if (isset($rates['flat_rate:5']))
+            unset(
+                $rates['flat_rate:3'],
+                $rates['flat_rate:4'],
+                $rates['flat_rate:6'],
+                $rates['flat_rate:7'],
+                $rates['flat_rate:8'],
+                $rates['flat_rate:9'],
+                $rates['flat_rate:10']);
+
+    } elseif (WC()->cart->cart_contents_weight > 5 and WC()->cart->cart_contents_weight <= 10) {
+        if (isset($rates['flat_rate:6']))
+            unset(
+                $rates['flat_rate:3'],
+                $rates['flat_rate:4'],
+                $rates['flat_rate:5'],
+                $rates['flat_rate:7'],
+                $rates['flat_rate:8'],
+                $rates['flat_rate:9'],
+                $rates['flat_rate:10']);
+
+    } elseif (WC()->cart->cart_contents_weight > 10 and WC()->cart->cart_contents_weight <= 20) {
+        if (isset($rates['flat_rate:7']))
+            unset(
+                $rates['flat_rate:3'],
+                $rates['flat_rate:4'],
+                $rates['flat_rate:5'],
+                $rates['flat_rate:6'],
+                $rates['flat_rate:8'],
+                $rates['flat_rate:9'],
+                $rates['flat_rate:10']);
+
+    } elseif (WC()->cart->cart_contents_weight > 20 and WC()->cart->cart_contents_weight <= 30) {
+        if (isset($rates['flat_rate:8']))
+            unset(
+                $rates['flat_rate:3'],
+                $rates['flat_rate:4'],
+                $rates['flat_rate:5'],
+                $rates['flat_rate:6'],
+                $rates['flat_rate:7'],
+                $rates['flat_rate:9'],
+                $rates['flat_rate:10']);
+
+    } elseif (WC()->cart->cart_contents_weight > 30 and WC()->cart->cart_contents_weight <= 50) {
+        if (isset($rates['flat_rate:9']))
+            unset(
+                $rates['flat_rate:3'],
+                $rates['flat_rate:4'],
+                $rates['flat_rate:5'],
+                $rates['flat_rate:6'],
+                $rates['flat_rate:7'],
+                $rates['flat_rate:8'],
+                $rates['flat_rate:10']);
+
+    } elseif (WC()->cart->cart_contents_weight > 50) {
+        if (isset($rates['flat_rate:10'])) {
+            $cartWeight = WC()->cart->cart_contents_weight;
+            $myExtraWeight = $cartWeight - 50;
+            $myNewPrice = 500 + (10 * $myExtraWeight);
+            $rates['flat_rate:10']->set_cost($myNewPrice);
+
+            unset(
+                $rates['flat_rate:3'],
+                $rates['flat_rate:4'],
+                $rates['flat_rate:5'],
+                $rates['flat_rate:6'],
+                $rates['flat_rate:7'],
+                $rates['flat_rate:8'],
+                $rates['flat_rate:9']);
+        }
+
+    }
+
+    return $rates;
+}

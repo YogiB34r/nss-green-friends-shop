@@ -48,10 +48,10 @@ if (isset($_POST['query'])) {
         }
     }
 
-//    $product_results = gf_custom_search($query, 4);
-    $product_results = gf_elastic_search($query, 4);
+    $product_results = gf_custom_search($query, 4);
+//    $product_results = gf_elastic_search($query, 4);
     /* @var \Elastica\ResultSet $product_results */
-    $product_results = gf_elastic_search_with_data($query, 4);
+//    $product_results = gf_elastic_search_with_data($query, 4);
 
     $html = '';
     if (!empty($cat_results)) {
@@ -67,14 +67,14 @@ if (isset($_POST['query'])) {
     $html .= '<span>Proizvodi</span>';
     $html .= '<ul>';
     if ($product_results) {
-//        foreach ($product_results->get_posts() as $post) {
-//            $product_link = get_permalink((int) $post->ID);
-//            $html .= '<li><a href="' . $product_link . '">' . $post->post_title . '</a></li>';
-//        }
-        foreach ($product_results->getResults() as $result) {
-            $product_link = get_permalink((int) $result->getId());
-            $html .= '<li><a href="' . $product_link . '">' . $result->getData()['name'] . '</a></li>';
+        foreach ($product_results->get_posts() as $post) {
+            $product_link = get_permalink((int) $post->ID);
+            $html .= '<li><a href="' . $product_link . '">' . $post->post_title . '</a></li>';
         }
+//        foreach ($product_results->getResults() as $result) {
+//            $product_link = get_permalink((int) $result->getId());
+//            $html .= '<li><a href="' . $product_link . '">' . $result->getData()['name'] . '</a></li>';
+//        }
     } else {
         $html .= '<li>Nema rezultata</li>';
     }
@@ -91,7 +91,7 @@ include(__DIR__ . "/inc/Search/Elastica/Setup.php");
 
 if (isset($_GET['action'])) {
     $config = array(
-        'host' => 'localhost',
+        'host' => ES_HOST,
         'port' => 9200
     );
     $elasticaClient = new \Elastica\Client($config);
@@ -103,7 +103,7 @@ if (isset($_GET['action'])) {
             break;
 
         case 'getList':
-            $keywords = $_GET['query'];
+            $keywords = (isset($_GET['query'])) ? $_GET['query'] : 'test';
             $search = new \GF\Search\Elastica\Search($elasticaClient);
             $search->search($keywords);
             $search->printDebug();
