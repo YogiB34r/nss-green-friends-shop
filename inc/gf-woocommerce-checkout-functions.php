@@ -57,9 +57,21 @@ function gf_checkout_field_display_admin_order_meta($order){
 }
 //Action to add custom field to order emails disabled per user request do not delete maybe we will need it :)
 //add_filter('woocommerce_email_order_meta_keys', 'gf_order_meta_keys');
-function gf_order_meta_keys( $keys ) {
-    $keys[] = '_billing_pib';
-    return $keys;
+
+add_filter( 'woocommerce_email_order_meta_fields', 'gf_order_meta_keys', 10, 3 );
+function gf_order_meta_keys( $fields, $sent_to_admin, $order ) {
+//    $keys[] = '_billing_pib';
+//    return $keys;
+
+    $value = get_post_meta( $order->id, '_billing_pib', true );
+    if(empty($value)){
+        return;
+    }
+    $fields['meta_key'] = array(
+        'label' => __( 'Pib' ),
+        'value' => $value,
+    );
+    return $fields;
 }
 add_action('woocommerce_checkout_process', 'gf_checbox_for_company');
 function gf_checbox_for_company() {
