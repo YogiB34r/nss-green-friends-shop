@@ -103,3 +103,32 @@ function gf_checkbox_for_company()
         unset($_POST['billing_pib']);
     }
 }
+
+add_action( 'woocommerce_order_details_after_order_table', 'nolo_custom_field_display_cust_order_meta', 10, 1 );
+
+function nolo_custom_field_display_cust_order_meta($order){
+    $value = get_post_meta($order->get_id(), '_billing_pib', true);
+    if (empty($value)) {
+        return;
+    }
+
+    echo '<p><strong>'._('Kompanija').':</strong> ' . $order->get_billing_company(). '</p>';
+    echo '<p><strong>'._('PIB').':</strong> ' . $value. '</p>';
+}
+
+
+
+add_filter( 'woocommerce_order_formatted_billing_address' , 'woo_custom_order_formatted_billing_address', 10, 2 );
+
+function woo_custom_order_formatted_billing_address( $address, $order ){
+//    $order = new WC_Order($order);
+    $address = array(
+        'first_name' => $order->get_billing_first_name(),
+        'last_name' => $order->get_billing_last_name(),
+        'address_1' => $order->get_billing_address_1(),
+        'address_2' => $order->get_billing_address_2(),
+        'postcode' => $order->get_billing_postcode(),
+    );
+
+    return $address;
+}
