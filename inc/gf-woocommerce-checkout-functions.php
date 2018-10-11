@@ -55,8 +55,8 @@ add_action( 'woocommerce_admin_order_data_after_billing_address', 'gf_checkout_f
 function gf_checkout_field_display_admin_order_meta($order){
     echo '<p><strong>'.__('Pib').':</strong> ' . get_post_meta( $order->get_id(), '_billing_pib', true ) . '</p>';
 }
-add_filter('woocommerce_email_order_meta_keys', 'gf_order_meta_keys');
-
+//Action to add custom field to order emails disabled per user request do not delete maybe we will need it :)
+//add_filter('woocommerce_email_order_meta_keys', 'gf_order_meta_keys');
 function gf_order_meta_keys( $keys ) {
     $keys[] = '_billing_pib';
     return $keys;
