@@ -1,6 +1,7 @@
 <?php
-add_action('woocommerce_admin_order_totals_after_tax', 'custom_admin_order_totals_after_tax', 10, 1 );
-function custom_admin_order_totals_after_tax( $orderid ) {
+add_action('woocommerce_admin_order_totals_after_tax', 'custom_admin_order_totals_after_tax', 10, 1);
+function custom_admin_order_totals_after_tax($orderid)
+{
     $order = wc_get_order($orderid);
     $totalWeight = 0;
     foreach ($order->get_items() as $item_id => $item_data) {
@@ -8,21 +9,21 @@ function custom_admin_order_totals_after_tax( $orderid ) {
     }
 
     $price = 0;
-    if ($totalWeight > 0 and $totalWeight <= 0.5){
+    if ($totalWeight > 0 and $totalWeight <= 0.5) {
         $price = 175;
-    }elseif ($totalWeight > 0.5 and $totalWeight <= 2){
+    } elseif ($totalWeight > 0.5 and $totalWeight <= 2) {
         $price = 200;
-    }elseif ($totalWeight > 2 and $totalWeight <= 5){
+    } elseif ($totalWeight > 2 and $totalWeight <= 5) {
         $price = 230;
-    }elseif ($totalWeight > 5 and $totalWeight <= 10){
+    } elseif ($totalWeight > 5 and $totalWeight <= 10) {
         $price = 270;
-    }elseif ($totalWeight > 10 and $totalWeight <= 20){
+    } elseif ($totalWeight > 10 and $totalWeight <= 20) {
         $price = 360;
-    }elseif ($totalWeight > 20 and $totalWeight <= 30){
+    } elseif ($totalWeight > 20 and $totalWeight <= 30) {
         $price = 470;
-    }elseif ($totalWeight > 30 and $totalWeight <= 50){
+    } elseif ($totalWeight > 30 and $totalWeight <= 50) {
         $price = 500;
-    }elseif ($totalWeight > 50){
+    } elseif ($totalWeight > 50) {
         $newWeight = $totalWeight - 50;
         $price = 500 + ($newWeight * 10);
     }
@@ -32,11 +33,11 @@ function custom_admin_order_totals_after_tax( $orderid ) {
     }
 
     if ($price > 0 && $order->get_shipping_total() == 0) {
-    $shipping = new WC_Order_Item_Shipping();
-    $shipping->set_total($price);
-    $order->add_item($shipping);
-    $order->set_shipping_total($price);
-    $order->save();
+        $shipping = new WC_Order_Item_Shipping();
+        $shipping->set_total($price);
+        $order->add_item($shipping);
+        $order->set_shipping_total($price);
+        $order->save();
     }
 }
 

@@ -10,16 +10,23 @@ class Indexer
 
         $elasticaIndex = $elasticaClient->getIndex('nss');
         $elasticaType = $elasticaIndex->getType('products');
-        $perPage = 500;
+        $perPage = 600;
+//        $perPage = 100;
 
         $documents = [];
-        for ($i = 0; $i < 42; $i++) {
-//        for ($i = 0; $i < 2; $i++) {
+//        for ($i = 0; $i < 42; $i++) {
+//        for ($i = 0; $i < 35; $i++) {
+        for ($i = 0; $i < 2; $i++) {
             $offset = $i * $perPage;
             $sql = "SELECT ID FROM wp_posts WHERE post_type = 'product' LIMIT {$offset}, {$perPage};";
             $result = $wpdb->get_results($sql);
             foreach ($result as $value) {
                 $product = wc_get_product($value->ID);
+                if (!$product) {
+                    var_dump($product);
+                    var_dump('Could not find product for postId : ', $value->ID);
+                    continue;
+                }
                 $documents[] = static::parseWcProduct($product);
             }
         }
@@ -72,7 +79,7 @@ class Indexer
         $price = $regularPrice;
         if ($product->get_price() !== $regularPrice) {
             $salePrice = $product->get_price();
-            $price = $regularPrice;
+            $price = $salePrice;
         }
         $sql = "SELECT * FROM wp_gf_products WHERE postId = {$product->get_id()}";
         $gfProduct = $wpdb->get_results($sql)[0];
@@ -91,7 +98,7 @@ class Indexer
             'permalink' => $product_link,
             'shortDescription' => $product->get_short_description(),
             'regularPrice' => $regularPrice,
-            'salePrice' => $salePrice,
+            'salePrice' => (string) $salePrice,
             'inputPrice' => $product->get_meta('input_price'),
             'stockStatus' => (int) $product->is_in_stock(),
             'status' => (int) $product->is_visible(),
@@ -101,16 +108,16 @@ class Indexer
             'synced' => 1,
             'type' => $product->get_type(),
             'search_data' => [
-                'full_text' => static::extractFullTextFields($product, $attributes),
-                'full_text_boosted' => static::extractFullTextBoostedFields($product, $attributes),
+                'full_text' => static::extractFullTextFields($product, $attributes, $cats),
+                'full_text_boosted' => static::extractFullTextBoostedFields($product, $attributes, $cats),
             ],
             'order_data' => [
                 'price' => (int) $price,
                 'rating' => $product->get_meta('rating'),
                 'date' => strtotime($product->get_date_created()),
                 'viewCount' => $gfProduct->viewCount,
-                'stockStatus' => (int) $product->is_in_stock(),
-                'status' => (int) $product->is_visible(),
+                'stock' => (int) $product->is_in_stock(),
+                'published' => (int) $product->is_visible(),
                 'default' => static::calculateOrderingRating($product),
             ]
         ];
@@ -119,16 +126,28 @@ class Indexer
 
     static function calculateOrderingRating(\WC_Product $product)
     {
+        $ponder = 10;
+        if ($product->is_on_sale()) {
+            $ponder = 100;
+        }
+        if (!$product->is_in_stock()) {
+            $ponder = 1;
+        }
+
+
+        return $ponder;
+
+
         $actionPonder = 50;
         $statusPonder = 20;
-        $stockPonder = -20;
+        $stockPonder = -100;
 
         return ((int) $product->is_on_sale() * $actionPonder) +
         ((int) $product->is_visible() * $statusPonder) +
-        ((int) $product->is_in_stock() * $stockPonder);
+        ((int) !$product->is_in_stock() * $stockPonder);
     }
 
-    static function extractFullTextBoostedFields(\WC_Product $product, $attributes)
+    static function extractFullTextBoostedFields(\WC_Product $product, $attributes, $cats)
     {
         $text = $product->get_name();
         $text .= ' ' . $product->get_meta('pa_proizvodjac');
@@ -137,23 +156,41 @@ class Indexer
         $attr = '';
         if (count($attributes) > 0) {
             foreach ($attributes as $attribute) {
-                $attr .= implode(' ', $attribute);
+                $attr .= ' ' . implode(' ', $attribute) . ' ';
             }
         }
-        $text .= ' ' . $attr;
+        $categories = '';
+        if (count($cats) > 0) {
+            foreach ($cats as $cat) {
+                $categories .= ', '. $cat['name'];
+            }
+        }
+        $text .= ' ' . $attr .' '. $categories;
 
         return $text;
     }
 
-    static function extractFullTextFields(\WC_Product $product, $attributes)
+    static function extractFullTextFields(\WC_Product $product, $attributes, $cats)
     {
         $text = $product->get_name();
-//        $text .= ' ' . $product->get_meta('pa_proizvodjac');
+        $text .= ' ' . $product->get_meta('pa_proizvodjac');
         $text .= ' ' . $product->get_meta('vendor_code');
-        $text .= ' ' . $product->get_description();
-        $text .= ' ' . $product->get_short_description();
+        $text .= ' ' . strip_tags($product->get_description());
+        $text .= ' ' . strip_tags($product->get_short_description());
         $text .= ' ' . $product->get_sku();
-//        $text .= ' ' . implode(' ', $attributes);
+        $attr = '';
+        if (count($attributes) > 0) {
+            foreach ($attributes as $attribute) {
+                $attr .= implode(' ', $attribute);
+            }
+        }
+        $categories = '';
+        if (count($cats) > 0) {
+            foreach ($cats as $cat) {
+                $categories .= ', '. $cat['name'];
+            }
+        }
+        $text .= ' ' . $attr .' '. $categories;
 
         return $text;
     }

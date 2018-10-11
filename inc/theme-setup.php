@@ -107,6 +107,9 @@ function gf_theme_and_plugins_frontend_scripts_and_styles()
     wp_enqueue_script('clamp', get_stylesheet_directory_uri() . '/assets/js/3rd-party/clamp.min.js');
     wp_enqueue_script('cookie', get_stylesheet_directory_uri() . '/assets/js/jquery.cookie.js');
     wp_enqueue_script('flexslider', plugins_url() . '/woocommerce/assets/js/flexslider/jquery.flexslider.min.js');
+    wp_enqueue_script('zoom', plugins_url() . '/woocommerce/assets/js/zoom/jquery.zoom.min.js');
+    wp_enqueue_script('photoswipe', plugins_url() . '/woocommerce/assets/js/photoswipe/jquery.photoswipe.min.js');
+    wp_enqueue_script('photoswipe-ui-default', plugins_url() . '/woocommerce/assets/js/photoswipe/jquery.photoswipe-ui-default.min.js');
 //    wp_enqueue_script('cookie-notice-front', plugins_url('/cookie-notice/js/front.js'), array('jquery', 'cookie', 'gf-front-js'));
 
     wp_enqueue_style('bootstrap 4.1', 'https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css');
@@ -136,8 +139,8 @@ $userData = get_userdata(get_current_user_id());
 if ($userData && in_array('administrator', $userData->roles)) {
 
 } else {
-    add_action('wp_print_styles', function() use ($compileOverrideActive) { merge_all_styles($compileOverrideActive); }, 999999);
-    add_action('wp_enqueue_scripts', function() use ($compileOverrideActive) { merge_all_scripts($compileOverrideActive); }, 999999);
+//    add_action('wp_print_styles', function() use ($compileOverrideActive) { merge_all_styles($compileOverrideActive); }, 999999);
+//    add_action('wp_enqueue_scripts', function() use ($compileOverrideActive) { merge_all_scripts($compileOverrideActive); }, 999999);
 }
 
 function merge_all_styles($compileOverrideActive) {
@@ -233,7 +236,7 @@ function merge_all_scripts($compileOverrideActive) {
             wp_dequeue_script($handle);
             wp_deregister_script($handle);
         }
-        wp_enqueue_script('merged-script',  get_stylesheet_directory_uri() . '/../../' . $targetFile, [], $version);
+        wp_enqueue_script('merged-script',  get_stylesheet_directory_uri() . '/../../' . $targetFile, [], $version, true);
         return;
     }
     $merged_script	= '';
@@ -289,7 +292,7 @@ function merge_all_scripts($compileOverrideActive) {
     $wc_queued_js = '';
 
     file_put_contents($merged_file_location, str_replace('  ', '', $merged_script));
-    wp_enqueue_script('merged-script',  get_stylesheet_directory_uri() . '/../../' . $targetFile, [], $version);
+    wp_enqueue_script('merged-script',  get_stylesheet_directory_uri() . '/../../' . $targetFile, [], $version, true);
 }
 
 function add_async_attribute($tag, $handle) {

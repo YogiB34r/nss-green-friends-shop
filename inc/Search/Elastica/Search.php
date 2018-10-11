@@ -26,8 +26,8 @@ class Search
             ->addIndex('nss')
             ->addType('products');
 
-        $qb = new \Elastica\QueryBuilder();
-        $query = new \Elastica\Query();
+//        $qb = new \Elastica\QueryBuilder();
+
 
 //        $query->setQuery(
 //            $qb->query()->bool()->addMust(
@@ -37,11 +37,17 @@ class Search
 //            )
 //        );
 
+
+
         $boolQuery = new \Elastica\Query\BoolQuery();
 
         $q = new \Elastica\Query\Term();
         $q->setParam('status', 1);
         $boolQuery->addMust($q);
+
+//        $q = new \Elastica\Query\Term();
+//        $q->setParam('stockStatus', 1);
+//        $boolQuery->addMust($q);
 
 //        $q = new \Elastica\Query\Term();
 //        $q->setParam('category.name', $keywords);
@@ -51,39 +57,49 @@ class Search
 //        $q->setParam('attributes.value', $keywords);
 //        $boolQuery->addShould($q);
 
-        $q = new \Elastica\Query\MultiMatch();
+//        $q = new \Elastica\Query\MultiMatch();
 //        $q->setFields(['name', 'description', 'attributes.value', 'category.name']);
-        $q->setFields(['name', 'description', 'attributes.value', 'category.name']);
-        $q->setQuery($keywords);
+//        $q->setFields(['name', 'description', 'attributes.value', 'category.name']);
+//        $q->setQuery($keywords);
 //        $q->setFuzziness(1);
-        $q->setOperator('or');
+//        $q->setOperator('or');
 //        $boolQuery->addMust($q);
 
         $q = new \Elastica\Query\Match();
-        $q->setFieldQuery('name', $keywords);
-        $q->setFieldFuzziness('name', 1);
-//        $q->setFieldBoost('name', 10);
+//        $q->setField('search_data.full_text', $keywords);
+//        $q->setQuery($keywords)->setFields(['search_data.full_text'])->setBoost(2);
+
+        $q->setFieldQuery('search_data.full_text', $keywords);
+        $q->setFieldOperator('search_data.full_text', 'and');
+        $q->setFieldFuzziness('search_data.full_text', 1);
+        $q->setFieldBoost('search_data.full_text', 15);
         $boolQuery->addMust($q);
 
         $q = new \Elastica\Query\Match();
-        $q->setFieldQuery('category.name', $keywords);
-//        $q->setFieldFuzziness('description', 1);
+        $q->setFieldQuery('search_data.full_text_boosted', $keywords);
+        $q->setFieldFuzziness('search_data.full_text_boosted', 1);
+//        $q->setFieldOperator('search_data.full_text_boosted', 'and');
+        $q->setFieldBoost('search_data.full_text_boosted', 20);
+
+//        $q = new \Elastica\Query\QueryString();
+//        $q = new \Elastica\Query\Match();
+//        $q->setTerm('search_data.full_text_boosted', $keywords);
+//        $q->setQuery($keywords)->setFields(['search_data.full_text_boosted'])->setBoost(5)->setFuzzyPrefixLength(3);
+//        $q->setField('search_data.full_text_boosted', $keywords);
+        $boolQuery->addMust($q);
+
+        $q = new \Elastica\Query\Match();
+        $q->setFieldQuery('entity.category.name', $keywords);
+        $q->setFieldFuzziness('entity.category.name', 1);
+        $q->setFieldBoost('entity.category.name', 20);
         $boolQuery->addShould($q);
 
         $q = new \Elastica\Query\Match();
-        $q->setFieldQuery('attributes.value', $keywords);
+        $q->setFieldQuery('entity.attribute.value', $keywords);
+//        $q->setFieldFuzziness('entity.attribute.value', 1);
+        $q->setFieldBoost('entity.attribute.value', 20);
         $boolQuery->addShould($q);
 
-        $q = new \Elastica\Query\Match();
-        $q->setFieldQuery('manufacturer', $keywords);
-        $boolQuery->addShould($q);
-
-        $q = new \Elastica\Query\Match();
-        $q->setFieldQuery('description', $keywords);
-//        $q->setFieldFuzziness('description', 1);
-        $boolQuery->addShould($q);
-
-        $query->setQuery($boolQuery);
         switch ($order) {
             case 'popularity':
                 $orderBy = [
@@ -102,7 +118,8 @@ class Search
 
             case 'date':
                 $orderBy = [
-                    'order_data.date' => 'asc'
+//                    'order_data.default' => 'desc'
+                    '_score'
                 ];
 
                 break;
@@ -123,12 +140,27 @@ class Search
 
             default:
                 $orderBy = [
-                    'postId' => 'asc'
+                    'order_data.default' => 'desc'
                 ];
 
                 break;
         }
-        $query->setSort($orderBy);
+
+        $query = new \Elastica\Query();
+        $functionQuery = new \Elastica\Query\FunctionScore();
+//        $scoreFunction = new \Elastica\Script\Script('_score * boostFactor', ['boostFactor' => 4]);
+        $scoreFunction = new \Elastica\Script\Script('_score * doc["order_data.default"].value');
+        $functionQuery->addScriptScoreFunction($scoreFunction);
+//        $functionQuery->setScoreMode('sum');
+//        $functionQuery->setBoostMode('replace');
+        $functionQuery->setQuery($boolQuery);
+
+        $query->setQuery($functionQuery);
+
+
+//        $query->setSort($orderBy);
+//        $query->addSort(['order_data.default' => 'desc']);
+//        $query->addSort(['_score' => 'asc']);
 
         $search->setQuery($query);
         $search->setOption('size', 10000);
@@ -169,14 +201,18 @@ class Search
         var_dump('total results: ' . $totalResults);
         var_dump('paged results: ' . count($this->resultSet->getResults()));
 
-        echo '<table><tr><th>score</th><th>name</th><th width="150px">status</th><th>desc</th><th>cat</th><th>attr</th></tr>';
+        echo '<table><tr><th></th><th>score</th><th width="250px">name</th><th width="150px">desc</th><th>cat</th><th width="250px">attr</th>
+            <th>price</th><th>regular</th><th>sale price</th></tr>';
         /* @var \Elastica\Result $result */
+        $i=0;
         foreach ($this->resultSet->getResults() as $result) {
+//            var_dump($result); die();
+            $i++;
             echo '<tr>';
+            echo '<td>' . $i . '</td>';
             echo '<td>' . $result->getScore() . '</td>';
             echo '<td>' . $result->getDocument()->getData()['name'] . '</td>';
-            echo '<td>' . $result->getDocument()->getData()['description'] . '</td>';
-            echo '<td>' . $result->getDocument()->getData()['status'] . '</td>';
+            echo '<td><textarea>' . $result->getDocument()->getData()['description'] . '</textarea></td>';
             echo '<td>';
             foreach ($result->getDocument()->getData()['category'] as $cat) {
                 echo $cat['name'] . ', ';
@@ -187,6 +223,9 @@ class Search
                 echo $cat['type'] .' - '. $cat['value'];
             }
             echo '</td>';
+            echo '<td>'.$result->getDocument()->getData()['order_data']['price'].'</td>';
+            echo '<td>'.$result->getDocument()->getData()['regularPrice'].'</td>';
+            echo '<td>'.$result->getDocument()->getData()['salePrice'].'</td>';
             echo '</tr>';
         }
         echo '</table>';

@@ -6,22 +6,23 @@ class Setup
 {
     static function createIndex(\Elastica\Client $elasticaClient) {
         $elasticaIndex = $elasticaClient->getIndex('nss');
+        $elasticaIndex->delete();
 
         $elasticaIndex->create(
             array(
                 'number_of_shards' => 4,
-                'number_of_replicas' => 2,
+                'number_of_replicas' => 1,
                 'analysis' => array(
                     'analyzer' => array(
                         'default' => array(
                             'type' => 'custom',
                             'tokenizer' => 'standard',
-                            'filter' => array('lowercase', 'stop') //custom_ascii_folding
+                            'filter' => array('lowercase', 'stop', 'trim', 'custom_ascii_folding') //custom_ascii_folding
                         ),
                         'search' => array(
                             'type' => 'custom',
                             'tokenizer' => 'standard',
-                            'filter' => array('standard', 'lowercase', 'trim') //@TODO install icu_folding
+                            'filter' => array('standard', 'lowercase', 'trim', 'custom_ascii_folding') //@TODO install icu_folding
                         )
                     ),
                     'filter' => array(
@@ -76,7 +77,7 @@ class Setup
                     'description' => array('type' => 'text'),
                     'shortDescription' => array('type' => 'text'),
                     'regularPrice' => array('type' => 'integer'),
-                    'salePrice' => array('type' => 'integer'),
+                    'salePrice' => array('type' => 'text'),
                     'status' => array('type' => 'integer'),
                     'stockStatus' => array('type' => 'integer'),
                     'sku' => array('type' => 'text', 'boost' => 20),
@@ -84,7 +85,7 @@ class Setup
                     'viewCount' => array('type' => 'integer'),
                     'rating' => array('type' => 'integer'),
                     'product_type' => array('type' => 'text'),
-                    'inputPrice' => array('type' => 'integer'), // check for float
+                    'inputPrice' => array('type' => 'long'),
                 ]
             ],
             'order_data' => [
@@ -93,8 +94,8 @@ class Setup
                     'rating' => array('type' => 'integer'),
                     'date' => array('type' => 'integer'),
                     'viewCount' => array('type' => 'integer'),
-                    'stockStatus' => array('type' => 'integer'),
-                    'status' => array('type' => 'integer'),
+                    'stock' => array('type' => 'integer'),
+                    'published' => array('type' => 'integer'),
                     'default' => array('type' => 'integer'),
                 ]
             ],
