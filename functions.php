@@ -281,13 +281,14 @@ function gf_elastic_search_with_data($input, $limit = 0)
         'port' => 9200
     );
     $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
+    $currentPage = (get_query_var('paged')) ? get_query_var('paged') : 1;
     if (isset($_POST['ppp'])) {
         $per_page = ($_POST['ppp'] > 48) ? 48 : $_POST['ppp'];
+        $currentPage = 1;
     }
     if ($limit) {
         $per_page = $limit;
     }
-    $currentPage = (get_query_var('paged')) ? get_query_var('paged') : 1;
     $elasticaSearch = new \GF\Search\Elastica\Search(new \Elastica\Client($config));
     $search = new \GF\Search\Search(new \GF\Search\Adapter\Elastic($elasticaSearch));
     $resultSet = $search->getItemsForSearch($input, $per_page, $currentPage);
@@ -307,10 +308,13 @@ function gf_get_category_items_from_elastic()
         'port' => 9200
     );
     $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
+    $currentPage = (get_query_var('paged')) ? get_query_var('paged') : 1;
+    // @TODO calculate proper page when per page param is changed
     if (isset($_POST['ppp'])) {
         $per_page = ($_POST['ppp'] > 48) ? 48 : $_POST['ppp'];
+        $currentPage = 1;
     }
-    $currentPage = (get_query_var('paged')) ? get_query_var('paged') : 1;
+
     $query = isset($_GET['query']) ? $_GET['query'] : null;
     $elasticaSearch = new \GF\Search\Elastica\Search(new \Elastica\Client($config));
     $search = new \GF\Search\Search(new \GF\Search\Adapter\Elastic($elasticaSearch));

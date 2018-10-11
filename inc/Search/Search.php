@@ -19,6 +19,13 @@ class Search
         return $this->adapter->getIdsForCategory($slug);
     }
 
+    /**
+     * @param $categoryId
+     * @param null $input
+     * @param int $limit
+     * @param int $currentPage
+     * @return \Elastica\ResultSet|\WP_Query
+     */
     public function getItemsForCategory($categoryId, $input = null, $limit = 0, $currentPage = 1)
     {
         return $this->adapter->getItemsForCategory($categoryId, $input, $limit, $currentPage);
@@ -29,7 +36,12 @@ class Search
         return $this->adapter->getIdsForStandardSearch($input, $limit);
     }
 
-
+    /**
+     * @param $input
+     * @param int $limit
+     * @param int $currentPage
+     * @return \Elastica\ResultSet|\WP_Query
+     */
     public function getItemsForSearch($input, $limit = 0, $currentPage = 1)
     {
         return $this->adapter->getItemsForStandardSearch($input, $limit, $currentPage);
