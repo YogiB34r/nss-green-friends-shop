@@ -2,12 +2,18 @@
 
 namespace GF\Search\Elastica;
 
+use Elastica\Query;
+use Elastica\Query\BoolQuery;
+use Elastica\Query\Term;
+
 class Search
 {
     /**
      * @var \Elastica\Client
      */
     private $client;
+
+    private $search;
 
     /**
      * @var \Elastica\ResultSet
@@ -16,19 +22,47 @@ class Search
 
     public function __construct(\Elastica\Client $elasticaClient)
     {
-        $this->client = $elasticaClient;
+//        $this->client = $elasticaClient;
+        $this->search = new \Elastica\Search($elasticaClient);
+        $this->search->addIndex('nss')->addType('products');
     }
 
-    public function search($keywords, $limit = 0, $currentPage = 1, $order = '') {
-        $search = new \Elastica\Search($this->client);
+    public function category($categoryId, $keywords = null, $limit = 0, $currentPage = 1, $order = '')
+    {
+        $boolQuery = new BoolQuery();
+        $q = new Term();
+        $q->setParam('status', 1);
+        $boolQuery->addMust($q);
+        $q = new Term();
+        $q->setParam('category.id', $categoryId);
+        $boolQuery->addMust($q);
 
-        $search
-            ->addIndex('nss')
-            ->addType('products');
+        if ($keywords) {
+            $q = new \Elastica\Query\Match();
+            $q->setFieldQuery('search_data.full_text', $keywords);
+            $q->setFieldOperator('search_data.full_text', 'and');
+            $q->setFieldFuzziness('search_data.full_text', 1);
+            $q->setFieldBoost('search_data.full_text', 15);
+            $boolQuery->addMust($q);
 
+            $q = new \Elastica\Query\Match();
+            $q->setFieldQuery('search_data.full_text_boosted', $keywords);
+            $q->setFieldFuzziness('search_data.full_text_boosted', 1);
+            $q->setFieldBoost('search_data.full_text_boosted', 20);
+            $boolQuery->addMust($q);
+        }
+
+        // get price range for this query, and set global values
+        $this->setPriceRange($boolQuery);
+        // set filters, price, etc
+        $boolQuery = $this->setFilters($boolQuery);
+
+        $this->performSearch($boolQuery, $limit, $currentPage, $order);
+    }
+
+    public function search($keywords, $limit = 0, $currentPage = 1, $order = '')
+    {
 //        $qb = new \Elastica\QueryBuilder();
-
-
 //        $query->setQuery(
 //            $qb->query()->bool()->addMust(
 //                $qb->query()->term(['name' => $keywords])
@@ -37,11 +71,9 @@ class Search
 //            )
 //        );
 
+        $boolQuery = new BoolQuery();
 
-
-        $boolQuery = new \Elastica\Query\BoolQuery();
-
-        $q = new \Elastica\Query\Term();
+        $q = new Term();
         $q->setParam('status', 1);
         $boolQuery->addMust($q);
 
@@ -49,26 +81,7 @@ class Search
 //        $q->setParam('stockStatus', 1);
 //        $boolQuery->addMust($q);
 
-//        $q = new \Elastica\Query\Term();
-//        $q->setParam('category.name', $keywords);
-//        $boolQuery->addShould($q);
-
-//        $q = new \Elastica\Query\Term();
-//        $q->setParam('attributes.value', $keywords);
-//        $boolQuery->addShould($q);
-
-//        $q = new \Elastica\Query\MultiMatch();
-//        $q->setFields(['name', 'description', 'attributes.value', 'category.name']);
-//        $q->setFields(['name', 'description', 'attributes.value', 'category.name']);
-//        $q->setQuery($keywords);
-//        $q->setFuzziness(1);
-//        $q->setOperator('or');
-//        $boolQuery->addMust($q);
-
         $q = new \Elastica\Query\Match();
-//        $q->setField('search_data.full_text', $keywords);
-//        $q->setQuery($keywords)->setFields(['search_data.full_text'])->setBoost(2);
-
         $q->setFieldQuery('search_data.full_text', $keywords);
         $q->setFieldOperator('search_data.full_text', 'and');
         $q->setFieldFuzziness('search_data.full_text', 1);
@@ -100,83 +113,86 @@ class Search
         $q->setFieldBoost('entity.attribute.value', 20);
         $boolQuery->addShould($q);
 
+        // get price range for this query, and set global values
+        $this->setPriceRange($boolQuery);
+        // set filters, price, etc
+        $boolQuery = $this->setFilters($boolQuery);
+
+        $this->performSearch($boolQuery, $limit, $currentPage, $order);
+    }
+
+    /**
+     * @param BoolQuery $boolQuery
+     * @return BoolQuery
+     */
+    private function setFilters(BoolQuery $boolQuery)
+    {
+        if (isset($_GET{'min_price'})) {
+            $q = new \Elastica\Query\Range();
+            $q->addField('order_data.price', [
+                'gte' => (int) $_GET{'min_price'},
+                'lte' => (int) $_GET{'max_price'}
+            ]);
+            $boolQuery->addMust($q);
+        }
+
+        return $boolQuery;
+    }
+
+    /**
+     * @param \Elastica\Query $mainQuery
+     * @param $boolQuery
+     * @param $order
+     * @return \Elastica\Query
+     */
+    private function setSorting(Query $mainQuery, $boolQuery, $order)
+    {
         switch ($order) {
             case 'popularity':
-                $orderBy = [
-                    'order_data.viewCount' => 'desc'
-                ];
+                $mainQuery->setSort(['order_data.viewCount' => 'desc']);
 
                 break;
 
             //@TODO add sync for ratings
             case 'rating':
-                $orderBy = [
-                    'order_data.rating' => 'desc'
-                ];
+                $mainQuery->setSort(['order_data.rating' => 'desc']);
 
                 break;
 
             case 'date':
-                $orderBy = [
-//                    'order_data.default' => 'desc'
-                    '_score'
-                ];
+                $functionQuery = new \Elastica\Query\FunctionScore();
+                $scoreFunction = new \Elastica\Script\Script('_score * doc["order_data.default"].value');
+                $functionQuery->addScriptScoreFunction($scoreFunction);
+                $functionQuery->setQuery($boolQuery);
+                $mainQuery->setQuery($functionQuery);
+                $mainQuery->setSort(['_score' => 'desc']);
+//        $functionQuery->setScoreMode('sum');
+//        $functionQuery->setBoostMode('replace');
 
                 break;
 
             case 'price-desc':
-                $orderBy = [
-                    'order_data.price' => 'desc'
-                ];
+                $mainQuery->setSort(['order_data.price' => 'desc']);
 
                 break;
 
             case 'price':
-                $orderBy = [
-                    'order_data.price' => 'asc'
-                ];
+                $mainQuery->setSort(['order_data.price' => 'asc']);
 
                 break;
 
             default:
-                $orderBy = [
-                    'order_data.default' => 'desc'
-                ];
+                $mainQuery->setSort(['order_data.default' => 'desc']);
 
                 break;
         }
 
-        $query = new \Elastica\Query();
-        $functionQuery = new \Elastica\Query\FunctionScore();
-//        $scoreFunction = new \Elastica\Script\Script('_score * boostFactor', ['boostFactor' => 4]);
-        $scoreFunction = new \Elastica\Script\Script('_score * doc["order_data.default"].value');
-        $functionQuery->addScriptScoreFunction($scoreFunction);
-//        $functionQuery->setScoreMode('sum');
-//        $functionQuery->setBoostMode('replace');
-        $functionQuery->setQuery($boolQuery);
-
-        $query->setQuery($functionQuery);
-
-
-//        $query->setSort($orderBy);
-//        $query->addSort(['order_data.default' => 'desc']);
-//        $query->addSort(['_score' => 'asc']);
-
-        $search->setQuery($query);
-        $search->setOption('size', 10000);
-//        $search->addOption('sort', [
-//            'name' => 'desc'
-//        ]);
-        if ($limit) {
-            $search->setOption('size', $limit);
-        }
-        $search->setOption('from', 0);
-        if ($currentPage > 1) {
-            $search->setOption('from', ($currentPage - 1) * $limit);
-        }
-        $this->resultSet = $search->search();
+        return $mainQuery;
     }
 
+    /**
+     * @return array
+     */
     public function getIds()
     {
         $ids = [];
@@ -185,6 +201,52 @@ class Search
         }
 
         return $ids;
+    }
+
+    /**
+     * @param BoolQuery $boolQuery
+     * @param $limit
+     * @param $page
+     * @param $order
+     */
+    private function performSearch(BoolQuery $boolQuery, $limit, $page, $order)
+    {
+        $mainQuery = new Query();
+        $mainQuery->setQuery($boolQuery);
+        $mainQuery = $this->setSorting($mainQuery, $boolQuery, $order);
+
+        $this->search->setQuery($mainQuery);
+        $this->search->setOption('size', 10000);
+        if ($limit) {
+            $this->search->setOption('size', $limit);
+        }
+        $this->search->setOption('from', 0);
+        if ($page > 1) {
+            $this->search->setOption('from', ($page - 1) * $limit);
+        }
+//        var_dump(json_encode($this->search->getQuery()->toArray()));
+        $this->resultSet = $this->search->search();
+    }
+
+    /**
+     * @param BoolQuery $boolQuery
+     */
+    private function setPriceRange(BoolQuery $boolQuery)
+    {
+        $mainQuery = new Query();
+        $mainQuery->setQuery($boolQuery);
+        $maxPriceAggregation = new \Elastica\Aggregation\Max('max_price');
+        $maxPriceAggregation->setField('order_data.price');
+        $minPriceAggregation = new \Elastica\Aggregation\Min('min_price');
+        $minPriceAggregation->setField('order_data.price');
+        $mainQuery->addAggregation($maxPriceAggregation);
+        $mainQuery->addAggregation($minPriceAggregation);
+
+        $search = $this->search->setQuery($mainQuery)->search();
+        $GLOBALS['gf_price_filter'] = [
+            'max_price' => (int) $search->getAggregation('max_price')['value'],
+            'min_price' => (int) $search->getAggregation('min_price')['value']
+        ];
     }
 
     /**

@@ -15,8 +15,8 @@ class Indexer
 
         $documents = [];
 //        for ($i = 0; $i < 42; $i++) {
-//        for ($i = 0; $i < 35; $i++) {
-        for ($i = 0; $i < 2; $i++) {
+        for ($i = 0; $i < 35; $i++) {
+//        for ($i = 0; $i < 2; $i++) {
             $offset = $i * $perPage;
             $sql = "SELECT ID FROM wp_posts WHERE post_type = 'product' LIMIT {$offset}, {$perPage};";
             $result = $wpdb->get_results($sql);

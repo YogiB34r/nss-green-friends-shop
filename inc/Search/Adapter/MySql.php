@@ -11,7 +11,13 @@ class MySql implements \GF\Search\AdapterInterface
         $this->wpdb = $wpdb;
     }
 
-    public function getItemsForStandardSearch($slug)
+    public function getItemsForCategory($category, $input = null, $limit = 0, $currentPage = 1)
+    {
+        // TODO: Implement getItemsForCategory() method.
+    }
+
+
+    public function getItemsForStandardSearch($slug, $limit, $currentPage)
     {
         // TODO: Implement getItemsForStandardSearch() method.
     }

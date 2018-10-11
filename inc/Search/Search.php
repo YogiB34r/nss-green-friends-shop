@@ -19,6 +19,11 @@ class Search
         return $this->adapter->getIdsForCategory($slug);
     }
 
+    public function getItemsForCategory($categoryId, $input = null, $limit = 0, $currentPage = 1)
+    {
+        return $this->adapter->getItemsForCategory($categoryId, $input, $limit, $currentPage);
+    }
+
     public function getItemIdsForSearch($input, $limit = 0)
     {
         return $this->adapter->getIdsForStandardSearch($input, $limit);

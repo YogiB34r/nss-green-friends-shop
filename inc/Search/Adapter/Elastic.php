@@ -27,6 +27,7 @@ class Elastic implements \GF\Search\AdapterInterface
     /**
      * @param $input
      * @param int $limit
+     * @param int $currentPage
      * @return \Elastica\ResultSet
      */
     public function getItemsForStandardSearch($input, $limit = 0, $currentPage = 1)
@@ -35,8 +36,26 @@ class Elastic implements \GF\Search\AdapterInterface
         $this->search->search($input, $limit, $currentPage, $order);
 
         return $this->search->getResultSet();
+    }
 
-//        return array_keys($products);
+    /**
+     * @param string $category
+     * @param string $input
+     * @param int $limit
+     * @param int $currentPage
+     * @return \Elastica\ResultSet
+     */
+    public function getItemsForCategory($category, $input = null, $limit = 0, $currentPage = 1)
+    {
+        $order = (isset($_GET['orderby'])) ? $_GET['orderby'] : 'date';
+        $this->search->category($category, $input, $limit, $currentPage, $order);
+
+        $resultSet = $this->search->getResultSet();
+        if ($resultSet->getTotalHits() > $limit) {
+            wc_get_loop_prop('is_paginated', true);
+        }
+
+        return $resultSet;
     }
 
     public function getIdsForCategory($slug)

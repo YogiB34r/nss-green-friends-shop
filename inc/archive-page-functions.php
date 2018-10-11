@@ -145,12 +145,21 @@ add_action('woocommerce_before_shop_loop', 'woocommerce_catalog_ordering', 26);
 add_action('woocommerce_before_shop_loop', 'woocommerce_pagination', 27);
 add_action('woocommerce_after_shop_loop', 'woocommerce_pagination', 27);
 
-//function wpa_98244_filter_short_description(  ){
-//    if (is_shop() || is_product_category()){
-//        return '';
-//    }
-//}
-//add_filter( 'woocommerce_short_description', 'wpa_98244_filter_short_description' );
+function woocommerce_result_count() {
+    if (!wc_get_loop_prop('is_paginated')) {
+        return;
+    }
+
+    $total    = wc_get_loop_prop( 'total' );
+    $per_page = wc_get_loop_prop( 'per_page' );
+    $current  = wc_get_loop_prop( 'current_page');
+    $first = ( $per_page * $current ) - $per_page + 1;
+    $last  = min( $total, $per_page * $current );
+
+    echo sprintf('<p class="woocommerce-result-count">Prikazano %s-%s od %s rezultata.</p>', $first, $last, $total);
+}
+
+
 remove_action('woocommerce_archive_description', 'woocommerce_taxonomy_archive_description', 10);
 remove_action('woocommerce_archive_description', 'woocommerce_product_archive_description', 10);
 add_action('woocommerce_archive_description', 'bbloomer_custom_action', 10);

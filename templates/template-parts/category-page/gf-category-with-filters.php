@@ -15,7 +15,21 @@ if ($sexyShopCats){
             }
         </script>
     <?php endif;
-} ?>
+}
+
+/**
+ * Has to be called on top in order to properly set all required filters
+ */
+$sortedProducts = false;
+/* @TODO make it better ... */
+if (get_query_var('term') !== '') {
+//            $sortedProducts = gf_get_category_query();
+    $sortedProducts = gf_get_category_items_from_elastic();
+} else {
+    $sortedProducts = gf_custom_search($_GET['query']);
+//            $sortedProducts = gf_elastic_search_with_data($_GET['query']);
+}
+?>
 <div class="row">
     <div class="col-3 list-unstyled gf-sidebar">
         <div class="gf-left-sidebar-wrapper">
@@ -56,7 +70,6 @@ if ($sexyShopCats){
          * @hooked WC_Structured_Data::generate_website_data() - 30
          */
         do_action('woocommerce_before_main_content');
-
         ?>
         <header class="woocommerce-products-header">
             <?php if (apply_filters('woocommerce_show_page_title', true)) : ?>
@@ -78,15 +91,6 @@ if ($sexyShopCats){
             ?>
         </header>
         <?php
-        $sortedProducts = false;
-        /* @TODO make it better ... */
-        if (get_query_var('term') !== '') {
-            $sortedProducts = gf_get_category_query();
-        } else {
-            $sortedProducts = gf_custom_search($_GET['query']);
-//            $sortedProducts = gf_elastic_search_with_data($_GET['query']);
-        }
-
         if ($sortedProducts) {
             /**
              * Hook: woocommerce_before_shop_loop.
@@ -100,11 +104,11 @@ if ($sexyShopCats){
             echo '</div>';
 
             woocommerce_product_loop_start();
-//            if (get_class($sortedProducts) === \Elastica\ResultSet::class) {
-//                gf_custom_shop_loop($sortedProducts);
-//            } else {
+            if (get_class($sortedProducts) === \Elastica\ResultSet::class) {
+                gf_custom_shop_loop($sortedProducts);
+            } else {
                 gf_custom_search_output($sortedProducts);
-//            }
+            }
 
             woocommerce_product_loop_end();
 

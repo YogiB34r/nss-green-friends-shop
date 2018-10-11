@@ -300,6 +300,31 @@ function gf_elastic_search_with_data($input, $limit = 0)
     return $resultSet;
 }
 
+function gf_get_category_items_from_elastic()
+{
+    $config = array(
+        'host' => ES_HOST,
+        'port' => 9200
+    );
+    $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
+    if (isset($_POST['ppp'])) {
+        $per_page = ($_POST['ppp'] > 48) ? 48 : $_POST['ppp'];
+    }
+    $currentPage = (get_query_var('paged')) ? get_query_var('paged') : 1;
+    $query = isset($_GET['query']) ? $_GET['query'] : null;
+    $elasticaSearch = new \GF\Search\Elastica\Search(new \Elastica\Client($config));
+    $search = new \GF\Search\Search(new \GF\Search\Adapter\Elastic($elasticaSearch));
+    $cat = get_term_by('slug', get_query_var('term'), 'product_cat');
+    $resultSet = $search->getItemsForCategory($cat->term_id, $query, $per_page, $currentPage);
+
+    wc_set_loop_prop('total', $resultSet->getTotalHits());
+    wc_set_loop_prop('per_page', $per_page);
+    wc_set_loop_prop('current_page', $currentPage);
+    wc_set_loop_prop('total_pages', ceil($resultSet->getTotalHits() / $per_page));
+
+    return $resultSet;
+}
+
 function gf_get_category_query()
 {
     global $wpdb;
@@ -673,6 +698,24 @@ function gf_authenticate_username_password( $user, $username, $password ) {
     return $user;
 }
 
+/**
+ * Prevent main wp query from returning 404 page on a category page when it thinks there are no more results.
+ *
+ * @param $query_string
+ * @return mixed
+ */
+function custom_request($query_string) {
+    if (isset($query_string['page'])) {
+        if($query_string['page'] !== '') {
+            if (isset($query_string['name'])) {
+                unset($query_string['name']);
+            }
+        }
+    }
+    return $query_string;
+}
+add_filter('request', 'custom_request');
+
 function gf_custom_shop_loop(\Elastica\ResultSet $products) {
     $html = '<ul class="products columns-4 grid">';
 
@@ -727,13 +770,16 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products) {
         $html .= '<h5>'.$product->getName().'</h5>';
         $html .= '</a>';
         $html .= '<span class="price">';
-        $html .= '<del><span class="woocommerce-Price-amount amount">'.$product->getRegularPrice()
-                     .'<span class="woocommerce-Price-currencySymbol">din.</span></span></del>';
         if ($saved_percentage > 0) {
+            $html .= '<del><span class="woocommerce-Price-amount amount">'.$product->getRegularPrice()
+                  .'<span class="woocommerce-Price-currencySymbol">din.</span></span></del>';
             $html .= '<ins><span class="woocommerce-Price-amount amount">'.$price.
                      '<span class="woocommerce-Price-currencySymbol">din.</span></span></ins>';
             $html .= '<p class="saved-sale">Ušteda: <span class="woocommerce-Price-amount amount">'.$saved_price.
                      '<span class="woocommerce-Price-currencySymbol">din.</span></span><em>'.$saved_percentage.'%</em></p>';
+        } else {
+            $html .= '<ins><span class="woocommerce-Price-amount amount">'.$product->getRegularPrice()
+                .'<span class="woocommerce-Price-currencySymbol">din.</span></span></ins>';
         }
         $html .= '</span>';
         $html .= '</li>';
