@@ -767,6 +767,7 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products) {
                 .'<span class="woocommerce-Price-currencySymbol">din.</span></span></ins>';
         }
         $html .= '</span>';
+        $html .= '<p class="loop-short-description">'.$product->getShortDescription().'</p>';
         $html .= '</li>';
     }
 
