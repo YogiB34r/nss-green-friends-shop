@@ -10,34 +10,40 @@ class Indexer
 
         $elasticaIndex = $elasticaClient->getIndex('nss');
         $elasticaType = $elasticaIndex->getType('products');
-        $perPage = 600;
+        $perPage = 300;
 //        $perPage = 100;
 
-        $documents = [];
-//        for ($i = 0; $i < 42; $i++) {
-        for ($i = 0; $i < 35; $i++) {
+        for ($i = 0; $i < 50; $i++) {
+//        for ($i = 0; $i < 35; $i++) {
 //        for ($i = 0; $i < 2; $i++) {
             $offset = $i * $perPage;
             $sql = "SELECT ID FROM wp_posts WHERE post_type = 'product' LIMIT {$offset}, {$perPage};";
             $result = $wpdb->get_results($sql);
-            foreach ($result as $value) {
-                $product = wc_get_product($value->ID);
-                if (!$product) {
-                    var_dump($product);
-                    var_dump('Could not find product for postId : ', $value->ID);
-                    continue;
+            if (count($result) > 0) {
+                $documents = [];
+                foreach ($result as $value) {
+                    $product = wc_get_product($value->ID);
+                    if (!$product) {
+                        var_dump($product);
+                        var_dump('Could not find product for postId : ', $value->ID);
+                        continue;
+                    }
+                    $documents[] = static::parseWcProduct($product);
                 }
-                $documents[] = static::parseWcProduct($product);
+                unset($result);
+
+                $response = $elasticaType->addDocuments($documents);
+                $documents = [];
+                if (!$response->isOk() || $response->hasError()) {
+                    var_dump($response->getError());
+                    die();
+                }
+                echo sprintf('stored %s items.', $response->count());
+                unset($response);
+                $elasticaType->getIndex()->refresh();
             }
         }
-
-        $response = $elasticaType->addDocuments($documents);
-        if (!$response->isOk()) {
-            var_dump($response->getError());
-            die();
-        }
-        echo sprintf('stored %s items.', 'x');
-        $elasticaType->getIndex()->refresh();
+        echo 'sync complete';
     }
 
     static function parseWcProduct(\WC_Product $product)
@@ -82,6 +88,9 @@ class Indexer
             $price = $salePrice;
         }
         $sql = "SELECT * FROM wp_gf_products WHERE postId = {$product->get_id()}";
+        if (!isset($wpdb->get_results($sql)[0])) {
+            throw new \Exception('could not find gf product for ' . $product->get_id());
+        }
         $gfProduct = $wpdb->get_results($sql)[0];
 
         $data = [
