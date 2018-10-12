@@ -721,8 +721,8 @@ function custom_request($query_string) {
 add_filter('request', 'custom_request');
 
 function gf_custom_shop_loop(\Elastica\ResultSet $products) {
-    $html = '<ul class="products columns-4 grid">';
-
+//    $html = '<ul class="products columns-4 grid">';
+    $html = '';
     $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
     if (isset($_POST['ppp'])) {
         $per_page = ($_POST['ppp'] > 48) ? 48 : $_POST['ppp'];
