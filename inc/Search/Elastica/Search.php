@@ -156,7 +156,6 @@ class Search
         $minPriceAggregation->setField('order_data.price');
         $mainQuery->addAggregation($maxPriceAggregation);
         $mainQuery->addAggregation($minPriceAggregation);
-
         $search = $this->search->setQuery($mainQuery)->search();
         $GLOBALS['gf_price_filter'] = [
             'max_price' => (int) $search->getAggregation('max_price')['value'],

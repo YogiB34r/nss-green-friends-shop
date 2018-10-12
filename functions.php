@@ -721,21 +721,8 @@ function custom_request($query_string) {
 add_filter('request', 'custom_request');
 
 function gf_custom_shop_loop(\Elastica\ResultSet $products) {
-//    $html = '<ul class="products columns-4 grid">';
     $html = '';
-    $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
-    if (isset($_POST['ppp'])) {
-        $per_page = ($_POST['ppp'] > 48) ? 48 : $_POST['ppp'];
-    }
-    $currentPage = (get_query_var('paged')) ? get_query_var('paged') : 1;
-    $totalPages = ceil($products->count() / $per_page);
 
-    wc_set_loop_prop('total', $products->count());
-    wc_set_loop_prop('per_page', $per_page);
-    wc_set_loop_prop('current_page', $currentPage);
-    wc_set_loop_prop('total_pages', $totalPages);
-
-//    var_dump($products->getResults()[0]->getData());
     foreach ($products->getResults() as $productData){
         $product = new \Nss\Feed\Product($productData->getData());
         $saved_price = $product->getRegularPrice() - $product->getSalePrice();
@@ -748,12 +735,6 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products) {
             $saved_percentage = number_format($saved_price * 100 / $product->getRegularPrice(), 2);
         }
 
-//        $product_link = get_permalink((int) $productData->getId());
-//        if (has_post_thumbnail($productData->getId())) {
-//
-//        } else {
-//            echo '<img src="' . wc_placeholder_img_src() . '" alt="Placeholder" width="200px" height="200px" />';
-//        }
         $classes = '';
         if ($saved_percentage > 0 && $product->getStockStatus() !== 0) {
             $classes .= ' sale ';
@@ -959,4 +940,18 @@ function gf_custom_shipping_rates($rates, $package)
     }
 
     return $rates;
+}
+function woocommerce_pagination() {
+    $args = array(
+        'total'   => wc_get_loop_prop( 'total_pages' ),
+        'current' => wc_get_loop_prop( 'current_page' ),
+        'base'    => esc_url_raw( add_query_arg( 'product-page', '%#%', false ) ),
+        'format'  => '?product-page=%#%',
+    );
+
+    if ( ! wc_get_loop_prop( 'is_shortcode' ) ) {
+        $args['format'] = '';
+        $args['base']   = esc_url_raw( str_replace( 999999999, '%#%', remove_query_arg( 'add-to-cart', get_pagenum_link( 999999999, false ) ) ) );
+    }
+    wc_get_template( 'loop/pagination.php', $args );
 }
