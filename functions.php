@@ -246,13 +246,6 @@ function gf_set_product_categories($product_id, $category_ids) {
     //maybe need to save product? $product->save()
 }
 
-function gf_add_custom_meta_to_users() {
-    $users = get_users(array('fields' => array('ID')));
-    foreach ($users as $user) {
-        update_user_meta($user->ID, 'migrated', '0');
-    }
-}
-
 /**
  * Prevent main wp query from returning 404 page on a category page when it thinks there are no more results.
  *
