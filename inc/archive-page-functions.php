@@ -171,8 +171,8 @@ function woocommerce_result_count() {
 
 remove_action('woocommerce_archive_description', 'woocommerce_taxonomy_archive_description', 10);
 remove_action('woocommerce_archive_description', 'woocommerce_product_archive_description', 10);
-add_action('woocommerce_archive_description', 'bbloomer_custom_action', 10);
-function bbloomer_custom_action()
+add_action('woocommerce_archive_description', 'gf_archive_description', 10);
+function gf_archive_description()
 {
     global $wp_query;
     $cat_id = $wp_query->get_queried_object_id();
@@ -183,6 +183,5 @@ function bbloomer_custom_action()
         echo '<div class="row gf-archive-description">' . $cat_desc . '</div>';
         echo '</div>';
     }
-
 }
 
