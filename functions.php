@@ -3,6 +3,10 @@
 //ini_set('post_max_size', '128M');
 //ini_set('max_execution_time', '300');
 
+require (__DIR__ . "user.functions.php");
+require (__DIR__ . "search.functions.php");
+require (__DIR__ . "util.functions.php");
+
 add_action('after_setup_theme', 'wc_support');
 function wc_support()
 {
