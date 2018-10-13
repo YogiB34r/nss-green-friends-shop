@@ -26,6 +26,9 @@ if (get_query_var('term') !== '') {
 //    $sortedProducts = gf_get_category_query();
     $sortedProducts = gf_get_category_items_from_elastic();
 } else {
+    if (!isset($_GET['query'])) {
+        header('Location: ' . home_url());
+    }
 //    $sortedProducts = gf_custom_search($_GET['query']);
     $sortedProducts = gf_elastic_search_with_data($_GET['query']);
 }
