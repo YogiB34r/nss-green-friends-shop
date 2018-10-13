@@ -156,3 +156,89 @@ function gf_get_category_children_ids($slug) {
     }
     return $childrenIds;
 }
+
+/**
+ * One time use function, in order to replace proper vendorid for products
+ */
+function gf_change_supplier_id_by_vendor_id() {
+    global $wpdb;
+
+    $failedMatchIds = [];
+    $alreadySyncedIds = [];
+//    for ($i = 0; $i < 10; $i++) {
+    for ($i = 1; $i < 5; $i++) {
+        $products_ids = wc_get_products(array(
+            'limit' => 5000,
+            'return' => 'ids',
+            'paged' => $i
+        ));
+        foreach ($products_ids as $product_id) {
+            if (get_post_meta($product_id, 'synced', true) != 1) {
+                $vendorId = (int) get_post_meta($product_id, 'supplier', true);
+                if ($vendorId === 0) {
+                    var_dump($product_id);
+                    continue;
+                }
+
+                //resolve duplicate vendors
+                if ($vendorId === 142) {
+                    $vendorId = 357;
+                }
+                if ($vendorId === 349) {
+                    $vendorId = 350;
+                }
+                if ($vendorId === 11) {
+                    $vendorId = 324;
+                }
+                if ($vendorId === 191) {
+                    $vendorId = 192;
+                }
+                if ($vendorId === 356) {
+                    $vendorId = 324;
+                }
+                if ($vendorId === 304) {
+                    $vendorId = 391;
+                }
+                if ($vendorId === 78) {
+                    $vendorId = 89;
+                }
+                if ($vendorId === 209) {
+                    $vendorId = 208;
+                }
+                if ($vendorId === 287 || $vendorId === 286) {
+                    $vendorId = 288;
+                }
+                $sql = "SELECT user_id FROM wp_usermeta WHERE meta_key = 'vendorid' AND meta_value = {$vendorId}";
+                $userId = $wpdb->get_var($sql);
+                if (!$userId) {
+                    if (!in_array($vendorId, $failedMatchIds)) {
+                        $failedMatchIds[] = $vendorId;
+                    }
+                    continue;
+                }
+                update_post_meta($product_id, 'supplier', $userId);
+                add_post_meta($product_id, 'synced', true);
+            } else {
+                if (!in_array($product_id, $alreadySyncedIds)) {
+                    $alreadySyncedIds[] = $product_id;
+                }
+                continue;
+//                var_dump('product already synced' . );
+//                die();
+            }
+        }
+    }
+    echo 'Nisu pronađeni dobavljachi za sledeće vendorid-eve: ' . count($failedMatchIds);
+    echo '<ul>';
+    foreach ($failedMatchIds as $failedMatchId) {
+        echo '<li>' . $failedMatchId . '</li>';
+    }
+    echo '</ul>';
+
+    echo 'Sledeći proizvodi su vec sinhronizovani: ' . count($alreadySyncedIds);
+//    echo '<ul>';
+//    foreach ($alreadySyncedIds as $syncedId) {
+//        echo '<li>' . $syncedId . '</li>';
+//    }
+//    echo '</ul>';
+}

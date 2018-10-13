@@ -187,8 +187,7 @@ function gf_parse_post_ids_for_list($allIds) {
     return $sortedProducts;
 }
 
-function gf_ajax_view_count($postId)
-{
+function gf_ajax_view_count($postId) {
     $key = 'post-view-count#' . $postId;
     $cache = new GF_Cache();
     $count = (int)$cache->redis->get($key);
@@ -203,39 +202,6 @@ function gf_ajax_view_count($postId)
     echo 1;
 }
 
-function gf_change_supplier_id_by_vendor_id()
-{
-    $failedMatchIds = [];
-    for ($i = 0; $i < 10; $i++) {
-        $products_ids = wc_get_products(array(
-            'limit' => 3000,
-            'return' => 'ids'
-        ));
-        $users = get_users();
-        foreach ($products_ids as $product_id) {
-            if (get_post_meta($product_id, 'synced', true) != 1) {
-                $supplier_id = (int)get_post_meta($product_id, 'supplier', 'true');
-                foreach ($users as $user) {
-                    $vendor_id = (int)get_user_meta($user->ID, 'vendorid', true);
-                    if ($supplier_id === $vendor_id) {
-                        update_post_meta($product_id, 'supplier', $user->ID);
-                        add_post_meta($product_id, 'synced', true);
-                    }
-                }
-            }
-            if (get_post_meta($product_id, 'synced', true) === '') {
-                $failedMatchIds[] = $product_id;
-            }
-        }
-    }
-    echo 'Nisu pronadđeni parovi za sledeće proizvode:';
-    echo '<ul>';
-    foreach ($failedMatchIds as $failedMatchId) {
-        echo '<li>' . $failedMatchId . '</li>';
-    }
-    echo '</ul>';
-}
-
 function gf_set_product_categories($product_id, $category_ids) {
     $product = wc_get_product($product_id);
     $product_categories = $product->get_category_ids();
@@ -246,6 +212,7 @@ function gf_set_product_categories($product_id, $category_ids) {
     //maybe need to save product? $product->save()
 }
 
+add_filter('request', 'custom_request');
 /**
  * Prevent main wp query from returning 404 page on a category page when it thinks there are no more results.
  *
@@ -262,11 +229,12 @@ function custom_request($query_string) {
     }
     return $query_string;
 }
-add_filter('request', 'custom_request');
+
 
 function gf_custom_shop_loop(\Elastica\ResultSet $products) {
     $html = '';
 
+    $i = 0;
     foreach ($products->getResults() as $productData){
         $product = new \Nss\Feed\Product($productData->getData());
         $saved_price = $product->getRegularPrice() - $product->getSalePrice();
@@ -287,7 +255,18 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products) {
             $classes .= ' outofstock';
         }
         // klase koje mozda zatrebaju za <li> 'instock sale shipping-taxable purchasable product-type-simple'
-        $html .= '<li class="product type-product status-publish has-post-thumbnail first instock sale shipping-taxable purchasable product-type-simple">';
+        $classes = " instock ";
+        if (!$product->getStockStatus()) {
+            $classes = " outofstock ";
+        }
+        if ($product->getSalePrice() > 0) {
+            $classes .= " sale ";
+        }
+        if ($i === 0) {
+            $classes .= " first ";
+        }
+        $classes .= " product type-product status-publish has-post-thumbnail shipping-taxable purchasable  ";
+        $html .= '<li class="product-type-'.$product->getType(). $classes .'">';
         $html .= '<a href=" ' . $product->dto['permalink'] .' " title=" '. $product->getName() .' ">';
         $html .= add_stickers_to_products_on_sale($classes);
 //        woocommerce_show_product_sale_flash('', '', '', $classes);
@@ -313,8 +292,8 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products) {
         $html .= '</span>';
         $html .= '<p class="loop-short-description">'.$product->getShortDescription().'</p>';
         $html .= '</li>';
+        $i++;
     }
-
     $html .= '</ul>';
 
     echo $html;
@@ -325,84 +304,34 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products) {
  */
 add_filter('woocommerce_package_rates', 'gf_custom_shipping_rates', 10, 2);
 function gf_custom_shipping_rates($rates, $package) {
-
     if (WC()->cart->cart_contents_weight <= 0.5) {
         if (isset($rates['flat_rate:3']))
-            unset(
-                $rates['flat_rate:4'],
-                $rates['flat_rate:5'],
-                $rates['flat_rate:6'],
-                $rates['flat_rate:7'],
-                $rates['flat_rate:8'],
-                $rates['flat_rate:9'],
-                $rates['flat_rate:10']);
-
+            unset($rates['flat_rate:4'], $rates['flat_rate:5'], $rates['flat_rate:6'], $rates['flat_rate:7'],
+                $rates['flat_rate:8'], $rates['flat_rate:9'], $rates['flat_rate:10']);
     } elseif (WC()->cart->cart_contents_weight > 0.5 and WC()->cart->cart_contents_weight <= 2) {
         if (isset($rates['flat_rate:4']))
-            unset(
-                $rates['flat_rate:3'],
-                $rates['flat_rate:5'],
-                $rates['flat_rate:6'],
-                $rates['flat_rate:7'],
-                $rates['flat_rate:8'],
-                $rates['flat_rate:9'],
-                $rates['flat_rate:10']);
-
+            unset($rates['flat_rate:3'], $rates['flat_rate:5'], $rates['flat_rate:6'], $rates['flat_rate:7'],
+                $rates['flat_rate:8'], $rates['flat_rate:9'], $rates['flat_rate:10']);
     } elseif (WC()->cart->cart_contents_weight > 2 and WC()->cart->cart_contents_weight <= 5) {
         if (isset($rates['flat_rate:5']))
-            unset(
-                $rates['flat_rate:3'],
-                $rates['flat_rate:4'],
-                $rates['flat_rate:6'],
-                $rates['flat_rate:7'],
-                $rates['flat_rate:8'],
-                $rates['flat_rate:9'],
-                $rates['flat_rate:10']);
-
+            unset($rates['flat_rate:3'], $rates['flat_rate:4'], $rates['flat_rate:6'], $rates['flat_rate:7'],
+                $rates['flat_rate:8'], $rates['flat_rate:9'], $rates['flat_rate:10']);
     } elseif (WC()->cart->cart_contents_weight > 5 and WC()->cart->cart_contents_weight <= 10) {
         if (isset($rates['flat_rate:6']))
-            unset(
-                $rates['flat_rate:3'],
-                $rates['flat_rate:4'],
-                $rates['flat_rate:5'],
-                $rates['flat_rate:7'],
-                $rates['flat_rate:8'],
-                $rates['flat_rate:9'],
-                $rates['flat_rate:10']);
-
+            unset($rates['flat_rate:3'], $rates['flat_rate:4'], $rates['flat_rate:5'], $rates['flat_rate:7'],
+                $rates['flat_rate:8'], $rates['flat_rate:9'], $rates['flat_rate:10']);
     } elseif (WC()->cart->cart_contents_weight > 10 and WC()->cart->cart_contents_weight <= 20) {
         if (isset($rates['flat_rate:7']))
-            unset(
-                $rates['flat_rate:3'],
-                $rates['flat_rate:4'],
-                $rates['flat_rate:5'],
-                $rates['flat_rate:6'],
-                $rates['flat_rate:8'],
-                $rates['flat_rate:9'],
-                $rates['flat_rate:10']);
-
+            unset($rates['flat_rate:3'], $rates['flat_rate:4'], $rates['flat_rate:5'], $rates['flat_rate:6'],
+                $rates['flat_rate:8'], $rates['flat_rate:9'], $rates['flat_rate:10']);
     } elseif (WC()->cart->cart_contents_weight > 20 and WC()->cart->cart_contents_weight <= 30) {
         if (isset($rates['flat_rate:8']))
-            unset(
-                $rates['flat_rate:3'],
-                $rates['flat_rate:4'],
-                $rates['flat_rate:5'],
-                $rates['flat_rate:6'],
-                $rates['flat_rate:7'],
-                $rates['flat_rate:9'],
-                $rates['flat_rate:10']);
-
+            unset($rates['flat_rate:3'], $rates['flat_rate:4'], $rates['flat_rate:5'], $rates['flat_rate:6'],
+                $rates['flat_rate:7'], $rates['flat_rate:9'], $rates['flat_rate:10']);
     } elseif (WC()->cart->cart_contents_weight > 30 and WC()->cart->cart_contents_weight <= 50) {
         if (isset($rates['flat_rate:9']))
-            unset(
-                $rates['flat_rate:3'],
-                $rates['flat_rate:4'],
-                $rates['flat_rate:5'],
-                $rates['flat_rate:6'],
-                $rates['flat_rate:7'],
-                $rates['flat_rate:8'],
-                $rates['flat_rate:10']);
-
+            unset($rates['flat_rate:3'], $rates['flat_rate:4'], $rates['flat_rate:5'], $rates['flat_rate:6'],
+                $rates['flat_rate:7'],$rates['flat_rate:8'],$rates['flat_rate:10']);
     } elseif (WC()->cart->cart_contents_weight > 50) {
         if (isset($rates['flat_rate:10'])) {
             $cartWeight = WC()->cart->cart_contents_weight;
@@ -410,18 +339,10 @@ function gf_custom_shipping_rates($rates, $package) {
             $myNewPrice = 500 + (10 * $myExtraWeight);
             $rates['flat_rate:10']->set_cost($myNewPrice);
 
-            unset(
-                $rates['flat_rate:3'],
-                $rates['flat_rate:4'],
-                $rates['flat_rate:5'],
-                $rates['flat_rate:6'],
-                $rates['flat_rate:7'],
-                $rates['flat_rate:8'],
-                $rates['flat_rate:9']);
+            unset($rates['flat_rate:3'],$rates['flat_rate:4'],$rates['flat_rate:5'],$rates['flat_rate:6'],$rates['flat_rate:7'],
+                $rates['flat_rate:8'],$rates['flat_rate:9']);
         }
-
     }
-
     return $rates;
 }
 

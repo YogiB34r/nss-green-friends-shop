@@ -33,6 +33,10 @@ if (isset($_GET['import'])) {
 //$sw = new \Symfony\Component\Stopwatch\Stopwatch();
 //$sw->start('gfmain');
 
+if (isset($_GET['testVendor'])) {
+    gf_change_supplier_id_by_vendor_id();
+}
+
 if (isset($_POST['query'])) {
     $query = addslashes($_POST['query']);
 
