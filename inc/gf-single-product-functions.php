@@ -117,22 +117,6 @@ function change_displayed_sale_price_html($price, WC_Product $product)
 }
 
 
-add_filter('woocommerce_product_tabs', 'woo_new_product_tab');
-function woo_new_product_tab($tabs)
-{
-
-    // Adds the new tab
-
-    $tabs['narucivanje_tab'] = array(
-        'title' => __('Naručivanje i plaćanje', 'woocommerce'),
-        'priority' => 50,
-        'callback' => 'woo_new_product_tab_content'
-    );
-
-    return $tabs;
-
-}
-
 function woo_new_product_tab_content()
 {
     $podrska = esc_url(get_permalink(get_page_by_title('podrška')));
@@ -174,64 +158,35 @@ function woo_new_product_tab_content()
 	";
 }
 
-
 remove_action('woocommerce_after_single_variation', 'woocommerce_single_product_summary', 20);
-
-
 remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_title', 5);
 add_action('woocommerce_before_single_product', 'woocommerce_template_single_title', 11);
+
+add_filter('woocommerce_product_tabs', 'woo_new_product_tab');
+function woo_new_product_tab($tabs) {
+    // Adds the new tab
+    $tabs['narucivanje_tab'] = array(
+        'title' => __('Naručivanje i plaćanje', 'woocommerce'),
+        'priority' => 50,
+        'callback' => 'woo_new_product_tab_content'
+    );
+
+    return $tabs;
+}
 
 /**
  * Customize product data tabs
  */
 add_filter('woocommerce_product_tabs', 'woo_custom_description_tab', 98);
-function woo_custom_description_tab($tabs)
-{
-
+function woo_custom_description_tab($tabs){
     $tabs['description']['callback'] = 'woo_custom_description_tab_content';    // Custom description callback
 
     return $tabs;
 }
-
-function woo_custom_description_tab_content()
-{
+function woo_custom_description_tab_content(){
     global $product;
 //    global $post;
-    echo '<p>' . $product->get_description() . '</p>';
+    echo '<p>' . htmlspecialchars_decode($product->get_description()) . '</p>';
     echo '<p>&nbsp</p>';
     echo nl2br('<p>' . get_post_meta($product->get_id(), 'features', true) . '</p>');
 }
-///**
-// * Temporarily enable hide out of stock items.
-// *
-// * @param string $template_name
-// * @param string $template_path
-// * @param bool $located
-// * @param array $args
-// */
-//function gf_enable_hide_out_of_stock_items( $template_name, $template_path, $located, $args ) {
-//    if( $template_name !== "single-product/related.php" ) {
-//        return;
-//    }
-//
-//    add_filter( 'pre_option_woocommerce_hide_out_of_stock_items', function( $option ) { return "yes"; }, 10, 1 );
-//}
-//
-///**
-// * Temporarily disable hide out of stock items.
-// *
-// * @param string $template_name
-// * @param string $template_path
-// * @param bool $located
-// * @param array $args
-// */
-//function gf_disable_hide_out_of_stock_items( $template_name, $template_path, $located, $args ) {
-//    if( $template_name !== "single-product/related.php" ) {
-//        return;
-//    }
-//
-//    add_filter( 'pre_option_woocommerce_hide_out_of_stock_items', function( $option ) { return "no"; }, 10, 1 );
-//}
-//
-//add_action( 'woocommerce_before_template_part', 'gf_enable_hide_out_of_stock_items', 10, 4 );
-//add_action( 'woocommerce_after_template_part', 'gf_disable_hide_out_of_stock_items', 10, 4 );
