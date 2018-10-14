@@ -299,52 +299,6 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products) {
     echo $html;
 }
 
-/**
- * Display shipping category and price
- */
-add_filter('woocommerce_package_rates', 'gf_custom_shipping_rates', 10, 2);
-function gf_custom_shipping_rates($rates, $package) {
-    if (WC()->cart->cart_contents_weight <= 0.5) {
-        if (isset($rates['flat_rate:3']))
-            unset($rates['flat_rate:4'], $rates['flat_rate:5'], $rates['flat_rate:6'], $rates['flat_rate:7'],
-                $rates['flat_rate:8'], $rates['flat_rate:9'], $rates['flat_rate:10']);
-    } elseif (WC()->cart->cart_contents_weight > 0.5 and WC()->cart->cart_contents_weight <= 2) {
-        if (isset($rates['flat_rate:4']))
-            unset($rates['flat_rate:3'], $rates['flat_rate:5'], $rates['flat_rate:6'], $rates['flat_rate:7'],
-                $rates['flat_rate:8'], $rates['flat_rate:9'], $rates['flat_rate:10']);
-    } elseif (WC()->cart->cart_contents_weight > 2 and WC()->cart->cart_contents_weight <= 5) {
-        if (isset($rates['flat_rate:5']))
-            unset($rates['flat_rate:3'], $rates['flat_rate:4'], $rates['flat_rate:6'], $rates['flat_rate:7'],
-                $rates['flat_rate:8'], $rates['flat_rate:9'], $rates['flat_rate:10']);
-    } elseif (WC()->cart->cart_contents_weight > 5 and WC()->cart->cart_contents_weight <= 10) {
-        if (isset($rates['flat_rate:6']))
-            unset($rates['flat_rate:3'], $rates['flat_rate:4'], $rates['flat_rate:5'], $rates['flat_rate:7'],
-                $rates['flat_rate:8'], $rates['flat_rate:9'], $rates['flat_rate:10']);
-    } elseif (WC()->cart->cart_contents_weight > 10 and WC()->cart->cart_contents_weight <= 20) {
-        if (isset($rates['flat_rate:7']))
-            unset($rates['flat_rate:3'], $rates['flat_rate:4'], $rates['flat_rate:5'], $rates['flat_rate:6'],
-                $rates['flat_rate:8'], $rates['flat_rate:9'], $rates['flat_rate:10']);
-    } elseif (WC()->cart->cart_contents_weight > 20 and WC()->cart->cart_contents_weight <= 30) {
-        if (isset($rates['flat_rate:8']))
-            unset($rates['flat_rate:3'], $rates['flat_rate:4'], $rates['flat_rate:5'], $rates['flat_rate:6'],
-                $rates['flat_rate:7'], $rates['flat_rate:9'], $rates['flat_rate:10']);
-    } elseif (WC()->cart->cart_contents_weight > 30 and WC()->cart->cart_contents_weight <= 50) {
-        if (isset($rates['flat_rate:9']))
-            unset($rates['flat_rate:3'], $rates['flat_rate:4'], $rates['flat_rate:5'], $rates['flat_rate:6'],
-                $rates['flat_rate:7'],$rates['flat_rate:8'],$rates['flat_rate:10']);
-    } elseif (WC()->cart->cart_contents_weight > 50) {
-        if (isset($rates['flat_rate:10'])) {
-            $cartWeight = WC()->cart->cart_contents_weight;
-            $myExtraWeight = $cartWeight - 50;
-            $myNewPrice = 500 + (10 * $myExtraWeight);
-            $rates['flat_rate:10']->set_cost($myNewPrice);
-
-            unset($rates['flat_rate:3'],$rates['flat_rate:4'],$rates['flat_rate:5'],$rates['flat_rate:6'],$rates['flat_rate:7'],
-                $rates['flat_rate:8'],$rates['flat_rate:9']);
-        }
-    }
-    return $rates;
-}
 
 function woocommerce_pagination() {
     $args = array(
