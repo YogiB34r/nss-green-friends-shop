@@ -7,13 +7,14 @@ class Indexer
     static function index(\Elastica\Client $elasticaClient)
     {
         global $wpdb;
+        ini_set('max_execution_time', '600');
 
         $elasticaIndex = $elasticaClient->getIndex('nss');
         $elasticaType = $elasticaIndex->getType('products');
         $perPage = 5000;
 //        $perPage = 100;
 
-        for ($i = 2; $i < 5; $i++) {
+        for ($i = 0; $i < 5; $i++) {
 //        for ($i = 0; $i < 35; $i++) {
 //        for ($i = 0; $i < 2; $i++) {
             $offset = $i * $perPage;

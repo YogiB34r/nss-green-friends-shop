@@ -284,7 +284,7 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products) {
             $html .= '<ins><span class="woocommerce-Price-amount amount">'.$price.
                      '<span class="woocommerce-Price-currencySymbol">din.</span></span></ins>';
             $html .= '<p class="saved-sale">Ušteda: <span class="woocommerce-Price-amount amount">'.$saved_price.
-                     '<span class="woocommerce-Price-currencySymbol">din.</span></span><em>'.$saved_percentage.'%</em></p>';
+                     '<span class="woocommerce-Price-currencySymbol">din.</span></span> <em> ('.$saved_percentage.'%)</em></p>';
         } else {
             $html .= '<ins><span class="woocommerce-Price-amount amount">'.$product->getRegularPrice()
                 .'<span class="woocommerce-Price-currencySymbol">din.</span></span></ins>';

@@ -93,12 +93,6 @@ class Search
         $q->setFieldFuzziness('search_data.full_text_boosted', 1);
 //        $q->setFieldOperator('search_data.full_text_boosted', 'and');
         $q->setFieldBoost('search_data.full_text_boosted', 20);
-
-//        $q = new \Elastica\Query\QueryString();
-//        $q = new \Elastica\Query\Match();
-//        $q->setTerm('search_data.full_text_boosted', $keywords);
-//        $q->setQuery($keywords)->setFields(['search_data.full_text_boosted'])->setBoost(5)->setFuzzyPrefixLength(3);
-//        $q->setField('search_data.full_text_boosted', $keywords);
         $boolQuery->addMust($q);
 
         $q = new \Elastica\Query\Match();
@@ -112,6 +106,13 @@ class Search
 //        $q->setFieldFuzziness('entity.attribute.value', 1);
         $q->setFieldBoost('entity.attribute.value', 20);
         $boolQuery->addShould($q);
+
+        // exclude sex shop categories
+        foreach (gf_get_category_children_ids('sexy-shop') as $catId) {
+            $q = new Term();
+            $q->setTerm('category.id', $catId);
+            $boolQuery->addMustNot($q);
+        }
 
         // set filters, price, etc
         $boolQuery = $this->setFilters($boolQuery);
