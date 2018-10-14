@@ -73,7 +73,7 @@ function gf_authenticate_username_password( $user, $username, $password ) {
     $user = get_user_by( 'login', $username );
 
     if ( !$user )
-        return new WP_Error( 'invalid_username', sprintf( __( '<strong>GREŠKA</strong>: Ne postojeće korisničko ime ili email. <a href="%s" title="Lozinka izgubljena">Izgubili ste lozinku</a>?' ), wp_lostpassword_url() ) );
+        return new WP_Error( 'invalid_username', sprintf( __( '<strong>GREŠKA</strong>: Nepostojeće korisničko ime ili email. <a href="%s" title="Lozinka izgubljena">Izgubili ste lozinku</a>?' ), wp_lostpassword_url() ) );
 
     $user = apply_filters( 'wp_authenticate_user', $user, $password );
     if ( is_wp_error( $user ) )
