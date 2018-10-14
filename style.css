@@ -3007,7 +3007,7 @@ ul.products.list li.product h3, ul.products.list li.product .woocommerce-product
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
-    line-height: 18px; /* fallback */
+    line-height: 19px; /* fallback */
     max-height: 40px; /* fallback */
     -webkit-line-clamp: 2; /* number of lines to show */
     -webkit-box-orient: vertical;
