@@ -255,7 +255,7 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products) {
             $classes .= ' outofstock';
         }
         // klase koje mozda zatrebaju za <li> 'instock sale shipping-taxable purchasable product-type-simple'
-        $classes = " instock ";
+        $classes .= " instock ";
         if (!$product->getStockStatus()) {
             $classes = " outofstock ";
         }
@@ -272,7 +272,10 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products) {
 //        woocommerce_show_product_sale_flash('', '', '', $classes);
 //        add_stickers_to_products_new($product);
         $html .= $product->dto['thumbnail'];
-        $html .= add_stickers_to_products_soldout($classes);
+        ob_start();
+        add_stickers_to_products_soldout($classes);
+        $html .= ob_get_clean();
+//        $html .= add_stickers_to_products_soldout($classes);
         $html .= '</a>';
         $html .= '<a href="'. $product->dto['permalink'] .'" title="'.$product->getName().'">';
         $html .= '<h5>'.$product->getName().'</h5>';
