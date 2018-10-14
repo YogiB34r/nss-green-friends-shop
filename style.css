@@ -887,7 +887,6 @@ ul.products.list li.product img {
 
 .saved-sale {
     order: 3;
-    font-size: 0.9em;
     margin-top: 5px;
 }
 
@@ -3342,5 +3341,8 @@ p.woocommerce-thankyou-order-received {
 
 .woocommerce form .form-row .required {
     visibility: visible;
+}
+.gf-single-product-share-buttons{
+    display: flex;
 }
 
