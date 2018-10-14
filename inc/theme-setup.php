@@ -139,8 +139,8 @@ $userData = get_userdata(get_current_user_id());
 if ($userData && in_array('administrator', $userData->roles)) {
 
 } else {
-//    add_action('wp_print_styles', function() use ($compileOverrideActive) { merge_all_styles($compileOverrideActive); }, 999999);
-//    add_action('wp_enqueue_scripts', function() use ($compileOverrideActive) { merge_all_scripts($compileOverrideActive); }, 999999);
+    add_action('wp_print_styles', function() use ($compileOverrideActive) { merge_all_styles($compileOverrideActive); }, 999999);
+    add_action('wp_enqueue_scripts', function() use ($compileOverrideActive) { merge_all_scripts($compileOverrideActive); }, 999999);
 }
 
 function merge_all_styles($compileOverrideActive) {
