@@ -3343,4 +3343,9 @@ p.woocommerce-thankyou-order-received {
 .woocommerce form .form-row .required {
     visibility: visible;
 }
+@media only screen and (max-width: 380px) {
+   .woocommerce-Tabs-panel--description iframe {
+       width: 100%;
+   }
+}
 
