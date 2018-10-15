@@ -101,7 +101,6 @@ add_filter('woocommerce_shipping_package_name', 'gf_translate_shipping', 10, 3);
 add_filter('woocommerce_package_rates', 'bbloomer_woocommerce_tiered_shipping', 10, 2);
 function bbloomer_woocommerce_tiered_shipping($rates, $package)
 {
-    var_dump('caooo');
     if (WC()->cart->cart_contents_weight <= 0.5) {
         if (isset($rates['flat_rate:3']))
             unset(
