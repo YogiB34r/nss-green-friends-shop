@@ -1,7 +1,12 @@
 <?php
-ini_set('upload_max_size', '128M');
-ini_set('post_max_size', '128M');
-ini_set('max_execution_time', '300');
+//ini_set('upload_max_size', '128M');
+//ini_set('post_max_size', '128M');
+ini_set('max_execution_time', '60');
+
+require (__DIR__ . DIRECTORY_SEPARATOR . "user.functions.php");
+require (__DIR__ . DIRECTORY_SEPARATOR . "/search.functions.php");
+require (__DIR__ . DIRECTORY_SEPARATOR . "/util.functions.php");
+
 add_action('after_setup_theme', 'wc_support');
 function wc_support()
 {
@@ -29,170 +34,20 @@ require (__DIR__ . "/inc/CheckoutHelper/CheckoutHelper.php");
 add_action('after_setup_theme', 'require_on_init');
 
 add_filter('woocommerce_currency_symbol', 'change_existing_currency_symbol', 10, 2);
-function change_existing_currency_symbol($currency_symbol, $currency)
-{
+function change_existing_currency_symbol($currency_symbol, $currency) {
     $currency_symbol = 'din.';
 
     return $currency_symbol;
 }
 
-//remove_action( 'woocommerce_before_main_content','woocommerce_breadcrumb', 20);
-
-function gf_get_categories($exlcude = array())
-{
-    $args = array(
-        'orderby' => 'name',
-        'order' => 'asc',
-        'hide_empty' => false,
-        'exclude' => $exlcude,
-    );
-    $product_cats = get_terms('product_cat', $args);
-    return $product_cats;
-}
-
-function gf_get_top_level_categories($exclude = array())
-{
-    $top_level_categories = [];
-    foreach (gf_get_categories($exclude) as $category) {
-        if (!$category->parent) {
-            $top_level_categories[] = $category;
-        }
-    }
-    return $top_level_categories;
-}
-
-function gf_get_second_level_categories($parent_id = null)
-{
-    $categories = gf_get_categories();
-    $top_level_ids = [];
-    $second_level_categories = [];
-    foreach ($categories as $category) {
-        if (!$category->parent) {
-            $top_level_ids[] = $category->term_id;
-        }
-    }
-    foreach ($categories as $category) {
-        if ($parent_id) {
-            if ($category->parent == $parent_id) {
-                $second_level_categories[] = $category;
-            }
-        } elseif (in_array($category->parent, $top_level_ids)) {
-            $second_level_categories[] = $category;
-        }
-    }
-    return $second_level_categories;
-}
-
-function gf_get_third_level_categories($parent_id = null)
-{
-    $categories = gf_get_categories();
-    $second_level_ids = [];
-    foreach (gf_get_second_level_categories() as $cat) {
-        $second_level_ids[] = $cat->term_id;
-    }
-    $third_level_categories = [];
-    foreach ($categories as $category) {
-        if ($parent_id) {
-            if ($category->parent == $parent_id) {
-                $third_level_categories[] = $category;
-            }
-        } elseif (in_array($category->parent, $second_level_ids)) {
-            $third_level_categories[] = $category;
-        }
-    }
-    return $third_level_categories;
-}
-
-function gf_check_level_of_category($cat_id)
-{
-    $result = null;
-    $top_level_ids = [];
-    $second_level_ids = [];
-    $third_level_ids = [];
-    foreach (gf_get_top_level_categories() as $category) {
-        $top_level_ids[] = $category->term_id;
-    }
-    foreach (gf_get_second_level_categories() as $category) {
-        $second_level_ids[] = $category->term_id;
-    }
-    foreach (gf_get_third_level_categories() as $category) {
-        $third_level_ids[] = $category->term_id;
-    }
-    if (in_array($cat_id, $top_level_ids)) {
-        $result = 1;
-    }
-    if (in_array($cat_id, $second_level_ids)) {
-        $result = 2;
-    }
-    if (in_array($cat_id, $third_level_ids)) {
-        $result = 3;
-    }
-    return $result;
-}
-
-//Testira razliku array-a order sensitive
-function gf_array_reccursive_difrence(array $array1, array $array2, array $_ = null)
-{
-    $diff = [];
-    $args = array_slice(func_get_args(), 1);
-    foreach ($array1 as $key => $value) {
-        foreach ($args as $item) {
-            if (is_array($item)) {
-                if (array_key_exists($key, $item)) {
-                    if (is_array($value) && is_array($item[$key])) {
-                        $tmpDiff = gf_array_reccursive_difrence($value, $item[$key]);
-
-                        if (!empty($tmpDiff)) {
-                            foreach ($tmpDiff as $tmpKey => $tmpValue) {
-                                if (isset($item[$key][$tmpKey])) {
-                                    if (is_array($value[$tmpKey]) && is_array($item[$key][$tmpKey])) {
-                                        $newDiff = array_diff($value[$tmpKey], $item[$key][$tmpKey]);
-                                    } else if ($value[$tmpKey] !== $item[$key][$tmpKey]) {
-                                        $newDiff = $value[$tmpKey];
-                                    }
-
-                                    if (isset($newDiff)) {
-                                        $diff[$key][$tmpKey] = $newDiff;
-                                    }
-                                } else {
-                                    $diff[$key][$tmpKey] = $tmpDiff;
-                                }
-                            }
-                        }
-                    } else if ($value !== $item[$key]) {
-                        $diff[$key] = $value;
-
-                    }
-                } else {
-                    $diff[$key] = $value;
-                }
-            }
-        }
-    }
-
-    return $diff;
-}
-
-function gf_insert_in_array_by_index($array, $index, $val)
-{
-    $size = count($array); //because I am going to use this more than one time
-    if (!is_int($index) || $index < 0 || $index > $size) {
-        return -1;
-    } else {
-        $temp = array_slice($array, 0, $index);
-        $temp[] = $val;
-        return array_merge($temp, array_slice($array, $index, $size));
-    }
-}
-
+add_filter('upload_dir', 'upload_dir_filter');
 /**
  * Saves uploads into folders organized by day.
  *
  * @param $uploads
  * @return mixed
  */
-function upload_dir_filter($uploads)
-{
+function upload_dir_filter($uploads) {
     //$day = date('d');
     $day = date('d/i');
     $uploads['path'] .= '/' . $day;
@@ -201,11 +56,12 @@ function upload_dir_filter($uploads)
     return $uploads;
 }
 
-add_filter('upload_dir', 'upload_dir_filter');
-
-// custom breadcrumbs based on wc breadcrumbs
-function woocommerce_breadcrumb($args = array())
-{
+/**
+ * custom breadcrumbs based on wc breadcrumbs
+ *
+ * @param array $args
+ */
+function woocommerce_breadcrumb($args = array()) {
     $args = wp_parse_args($args, apply_filters('woocommerce_breadcrumb_defaults', array(
         'delimiter' => '&nbsp;&#47;&nbsp;',
         'wrap_before' => '<nav class="woocommerce-breadcrumb" ' . (is_single() ? 'itemprop="breadcrumb"' : '') . '>',
@@ -224,9 +80,12 @@ function woocommerce_breadcrumb($args = array())
     wc_get_template('global/breadcrumb.php', $args);
 }
 
-//print all enqued styles
-function gf_print_styles()
-{
+/**
+ * print all enqued styles
+ *
+ * @return array
+ */
+function gf_print_styles() {
     $result = [];
     $result['scripts'] = [];
     $result['styles'] = [];
@@ -245,102 +104,12 @@ function gf_print_styles()
     return $result;
 }
 
-//@TODO implement category as filter
 /**
- * @param $input
- * @param int $limit
- * @return bool|WP_Query
+ * Custom loop that works with wp query
+ *
+ * @param WP_Query $sortedProducts
  */
-function gf_custom_search($input, $limit = 0)
-{
-    global $wpdb;
-
-    $search = new \GF\Search\Search(new \GF\Search\Adapter\MySql($wpdb));
-    $allIds = $search->getItemIdsForSearch($input, $limit);
-
-    return gf_parse_post_ids_for_list($allIds);
-}
-
-function gf_elastic_search($input, $limit = 0)
-{
-    $config = array(
-        'host' => ES_HOST,
-        'port' => 9200
-    );
-    $elasticaSearch = new \GF\Search\Elastica\Search(new \Elastica\Client($config));
-    $search = new \GF\Search\Search(new \GF\Search\Adapter\Elastic($elasticaSearch));
-    $allIds = $search->getItemIdsForSearch($input, $limit);
-
-    return gf_parse_post_ids_for_list($allIds);
-}
-
-function gf_elastic_search_with_data($input, $limit = 0)
-{
-    $config = array(
-        'host' => ES_HOST,
-        'port' => 9200
-    );
-    $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
-    $currentPage = (get_query_var('paged')) ? get_query_var('paged') : 1;
-    if (isset($_POST['ppp'])) {
-        $per_page = ($_POST['ppp'] > 48) ? 48 : $_POST['ppp'];
-        $currentPage = 1;
-    }
-    if ($limit) {
-        $per_page = $limit;
-    }
-    $elasticaSearch = new \GF\Search\Elastica\Search(new \Elastica\Client($config));
-    $search = new \GF\Search\Search(new \GF\Search\Adapter\Elastic($elasticaSearch));
-    $resultSet = $search->getItemsForSearch($input, $per_page, $currentPage);
-
-    wc_set_loop_prop('total', $resultSet->getTotalHits());
-    wc_set_loop_prop('per_page', $per_page);
-    wc_set_loop_prop('current_page', $currentPage);
-    wc_set_loop_prop('total_pages', ceil($resultSet->getTotalHits() / $per_page));
-
-    return $resultSet;
-}
-
-function gf_get_category_items_from_elastic()
-{
-    $config = array(
-        'host' => ES_HOST,
-        'port' => 9200
-    );
-    $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
-    $currentPage = (get_query_var('paged')) ? get_query_var('paged') : 1;
-    // @TODO calculate proper page when per page param is changed
-    if (isset($_POST['ppp'])) {
-        $per_page = ($_POST['ppp'] > 48) ? 48 : $_POST['ppp'];
-        $currentPage = 1;
-    }
-
-    $query = isset($_GET['query']) ? $_GET['query'] : null;
-    $elasticaSearch = new \GF\Search\Elastica\Search(new \Elastica\Client($config));
-    $search = new \GF\Search\Search(new \GF\Search\Adapter\Elastic($elasticaSearch));
-    $cat = get_term_by('slug', get_query_var('term'), 'product_cat');
-    $resultSet = $search->getItemsForCategory($cat->term_id, $query, $per_page, $currentPage);
-
-    wc_set_loop_prop('total', $resultSet->getTotalHits());
-    wc_set_loop_prop('per_page', $per_page);
-    wc_set_loop_prop('current_page', $currentPage);
-    wc_set_loop_prop('total_pages', ceil($resultSet->getTotalHits() / $per_page));
-
-    return $resultSet;
-}
-
-function gf_get_category_query()
-{
-    global $wpdb;
-
-    $search = new \GF\Search\Search(new \GF\Search\Adapter\MySql($wpdb));
-    $allIds = $search->getItemIdsForCategory(get_query_var('term'));
-
-    return gf_parse_post_ids_for_list($allIds);
-}
-
-function gf_custom_search_output(WP_Query $sortedProducts)
-{
+function gf_custom_search_output(WP_Query $sortedProducts) {
     if ($sortedProducts->have_posts()):
 //        global $sw;
         wc_setup_loop();
@@ -359,8 +128,7 @@ function gf_custom_search_output(WP_Query $sortedProducts)
     endif;
 }
 
-function parseAttributes()
-{
+function parseAttributes() {
     $redis = new GF_Cache();
     $atributes = unserialize($redis->redis->get('attributes-collection'));
     if ($atributes === false) {
@@ -380,11 +148,12 @@ function parseAttributes()
 }
 
 /**
+ * Parses array of post ids and fetches them via wp query to prepare for loop.
+ *
  * @param $allIds
  * @return bool|WP_Query
  */
-function gf_parse_post_ids_for_list($allIds)
-{
+function gf_parse_post_ids_for_list($allIds) {
     $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
     if (isset($_POST['ppp'])) {
         $per_page = ($_POST['ppp'] > 48) ? 48 : $_POST['ppp'];
@@ -418,61 +187,7 @@ function gf_parse_post_ids_for_list($allIds)
     return $sortedProducts;
 }
 
-//for loged in users
-add_action('wp_ajax_ajax_gf_autocomplete', 'gf_ajax_search_autocomplete');
-//for logged out users
-add_action('wp_ajax_nopriv_ajax_gf_autocomplete', 'gf_ajax_search_autocomplete');
-function gf_ajax_search_autocomplete()
-{
-    if (isset($_POST['keyword'])) {
-        global $wpdb;
-
-        $query = addslashes($_POST['keyword']);
-
-        $cache = new GF_Cache();
-        $key = 'category-search-' . md5($query);
-        $cat_results = unserialize($cache->redis->get($key));
-        if ($cat_results === false || $cat_results === '') {
-            $sql_cat = "SELECT `name`,`term_id` FROM wp_terms t JOIN wp_term_taxonomy tt USING (term_id) WHERE t.name LIKE '{$query}%' AND tt.taxonomy = 'product_cat' LIMIT 4";
-            $cat_results = $wpdb->get_results($sql_cat);
-            if (!empty($cat_results)) {
-                $cache->redis->set($key, serialize($cat_results));
-            }
-        }
-
-//        $sql_product = "SELECT `productName`, `postId` FROM wp_gf_products WHERE `productName` LIKE '%{$keyword}%' LIMIT 4";
-//        $product_results = $wpdb->get_results($sql_product);
-        $product_results = gf_custom_search($query, 4);
-
-        $html = '';
-        if (!empty($cat_results)) {
-            $html = '<span>Kategorije</span>';
-            $html .= '<ul>';
-            foreach ($cat_results as $category) {
-                $category_link = get_term_link((int)$category->term_id);
-                $html .= '<li><a href="' . $category_link . '">' . $category->name . '</a></li>';
-            }
-            $html .= '</ul>';
-        }
-
-        $html .= '<span>Proizvodi</span>';
-        $html .= '<ul>';
-        if ($product_results) {
-            foreach ($product_results->get_posts() as $post) {
-                $product_link = get_permalink((int)$post->ID);
-                $html .= '<li><a href="' . $product_link . '">' . $post->post_title . '</a></li>';
-            }
-        } else {
-            $html .= '<li>Nema rezultata</li>';
-        }
-        $html .= '</ul>';
-
-        echo $html;
-    }
-}
-
-function gf_ajax_view_count($postId)
-{
+function gf_ajax_view_count($postId) {
     $key = 'post-view-count#' . $postId;
     $cache = new GF_Cache();
     $count = (int)$cache->redis->get($key);
@@ -487,41 +202,7 @@ function gf_ajax_view_count($postId)
     echo 1;
 }
 
-function gf_change_supplier_id_by_vendor_id()
-{
-    $failedMatchIds = [];
-    for ($i = 0; $i < 10; $i++) {
-        $products_ids = wc_get_products(array(
-            'limit' => 3000,
-            'return' => 'ids'
-        ));
-        $users = get_users();
-        foreach ($products_ids as $product_id) {
-            if (get_post_meta($product_id, 'synced', true) != 1) {
-                $supplier_id = (int)get_post_meta($product_id, 'supplier', 'true');
-                foreach ($users as $user) {
-                    $vendor_id = (int)get_user_meta($user->ID, 'vendorid', true);
-                    if ($supplier_id === $vendor_id) {
-                        update_post_meta($product_id, 'supplier', $user->ID);
-                        add_post_meta($product_id, 'synced', true);
-                    }
-                }
-            }
-            if (get_post_meta($product_id, 'synced', true) === '') {
-                $failedMatchIds[] = $product_id;
-            }
-        }
-    }
-    echo 'Nisu pronadđeni parovi za sledeće proizvode:';
-    echo '<ul>';
-    foreach ($failedMatchIds as $failedMatchId) {
-        echo '<li>' . $failedMatchId . '</li>';
-    }
-    echo '</ul>';
-}
-
-function gf_set_product_categories($product_id, $category_ids)
-{
+function gf_set_product_categories($product_id, $category_ids) {
     $product = wc_get_product($product_id);
     $product_categories = $product->get_category_ids();
     $diff = array_diff($category_ids, $product_categories);
@@ -531,177 +212,7 @@ function gf_set_product_categories($product_id, $category_ids)
     //maybe need to save product? $product->save()
 }
 
-
-//Custom addd to cart message
-add_filter('wc_add_to_cart_message_html', '__return_null');
-add_filter('wc_add_to_cart_message_html', 'gf_custom_add_to_cart_message', 10, 2);
-function gf_custom_add_to_cart_message($message)
-{
-    if (isset($_POST['quantity']) && isset($_POST['add-to-cart'])) {
-        $qty = $_POST['quantity'];
-        $product_id = $_POST['add-to-cart'];
-        $product_title = wc_get_product($product_id)->get_name();
-        if ($qty <= 1) {
-            $message = '&ldquo;' . $product_title . '&rdquo; je dodat u Vašu korpu.';
-        } else {
-            $message = $qty . ' &times; ' . '&ldquo;' . $product_title . '&rdquo; je dodat u Vašu korpu.';
-        }
-    }
-    $cart_link = '<a href = "' . wc_get_page_permalink('cart') . '" class="button wc-forward" >Pogledaj korpu</a >';
-    $message .= $cart_link;
-
-    return $message;
-
-}
-
-function gf_get_category_children_ids($slug) {
-    $cat = get_term_by('slug', $slug, 'product_cat');
-    $childrenIds = [];
-    if ($cat) {
-        $catChildren = get_term_children($cat->term_id, 'product_cat');
-        $childrenIds[] = $cat->term_id;
-        foreach ($catChildren as $child) {
-            $childrenIds[] = $child;
-        }
-    }
-    return $childrenIds;
-}
-
-function gf_add_custom_meta_to_users() {
-    $users = get_users(array('fields' => array('ID')));
-    foreach ($users as $user) {
-        update_user_meta($user->ID, 'migrated', '0');
-    }
-}
-
-function gf_check_if_user_is_migrated($user, $password) {
-    if (!empty($user)) {
-        if (get_user_meta($user->ID, 'migrated', true) != 0) {
-
-            global $wpdb;
-
-            //skloniti posle testiranja, promenjeno je trenutno za usera 'admin'
-//        update_user_meta($user->ID, 'migrated', '1');
-
-            $salt = 'd@uy/o%b^';
-            $passwordHash = $salt . md5($salt, $password);
-            $sql = "SELECT user_pass FROM wp_users WHERE ID = '{$user->ID}'";
-            $password_in_db = $wpdb->get_results($sql)[0]->user_pass;
-
-//            var_dump($passwordHash);
-//            var_dump($password_in_db);
-//            var_dump($user);
-//            die();
-
-            if ($passwordHash === $password_in_db) {
-                return $user;
-            } else {
-                return new WP_Error('incorrect_password',
-                    sprintf(
-                    /* translators: %s: user name */
-                        __('<strong>GREŠKA</strong>: Lozinka koju ste uneli za korisničko ime %s nije ispravna.'),
-                        '<strong>' . $user->user_login . '</strong>'
-                    ) .
-                    ' <a href="' . wp_lostpassword_url() . '">' .
-                    __('Izgubili ste lozinku?') .
-                    '</a>'
-                );
-            }
-        }
-    }
-
-    return false;
-}
-
-//add_filter('wp_authenticate_user', 'gf_check_if_user_is_migrated', 10, 2);
-
-
-//function remove_country_field_billing($fields)
-//{
-//    unset($fields['billing_country']);
-//    unset($fields['billing_state']);
-//    return $fields;
-//
-//}
-//add_filter('woocommerce_billing_fields', 'remove_country_field_billing');
-//function remove_country_field_shipping($fields)
-//{
-//    unset($fields['shipping_country']);
-//    unset($fields['shipping_state']);
-//    return $fields;
-//}
-//add_filter('woocommerce_shipping_fields', 'remove_country_field_shipping');
-
-//function custom_override_checkout_fields( $fields ) {
-//    unset($fields['billing']['billing_country']);
-//    unset($fields['shipping_country']);
-//
-//    return $fields;
-//}
-//add_filter( 'woocommerce_checkout_fields' , 'custom_override_checkout_fields' );
-
-
-
-// Disable W3TC footer comment for everyone but Admins (single site & network mode)
-if (!current_user_can('activate_plugins')) {
-    add_filter('w3tc_can_print_comment', function ($w3tc_setting) {
-        return false;
-    }, 10, 1);
-}
-
-
-function action_woocommerce_register_form()
-{
-    ?>
-    <div class="gf-wc-registration-info">
-        <div class="woocommerce-info ">
-            <p>Podaci o Vašem nalogu biće poslati na unetu email adresu</p>
-        </div>
-    </div>
-    <?php
-}
-add_action('woocommerce_register_form', 'action_woocommerce_register_form', 20, 10);
-
-remove_filter( 'authenticate', 'wp_authenticate_username_password' );
-add_filter( 'authenticate', 'gf_authenticate_username_password', 20, 3 );
-/**
- * Remove Wordpress filer and write our own with changed error text.
- */
-function gf_authenticate_username_password( $user, $username, $password ) {
-    if ( is_a($user, 'WP_User') )
-        return $user;
-
-    if ( empty( $username ) || empty( $password ) ) {
-        if ( is_wp_error( $user ) )
-            return $user;
-
-        $error = new WP_Error();
-
-        if ( empty( $username ) )
-            return new WP_Error( 'invalid_username', sprintf( __( '<strong>GREŠKA</strong>: Polje korisničko ime ne može biti prazno.' ), wp_lostpassword_url() ) );
-
-        if ( empty( $password ) )
-            return new WP_Error( 'invalid_username', sprintf( __( '<strong>GREŠKA</strong>: Polje lozinka ne može biti prazno.' ), wp_lostpassword_url() ) );
-
-        return $error;
-    }
-
-    $user = get_user_by( 'login', $username );
-
-    if ( !$user )
-        return new WP_Error( 'invalid_username', sprintf( __( '<strong>GREŠKA</strong>: Ne postojeće korisničko ime ili email. <a href="%s" title="Lozinka izgubljena">Izgubili ste lozinku</a>?' ), wp_lostpassword_url() ) );
-
-    $user = apply_filters( 'wp_authenticate_user', $user, $password );
-    if ( is_wp_error( $user ) )
-        return $user;
-
-    if ( ! wp_check_password( $password, $user->user_pass, $user->ID ) )
-        return new WP_Error( 'incorrect_password', sprintf( __( '<strong>GREŠKA</strong>: Lozinka koju ste uneli za korisničko ime <strong>%1$s</strong> nije ispravna. <a href="%2$s" title="Lozinka izgubljena">Izgubili ste lozinku</a>?' ),
-            $username, wp_lostpassword_url() ) );
-
-    return $user;
-}
-
+add_filter('request', 'custom_request');
 /**
  * Prevent main wp query from returning 404 page on a category page when it thinks there are no more results.
  *
@@ -718,11 +229,12 @@ function custom_request($query_string) {
     }
     return $query_string;
 }
-add_filter('request', 'custom_request');
+
 
 function gf_custom_shop_loop(\Elastica\ResultSet $products) {
     $html = '';
 
+    $i = 0;
     foreach ($products->getResults() as $productData){
         $product = new \Nss\Feed\Product($productData->getData());
         $saved_price = $product->getRegularPrice() - $product->getSalePrice();
@@ -743,13 +255,27 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products) {
             $classes .= ' outofstock';
         }
         // klase koje mozda zatrebaju za <li> 'instock sale shipping-taxable purchasable product-type-simple'
-        $html .= '<li class="product type-product status-publish has-post-thumbnail first instock sale shipping-taxable purchasable product-type-simple">';
+        $classes .= " instock ";
+        if (!$product->getStockStatus()) {
+            $classes = " outofstock ";
+        }
+        if ($product->getSalePrice() > 0) {
+            $classes .= " sale ";
+        }
+        if ($i === 0) {
+            $classes .= " first ";
+        }
+        $classes .= " product type-product status-publish has-post-thumbnail shipping-taxable purchasable  ";
+        $html .= '<li class="product-type-'.$product->getType(). $classes .'">';
         $html .= '<a href=" ' . $product->dto['permalink'] .' " title=" '. $product->getName() .' ">';
         $html .= add_stickers_to_products_on_sale($classes);
 //        woocommerce_show_product_sale_flash('', '', '', $classes);
 //        add_stickers_to_products_new($product);
         $html .= $product->dto['thumbnail'];
-        $html .= add_stickers_to_products_soldout($classes);
+        ob_start();
+        add_stickers_to_products_soldout($classes);
+        $html .= ob_get_clean();
+//        $html .= add_stickers_to_products_soldout($classes);
         $html .= '</a>';
         $html .= '<a href="'. $product->dto['permalink'] .'" title="'.$product->getName().'">';
         $html .= '<h5>'.$product->getName().'</h5>';
@@ -761,7 +287,7 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products) {
             $html .= '<ins><span class="woocommerce-Price-amount amount">'.$price.
                      '<span class="woocommerce-Price-currencySymbol">din.</span></span></ins>';
             $html .= '<p class="saved-sale">Ušteda: <span class="woocommerce-Price-amount amount">'.$saved_price.
-                     '<span class="woocommerce-Price-currencySymbol">din.</span></span><em>'.$saved_percentage.'%</em></p>';
+                     '<span class="woocommerce-Price-currencySymbol">din.</span></span> <em> ('.$saved_percentage.'%)</em></p>';
         } else {
             $html .= '<ins><span class="woocommerce-Price-amount amount">'.$product->getRegularPrice()
                 .'<span class="woocommerce-Price-currencySymbol">din.</span></span></ins>';
@@ -769,34 +295,28 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products) {
         $html .= '</span>';
         $html .= '<p class="loop-short-description">'.$product->getShortDescription().'</p>';
         $html .= '</li>';
+        $i++;
     }
-
     $html .= '</ul>';
 
     echo $html;
 }
 
-add_action('validate_password_reset', 'gf_validate_password_reset', 10, 2 );
-function gf_validate_password_reset( $errors, $user ) {
-    if(strlen($_POST['password_1']) < 6  ) {
-        $errors->add( 'woocommerce_password_error', __( 'Lozinka mora imati minimum 6 karaktera.' ) );
+
+function woocommerce_pagination() {
+    $args = array(
+        'total'   => wc_get_loop_prop( 'total_pages' ),
+        'current' => wc_get_loop_prop( 'current_page' ),
+        'base'    => esc_url_raw( add_query_arg( 'product-page', '%#%', false ) ),
+        'format'  => '?product-page=%#%',
+    );
+
+    if ( ! wc_get_loop_prop( 'is_shortcode' ) ) {
+        $args['format'] = '';
+        $args['base']   = esc_url_raw( str_replace( 999999999, '%#%', remove_query_arg( 'add-to-cart', get_pagenum_link( 999999999, false ) ) ) );
     }
-    // adding ability to set maximum allowed password chars -- uncomment the following two (2) lines to enable that
-    elseif (strlen($_POST['password_1']) > 64 )
-        $errors->add( 'woocommerce_password_error', __( 'Lozinka ne može imati više od 64 karaktera.' ) );
-    return $errors;
+    wc_get_template( 'loop/pagination.php', $args );
 }
-
-
-add_filter( 'registration_errors', 'wpse8170_registration_errors', 10, 3 );
-function wpse8170_registration_errors( $errors, $sanitized_user_login, $user_email ) {
-    if ($user_email == 'test@test123.com' ) {
-        $errors->add( 'myexception_code', 'This is my message' );
-    }
-
-    return $errors;
-}
-
 
 
 //maybe we will need this function...
@@ -834,125 +354,27 @@ function wpse8170_registration_errors( $errors, $sanitized_user_login, $user_ema
 //}
 
 
+//function remove_country_field_billing($fields)
+//{
+//    unset($fields['billing_country']);
+//    unset($fields['billing_state']);
+//    return $fields;
+//
+//}
+//add_filter('woocommerce_billing_fields', 'remove_country_field_billing');
+//function remove_country_field_shipping($fields)
+//{
+//    unset($fields['shipping_country']);
+//    unset($fields['shipping_state']);
+//    return $fields;
+//}
+//add_filter('woocommerce_shipping_fields', 'remove_country_field_shipping');
 
+//function custom_override_checkout_fields( $fields ) {
+//    unset($fields['billing']['billing_country']);
+//    unset($fields['shipping_country']);
+//
+//    return $fields;
+//}
+//add_filter( 'woocommerce_checkout_fields' , 'custom_override_checkout_fields' );
 
-
-/*
- * Display shipping category and price
- */
-add_filter('woocommerce_package_rates', 'gf_custom_shipping_rates', 10, 2);
-function gf_custom_shipping_rates($rates, $package)
-{
-
-    if (WC()->cart->cart_contents_weight <= 0.5) {
-        if (isset($rates['flat_rate:3']))
-            unset(
-                $rates['flat_rate:4'],
-                $rates['flat_rate:5'],
-                $rates['flat_rate:6'],
-                $rates['flat_rate:7'],
-                $rates['flat_rate:8'],
-                $rates['flat_rate:9'],
-                $rates['flat_rate:10']);
-
-    } elseif (WC()->cart->cart_contents_weight > 0.5 and WC()->cart->cart_contents_weight <= 2) {
-        if (isset($rates['flat_rate:4']))
-            unset(
-                $rates['flat_rate:3'],
-                $rates['flat_rate:5'],
-                $rates['flat_rate:6'],
-                $rates['flat_rate:7'],
-                $rates['flat_rate:8'],
-                $rates['flat_rate:9'],
-                $rates['flat_rate:10']);
-
-    } elseif (WC()->cart->cart_contents_weight > 2 and WC()->cart->cart_contents_weight <= 5) {
-        if (isset($rates['flat_rate:5']))
-            unset(
-                $rates['flat_rate:3'],
-                $rates['flat_rate:4'],
-                $rates['flat_rate:6'],
-                $rates['flat_rate:7'],
-                $rates['flat_rate:8'],
-                $rates['flat_rate:9'],
-                $rates['flat_rate:10']);
-
-    } elseif (WC()->cart->cart_contents_weight > 5 and WC()->cart->cart_contents_weight <= 10) {
-        if (isset($rates['flat_rate:6']))
-            unset(
-                $rates['flat_rate:3'],
-                $rates['flat_rate:4'],
-                $rates['flat_rate:5'],
-                $rates['flat_rate:7'],
-                $rates['flat_rate:8'],
-                $rates['flat_rate:9'],
-                $rates['flat_rate:10']);
-
-    } elseif (WC()->cart->cart_contents_weight > 10 and WC()->cart->cart_contents_weight <= 20) {
-        if (isset($rates['flat_rate:7']))
-            unset(
-                $rates['flat_rate:3'],
-                $rates['flat_rate:4'],
-                $rates['flat_rate:5'],
-                $rates['flat_rate:6'],
-                $rates['flat_rate:8'],
-                $rates['flat_rate:9'],
-                $rates['flat_rate:10']);
-
-    } elseif (WC()->cart->cart_contents_weight > 20 and WC()->cart->cart_contents_weight <= 30) {
-        if (isset($rates['flat_rate:8']))
-            unset(
-                $rates['flat_rate:3'],
-                $rates['flat_rate:4'],
-                $rates['flat_rate:5'],
-                $rates['flat_rate:6'],
-                $rates['flat_rate:7'],
-                $rates['flat_rate:9'],
-                $rates['flat_rate:10']);
-
-    } elseif (WC()->cart->cart_contents_weight > 30 and WC()->cart->cart_contents_weight <= 50) {
-        if (isset($rates['flat_rate:9']))
-            unset(
-                $rates['flat_rate:3'],
-                $rates['flat_rate:4'],
-                $rates['flat_rate:5'],
-                $rates['flat_rate:6'],
-                $rates['flat_rate:7'],
-                $rates['flat_rate:8'],
-                $rates['flat_rate:10']);
-
-    } elseif (WC()->cart->cart_contents_weight > 50) {
-        if (isset($rates['flat_rate:10'])) {
-            $cartWeight = WC()->cart->cart_contents_weight;
-            $myExtraWeight = $cartWeight - 50;
-            $myNewPrice = 500 + (10 * $myExtraWeight);
-            $rates['flat_rate:10']->set_cost($myNewPrice);
-
-            unset(
-                $rates['flat_rate:3'],
-                $rates['flat_rate:4'],
-                $rates['flat_rate:5'],
-                $rates['flat_rate:6'],
-                $rates['flat_rate:7'],
-                $rates['flat_rate:8'],
-                $rates['flat_rate:9']);
-        }
-
-    }
-
-    return $rates;
-}
-function woocommerce_pagination() {
-    $args = array(
-        'total'   => wc_get_loop_prop( 'total_pages' ),
-        'current' => wc_get_loop_prop( 'current_page' ),
-        'base'    => esc_url_raw( add_query_arg( 'product-page', '%#%', false ) ),
-        'format'  => '?product-page=%#%',
-    );
-
-    if ( ! wc_get_loop_prop( 'is_shortcode' ) ) {
-        $args['format'] = '';
-        $args['base']   = esc_url_raw( str_replace( 999999999, '%#%', remove_query_arg( 'add-to-cart', get_pagenum_link( 999999999, false ) ) ) );
-    }
-    wc_get_template( 'loop/pagination.php', $args );
-}

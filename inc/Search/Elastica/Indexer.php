@@ -7,18 +7,20 @@ class Indexer
     static function index(\Elastica\Client $elasticaClient)
     {
         global $wpdb;
+        ini_set('max_execution_time', '600');
 
         $elasticaIndex = $elasticaClient->getIndex('nss');
         $elasticaType = $elasticaIndex->getType('products');
-        $perPage = 300;
+        $perPage = 5000;
 //        $perPage = 100;
 
-        for ($i = 0; $i < 50; $i++) {
+        for ($i = 0; $i < 5; $i++) {
 //        for ($i = 0; $i < 35; $i++) {
 //        for ($i = 0; $i < 2; $i++) {
             $offset = $i * $perPage;
             $sql = "SELECT ID FROM wp_posts WHERE post_type = 'product' LIMIT {$offset}, {$perPage};";
             $result = $wpdb->get_results($sql);
+            $wpdb->flush();
             if (count($result) > 0) {
                 $documents = [];
                 foreach ($result as $value) {
