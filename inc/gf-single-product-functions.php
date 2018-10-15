@@ -75,21 +75,6 @@ function gf_display_offer_notice()
     echo '<p>' . __('Ponuda važi dok traju zalihe', 'green-fiends') . '</p>';
 }
 
-add_action('woocommerce_after_add_to_cart_form', 'gf_display_social_media_share_button', 5);
-function gf_display_social_media_share_button()
-{
-    $link = get_post_permalink(get_queried_object_id());
-    echo '<p class="mt-2 mb-1">Podeli sa prijateljima</p>';
-    echo '<div class="gf-single-product-share-buttons">';
-    echo '<div class="fb-share-button" data-href="'.$link.'" data-layout="button" data-size="large" data-mobile-iframe="true"><a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fdevelopers.facebook.com%2Fdocs%2Fplugins%2F&amp;src=sdkpreparse" class="fb-xfbml-parse-ignore">Podeli</a></div>';
-    echo '<a class="twitter-share-button" href="https://twitter.com/intent/tweet" data-size="large">Tweet</a>';
-    echo '<a data-href="'.$link.'" href="https://www.pinterest.com/pin/create/button/" data-pin-do="buttonBookmark"  data-pin-tall="true"></a>';
-    echo '<div class="g-plus" data-action="share" data-height="28" data-href="'.$link.'"></div>';
-
-    echo '</div>';
-
-}
-
 add_filter('woocommerce_get_price_html', 'change_displayed_sale_price_html', 10, 2);
 function change_displayed_sale_price_html($price, WC_Product $product)
 {
@@ -189,4 +174,20 @@ function woo_custom_description_tab_content(){
     echo '<p>' . htmlspecialchars_decode($product->get_description()) . '</p>';
     echo '<p>&nbsp</p>';
     echo nl2br('<p>' . get_post_meta($product->get_id(), 'features', true) . '</p>');
+}
+
+
+add_action('woocommerce_after_single_product_summary', 'gf_display_social_media_share_button', 11);
+function gf_display_social_media_share_button()
+{
+    $link = get_post_permalink(get_queried_object_id());
+    echo '<p class="mb-1">Podeli sa prijateljima</p>';
+    echo '<div class="gf-single-product-share-buttons mb-3">';
+    echo '<div class="fb-share-button" data-href="'.$link.'" data-layout="button" data-size="large" data-mobile-iframe="true"><a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fdevelopers.facebook.com%2Fdocs%2Fplugins%2F&amp;src=sdkpreparse" class="fb-xfbml-parse-ignore">Podeli</a></div>';
+    echo '<a class="twitter-share-button" href="https://twitter.com/intent/tweet" data-size="large">Tweet</a>';
+    echo '<a data-href="'.$link.'" href="https://www.pinterest.com/pin/create/button/" data-pin-do="buttonBookmark"  data-pin-tall="true"></a>';
+    echo '<div class="g-plus" data-action="share" data-height="28" data-href="'.$link.'"></div>';
+
+    echo '</div>';
+
 }
