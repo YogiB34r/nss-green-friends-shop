@@ -3348,4 +3348,14 @@ p.woocommerce-thankyou-order-received {
 .woocommerce-Tabs-panel--description iframe {
     width: 100%;
 }
-
+.gf-search-radio-button-wrapper{
+    display: inline-flex;
+}
+@media only screen and (min-width: 768px) and (max-width: 1023px) {
+    .site-header{
+        height: 160px;
+    }
+    .gf-search-form{
+        padding-top: 35px;
+    }
+}
