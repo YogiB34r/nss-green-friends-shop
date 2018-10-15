@@ -341,7 +341,10 @@ jQuery(document).ready(function ($) {
     }
 
     function startSlider(selector) {
-        $(selector).slick({
+        $(selector).on('init', function(slick) {
+            $('.gf-product-slider').css("visibility","visible");
+        })
+            .slick({
             infinite: true,
             // slidesToShow: gfSliderColumnCount,
             slidesToShow: $(selector).parents('.gf-product-slider').data('sliderItemCount'),
@@ -349,6 +352,7 @@ jQuery(document).ready(function ($) {
             slidesToScroll: $(selector).parents('.gf-product-slider').data('sliderItemCount'),
             arrows: false,
             dots: false,
+            lazyLoad: 'ondemand',
             responsive: [{
                 breakpoint: 1024,
                 settings: {
