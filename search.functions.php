@@ -109,34 +109,50 @@ function gf_elastic_search_with_data($input, $limit = 0)
 
     wc_set_loop_prop('total', $resultSet->getTotalHits());
     wc_set_loop_prop('per_page', $per_page);
+    wc_set_loop_prop('query', $input);
     wc_set_loop_prop('current_page', $currentPage);
     wc_set_loop_prop('total_pages', ceil($resultSet->getTotalHits() / $per_page));
+
+    add_filter('woocommerce_page_title', 'applySearchPageTitle');
 
     return $resultSet;
 }
 
-function parse_search_category_aggregation(\Elastica\ResultSet $resultSet)
-{
+
+function applySearchPageTitle($title) {
+    $page_title = sprintf('Rezultati pretrage za: &ldquo;%s&rdquo;', wc_get_loop_prop('query'));
+
+    if (wc_get_loop_prop('current_page')) {
+        $page_title .= sprintf('&nbsp;&ndash; strana %s', wc_get_loop_prop('current_page'));
+    }
+
+    return $page_title;
+}
+
+function parse_search_category_aggregation(\Elastica\ResultSet $resultSet) {
     $counts = [];
     foreach ($resultSet->getAggregation('category')['buckets'] as $bucket) {
         $counts[$bucket['key']] = $bucket['doc_count'];
     }
+
     $args = array(
         'taxonomy'     => 'product_cat',
         'include' => array_keys($counts),
+        'orderby' => 'include',
         'posts_per_page' => 50,  // ?
         'suppress_filters' => true,
         'no_found_rows' => true
     );
     $cats = [];
     foreach (get_categories($args) as $cat) {
-        $cats[] = [
-            'name' => $cat->name,
-            'id' => $cat->term_id,
-            'url' => $cat->slug,
-            'count' => $counts[$cat->term_id]
-        ];
-
+        if ($cat->parent === 0) {
+            $cats[] = [
+                'name' => $cat->name,
+                'id' => $cat->term_id,
+                'url' => $cat->slug,
+                'count' => $counts[$cat->term_id]
+            ];
+        }
     }
 
     $GLOBALS['gf-search']['facets']['category'] = $cats;
