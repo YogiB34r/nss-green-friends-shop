@@ -12,11 +12,11 @@ class Indexer
         $elasticaIndex = $elasticaClient->getIndex('nss');
         $elasticaType = $elasticaIndex->getType('products');
         $perPage = 5000;
-//        $perPage = 100;
+        $perPage = 50;
 
-        for ($i = 0; $i < 5; $i++) {
+//        for ($i = 0; $i < 5; $i++) {
 //        for ($i = 0; $i < 35; $i++) {
-//        for ($i = 0; $i < 2; $i++) {
+        for ($i = 0; $i < 1; $i++) {
             $offset = $i * $perPage;
             $sql = "SELECT ID FROM wp_posts WHERE post_type = 'product' LIMIT {$offset}, {$perPage};";
             $result = $wpdb->get_results($sql);
@@ -55,9 +55,21 @@ class Indexer
         $cats = [];
         foreach ($product->get_category_ids() as $category_id) {
             $cat = get_term_by('id', $category_id, 'product_cat');
+            if($cat->parent === 0){
+                $cat_lvl = 1;
+            }else{
+                if (get_term($cat->parent, 'product_cat')->parent === 0){
+                    $cat_lvl = 2;
+                }else{
+                    $cat_lvl = 3;
+                }
+            }
             $cats[] = [
-                'id' => $cat->term_id,
-                'name' => $cat->name,
+                'id'    => $cat->term_id,
+                'name'  => $cat->name,
+                'slug'  => $cat->slug,
+                'parent'=> $cat->parent,
+                'level' => $cat_lvl
             ];
         }
         $attributes = [];
