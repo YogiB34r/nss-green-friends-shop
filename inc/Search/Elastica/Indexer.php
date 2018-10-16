@@ -55,9 +55,21 @@ class Indexer
         $cats = [];
         foreach ($product->get_category_ids() as $category_id) {
             $cat = get_term_by('id', $category_id, 'product_cat');
+            if($cat->parent === 0){
+                $cat_lvl = 1;
+            }else{
+                if (get_term($cat->parent, 'product_cat')->parent === 0){
+                    $cat_lvl = 2;
+                }else{
+                    $cat_lvl = 3;
+                }
+            }
             $cats[] = [
-                'id' => $cat->term_id,
-                'name' => $cat->name,
+                'id'    => $cat->term_id,
+                'name'  => $cat->name,
+                'slug'  => $cat->slug,
+                'parent'=> $cat->parent,
+                'level' => $cat_lvl
             ];
         }
         $attributes = [];
