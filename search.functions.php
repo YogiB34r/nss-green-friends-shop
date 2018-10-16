@@ -149,7 +149,9 @@ function parse_search_category_aggregation(\Elastica\ResultSet $resultSet) {
             $cats[] = [
                 'name' => $cat->name,
                 'id' => $cat->term_id,
-                'url' => $cat->slug,
+//                'url' => $cat->slug,
+//                'url' => get_permalink($cat->term_id),
+                'url' => get_term_link($cat->term_id, 'product_cat'),
                 'count' => $counts[$cat->term_id]
             ];
         }
