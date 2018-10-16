@@ -378,11 +378,3 @@ function woocommerce_pagination() {
 //    return $fields;
 //}
 //add_filter( 'woocommerce_checkout_fields' , 'custom_override_checkout_fields' );
-
-add_action( 'woocommerce_archive_description', 'bbloomer_custom_action', 15 );
-
-function bbloomer_custom_action() {
-    if(isset($_GET['query'])){
-        echo 'TEST';
-    }
-}
