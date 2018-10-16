@@ -1279,7 +1279,7 @@ body.home .saved-sale {
 }
 
 .gf-category-expander__col__subcategory {
-    font-weight: 500;
+    font-weight: 400;
 }
 
 .gf-category-expander__footer {
@@ -3307,6 +3307,12 @@ p.woocommerce-thankyou-order-received {
     padding-bottom: 12px;
     font-size: 18px;
     color: #f45411;
+}
+.gf-expander-first-line-parent:hover{
+    color: #333;
+}
+.gf-category-expander__col__subcategory:hover{
+    color: #333;
 }
 
 .gf-expander-ul-first-line {
