@@ -20,9 +20,15 @@ class Search
      */
     private $resultSet;
 
+    /**
+     * @TODO add logger
+     *
+     * Search constructor.
+     * @param \Elastica\Client $elasticaClient
+     */
     public function __construct(\Elastica\Client $elasticaClient)
     {
-//        $this->client = $elasticaClient;
+        $this->client = $elasticaClient;
         $this->search = new \Elastica\Search($elasticaClient);
         $this->search->addIndex('nss')->addType('products');
     }
@@ -70,7 +76,6 @@ class Search
 //                $qb->query()->term(['status' => 1])
 //            )
 //        );
-
         $boolQuery = new BoolQuery();
 
         $q = new Term();
@@ -239,6 +244,11 @@ class Search
         $mainQuery = new Query();
         $mainQuery->setQuery($boolQuery);
         $mainQuery = $this->setSorting($mainQuery, $boolQuery, $order);
+
+        $categoryAggregation = new \Elastica\Aggregation\Terms('category');
+        $categoryAggregation->setField('category.id');
+        $categoryAggregation->setSize(50);
+        $mainQuery->addAggregation($categoryAggregation);
 
         $this->search->setQuery($mainQuery);
         $this->search->setOption('size', 10000);

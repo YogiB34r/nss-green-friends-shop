@@ -12,11 +12,11 @@ class Indexer
         $elasticaIndex = $elasticaClient->getIndex('nss');
         $elasticaType = $elasticaIndex->getType('products');
         $perPage = 5000;
-//        $perPage = 100;
+        $perPage = 50;
 
-        for ($i = 0; $i < 5; $i++) {
+//        for ($i = 0; $i < 5; $i++) {
 //        for ($i = 0; $i < 35; $i++) {
-//        for ($i = 0; $i < 2; $i++) {
+        for ($i = 0; $i < 1; $i++) {
             $offset = $i * $perPage;
             $sql = "SELECT ID FROM wp_posts WHERE post_type = 'product' LIMIT {$offset}, {$perPage};";
             $result = $wpdb->get_results($sql);

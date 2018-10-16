@@ -33,9 +33,9 @@ if (isset($_GET['import'])) {
 //$sw = new \Symfony\Component\Stopwatch\Stopwatch();
 //$sw->start('gfmain');
 
-if (isset($_GET['testVendor'])) {
-    gf_change_supplier_id_by_vendor_id();
-}
+//if (isset($_GET['testVendor'])) {
+//    gf_change_supplier_id_by_vendor_id();
+//}
 
 if (isset($_POST['query'])) {
     $query = addslashes($_POST['query']);
@@ -91,7 +91,8 @@ if (isset($_POST['query'])) {
 
 //include(__DIR__ . "/inc/Search/Elastica/Search.php");
 include(__DIR__ . "/inc/Search/Elastica/Indexer.php");
-include(__DIR__ . "/inc/Search/Elastica/Setup.php");
+include(__DIR__ . "/inc/Search/Elastica/SetupProducts.php");
+include(__DIR__ . "/inc/Search/Elastica/SetupTerms.php");
 
 if (isset($_GET['action'])) {
     $config = array(
@@ -102,7 +103,11 @@ if (isset($_GET['action'])) {
 
     switch ($_GET['action']) {
         case 'createIndex':
-            \GF\Search\Elastica\Setup::createIndex($elasticaClient);
+            $products = new \GF\Search\Elastica\SetupProducts($elasticaClient);
+            $terms = new \GF\Search\Elastica\SetupTerms($elasticaClient);
+            $recreate = true;
+//            $products->createIndex($recreate);
+            $terms->createIndex($recreate);
 
             break;
 
@@ -114,14 +119,11 @@ if (isset($_GET['action'])) {
 
             break;
 
-
-            break;
         case 'syncIndex':
             \GF\Search\Elastica\Indexer::index($elasticaClient);
 
             break;
     }
-
 }
 
 

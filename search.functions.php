@@ -98,9 +98,14 @@ function gf_elastic_search_with_data($input, $limit = 0)
     if ($limit) {
         $per_page = $limit;
     }
-    $elasticaSearch = new \GF\Search\Elastica\Search(new \Elastica\Client($config));
+    $client = new \Elastica\Client($config);
+    $term = new \GF\Search\Elastica\TermSearch($client);
+    $term->storeQuery($input);
+    $elasticaSearch = new \GF\Search\Elastica\Search($client);
     $search = new \GF\Search\Search(new \GF\Search\Adapter\Elastic($elasticaSearch));
     $resultSet = $search->getItemsForSearch($input, $per_page, $currentPage);
+
+    parse_search_category_aggregation($resultSet);
 
     wc_set_loop_prop('total', $resultSet->getTotalHits());
     wc_set_loop_prop('per_page', $per_page);
@@ -108,6 +113,37 @@ function gf_elastic_search_with_data($input, $limit = 0)
     wc_set_loop_prop('total_pages', ceil($resultSet->getTotalHits() / $per_page));
 
     return $resultSet;
+}
+
+function parse_search_category_aggregation(\Elastica\ResultSet $resultSet)
+{
+    $counts = [];
+    foreach ($resultSet->getAggregation('category')['buckets'] as $bucket) {
+        $counts[$bucket['key']] = $bucket['doc_count'];
+    }
+    $args = array(
+        'taxonomy'     => 'product_cat',
+        'include' => array_keys($counts),
+        'posts_per_page' => 50,  // ?
+        'suppress_filters' => true,
+        'no_found_rows' => true
+    );
+    $cats = [];
+    foreach (get_categories($args) as $cat) {
+        $cats[] = [
+            'name' => $cat->name,
+            'id' => $cat->term_id,
+            'url' => $cat->slug,
+            'count' => $counts[$cat->term_id]
+        ];
+
+    }
+
+    $GLOBALS['gf-search']['facets']['category'] = $cats;
+}
+
+function get_search_category_aggregation() {
+    return $GLOBALS['gf-search']['facets']['category'];
 }
 
 function gf_get_category_items_from_elastic()
@@ -125,7 +161,8 @@ function gf_get_category_items_from_elastic()
     }
 
     $query = isset($_GET['query']) ? $_GET['query'] : null;
-    $elasticaSearch = new \GF\Search\Elastica\Search(new \Elastica\Client($config));
+    $client = new \Elastica\Client($config);
+    $elasticaSearch = new \GF\Search\Elastica\Search($client);
     $search = new \GF\Search\Search(new \GF\Search\Adapter\Elastic($elasticaSearch));
     $cat = get_term_by('slug', get_query_var('term'), 'product_cat');
     $resultSet = $search->getItemsForCategory($cat->term_id, $query, $per_page, $currentPage);
