@@ -1989,9 +1989,9 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title {
         display: block;
     }
 
-    .gf-category-expander {
-        display: block;
-    }
+    /*.gf-category-expander {*/
+        /*display: block;*/
+    /*}*/
 
     .gf-inner-navigation__row {
         margin-bottom: 0;
@@ -2090,6 +2090,9 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title {
 
     .cookie-notice-container {
         flex-wrap: wrap;
+    }
+    .gf-expander-module-first-line{
+        width: 50%;
     }
 }
 

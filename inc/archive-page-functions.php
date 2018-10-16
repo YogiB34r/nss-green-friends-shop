@@ -84,8 +84,8 @@ function gf_display_categories_on_archive_page()
 
                 $child_cats = get_terms($child_args);
 
-                if ($i <= 4) {
-                    echo '<div class="col-12 col-sm-6 col-md-3 gf-expander-module-first-line">';
+                if ($i <= count($second_lvl_cat_ids)) {
+                    echo '<div class="col-sm-6 col-xs-6 col-md-3 gf-expander-module-first-line">';
                     echo '<a class="gf-expander-first-line-parent" href="' . get_term_link($category) . '">' . $category->name . '</a>';
                     echo '<ul class="gf-expander__subcategory-list">';
                     foreach ($child_cats as $child_cat) {
@@ -97,7 +97,7 @@ function gf_display_categories_on_archive_page()
               </div>';
                     continue;
                 }
-                echo '<div class="col-12 col-sm-6 col-md-3 gf-category-expander__col">';
+                echo '<div class="col-sm-6 col-xs-6 col-md-3 gf-category-expander__col">';
                 echo '<a class="gf-category-expander__col__category" href="' . get_term_link($category) . '">' . $category->name . '</a>';
                 echo '<ul class="gf-expander__subcategory-list">';
                 foreach ($child_cats as $child_cat) {
@@ -124,7 +124,7 @@ function gf_display_categories_on_archive_page()
                     break;
                 }
             }
-            if (!empty($child_cats) || count($second_lvl_cat_ids) > 4) {
+            if (!empty($child_cats)) {
                 echo '<div class="gf-category-expander__footer"><span class="fas fa-angle-down"></span></div>';
             } else {
                 echo '<div class="gf-category-expander__footer"></div>';
