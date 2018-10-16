@@ -7,7 +7,7 @@ if (!is_product_category()){
     foreach ($categories as $category) {
         $url = $category['url'] . '?query=' . $_GET['query'];
         $html .= '<div class="col-sm-6 col-xs-6 col-md-3 gf-expander-module-first-line">';
-        $html .= '<a class="gf-expander-first-line-parent" href="' . $category['url'] . '">' . $category['name'] .' ('.$category['count'].') </a>';
+        $html .= '<a class="gf-expander-first-line-parent" href="' . $url . '">' . $category['name'] .' ('.$category['count'].') </a>';
         $html .= '</div>';
     }
 
