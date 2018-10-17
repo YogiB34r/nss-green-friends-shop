@@ -378,3 +378,28 @@ function woocommerce_pagination() {
 //    return $fields;
 //}
 //add_filter( 'woocommerce_checkout_fields' , 'custom_override_checkout_fields' );
+
+
+function iconic_remove_password_strength() {
+    wp_dequeue_script( 'wc-password-strength-meter' );
+}
+add_action( 'wp_print_scripts', 'iconic_remove_password_strength', 10 );
+
+
+
+add_action( 'woocommerce_save_account_details_errors','wooc_validate_custom_field', 10, 2 );
+
+// with something like:
+
+function wooc_validate_custom_field( $args, $user ){
+    $user_id = $user->ID;
+    $user_pass_hash = get_user_by('id', $user_id)->user_pass;
+    if(isset($_POST['password_current']) && !empty($_POST['password_current'])){
+        $current_pass = $_POST['password_current'];
+        $passowrd_check = wp_check_password($current_pass, $user_pass_hash, $user_id);
+        if ( isset( $_POST['password_1'] ) && $passowrd_check == 'true') {
+            if(strlen($_POST['password_1']) < 6 )
+                $args->add( 'error', __( 'Lozinka mora sadržati minimum 6 karaktera!', 'woocommerce' ),'');
+        }
+    }
+}
