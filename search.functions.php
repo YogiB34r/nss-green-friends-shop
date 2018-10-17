@@ -95,7 +95,12 @@ function parse_search_category_aggregation(\Elastica\ResultSet $resultSet) {
     $activeCategory = get_term_by('slug', get_query_var('term'), 'product_cat');
     foreach (get_categories($args) as $cat) {
         if (get_query_var('term') != '') {
-            if ($cat->parent > 0 && $activeCategory->term_id != $cat->term_id && $activeCategory->parent != $cat->term_id) {
+            if ($cat->parent > 0 &&
+                $activeCategory->term_id != $cat->term_id && //ignore current
+//                get_queried_object_id()
+//                $activeCategory->parent != $cat->term_id && //ignore current parent
+                $activeCategory->term_id === $cat->parent // only children
+            ) {
                 $cats[] = [
                     'name' => $cat->name,
                     'id' => $cat->term_id,
