@@ -180,14 +180,17 @@ function woo_custom_description_tab_content(){
 add_action('woocommerce_after_single_product_summary', 'gf_display_social_media_share_button', 11);
 function gf_display_social_media_share_button()
 {
-    $link = get_post_permalink(get_queried_object_id());
-    echo '<p class="mb-1">Podeli sa prijateljima</p>';
-    echo '<div class="gf-single-product-share-buttons mb-3">';
-    echo '<div class="fb-share-button" data-href="'.$link.'" data-layout="button" data-size="large" data-mobile-iframe="true"><a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fdevelopers.facebook.com%2Fdocs%2Fplugins%2F&amp;src=sdkpreparse" class="fb-xfbml-parse-ignore">Podeli</a></div>';
-    echo '<a class="twitter-share-button" href="https://twitter.com/intent/tweet" data-size="large">Tweet</a>';
-    echo '<a data-href="'.$link.'" href="https://www.pinterest.com/pin/create/button/" data-pin-do="buttonBookmark"  data-pin-tall="true"></a>';
-    echo '<div class="g-plus" data-action="share" data-height="28" data-href="'.$link.'"></div>';
+    $post = get_queried_object();
+    $title = $post->post_title;
+    $link = $post->guid;
+    $media = get_the_post_thumbnail_url($post->ID);
+    $html = '<div class="gf-social-share-buttons mb-4">';
+    $html .= '<div class="gf-social-share-button-single mr-2 gf-social-share-twitter"><a href="http://twitter.com/intent/tweet?status='.$title.'+'.$link.'" target="_blank"><i class="fab fa-twitter"></i></a></div>';
+    $html .= '<div class="gf-social-share-button-single mr-2 gf-social-share-facebook"><a href="http://www.facebook.com/share.php?u='.$link.'&title='.$title.'" target="_blank"><i class="fab fa-facebook-f"></i></a></div>';
+    $html .= '<div class="gf-social-share-button-single mr-2 gf-social-share-google"><a href="https://plus.google.com/share?url='.$link.'" target="_blank"><i class="fab fa-google-plus-g"></i></a></div>';
+    $html .= '<div class="gf-social-share-button-single mr-2 gf-social-share-pinterest"><a href="http://pinterest.com/pin/create/bookmarklet/?media='.$media.'&url='.$link.'&is_video=false&description='.$title.'" target="_blank"><i class="fab fa-pinterest-p"></i></a></div>';
+    $html .= '</div>';
 
-    echo '</div>';
+    echo $html;
 
 }

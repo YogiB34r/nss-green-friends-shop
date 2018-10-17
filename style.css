@@ -3364,7 +3364,9 @@ p.woocommerce-thankyou-order-received {
 .gf-product-slider{
     visibility: hidden;
 }
-
+.padding-left-45{
+    padding-left: 45px;
+}
 @media only screen and (max-width: 768px){
     .gf-footer-card-images-wrapper{
         justify-content: center;
@@ -3381,5 +3383,43 @@ p.woocommerce-thankyou-order-received {
     .gf-newsletter--home{
         width: 100%;
     }
+    .padding-left-45{
+        padding-left: 0px;
+    }
 }
+.gf-social-share-buttons{
+    display: flex;
+}
+.gf-social-share-buttons a{
+    color: #fff;
+}
+.gf-social-share-button-single{
+    width: 45px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+}
+.gf-social-share-twitter{
+    background-color: #1DA1F2;
+}
+.gf-social-share-facebook{
+    background-color: #3B5998;
+}
+.gf-social-share-google{
+    background-color: #DB4437;
+}
+.gf-social-share-pinterest{
+    background-color: #BD081C;
+}
+
+.gf-social-share-button-single:hover{
+    border: 1px solid #f45411;
+    transition: all 0.3s;
+    background-color: #fff;
+}
+.gf-social-share-button-single:hover a{
+    color: #f45411;
+    transition: all 0.3s;
+}
+
 
