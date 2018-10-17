@@ -4,8 +4,10 @@ namespace GF\Search\Elastica;
 
 
 use Elastica\Document;
+use Elastica\Query;
 use Elastica\Query\BoolQuery;
 use Elastica\Query\Exists;
+use Elastica\Query\Match;
 use Elastica\Query\MatchAll;
 use Elastica\Query\Term;
 
@@ -66,13 +68,28 @@ class TermSearch
         return false;
     }
 
-    public function getTerms()
+    public function getTerms($page = 1, $limit = 50, $query = null)
     {
         $boolQuery = new BoolQuery();
         $q = new MatchAll();
-//        $q->setParam('searchQuery', $query);
+        if ($query) {
+            $q = new Match();
+            $q->setField('searchQuery', $query);
+            $q->setFieldFuzziness('searchQuery', 1);
+        }
         $boolQuery->addMust($q);
-        $response = $this->search->setQuery($boolQuery)->search();
+        $mainQuery = new Query();
+        $mainQuery->setQuery($boolQuery);
+        $this->search->setQuery($mainQuery);
+        $this->search->setOption('size', 10000);
+        if ($limit) {
+            $this->search->setOption('size', $limit);
+        }
+        $this->search->setOption('from', 0);
+        if ($page > 1) {
+            $this->search->setOption('from', ($page - 1) * $limit);
+        }
+        $response = $this->search->search();
 
         return $response->getResults();
     }
