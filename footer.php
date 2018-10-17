@@ -11,8 +11,8 @@
                 <div class="col-xs-12 col-md-3 gf-footer-section gf-footer-newsletter">
                     <?php dynamic_sidebar('gf-footer-row-1-column-1'); ?>
                 </div>
-                <div class="col-xs-12 col-md-9 gf-footer-section">
-                    <div class="row gf-footer-links-wrapper">
+                <div class="col-xs-12 col-md-9 gf-footer-section ">
+                    <div class="row gf-footer-links-wrapper padding-left-45">
                         <a class="mr-3 mt-2" href="/o-kompaniji/">O kompaniji</a>
                         <a class="mr-3 mt-2" href="/kontaktirajte-nas/">Kontaktirajte nas</a>
 
@@ -29,7 +29,7 @@
                         <a class="mr-3 mt-2" href="/politika-privatnosti-2/">Politika privatnosti</a>
 
                         </div>
-                        <div class="row mt-4 gf-footer-card-images-wrapper">
+                        <div class="row mt-4 gf-footer-card-images-wrapper padding-left-45">
                             <div class="">
                                 <div class="gffooter-card-3"></div>
                                 <div class="gffooter-card-4"></div>
