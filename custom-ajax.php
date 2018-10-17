@@ -58,8 +58,8 @@ if (isset($_POST['query'])) {
     $client = new \Elastica\Client($config);
     $term = new \GF\Search\Elastica\TermSearch($client);
     $data = $term->getRedirectFor($query);
-    if ($data) {
-        $html = '<span>Slicne pretrage</span>';
+    if ($data && $data->getTotalHits() > 0) {
+        $html = '<span>Popularne pretrage</span>';
         $html .= '<ul>';
         foreach ($data->getResults() as $result) {
             if ($result->getData()['url'] !== '') {

@@ -14,7 +14,7 @@ class Indexer
         $perPage = 5000;
 //        $perPage = 50;
 
-        for ($i = 0; $i < 5; $i++) {
+        for ($i = 2; $i < 5; $i++) {
 //        for ($i = 0; $i < 35; $i++) {
 //        for ($i = 0; $i < 1; $i++) {
             $offset = $i * $perPage;

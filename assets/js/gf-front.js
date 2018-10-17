@@ -318,9 +318,11 @@ function ajaxSearch(value) {
         },
         success: function (response) {
             jQuery(".gf-search-box").css("background", "none");
-            jQuery(".suggesstion-box").html(response.slice(0, -1));
-            jQuery(".suggesstion-box").fadeIn(200);
             jQuery(".search-box").css("background", "#eee");
+            if (response != '') {
+                jQuery(".suggesstion-box").html(response);
+                jQuery(".suggesstion-box").fadeIn(200);
+            }
         }
     });
 }
