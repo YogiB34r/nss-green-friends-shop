@@ -57,11 +57,12 @@ class SetupTerms
         $mapping->setType($type);
 
         $mapping->setProperties([
-            'entity' => [
-                'properties' => [
-                    'searchQuery' => ['type' => 'text']
-                ]
-            ]
+//            'entity' => [
+//                'properties' => [
+                    'searchQuery' => ['type' => 'text'],
+                    'url' => ['type' => 'text']
+//                ]
+//            ]
         ]);
 
         return $mapping;

@@ -1,59 +1,5 @@
 <?php
 
-
-//for loged in users
-add_action('wp_ajax_ajax_gf_autocomplete', 'gf_ajax_search_autocomplete');
-//for logged out users
-add_action('wp_ajax_nopriv_ajax_gf_autocomplete', 'gf_ajax_search_autocomplete');
-function gf_ajax_search_autocomplete()
-{
-    if (isset($_POST['keyword'])) {
-        global $wpdb;
-
-        $query = addslashes($_POST['keyword']);
-
-        $cache = new GF_Cache();
-        $key = 'category-search-' . md5($query);
-        $cat_results = unserialize($cache->redis->get($key));
-        if ($cat_results === false || $cat_results === '') {
-            $sql_cat = "SELECT `name`,`term_id` FROM wp_terms t JOIN wp_term_taxonomy tt USING (term_id) WHERE t.name LIKE '{$query}%' AND tt.taxonomy = 'product_cat' LIMIT 4";
-            $cat_results = $wpdb->get_results($sql_cat);
-            if (!empty($cat_results)) {
-                $cache->redis->set($key, serialize($cat_results));
-            }
-        }
-
-//        $sql_product = "SELECT `productName`, `postId` FROM wp_gf_products WHERE `productName` LIKE '%{$keyword}%' LIMIT 4";
-//        $product_results = $wpdb->get_results($sql_product);
-        $product_results = gf_custom_search($query, 4);
-
-        $html = '';
-        if (!empty($cat_results)) {
-            $html = '<span>Kategorije</span>';
-            $html .= '<ul>';
-            foreach ($cat_results as $category) {
-                $category_link = get_term_link((int)$category->term_id);
-                $html .= '<li><a href="' . $category_link . '">' . $category->name . '</a></li>';
-            }
-            $html .= '</ul>';
-        }
-
-        $html .= '<span>Proizvodi</span>';
-        $html .= '<ul>';
-        if ($product_results) {
-            foreach ($product_results->get_posts() as $post) {
-                $product_link = get_permalink((int)$post->ID);
-                $html .= '<li><a href="' . $product_link . '">' . $post->post_title . '</a></li>';
-            }
-        } else {
-            $html .= '<li>Nema rezultata</li>';
-        }
-        $html .= '</ul>';
-
-        echo $html;
-    }
-}
-
 //@TODO implement category as filter
 /**
  * @param $input
@@ -99,8 +45,10 @@ function gf_elastic_search_with_data($input, $limit = 0)
         $per_page = $limit;
     }
     $client = new \Elastica\Client($config);
-    $term = new \GF\Search\Elastica\TermSearch($client);
-    $term->storeQuery($input);
+    if ($input && $input != '') {
+        $term = new \GF\Search\Elastica\TermSearch($client);
+        $term->storeQuery($input);
+    }
     $elasticaSearch = new \GF\Search\Elastica\Search($client);
     $search = new \GF\Search\Search(new \GF\Search\Adapter\Elastic($elasticaSearch));
     $resultSet = $search->getItemsForSearch($input, $per_page, $currentPage);
@@ -144,16 +92,26 @@ function parse_search_category_aggregation(\Elastica\ResultSet $resultSet) {
         'no_found_rows' => true
     );
     $cats = [];
+    $activeCategory = get_term_by('slug', get_query_var('term'), 'product_cat');
     foreach (get_categories($args) as $cat) {
-        if ($cat->parent === 0) {
-            $cats[] = [
-                'name' => $cat->name,
-                'id' => $cat->term_id,
-//                'url' => $cat->slug,
-//                'url' => get_permalink($cat->term_id),
-                'url' => get_term_link($cat->term_id, 'product_cat'),
-                'count' => $counts[$cat->term_id]
-            ];
+        if (get_query_var('term') != '') {
+            if ($cat->parent > 0 && $activeCategory->term_id != $cat->term_id && $activeCategory->parent != $cat->term_id) {
+                $cats[] = [
+                    'name' => $cat->name,
+                    'id' => $cat->term_id,
+                    'url' => get_term_link($cat->term_id, 'product_cat'),
+                    'count' => $counts[$cat->term_id]
+                ];
+            }
+        } else {
+            if ($cat->parent === 0) {
+                $cats[] = [
+                    'name' => $cat->name,
+                    'id' => $cat->term_id,
+                    'url' => get_term_link($cat->term_id, 'product_cat'),
+                    'count' => $counts[$cat->term_id]
+                ];
+            }
         }
     }
 
@@ -180,10 +138,16 @@ function gf_get_category_items_from_elastic()
 
     $query = isset($_GET['query']) ? $_GET['query'] : null;
     $client = new \Elastica\Client($config);
+    if ($query && $query != '') {
+        $term = new \GF\Search\Elastica\TermSearch($client);
+        $term->storeQuery($query);
+    }
     $elasticaSearch = new \GF\Search\Elastica\Search($client);
     $search = new \GF\Search\Search(new \GF\Search\Adapter\Elastic($elasticaSearch));
     $cat = get_term_by('slug', get_query_var('term'), 'product_cat');
     $resultSet = $search->getItemsForCategory($cat->term_id, $query, $per_page, $currentPage);
+
+    parse_search_category_aggregation($resultSet);
 
     wc_set_loop_prop('total', $resultSet->getTotalHits());
     wc_set_loop_prop('per_page', $per_page);
@@ -201,4 +165,21 @@ function gf_get_category_query()
     $allIds = $search->getItemIdsForCategory(get_query_var('term'));
 
     return gf_parse_post_ids_for_list($allIds);
+}
+
+add_action('admin_menu', function (){
+    add_menu_page('Pretraga', 'Podesavanje pretrage', 'edit_pages',
+    'gf-search-settings', 'handleAdminSearchSettings');
+});
+
+function handleAdminSearchSettings() {
+    $config = array(
+        'host' => ES_HOST,
+        'port' => 9200
+    );
+    $client = new \Elastica\Client($config);
+    $term = new \GF\Search\Elastica\TermSearch($client);
+//    $result = $term->getTerms();
+    include(__DIR__ . "/templates/admin/search-settings.php");
+
 }

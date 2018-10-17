@@ -238,10 +238,14 @@ jQuery(document).ready(function () {
     //   });
     // });
 
+    /**
+     * Ajax search disabled
+     * @type {boolean}
+     */
     var preventSearch = false, timer, searchQuery, delay = 300;
     jQuery(".gf-search-form").on('keyup', '.gf-search-box', function (e) {
         var _this = jQuery(this);
-        // prevent further search when enter detected
+    //     prevent further search when enter detected
         if (e.keyCode === 13 || e.keyCode === 99) {
             preventSearch = true;
             return false;

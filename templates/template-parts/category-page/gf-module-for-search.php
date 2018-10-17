@@ -1,7 +1,7 @@
 <?php
 $categories = get_search_category_aggregation();
 
-if (!is_product_category()){
+if (count($categories) != 0) {
     $html = '<div id="gf-expander-id" class="row gf-category-expander">';
 
     foreach ($categories as $category) {
@@ -13,4 +13,6 @@ if (!is_product_category()){
 
     $html .= '<div class="gf-category-expander__footer"></div>';
     $html .= '</div>';
+
+    echo $html;
 }

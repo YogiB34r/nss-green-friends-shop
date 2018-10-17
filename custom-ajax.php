@@ -3,6 +3,11 @@
 
 global $wpdb;
 
+$config = array(
+    'host' => ES_HOST,
+    'port' => 9200
+);
+
 if (isset($_GET['viewCount'])) {
     gf_ajax_view_count((int) $_GET['postId']);
     exit();
@@ -30,6 +35,16 @@ if (isset($_GET['import'])) {
     exit();
 }
 
+if (isset($_GET['saveSearchRedirect'])) {
+    $client = new \Elastica\Client($config);
+    $term = new \GF\Search\Elastica\TermSearch($client);
+    $term->updateQuery($_POST['term'], $_POST['url']);
+    echo 1;
+
+    exit();
+}
+
+
 //$sw = new \Symfony\Component\Stopwatch\Stopwatch();
 //$sw->start('gfmain');
 
@@ -39,6 +54,23 @@ if (isset($_GET['import'])) {
 
 if (isset($_POST['query'])) {
     $query = addslashes($_POST['query']);
+
+    $client = new \Elastica\Client($config);
+    $term = new \GF\Search\Elastica\TermSearch($client);
+    $data = $term->getRedirectFor($query);
+    if ($data) {
+        $html = '<span>Slicne pretrage</span>';
+        $html .= '<ul>';
+        foreach ($data->getResults() as $result) {
+            if ($result->getData()['url'] !== '') {
+//                $category_link = get_term_link((int) $category->term_id);
+                $html .= '<li><a href="' . $result->getData()['url'] . '">' . $result->getData()['searchQuery'] . '</a></li>';
+            }
+        }
+        $html .= '</ul>';
+        echo $html;
+    }
+    die();
 
     $cache = new GF_Cache();
     $key = 'category-search#' . md5($query);

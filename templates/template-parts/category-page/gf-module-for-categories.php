@@ -7,7 +7,6 @@ $categories = get_terms([
 if (count($categories) != 0) {
     echo '<div id="gf-expander-id" class="row gf-category-expander">';
 
-
     $i = 0;
     $second_lvl_cat_ids = [];
     foreach ($categories as $category) {
@@ -16,9 +15,7 @@ if (count($categories) != 0) {
             'taxonomy' => 'product_cat',
             'parent' => $category->term_id
         );
-
         $second_lvl_cat_ids[] = $category->term_id;
-
         $child_cats = get_terms($child_args);
 
         if ($i <= count($second_lvl_cat_ids)) {
@@ -45,22 +42,22 @@ if (count($categories) != 0) {
         echo '</ul>
               </div>';
     }
-    $args = array(
-        'taxonomy' => 'product_cat',
-        'childless' => 1,
-    );
-    $childless_cats = get_terms($args);
-    $childless_cats_ids = [];
-    foreach ($childless_cats as $cat) {
-        $childless_cats_ids[] = $cat->term_id;
-    }
-    $result = false;
-    foreach ($second_lvl_cat_ids as $second_lvl_cat_id) {
-        if (!in_array($second_lvl_cat_id, $childless_cats_ids)) {
-            $result = true;
-            break;
-        }
-    }
+//    $args = array(
+//        'taxonomy' => 'product_cat',
+//        'childless' => 1,
+//    );
+//    $childless_cats = get_terms($args);
+//    $childless_cats_ids = [];
+//    foreach ($childless_cats as $cat) {
+//        $childless_cats_ids[] = $cat->term_id;
+//    }
+//    $result = false;
+//    foreach ($second_lvl_cat_ids as $second_lvl_cat_id) {
+//        if (!in_array($second_lvl_cat_id, $childless_cats_ids)) {
+//            $result = true;
+//            break;
+//        }
+//    }
     if (!empty($child_cats)) {
         echo '<div class="gf-category-expander__footer"><span class="fas fa-angle-down"></span></div>';
     } else {
