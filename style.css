@@ -1869,7 +1869,9 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title {
 .custom-html-widget .woocommerce ul.products li.product {
     width: 100% !important;
 }
-
+.gf-footer-section{
+    padding: 0;
+}
 @media only screen and (max-width: 767px) {
     .woocommerce ul.products li.product, .woocommerce-page ul.products li.product {
         width: 46% !important;
