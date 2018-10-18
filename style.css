@@ -3424,4 +3424,6 @@ p.woocommerce-thankyou-order-received {
     transition: all 0.3s;
 }
 
-
+.carousel-indicators li {
+    border: solid 1px lightgray;
+}

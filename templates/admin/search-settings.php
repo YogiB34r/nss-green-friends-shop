@@ -1,10 +1,10 @@
 <?php
 /**
  * @var Elastica\Result $result
+ * @var \GF\Search\Elastica\TermSearch $termSearch
  */
-
 if (is_admin()) {
-    new Gf_Search_Wp_List_Table();
+    new Gf_Search_Wp_List_Table($termSearch);
 }
 
 /**
@@ -13,11 +13,13 @@ if (is_admin()) {
 class Gf_Search_Wp_List_Table
 {
     /**
-     * Constructor will create the menu item
+     * Gf_Search_Wp_List_Table constructor.
+     *
+     * @param \GF\Search\Elastica\TermSearch $search
      */
-    public function __construct()
+    public function __construct(\GF\Search\Elastica\TermSearch $search)
     {
-        $this->list_table_page();
+        $this->list_table_page($search);
     }
 
     /**
@@ -25,9 +27,9 @@ class Gf_Search_Wp_List_Table
      *
      * @return Void
      */
-    public function list_table_page()
+    public function list_table_page($search)
     {
-        $searchListTable = new Search_List_Table();
+        $searchListTable = new Search_List_Table([], $search);
         $searchListTable->prepare_items();
         ?>
         <div class="wrap">
@@ -49,6 +51,17 @@ if (!class_exists('WP_List_Table')) {
  */
 class Search_List_Table extends WP_List_Table
 {
+    /**
+     * @var \GF\Search\Elastica\TermSearch
+     */
+    private $search;
+
+    public function __construct($args = array(), \GF\Search\Elastica\TermSearch $search)
+    {
+        parent::__construct($args);
+        $this->search = $search;
+    }
+
     /**
      * Prepare the items for the table to process
      *
@@ -89,6 +102,7 @@ class Search_List_Table extends WP_List_Table
             'searchQuery' => 'Upit',
             'count' => 'Broj Ponavljanja',
             'url' => 'Preusmeren Na',
+            'action' => 'Akcija',
         );
         return $columns;
     }
@@ -123,22 +137,23 @@ class Search_List_Table extends WP_List_Table
      */
     private function table_data()
     {
-        $config = array(
-            'host' => ES_HOST,
-            'port' => 9200
-        );
-        $client = new \Elastica\Client($config);
-        $term = new \GF\Search\Elastica\TermSearch($client);
         $data = [];
-        foreach ($term->getTerms() as $term) {
+        foreach ($this->search->getTerms() as $term) {
+            $url = '<input type="text" style="display:none;" />';
+            if ($term->getData()['url'] !== '') {
+                $url = '<input readonly size="55" class="redirected" type="text" value="' . $term->getData()['url'] . '" />';
+            }
+            $url .= '<button style="display: none" data-query="'. $term->getData()['searchQuery'] .'" class="redirect">
+                    Snimi
+                </button>';
             $data[] = array(
                 'id' => $term->id,
                 'searchQuery' => $term->searchQuery,
                 'count' => $term->count,
-                'url' => $term->url
+                'url' => $url,
+                'action' => '<a href="#" class="showRedirect">Preusmeri</a>'
             );
         }
-
 
         return $data;
     }
@@ -157,6 +172,7 @@ class Search_List_Table extends WP_List_Table
             case 'id':
             case 'searchQuery':
             case 'count':
+            case 'action':
             case 'url':
                 return $item[$column_name];
             default:
@@ -189,22 +205,22 @@ class Search_List_Table extends WP_List_Table
         return -$result;
     }
 
-    function column_url($item)
-    {
-        $actions = array(
-            'edit' => sprintf('<a href="?page=%s&action=%s&url=%s">Edit</a>', $_REQUEST['page'], 'edit', $item['id']),
-        );
+//    function column_url($item)
+//    {
+//        $actions = array(
+//            'edit' => sprintf('<a href="?page=%s&action=%s&url=%s">Edit</a>', $_REQUEST['page'], 'edit', $item['id']),
+//        );
+//
+//        return sprintf('%1$s %2$s', $item['url'], $this->row_actions($actions));
+//    }
 
-        return sprintf('%1$s %2$s', $item['url'], $this->row_actions($actions));
-    }
-
-    function get_bulk_actions()
-    {
-        $actions = array(
-            'delete' => 'Delete'
-        );
-        return $actions;
-    }
+//    function get_bulk_actions()
+//    {
+//        $actions = array(
+//            'delete' => 'Delete'
+//        );
+//        return $actions;
+//    }
 
     function column_cb($item)
     {
@@ -233,51 +249,11 @@ class Search_List_Table extends WP_List_Table
     {
         //@TODO process bulk delete action
     }
-
-
-
 }
-
-
-
 ?>
-
-<h3>Pregled snimljenih upita</h3>
-
-<a href="admin.php?page=gf-search-settings&filter=redirected">Sakrij redirektovane</a>
-<table>
-    <tr>
-        <th>Upit</th>
-        <th>Broj ponavljanja</th>
-        <th>Preusmeren na</th>
-        <th>Akcija</th>
-    </tr>
-    <?php
-    var_dump($_GET);
-    ?>
-    <?php foreach ($term->getTerms() as $result): ?>
-        <?php
-        $url = '<input type="text" style="display:none;" />';
-        if ($result->getData()['url'] !== '') {
-            $url = '<input readonly class="redirected" type="text" value="' . $result->getData()['url'] . '" />';
-        }
-        ?>
-        <tr>
-            <td><?= $result->getData()['searchQuery'] ?></td>
-            <td><?= $result->getData()['count'] ?></td>
-            <td><?= $url ?>
-                <button style="display: none" data-query="<?= $result->getData()['searchQuery'] ?>" class="redirect">
-                    Snimi
-                </button>
-            </td>
-            <td><a href="#" class="showRedirect">Preusmeri</a></td>
-        </tr>
-    <?php endforeach; ?>
-</table>
-
 <script>
     jQuery(document).ready(function () {
-        jQuery('.redirect').click(function () {
+        jQuery('.toplevel_page_gf-search-settings').on('click', '.redirect', function () {
             var parent = jQuery(this).parent();
             var data = {
                 term: jQuery(this).data('query'),
@@ -292,7 +268,7 @@ class Search_List_Table extends WP_List_Table
             });
         });
 
-        jQuery('.showRedirect').click(function () {
+        jQuery('.toplevel_page_gf-search-settings').on('click', '.showRedirect', function () {
             var inputElement = jQuery(this).parent().prev().find('input');
             if (inputElement.hasClass('redirected')) {
                 inputElement.prop('readonly', false);

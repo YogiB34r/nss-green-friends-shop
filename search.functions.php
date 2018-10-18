@@ -178,13 +178,13 @@ add_action('admin_menu', function (){
 });
 
 function handleAdminSearchSettings() {
-//    $config = array(
-//        'host' => ES_HOST,
-//        'port' => 9200
-//    );
-//    $client = new \Elastica\Client($config);
-//    $term = new \GF\Search\Elastica\TermSearch($client);
+    $config = array(
+        'host' => ES_HOST,
+        'port' => 9200
+    );
+    $client = new \Elastica\Client($config);
+    $termSearch = new \GF\Search\Elastica\TermSearch($client);
 //    $result = $term->getTerms();
-    include(__DIR__ . "/templates/admin/search-settings.php");
+    require(__DIR__ . "/templates/admin/search-settings.php");
 
 }
