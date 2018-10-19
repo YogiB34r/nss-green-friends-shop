@@ -16,8 +16,8 @@
         <div>
             <h3>Svrha uplate</h3>
             <div style="border:1px solid;">
-                <p>Plaćanje robe</p>
-            </div>
+                <p>Kupovina na NonStopShop-u</p>
+        </div>
         </div>
         <div>
             <h3>Primalac</h3>
@@ -50,7 +50,7 @@
         <div>
             <h3>Račun primaoca</h3>
             <div style="border:1px solid;text-align: center;">
-                <p style="margin: 8px;min-height: 17px;min-width: 300px"></p>
+                <p style="margin: 8px;min-height: 17px;min-width: 300px">160-487203-63</p>
             </div>
         </div>
         <div style="float: left;">

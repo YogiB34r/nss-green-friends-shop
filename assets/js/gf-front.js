@@ -198,7 +198,7 @@ jQuery(document).ready(function () {
 
     });
 
-    if (jQuery('body').is('.archive, .single-product')) {
+    if (jQuery('body').is('.archive, .single-product, .woocommerce-account')) {
         jQuery('.gf-wrapper-before span').toggleClass('fa-angle-down fa-angle-up');
     }
 

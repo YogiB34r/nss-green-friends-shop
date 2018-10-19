@@ -558,7 +558,7 @@ input[type="radio"]:checked + span::before {
 }
 
 h1.product_title.entry-title {
-    font-size: 2em;
+    font-size: 1.5em;
     line-height: 1.214;
     letter-spacing: -1px;
     margin: 0 0 1em;
@@ -1205,9 +1205,7 @@ body.home .saved-sale {
     order: 2;
 }
 
-.woocommerce-account .woocommerce-MyAccount-content {
-    margin-top: 40px;
-}
+
 
 .woocommerce-account .woocommerce-MyAccount-content p:first-child {
     line-height: 2;
@@ -3325,6 +3323,9 @@ p.woocommerce-thankyou-order-received {
 #billing_country_field, #billing_state_field, #shipping_country_field, #shipping_state_field {
     display: none;
 }
+#billing_city_field{
+    display: block;
+}
 
 /*@media only screen and (max-width: 1200px) {*/
 /*.mega-menu{*/
@@ -3426,4 +3427,77 @@ p.woocommerce-thankyou-order-received {
 
 .carousel-indicators li {
     border: solid 1px lightgray;
+}
+.gf-shop-button{
+    color: #f45411;
+    background-color: #fff;
+    border: 1px solid #f45411;
+    padding: 10px;
+    display: block;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 18px;
+}
+.gf-shop-button:hover{
+    background-color: #f45411;
+    color: #fff;
+}
+.gf-checkout-shipping-notice{
+    background-color: #eee;
+}
+
+button[name='update_cart'] {
+    display: none !important;
+}
+.gf-welcome-wrapper a{
+    color: #f45411;
+}
+.gf-welcome-wrapper a:hover{
+    text-decoration: underline;
+}
+.gf_login_notice{
+    background: #eee;
+    border-bottom: 2px solid #f45411;
+}
+.gf-product-remove{
+    display: none;
+}
+@media only screen and (max-width: 767px) {
+    .gf-product-remove{
+        display: block;
+        order: 3;
+    }
+    .gf-dsplay-none-on-mobile{
+        display: none !important;
+    }
+    .woocommerce-cart-form .product-quantity{
+        display: flex !important;
+        align-items: center !important;
+    }
+    .woocommerce-cart-form .product-quantity .quantity{
+        margin-right: auto !important;
+        margin-left: 5px !important;
+    }
+    .quantity label.screen-reader-text:first-child{
+        display: none !important;
+    }
+    .woocommerce-cart-form__cart-item .cart_item{
+        margin-bottom: 10px;
+    }
+}
+.gf-category-sidebar-toggle{
+    font-size: 20px;
+}
+.gf-cart-extra-buttons{
+    border: 1px solid #f45411;
+    max-width: 40%;
+    text-align: center;
+}
+.gf-cart-extra-buttons:hover{
+    background-color: #eee;
+}
+@media only screen and (max-width: 576px) {
+    .gf-cart-extra-buttons{
+        max-width: 100%;
+    }
 }

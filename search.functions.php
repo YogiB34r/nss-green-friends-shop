@@ -71,7 +71,8 @@ function applySearchPageTitle($title) {
     $page_title = sprintf('Rezultati pretrage za: &ldquo;%s&rdquo;', wc_get_loop_prop('query'));
 
     if (wc_get_loop_prop('current_page')) {
-        $page_title .= sprintf('&nbsp;&ndash; strana %s', wc_get_loop_prop('current_page'));
+        $page_title .= sprintf('&nbsp;', wc_get_loop_prop('current_page'));
+        // &ndash; strana %s ako zatreba
     }
 
     return $page_title;

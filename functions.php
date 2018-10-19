@@ -389,8 +389,6 @@ add_action( 'wp_print_scripts', 'iconic_remove_password_strength', 10 );
 
 add_action( 'woocommerce_save_account_details_errors','wooc_validate_custom_field', 10, 2 );
 
-// with something like:
-
 function wooc_validate_custom_field( $args, $user ){
     $user_id = $user->ID;
     $user_pass_hash = get_user_by('id', $user_id)->user_pass;
@@ -398,8 +396,100 @@ function wooc_validate_custom_field( $args, $user ){
         $current_pass = $_POST['password_current'];
         $passowrd_check = wp_check_password($current_pass, $user_pass_hash, $user_id);
         if ( isset( $_POST['password_1'] ) && $passowrd_check == 'true') {
-            if(strlen($_POST['password_1']) < 6 )
-                $args->add( 'error', __( 'Lozinka mora sadržati minimum 6 karaktera!', 'woocommerce' ),'');
+            if(strlen($_POST['password_1']) < 5 )
+                $args->add( 'error', __( 'Lozinka mora sadržati minimum 5 karaktera!', 'woocommerce' ),'');
         }
+    }
+}
+
+add_action('woocommerce_before_account_navigation', 'gf_my_account_shop_button', 1);
+function gf_my_account_shop_button(){
+    if ( ! defined( 'ABSPATH' ) ) {
+        exit; // Exit if accessed directly
+    }
+    global $wp;
+    $request = explode( '/', $wp->request );
+    $page = end($request);
+
+    $user = wp_get_current_user();
+    $args = array(
+        'customer_id' => $user->ID,
+    );
+    $orders = wc_get_orders( $args );
+    $class = '';
+    if($page == 'narudzbine' && empty($orders)){
+        $class = 'd-none';
+    }
+    echo '<div class="gf-welcome-wrapper mb-3">';
+    echo '<a class="gf-shop-button '.$class.'" href="/">Kreni u kupovinu</a>';
+    echo '<div class="gf_login_notice py-3 px-1 mt-0 mb-4"><p class="mb-0">Prilikom prijave možete koristiti <strong>korisničko ime</strong> ili <strong>email adresu</strong>.</p>
+            <div class="mt-3 mb-1"><strong>Korisničko ime: </strong>'.$user->user_login.'</div>
+            <div><strong>Email adresa: </strong>'.$user->user_email.'</div>
+            </div>';
+    echo '<div class="mb-2">';
+    printf(
+        __( 'Hello %1$s (not %1$s? <a href="%2$s">Log out</a>)', 'woocommerce' ),
+        '<strong>' . esc_html( $user->display_name ) . '</strong>',
+        esc_url( wc_logout_url( wc_get_page_permalink( 'myaccount' ) ) )
+    );
+    echo '</div>';
+    printf(
+        __( 'From your account dashboard you can view your <a href="%1$s">recent orders</a>, manage your <a href="%2$s">shipping and billing addresses</a>, and <a href="%3$s">edit your password and account details</a>.', 'woocommerce' ),
+        esc_url( wc_get_endpoint_url( 'orders' ) ),
+        esc_url( wc_get_endpoint_url( 'edit-address' ) ),
+        esc_url( wc_get_endpoint_url( 'edit-account' ) )
+    );
+    echo '</div>';
+}
+
+add_action('woocommerce_before_checkout_shipping_form', 'gf_checkout_shipping_notice');
+function gf_checkout_shipping_notice(){
+    echo '<div class ="gf-checkout-shipping-notice p-3" >Ukoliko se adresa za dostavu razlikuje od navedene u detaljima naplate, popunite sledeća polja:</div>';
+}
+
+
+add_action( 'wp_footer', 'gf_cart_refresh_update_qty' );
+
+function gf_cart_refresh_update_qty() {
+    if (is_cart()) {
+        ?>
+        <script type="text/javascript">
+            jQuery('div.woocommerce').on('click', 'input.qty', function(){
+                jQuery("[name='update_cart']").trigger("click");
+            });
+        </script>
+        <?php
+    }
+}
+
+add_filter ( 'woocommerce_account_menu_items', 'gf_remove_my_account_links' );
+function gf_remove_my_account_links( $menu_links ){
+
+    unset( $menu_links['dashboard'] ); // Addresses
+
+    //unset( $menu_links['dashboard'] ); // Dashboard
+    //unset( $menu_links['payment-methods'] ); // Payment Methods
+    //unset( $menu_links['orders'] ); // Orders
+    //unset( $menu_links['downloads'] ); // Downloads
+    //unset( $menu_links['edit-account'] ); // Account details
+    //unset( $menu_links['customer-logout'] ); // Logout
+
+    return $menu_links;
+}
+
+add_filter( 'post_date_column_time' , 'gf_custom_post_date_column_time', 10, 2 );
+
+function gf_custom_post_date_column_time( $h_time, $post ) {
+
+    $h_time = get_the_time( __( 'd/m/Y', 'woocommerce' ), $post );
+
+    return $h_time;
+}
+
+add_action('woocommerce_cart_collaterals', 'gf_cart_page_extra_buttons');
+function gf_cart_page_extra_buttons(){
+    if(!is_user_logged_in()) {
+        echo '<a class="gf-cart-extra-buttons d-block p-3 mb-3" href="/moj-nalog">REGISTRUJ SE</a>
+              <a class="gf-cart-extra-buttons d-block p-3" href="/placanje">NASTAVI KUPOVINU BEZ REGISTRACIJE</a>';
     }
 }

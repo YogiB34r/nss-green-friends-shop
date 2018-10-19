@@ -38,6 +38,7 @@ function gf_order_fields($fields)
         "billing_pib",
         "billing_address_1",
         "billing_address_2",
+        "billing_city",
         "billing_postcode",
         "billing_country",
         "billing_email",
@@ -122,11 +123,13 @@ add_filter( 'woocommerce_order_formatted_billing_address' , 'woo_custom_order_fo
 
 function woo_custom_order_formatted_billing_address( $address, $order ){
 //    $order = new WC_Order($order);
+
     $address = array(
         'first_name' => $order->get_billing_first_name(),
         'last_name' => $order->get_billing_last_name(),
         'address_1' => $order->get_billing_address_1(),
         'address_2' => $order->get_billing_address_2(),
+        'city' => $order->get_billing_city(),
         'postcode' => $order->get_billing_postcode(),
     );
 
