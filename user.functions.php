@@ -87,7 +87,7 @@ function gf_authenticate_username_password($user, $username, $password)
 add_action('validate_password_reset', 'gf_validate_password_reset', 10, 2);
 function gf_validate_password_reset($errors, $user)
 {
-    if (strlen($_POST['password_1']) < 6) {
+    if (strlen($_POST['password_1']) < 5) {
         $errors->add('woocommerce_password_error', __('Lozinka mora imati minimum 6 karaktera.'));
     } // adding ability to set maximum allowed password chars -- uncomment the following two (2) lines to enable that
     elseif (strlen($_POST['password_1']) > 64)
