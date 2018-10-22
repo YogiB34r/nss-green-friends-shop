@@ -1,5 +1,4 @@
 <?php get_header();
-
 $file = file_get_contents(__DIR__ . '/users1.csv');
 $lines = explode(PHP_EOL, $file);
 unset($lines[0]);
@@ -43,6 +42,7 @@ foreach ($lines as $line){
     }
     if (!empty($data[2])) {
         $password = $data[2];
+        $gfPasswords[] = $data[2];
     }
     if (!empty($data[3])) {
         $first_name = $data[3];
@@ -119,45 +119,43 @@ foreach ($lines as $line){
 
     $salt = 'd@uy/o%b^';
     $passwordHash = $salt . md5($salt, $password);
-    $sql_update_pass = "UPDATE wp_users SET user_pass = '{$passwordHash}' WHERE ID = '{$user_id}'";
-    $update = $wpdb->query($sql_update_pass);
 
-    $sql_get_pass = "SELECT user_pass FROM wp_users WHERE ID = '{$user_id}'";
+//    $sql_update_pass = "UPDATE wp_users SET user_pass = '{$passwordHash}' WHERE ID = '{$user_id}'";
+//    $update = $wpdb->query($sql_update_pass);
+
+    $sql_get_pass = "SELECT user_pass FROM wp_users WHERE user_email = '{$email}'";
     $password_in_db = $wpdb->get_results($sql_get_pass)[0]->user_pass;
-
-    var_dump($passwordHash);
+    update_user_meta($user_id, "hash_password_old", $password);
+    var_dump(get_user_meta($user_id, 'hash_password_old')[0]);
+//    die();
     var_dump($password_in_db);
 
 
-    update_user_meta($user_id, "first_name", $first_name);
-
-    //billing
-    update_user_meta($user_id, "billing_first_name", $billing_first_name);
-    update_user_meta($user_id, "billing_company", $billing_company);
-    update_user_meta($user_id, "billing_pib", $billing_pib);
-    update_user_meta($user_id, "billing_mb", $billing_mb);
-    update_user_meta($user_id, "billing_address_1", $billing_address_1);
-    update_user_meta($user_id, "billing_city", $billing_city);
-    update_user_meta($user_id, "billing_postcode", $billing_postcode);
-    update_user_meta($user_id, "billing_phone", $billing_phone);
-    update_user_meta($user_id, "billing_country", $billing_country);
-
-    //shipping
-    update_user_meta($user_id, "shipping_first_name", $shipping_first_name);
-    update_user_meta($user_id, "shipping_company", $shipping_company);
-    update_user_meta($user_id, "shipping_address_1", $shipping_address_1);
-    update_user_meta($user_id, "shipping_city", $shipping_city);
-    update_user_meta($user_id, "shipping_postcode", $shipping_postcode);
-    update_user_meta($user_id, "shipping_phone", $shipping_phone);
-    update_user_meta($user_id, "shipping_country", $shipping_country);
-
-    update_user_meta($user_id, "age_range", $age_range);
-    update_user_meta($user_id, "meta_sex", $meta_sex);
-    update_user_meta($user_id, "migrated", $migrated);
-
-
-
-
+//    update_user_meta($user_id, "first_name", $first_name);
+//
+//    //billing
+//    update_user_meta($user_id, "billing_first_name", $billing_first_name);
+//    update_user_meta($user_id, "billing_company", $billing_company);
+//    update_user_meta($user_id, "billing_pib", $billing_pib);
+//    update_user_meta($user_id, "billing_mb", $billing_mb);
+//    update_user_meta($user_id, "billing_address_1", $billing_address_1);
+//    update_user_meta($user_id, "billing_city", $billing_city);
+//    update_user_meta($user_id, "billing_postcode", $billing_postcode);
+//    update_user_meta($user_id, "billing_phone", $billing_phone);
+//    update_user_meta($user_id, "billing_country", $billing_country);
+//
+//    //shipping
+//    update_user_meta($user_id, "shipping_first_name", $shipping_first_name);
+//    update_user_meta($user_id, "shipping_company", $shipping_company);
+//    update_user_meta($user_id, "shipping_address_1", $shipping_address_1);
+//    update_user_meta($user_id, "shipping_city", $shipping_city);
+//    update_user_meta($user_id, "shipping_postcode", $shipping_postcode);
+//    update_user_meta($user_id, "shipping_phone", $shipping_phone);
+//    update_user_meta($user_id, "shipping_country", $shipping_country);
+//
+//    update_user_meta($user_id, "age_range", $age_range);
+//    update_user_meta($user_id, "meta_sex", $meta_sex);
+    update_user_meta($user_id, "migrated", 1);
 }
 
 ?>

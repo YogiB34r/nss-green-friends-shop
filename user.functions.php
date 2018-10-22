@@ -8,25 +8,41 @@ function gf_add_custom_meta_to_users()
     }
 }
 
+add_filter('wp_authenticate_user', 'gf_check_if_user_is_migrated', 10, 2);
 function gf_check_if_user_is_migrated($user, $password)
 {
     if (!empty($user)) {
-        if (get_user_meta($user->ID, 'migrated', true) != 0) {
+        if (get_user_meta($user->ID, 'migrated', true) !== 0) {
 
             global $wpdb;
 
-            //skloniti posle testiranja, promenjeno je trenutno za usera 'admin'
-//        update_user_meta($user->ID, 'migrated', '1');
+            $old_password_hash = get_user_meta($user->ID, 'hash_password_old')[0];
 
             $salt = 'd@uy/o%b^';
             $passwordHash = $salt . md5($salt, $password);
-            $sql = "SELECT user_pass FROM wp_users WHERE ID = {$user->ID}";
-            $password_in_db = $wpdb->get_results($sql)[0]->user_pass;
 
+            if ($old_password_hash == $passwordHash) {
 
-            if ($passwordHash === $password_in_db) {
-                return $user;
-            } else {
+                $sql = "SELECT user_pass FROM wp_users WHERE ID = {$user->ID}";
+                $password_in_db = $wpdb->get_results($sql)[0]->user_pass;
+
+                $wp_hasher = new PasswordHash(8, false);
+
+                if ($wp_hasher->CheckPassword($passwordHash, $password_in_db)) {
+                    return $user;
+                } else {
+                    return new WP_Error('incorrect_password',
+                        sprintf(
+                        /* translators: %s: user name */
+                            __('<strong>GREŠKA</strong>: Lozinka koju ste uneli za korisničko ime %s nije ispravna.'),
+                            '<strong>' . $user->user_login . '</strong>'
+                        ) .
+                        ' <a href="' . wp_lostpassword_url() . '">' .
+                        __('Izgubili ste lozinku?') .
+                        '</a>'
+                    );
+                }
+            }else {
                 return new WP_Error('incorrect_password',
                     sprintf(
                     /* translators: %s: user name */
@@ -137,7 +153,6 @@ function gf_custom_add_to_cart_message($message)
 }
 
 
-//add_filter('wp_authenticate_user', 'gf_check_if_user_is_migrated', 10, 2);
 
 
 //function remove_country_field_billing($fields)
