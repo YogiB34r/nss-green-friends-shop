@@ -78,7 +78,7 @@ class Search_List_Table extends WP_List_Table
 
         $data = $this->table_data();
         usort($data, array(&$this, 'sort_data'));
-        $perPage = 10;
+        $perPage = 30;
         $currentPage = $this->get_pagenum();
         $totalItems = count($data);
         $this->set_pagination_args(array(

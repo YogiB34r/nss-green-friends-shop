@@ -93,7 +93,10 @@ function woocommerce_result_count() {
     if ($last === 0) {
         $first = 0;
     }
-    $tpl = '<p class="woocommerce-result-count">Prikazano %s-%s od %s rezultata</p>';
+    $tpl = '<p class="woocommerce-result-count">Prikazano %s-%s od %s rezultata.</p>';
+    if (isset($_GET['query'])) {
+        $tpl = '<p class="woocommerce-result-count">Prikazano %s-%s od %s rezultata za upit: <strong>'. $_GET['query'] .'</strong></p>';
+    }
 
     echo sprintf($tpl, $first, $last, $total);
 }
