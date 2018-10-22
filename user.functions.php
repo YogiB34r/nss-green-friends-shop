@@ -18,7 +18,7 @@ function gf_check_if_user_is_migrated($user, $password) {
 
             $salt = 'd@uy/o%b^';
             $passwordHash = $salt . md5($salt, $password);
-            $sql = "SELECT user_pass FROM wp_users WHERE ID = '{$user->ID}'";
+            $sql = "SELECT user_pass FROM wp_users WHERE ID = {$user->ID}";
             $password_in_db = $wpdb->get_results($sql)[0]->user_pass;
 
 //            var_dump($passwordHash);
@@ -29,6 +29,7 @@ function gf_check_if_user_is_migrated($user, $password) {
             if ($passwordHash === $password_in_db) {
                 return $user;
             } else {
+                var_dump('caoo');
                 return new WP_Error('incorrect_password',
                     sprintf(
                     /* translators: %s: user name */
@@ -70,8 +71,6 @@ function gf_authenticate_username_password( $user, $username, $password ) {
         return $error;
     }
 
-    $user = get_user_by( 'login', $username );
-
     if ( !$user )
         return new WP_Error( 'invalid_username', sprintf( __( '<strong>GREŠKA</strong>: Nepostojeće korisničko ime ili email. <a href="%s" title="Lozinka izgubljena">Izgubili ste lozinku</a>?' ), wp_lostpassword_url() ) );
 
@@ -79,9 +78,26 @@ function gf_authenticate_username_password( $user, $username, $password ) {
     if ( is_wp_error( $user ) )
         return $user;
 
-    if ( ! wp_check_password( $password, $user->user_pass, $user->ID ) )
-        return new WP_Error( 'incorrect_password', sprintf( __( '<strong>GREŠKA</strong>: Lozinka koju ste uneli za korisničko ime <strong>%1$s</strong> nije ispravna. <a href="%2$s" title="Lozinka izgubljena">Izgubili ste lozinku</a>?' ),
-            $username, wp_lostpassword_url() ) );
+    $user = get_user_by( 'login', $username );
+
+    if(get_user_meta($user->ID, 'migrated', true) != 0){
+        global $wpdb;
+        $salt = 'd@uy/o%b^';
+        $passwordHash = $salt . md5($salt, $password);
+        var_dump('ovde sam');
+        var_dump($passwordHash);
+        $sql = "SELECT user_pass FROM wp_users WHERE ID = {$user->ID}";
+        $password_in_db = $wpdb->get_results($sql)[0]->user_pass;
+        if($passwordHash === $password_in_db){
+            return $user;
+        }
+    }else{
+        if ( ! wp_check_password( $password, $user->user_pass, $user->ID ) )
+            return new WP_Error( 'incorrect_password', sprintf( __( '<strong>GREŠKA</strong>: Lozinka koju ste uneli za korisničko ime <strong>%1$s</strong> nije ispravna. <a href="%2$s" title="Lozinka izgubljena">Izgubili ste lozinku</a>?' ),
+                $username, wp_lostpassword_url() ) );
+    }
+
+
 
     return $user;
 }
