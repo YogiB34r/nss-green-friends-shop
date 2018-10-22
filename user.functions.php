@@ -18,6 +18,7 @@ function gf_check_if_user_is_migrated($user, $password)
 
             $old_password_hash = get_user_meta($user->ID, 'hash_password_old')[0];
 
+            //@TODO make it same as old password hash!
             $salt = 'd@uy/o%b^';
             $passwordHash = $salt . md5($salt, $password);
 
