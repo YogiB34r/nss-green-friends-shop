@@ -3,9 +3,9 @@
 //ini_set('post_max_size', '128M');
 ini_set('max_execution_time', '120');
 
-require (__DIR__ . DIRECTORY_SEPARATOR . "user.functions.php");
-require (__DIR__ . DIRECTORY_SEPARATOR . "/search.functions.php");
-require (__DIR__ . DIRECTORY_SEPARATOR . "/util.functions.php");
+require(__DIR__ . DIRECTORY_SEPARATOR . "user.functions.php");
+require(__DIR__ . DIRECTORY_SEPARATOR . "/search.functions.php");
+require(__DIR__ . DIRECTORY_SEPARATOR . "/util.functions.php");
 
 add_action('after_setup_theme', 'wc_support');
 function wc_support()
@@ -24,18 +24,19 @@ function require_on_init()
     }
 }
 
-require (__DIR__ . "/inc/Search/AdapterInterface.php");
-require (__DIR__ . "/inc/Search/Adapter/MySql.php");
-require (__DIR__ . "/inc/Search/Adapter/Elastic.php");
-require (__DIR__ . "/inc/Search/Search.php");
-require (__DIR__ . "/inc/Search/Elastica/Search.php");
-require (__DIR__ . "/inc/Search/Elastica/TermSearch.php");
-require (__DIR__ . "/inc/CheckoutHelper/CheckoutHelper.php");
+require(__DIR__ . "/inc/Search/AdapterInterface.php");
+require(__DIR__ . "/inc/Search/Adapter/MySql.php");
+require(__DIR__ . "/inc/Search/Adapter/Elastic.php");
+require(__DIR__ . "/inc/Search/Search.php");
+require(__DIR__ . "/inc/Search/Elastica/Search.php");
+require(__DIR__ . "/inc/Search/Elastica/TermSearch.php");
+require(__DIR__ . "/inc/CheckoutHelper/CheckoutHelper.php");
 
 add_action('after_setup_theme', 'require_on_init');
 
 add_filter('woocommerce_currency_symbol', 'change_existing_currency_symbol', 10, 2);
-function change_existing_currency_symbol($currency_symbol, $currency) {
+function change_existing_currency_symbol($currency_symbol, $currency)
+{
     $currency_symbol = 'din.';
 
     return $currency_symbol;
@@ -48,7 +49,8 @@ add_filter('upload_dir', 'upload_dir_filter');
  * @param $uploads
  * @return mixed
  */
-function upload_dir_filter($uploads) {
+function upload_dir_filter($uploads)
+{
     //$day = date('d');
     $day = date('d/i');
     $uploads['path'] .= '/' . $day;
@@ -62,7 +64,8 @@ function upload_dir_filter($uploads) {
  *
  * @param array $args
  */
-function woocommerce_breadcrumb($args = array()) {
+function woocommerce_breadcrumb($args = array())
+{
     $args = wp_parse_args($args, apply_filters('woocommerce_breadcrumb_defaults', array(
         'delimiter' => '&nbsp;&#47;&nbsp;',
         'wrap_before' => '<nav class="woocommerce-breadcrumb" ' . (is_single() ? 'itemprop="breadcrumb"' : '') . '>',
@@ -86,7 +89,8 @@ function woocommerce_breadcrumb($args = array()) {
  *
  * @return array
  */
-function gf_print_styles() {
+function gf_print_styles()
+{
     $result = [];
     $result['scripts'] = [];
     $result['styles'] = [];
@@ -110,7 +114,8 @@ function gf_print_styles() {
  *
  * @param WP_Query $sortedProducts
  */
-function gf_custom_search_output(WP_Query $sortedProducts) {
+function gf_custom_search_output(WP_Query $sortedProducts)
+{
     if ($sortedProducts->have_posts()):
 //        global $sw;
         wc_setup_loop();
@@ -129,7 +134,8 @@ function gf_custom_search_output(WP_Query $sortedProducts) {
     endif;
 }
 
-function parseAttributes() {
+function parseAttributes()
+{
     $redis = new GF_Cache();
     $atributes = unserialize($redis->redis->get('attributes-collection'));
     if ($atributes === false) {
@@ -154,7 +160,8 @@ function parseAttributes() {
  * @param $allIds
  * @return bool|WP_Query
  */
-function gf_parse_post_ids_for_list($allIds) {
+function gf_parse_post_ids_for_list($allIds)
+{
     $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
     if (isset($_POST['ppp'])) {
         $per_page = ($_POST['ppp'] > 48) ? 48 : $_POST['ppp'];
@@ -188,7 +195,8 @@ function gf_parse_post_ids_for_list($allIds) {
     return $sortedProducts;
 }
 
-function gf_ajax_view_count($postId) {
+function gf_ajax_view_count($postId)
+{
     $key = 'post-view-count#' . $postId;
     $cache = new GF_Cache();
     $count = (int)$cache->redis->get($key);
@@ -203,7 +211,8 @@ function gf_ajax_view_count($postId) {
     echo 1;
 }
 
-function gf_set_product_categories($product_id, $category_ids) {
+function gf_set_product_categories($product_id, $category_ids)
+{
     $product = wc_get_product($product_id);
     $product_categories = $product->get_category_ids();
     $diff = array_diff($category_ids, $product_categories);
@@ -220,9 +229,10 @@ add_filter('request', 'custom_request');
  * @param $query_string
  * @return mixed
  */
-function custom_request($query_string) {
+function custom_request($query_string)
+{
     if (isset($query_string['page'])) {
-        if($query_string['page'] !== '') {
+        if ($query_string['page'] !== '') {
             if (isset($query_string['name'])) {
                 unset($query_string['name']);
             }
@@ -232,11 +242,12 @@ function custom_request($query_string) {
 }
 
 
-function gf_custom_shop_loop(\Elastica\ResultSet $products) {
+function gf_custom_shop_loop(\Elastica\ResultSet $products)
+{
     $html = '';
 
     $i = 0;
-    foreach ($products->getResults() as $productData){
+    foreach ($products->getResults() as $productData) {
         $product = new \Nss\Feed\Product($productData->getData());
         $saved_price = $product->getRegularPrice() - $product->getSalePrice();
         $price = $product->getRegularPrice();
@@ -267,8 +278,8 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products) {
             $classes .= " first ";
         }
         $classes .= " product type-product status-publish has-post-thumbnail shipping-taxable purchasable  ";
-        $html .= '<li class="product-type-'.$product->getType(). $classes .'">';
-        $html .= '<a href=" ' . $product->dto['permalink'] .' " title=" '. $product->getName() .' ">';
+        $html .= '<li class="product-type-' . $product->getType() . $classes . '">';
+        $html .= '<a href=" ' . $product->dto['permalink'] . ' " title=" ' . $product->getName() . ' ">';
         $html .= add_stickers_to_products_on_sale($classes);
 //        woocommerce_show_product_sale_flash('', '', '', $classes);
 //        add_stickers_to_products_new($product);
@@ -278,23 +289,23 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products) {
         $html .= ob_get_clean();
 //        $html .= add_stickers_to_products_soldout($classes);
         $html .= '</a>';
-        $html .= '<a href="'. $product->dto['permalink'] .'" title="'.$product->getName().'">';
-        $html .= '<h5>'.$product->getName().'</h5>';
+        $html .= '<a href="' . $product->dto['permalink'] . '" title="' . $product->getName() . '">';
+        $html .= '<h5>' . $product->getName() . '</h5>';
         $html .= '</a>';
         $html .= '<span class="price">';
         if ($saved_percentage > 0) {
-            $html .= '<del><span class="woocommerce-Price-amount amount">'.$product->getRegularPrice()
-                  .'<span class="woocommerce-Price-currencySymbol">din.</span></span></del>';
-            $html .= '<ins><span class="woocommerce-Price-amount amount">'.$price.
-                     '<span class="woocommerce-Price-currencySymbol">din.</span></span></ins>';
-            $html .= '<p class="saved-sale">Ušteda: <span class="woocommerce-Price-amount amount">'.$saved_price.
-                     '<span class="woocommerce-Price-currencySymbol">din.</span></span> <em> ('.$saved_percentage.'%)</em></p>';
+            $html .= '<del><span class="woocommerce-Price-amount amount">' . $product->getRegularPrice()
+                . '<span class="woocommerce-Price-currencySymbol">din.</span></span></del>';
+            $html .= '<ins><span class="woocommerce-Price-amount amount">' . $price .
+                '<span class="woocommerce-Price-currencySymbol">din.</span></span></ins>';
+            $html .= '<p class="saved-sale">Ušteda: <span class="woocommerce-Price-amount amount">' . $saved_price .
+                '<span class="woocommerce-Price-currencySymbol">din.</span></span> <em> (' . $saved_percentage . '%)</em></p>';
         } else {
-            $html .= '<ins><span class="woocommerce-Price-amount amount">'.$product->getRegularPrice()
-                .'<span class="woocommerce-Price-currencySymbol">din.</span></span></ins>';
+            $html .= '<ins><span class="woocommerce-Price-amount amount">' . $product->getRegularPrice()
+                . '<span class="woocommerce-Price-currencySymbol">din.</span></span></ins>';
         }
         $html .= '</span>';
-        $html .= '<p class="loop-short-description">'.$product->getShortDescription().'</p>';
+        $html .= '<p class="loop-short-description">' . $product->getShortDescription() . '</p>';
         $html .= '</li>';
         $i++;
     }
@@ -304,19 +315,20 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products) {
 }
 
 
-function woocommerce_pagination() {
+function woocommerce_pagination()
+{
     $args = array(
-        'total'   => wc_get_loop_prop( 'total_pages' ),
-        'current' => wc_get_loop_prop( 'current_page' ),
-        'base'    => esc_url_raw( add_query_arg( 'product-page', '%#%', false ) ),
-        'format'  => '?product-page=%#%',
+        'total' => wc_get_loop_prop('total_pages'),
+        'current' => wc_get_loop_prop('current_page'),
+        'base' => esc_url_raw(add_query_arg('product-page', '%#%', false)),
+        'format' => '?product-page=%#%',
     );
 
-    if ( ! wc_get_loop_prop( 'is_shortcode' ) ) {
+    if (!wc_get_loop_prop('is_shortcode')) {
         $args['format'] = '';
-        $args['base']   = esc_url_raw( str_replace( 999999999, '%#%', remove_query_arg( 'add-to-cart', get_pagenum_link( 999999999, false ) ) ) );
+        $args['base'] = esc_url_raw(str_replace(999999999, '%#%', remove_query_arg('add-to-cart', get_pagenum_link(999999999, false))));
     }
-    wc_get_template( 'loop/pagination.php', $args );
+    wc_get_template('loop/pagination.php', $args);
 }
 
 
@@ -380,81 +392,86 @@ function woocommerce_pagination() {
 //add_filter( 'woocommerce_checkout_fields' , 'custom_override_checkout_fields' );
 
 
-function iconic_remove_password_strength() {
-    wp_dequeue_script( 'wc-password-strength-meter' );
+function iconic_remove_password_strength()
+{
+    wp_dequeue_script('wc-password-strength-meter');
 }
-add_action( 'wp_print_scripts', 'iconic_remove_password_strength', 10 );
+
+add_action('wp_print_scripts', 'iconic_remove_password_strength', 10);
 
 
+add_action('woocommerce_save_account_details_errors', 'wooc_validate_custom_field', 10, 2);
 
-add_action( 'woocommerce_save_account_details_errors','wooc_validate_custom_field', 10, 2 );
-
-function wooc_validate_custom_field( $args, $user ){
+function wooc_validate_custom_field($args, $user)
+{
     $user_id = $user->ID;
     $user_pass_hash = get_user_by('id', $user_id)->user_pass;
-    if(isset($_POST['password_current']) && !empty($_POST['password_current'])){
+    if (isset($_POST['password_current']) && !empty($_POST['password_current'])) {
         $current_pass = $_POST['password_current'];
         $passowrd_check = wp_check_password($current_pass, $user_pass_hash, $user_id);
-        if ( isset( $_POST['password_1'] ) && $passowrd_check == 'true') {
-            if(strlen($_POST['password_1']) < 5 )
-                $args->add( 'error', __( 'Lozinka mora sadržati minimum 5 karaktera!', 'woocommerce' ),'');
+        if (isset($_POST['password_1']) && $passowrd_check == 'true') {
+            if (strlen($_POST['password_1']) < 5)
+                $args->add('error', __('Lozinka mora sadržati minimum 5 karaktera!', 'woocommerce'), '');
         }
     }
 }
 
 add_action('woocommerce_before_account_navigation', 'gf_my_account_shop_button', 1);
-function gf_my_account_shop_button(){
-    if ( ! defined( 'ABSPATH' ) ) {
+function gf_my_account_shop_button()
+{
+    if (!defined('ABSPATH')) {
         exit; // Exit if accessed directly
     }
     global $wp;
-    $request = explode( '/', $wp->request );
+    $request = explode('/', $wp->request);
     $page = end($request);
 
     $user = wp_get_current_user();
     $args = array(
         'customer_id' => $user->ID,
     );
-    $orders = wc_get_orders( $args );
+    $orders = wc_get_orders($args);
     $class = '';
-    if($page == 'narudzbine' && empty($orders)){
+    if ($page == 'narudzbine' && empty($orders)) {
         $class = 'd-none';
     }
     echo '<div class="gf-welcome-wrapper mb-3">';
-    echo '<a class="gf-shop-button '.$class.'" href="/">Kreni u kupovinu</a>';
+    echo '<a class="gf-shop-button ' . $class . '" href="/">Kreni u kupovinu</a>';
     echo '<div class="gf_login_notice py-3 px-1 mt-0 mb-4"><p class="mb-0">Prilikom prijave možete koristiti <strong>korisničko ime</strong> ili <strong>email adresu</strong>.</p>
-            <div class="mt-3 mb-1"><strong>Korisničko ime: </strong>'.$user->user_login.'</div>
-            <div><strong>Email adresa: </strong>'.$user->user_email.'</div>
+            <div class="mt-3 mb-1"><strong>Korisničko ime: </strong>' . $user->user_login . '</div>
+            <div><strong>Email adresa: </strong>' . $user->user_email . '</div>
             </div>';
     echo '<div class="mb-2">';
     printf(
-        __( 'Hello %1$s (not %1$s? <a href="%2$s">Log out</a>)', 'woocommerce' ),
-        '<strong>' . esc_html( $user->display_name ) . '</strong>',
-        esc_url( wc_logout_url( wc_get_page_permalink( 'myaccount' ) ) )
+        __('Hello %1$s (not %1$s? <a href="%2$s">Log out</a>)', 'woocommerce'),
+        '<strong>' . esc_html($user->display_name) . '</strong>',
+        esc_url(wc_logout_url(wc_get_page_permalink('myaccount')))
     );
     echo '</div>';
     printf(
-        __( 'From your account dashboard you can view your <a href="%1$s">recent orders</a>, manage your <a href="%2$s">shipping and billing addresses</a>, and <a href="%3$s">edit your password and account details</a>.', 'woocommerce' ),
-        esc_url( wc_get_endpoint_url( 'orders' ) ),
-        esc_url( wc_get_endpoint_url( 'edit-address' ) ),
-        esc_url( wc_get_endpoint_url( 'edit-account' ) )
+        __('From your account dashboard you can view your <a href="%1$s">recent orders</a>, manage your <a href="%2$s">shipping and billing addresses</a>, and <a href="%3$s">edit your password and account details</a>.', 'woocommerce'),
+        esc_url(wc_get_endpoint_url('orders')),
+        esc_url(wc_get_endpoint_url('edit-address')),
+        esc_url(wc_get_endpoint_url('edit-account'))
     );
     echo '</div>';
 }
 
 add_action('woocommerce_before_checkout_shipping_form', 'gf_checkout_shipping_notice');
-function gf_checkout_shipping_notice(){
+function gf_checkout_shipping_notice()
+{
     echo '<div class ="gf-checkout-shipping-notice p-3" >Ukoliko se adresa za dostavu razlikuje od navedene u detaljima naplate, popunite sledeća polja:</div>';
 }
 
 
-add_action( 'wp_footer', 'gf_cart_refresh_update_qty' );
+add_action('wp_footer', 'gf_cart_refresh_update_qty');
 
-function gf_cart_refresh_update_qty() {
+function gf_cart_refresh_update_qty()
+{
     if (is_cart()) {
         ?>
         <script type="text/javascript">
-            jQuery('div.woocommerce').on('click', 'input.qty', function(){
+            jQuery('div.woocommerce').on('click', 'input.qty', function () {
                 jQuery("[name='update_cart']").trigger("click");
             });
         </script>
@@ -462,10 +479,11 @@ function gf_cart_refresh_update_qty() {
     }
 }
 
-add_filter ( 'woocommerce_account_menu_items', 'gf_remove_my_account_links' );
-function gf_remove_my_account_links( $menu_links ){
+add_filter('woocommerce_account_menu_items', 'gf_remove_my_account_links');
+function gf_remove_my_account_links($menu_links)
+{
 
-    unset( $menu_links['dashboard'] ); // Addresses
+    unset($menu_links['dashboard']); // Addresses
 
     //unset( $menu_links['dashboard'] ); // Dashboard
     //unset( $menu_links['payment-methods'] ); // Payment Methods
@@ -477,19 +495,74 @@ function gf_remove_my_account_links( $menu_links ){
     return $menu_links;
 }
 
-add_filter( 'post_date_column_time' , 'gf_custom_post_date_column_time', 10, 2 );
+add_filter('post_date_column_time', 'gf_custom_post_date_column_time', 10, 2);
 
-function gf_custom_post_date_column_time( $h_time, $post ) {
+function gf_custom_post_date_column_time($h_time, $post)
+{
 
-    $h_time = get_the_time( __( 'd/m/Y', 'woocommerce' ), $post );
+    $h_time = get_the_time(__('d/m/Y', 'woocommerce'), $post);
 
     return $h_time;
 }
 
 add_action('woocommerce_cart_collaterals', 'gf_cart_page_extra_buttons');
-function gf_cart_page_extra_buttons(){
-    if(!is_user_logged_in()) {
+function gf_cart_page_extra_buttons()
+{
+    if (!is_user_logged_in()) {
         echo '<a class="gf-cart-extra-buttons d-block p-3 mb-3" href="/moj-nalog">REGISTRUJ SE</a>
               <a class="gf-cart-extra-buttons d-block p-3" href="/placanje">NASTAVI KUPOVINU BEZ REGISTRACIJE</a>';
     }
+}
+
+//Migrate comments from old site
+function gf_migrate_comments($array)
+{
+    foreach ($array as $comment) {
+        $post = get_product_by_sku($comment->sku);
+        $postId = $post->get_id();
+        $user = get_user_by_email($comment->email);
+        $commentAuthor = $user->get('first_name') .' '. $user->get('last_name');
+        $commentAuthorEmail = $user->get('email');
+        $commentAuthorUrl = '';
+        $commentContent = $comment->content;
+        $commentType = '';
+        $commentParent = '';
+        $userId = $user->get('id');
+        $commentDate = $comment->date;
+
+
+        $data = array(
+            'comment_post_ID' => 1,
+            'comment_author' => 'admin',
+            'comment_author_email' => 'admin@admin.com',
+            'comment_author_url' => 'http://',
+            'comment_content' => 'content here',
+            'comment_type' => '',
+            'comment_parent' => 0,
+            'user_id' => 1,
+            'comment_author_IP' => '127.0.0.1',
+            'comment_agent' => 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.10) Gecko/2009042316 Firefox/3.0.10 (.NET CLR 3.5.30729)',
+            'comment_date' => '',
+            'comment_approved' => 1,
+        );
+        wp_insert_comment($data);
+
+    }
+
+}
+function gf_test_comment(){
+    $data = array(
+        'comment_post_ID' => 422450,
+        'comment_author' => 'admin',
+        'comment_author_email' => 'admin@admin.com',
+        'comment_author_url' => 'http://www.catswhocode.com',
+        'comment_content' => 'Test Test Test',
+        'comment_author_IP' => '127.0.0.1',
+        'comment_agent' => 'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; fr; rv:1.9.2.3) Gecko/20100401 Firefox/3.6.3',
+        'comment_date' => date('Y-m-d H:i:s'),
+        'comment_date_gmt' => date('Y-m-d H:i:s'),
+        'comment_approved' => 1,
+    );
+
+    return $comment_id = wp_insert_comment($data);
 }
