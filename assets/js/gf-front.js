@@ -439,3 +439,11 @@ jQuery(document).ready(function ($) {
     $('.tnp-email').attr('title','Ovo polje mora biti popunjeno').attr('onInvalid','this.setCustomValidity(\'Neispravna email adresa\')').attr('onInput','this.setCustomValidity(\'\')');
     $('.tnp-privacy').attr('title','Da bi ste nastavili morate čekirati ovo polje').attr('onInvalid','this.setCustomValidity(\'Morate prihvatiti politiku privatnosti\')')
 });
+function showPassword() {
+    var x = jQuery('#password');
+    if (x.attr('type') === "password") {
+        x.attr('type', "text");
+    } else {
+        x.attr('type',  "password");
+    }
+}

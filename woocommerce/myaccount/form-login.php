@@ -35,7 +35,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		<h2><?php esc_html_e( 'Login', 'woocommerce' ); ?></h2>
 
-		<form class="woocommerce-form woocommerce-form-login login" method="post">
+		<form class="woocommerce-form woocommerce-form-login" method="post">
 
 			<?php do_action( 'woocommerce_login_form_start' ); ?>
 
@@ -46,6 +46,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
 				<label for="password"><?php esc_html_e( 'Password', 'woocommerce' ); ?>&nbsp;<span class="required">*</span></label>
 				<input class="woocommerce-Input woocommerce-Input--text input-text" type="password" name="password" id="password" autocomplete="current-password" />
+            <div class="show-password-wrapper"> <input type="checkbox" id="show-password-checkbox" onclick="showPassword()" /><span>Show password</span></div>
 			</p>
 
 			<?php do_action( 'woocommerce_login_form' ); ?>
