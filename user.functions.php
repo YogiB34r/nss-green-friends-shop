@@ -138,7 +138,7 @@ function gf_custom_add_to_cart_message($message)
 }
 
 
-//add_filter('wp_authenticate_user', 'gf_check_if_user_is_migrated', 10, 2);
+add_filter('wp_authenticate_user', 'gf_check_if_user_is_migrated', 10, 2);
 
 
 //function remove_country_field_billing($fields)
