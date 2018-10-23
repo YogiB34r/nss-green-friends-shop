@@ -9,8 +9,7 @@ function gf_cart_display_tax_notice()
 }
 
 add_action('woocommerce_before_cart_table', 'gf_cart_display_seller_info', 11);
-function gf_cart_display_seller_info()
-{
+function gf_cart_display_seller_info() {
     echo '<div class="gf-seller-info">
            <p>' . _e('Prodavac:', 'green-fiends') . ' 
                 <span class="gf-seller-info-title">Non Stop Shop</span>
@@ -25,8 +24,7 @@ function gf_cart_display_seller_info()
  */
 add_action('woocommerce_review_order_before_shipping', 'bbloomer_print_cart_weight');
 add_action('woocommerce_cart_totals_before_shipping', 'bbloomer_print_cart_weight');
-function bbloomer_print_cart_weight($posted)
-{
+function bbloomer_print_cart_weight($posted) {
     global $woocommerce;
     $html =
         '<tr class="shipping">
