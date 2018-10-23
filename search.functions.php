@@ -85,6 +85,7 @@ function parse_search_category_aggregation(\Elastica\ResultSet $resultSet) {
     }
     $catIds = array_keys($counts);
     if (count($catIds) === 0) {
+        $GLOBALS['gf-search']['facets']['category'] = [];
         return [];
     }
 
