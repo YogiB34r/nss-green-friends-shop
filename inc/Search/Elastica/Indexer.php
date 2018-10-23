@@ -11,10 +11,10 @@ class Indexer
 
         $elasticaIndex = $elasticaClient->getIndex('nss');
         $elasticaType = $elasticaIndex->getType('products');
-        $perPage = 5000;
+        $perPage = 500;
 //        $perPage = 50;
 
-        for ($i = 0; $i < 5; $i++) {
+        for ($i = 0; $i < 40; $i++) {
 //        for ($i = 0; $i < 35; $i++) {
 //        for ($i = 0; $i < 1; $i++) {
             $offset = $i * $perPage;
@@ -34,15 +34,20 @@ class Indexer
                 }
                 unset($result);
 
-                $response = $elasticaType->addDocuments($documents);
-                $documents = [];
-                if (!$response->isOk() || $response->hasError()) {
-                    var_dump($response->getError());
-                    die();
+                try {
+                    $response = $elasticaType->addDocuments($documents);
+                    $documents = [];
+                    if (!$response->isOk() || $response->hasError()) {
+                        var_dump($response->getError());
+                        die();
+                    }
+                    echo sprintf('stored %s items.', $response->count());
+                    unset($response);
+                    $elasticaType->getIndex()->refresh();
+                } catch (\Exception $e) {
+                    var_dump($e->getMessage());
                 }
-                echo sprintf('stored %s items.', $response->count());
-                unset($response);
-                $elasticaType->getIndex()->refresh();
+
             }
         }
         echo 'sync complete';
