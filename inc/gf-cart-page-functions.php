@@ -34,6 +34,13 @@ function bbloomer_print_cart_weight($posted) {
 				</td>
 		</tr>';
 
+    $userData = get_userdata(get_current_user_id());
+    if ($userData && in_array('administrator', $userData->roles)) {
+        echo 123;
+        var_dump(is_cart());
+        var_dump(is_checkout());
+    }
+
     if (is_cart() or is_checkout()) {
         echo $html;
     }

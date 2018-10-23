@@ -31,6 +31,7 @@ if (is_singular('product')) {
         'exclude' => $exclude_cats_ids,
     );
     $terms = wp_get_post_terms($post->ID, 'product_cat', $args);
+    $cats_array = [];
     foreach ($terms as $term) {
         $children = get_term_children($term->term_id, 'product_cat');
         if (!sizeof($children))
