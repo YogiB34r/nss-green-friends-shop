@@ -42,7 +42,6 @@ foreach ($lines as $line){
     }
     if (!empty($data[2])) {
         $password = $data[2];
-        $gfPasswords[] = $data[2];
     }
     if (!empty($data[3])) {
         $first_name = $data[3];
@@ -117,21 +116,11 @@ foreach ($lines as $line){
 
     $user_id = wp_insert_user($user_data);
 
-    $salt = 'd@uy/o%b^';
-    $passwordHash = $salt . md5($salt, $password);
-
-//    $sql_update_pass = "UPDATE wp_users SET user_pass = '{$passwordHash}' WHERE ID = '{$user_id}'";
-//    $update = $wpdb->query($sql_update_pass);
-
-    $sql_get_pass = "SELECT user_pass FROM wp_users WHERE user_email = '{$email}'";
-    $password_in_db = $wpdb->get_results($sql_get_pass)[0]->user_pass;
     update_user_meta($user_id, "hash_password_old", $password);
     var_dump(get_user_meta($user_id, 'hash_password_old')[0]);
-//    die();
-    var_dump($password_in_db);
 
 
-//    update_user_meta($user_id, "first_name", $first_name);
+    update_user_meta($user_id, "first_name", $first_name);
 //
 //    //billing
 //    update_user_meta($user_id, "billing_first_name", $billing_first_name);
@@ -157,7 +146,6 @@ foreach ($lines as $line){
 //    update_user_meta($user_id, "meta_sex", $meta_sex);
     update_user_meta($user_id, "migrated", 1);
 }
-
 ?>
 <div class="row">
     <div class="col-3 gf-sidebar gf-left-sidebar">
