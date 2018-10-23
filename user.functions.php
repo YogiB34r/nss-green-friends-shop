@@ -1,78 +1,18 @@
 <?php
 
-//function gf_add_custom_meta_to_users()
-//{
-//    $users = get_users(array('fields' => array('ID')));
-//    foreach ($users as $user) {
-//        update_user_meta($user->ID, 'migrated', '0');
-//    }
-//}
-add_filter('wp_authenticate_user', 'gf_check_if_user_is_migrated', 10, 2);
-
-function gf_check_if_user_is_migrated($user, $password)
-{
-    if (is_a($user, 'WP_User')) {
-        $user_id = $user->ID;
-        var_dump($user_id);
-        var_dump(get_user_meta($user_id, 'migrated', true));
-
-        if (get_user_meta($user_id, 'migrated', true) == 1) {
-            global $wpdb;
-
-            $old_password_hash = get_user_meta($user_id, 'hash_password_old')[0];
-
-            //we made password has like old one
-            $salt = 'd@uy/o%b^';
-            $passwordHash = $salt . md5($password);
-
-            $sql = "SELECT user_pass FROM wp_users WHERE ID = '{$user_id}'";
-            $password_in_db = $wpdb->get_results($sql)[0]->user_pass;
-
-            $wp_hasher = new PasswordHash(8, true);
-
-            if ($wp_hasher->CheckPassword($passwordHash, $password_in_db)) {
-                return $user;
-            } else {
-                var_dump('ovde sam 1');
-                return new WP_Error('incorrect_password',
-                    sprintf(
-                    /* translators: %s: user name */
-                        __('<strong>GREŠKA</strong>: Lozinka koju ste uneli za korisničko ime %s nije ispravna.'),
-                        '<strong>' . $user->data->user_login . '</strong>'
-                    ) .
-                    ' <a href="' . wp_lostpassword_url() . '">' .
-                    __('Izgubili ste lozinku?') .
-                    '</a>'
-                );
-            }
-        } else {
-            var_dump('ovde sam 2');
-            if (!wp_check_password($password, $user->user_pass, $user->ID))
-                return new WP_Error('incorrect_password', sprintf(__('<strong>GREŠKA</strong>: Lozinka koju ste uneli za korisničko ime <strong>%1$s</strong> nije ispravna. <a href="%2$s" title="Lozinka izgubljena">Izgubili ste lozinku</a>?'),
-                    $user->data->user_login, wp_lostpassword_url()));
-        }
-    } else {
-        var_dump('zastoooo');
-    }
-    return $user;
-}
-
 remove_filter('authenticate', 'wp_authenticate_username_password');
-
 add_filter('authenticate', 'gf_authenticate_username_password', 20, 3);
 /**
  * Remove Wordpress filer and write our own with changed error text.
  */
-function gf_authenticate_username_password($user, $username, $password)
-{
-
+function gf_authenticate_username_password($user, $username, $password) {
     if (is_a($user, 'WP_User'))
         return $user;
 
     if (empty($username) || empty($password)) {
-        if (is_wp_error($user))
+        if (is_wp_error($user)) {
             return $user;
-
+        }
         $error = new WP_Error();
 
         if (empty($username))
@@ -87,7 +27,16 @@ function gf_authenticate_username_password($user, $username, $password)
     if (!$user)
         return new WP_Error('invalid_username', sprintf(__('<strong>GREŠKA</strong>: Nepostojeće korisničko ime ili email. <a href="%s" title="Lozinka izgubljena">Izgubili ste lozinku</a>?'), wp_lostpassword_url()));
 
-    $user = apply_filters('wp_authenticate_user', $user, $password);
+    $user = get_user_by('email', $username);
+    if (get_user_meta($user->ID, 'migrated', true) == 1) {
+        return gf_migrate_user_password($user, $password);
+    } else {
+        if (!wp_check_password($password, $user->user_pass, $user->ID))
+            return new WP_Error('incorrect_password', sprintf(__('<strong>GREŠKA</strong>: Lozinka koju ste uneli za korisničko ime <strong>%1$s</strong> nije ispravna. <a href="%2$s" title="Lozinka izgubljena">Izgubili ste lozinku</a>?'),
+                $user->data->user_login, wp_lostpassword_url()));
+
+        $user = apply_filters('wp_authenticate_user', $user, $password);
+    }
 
     if (is_wp_error($user))
         return $user;
@@ -95,6 +44,35 @@ function gf_authenticate_username_password($user, $username, $password)
     return $user;
 }
 
+/**
+ * Migrate old user's password to new algorithm by checking with old version first, then updating password if ok.
+ *
+ * @param $user
+ * @param $password
+ * @return WP_Error|WP_User
+ */
+function gf_migrate_user_password($user, $password) {
+    $salt = 'd@uy/o%b^';
+    $passwordHash = $salt . md5($salt . $password);
+    $hasher = new PasswordHash(8, true);
+    if ($hasher->CheckPassword($passwordHash, $user->user_pass)) {
+        wp_set_password($password, $user->ID);
+        update_user_meta($user->ID, 'migrated', 2, 1);
+
+        return $user;
+    } else {
+        return new WP_Error('incorrect_password',
+            sprintf(
+            /* translators: %s: user name */
+                __('<strong>GREŠKA</strong>: Lozinka koju ste uneli za korisničko ime %s nije ispravna.'),
+                '<strong>' . $user->data->user_login . '</strong>'
+            ) .
+            ' <a href="' . wp_lostpassword_url() . '">' .
+            __('Izgubili ste lozinku?') .
+            '</a>'
+        );
+    }
+}
 
 add_action('validate_password_reset', 'gf_validate_password_reset', 10, 2);
 function gf_validate_password_reset($errors, $user)
