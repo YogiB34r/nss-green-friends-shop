@@ -515,54 +515,58 @@ function gf_cart_page_extra_buttons()
 }
 
 //Migrate comments from old site
-function gf_migrate_comments($array)
+function gf_migrate_comments()
 {
-    foreach ($array as $comment) {
-        $post = get_product_by_sku($comment->sku);
-        $postId = $post->get_id();
-        $user = get_user_by_email($comment->email);
-        $commentAuthor = $user->get('first_name') .' '. $user->get('last_name');
-        $commentAuthorEmail = $user->get('email');
-        $commentAuthorUrl = '';
-        $commentContent = $comment->content;
-        $commentType = '';
-        $commentParent = '';
-        $userId = $user->get('id');
-        $commentDate = $comment->date;
+    $rows = array_map('str_getcsv', file(__DIR__ . '/reviews.csv'));
+    $header = array_shift($rows);
+    $csv = array();
+    foreach ($rows as $row) {
+        $csv[] = array_combine($header, $row);
+    }
+    $successfulComments = [];
+    $emptySkus = [];
+    $emptyUsers = [];
+    foreach ($csv as $comment) {
+        $postId = wc_get_product_id_by_sku($comment['sku']);
+        if (!$postId) {
+            $emptySkus[] = $comment['sku'];
+            continue;
+        }
+        $user = get_user_by('email', $comment['Email']);
+        if (!$user) {
+            $emptyUsers[] = $comment['Email'];
+            continue;
+        }
+        $commentAuthor = $user->get('display_name');
+        $commentAuthorEmail = $user->get('user_email');
+        $commentAuthorUrl = $user->get('user_url');
+        $commentContent = $comment['comment'];
+        $userId = $user->get('ID');
+        $commentDate = $comment['date'];
 
 
         $data = array(
-            'comment_post_ID' => 1,
-            'comment_author' => 'admin',
-            'comment_author_email' => 'admin@admin.com',
-            'comment_author_url' => 'http://',
-            'comment_content' => 'content here',
-            'comment_type' => '',
-            'comment_parent' => 0,
-            'user_id' => 1,
-            'comment_author_IP' => '127.0.0.1',
-            'comment_agent' => 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.10) Gecko/2009042316 Firefox/3.0.10 (.NET CLR 3.5.30729)',
-            'comment_date' => '',
+            'comment_post_ID' => $postId,
+            'comment_author' => $commentAuthor,
+            'comment_author_email' => $commentAuthorEmail,
+            'comment_author_url' => $commentAuthorUrl,
+            'comment_content' => $commentContent,
+            'comment_date' => $commentDate,
+            'comment_date_gmt' => $commentDate,
             'comment_approved' => 1,
+            'user_id' => $userId,
         );
-        wp_insert_comment($data);
+        $comment_id = wp_insert_comment($data);
+        $successfulComments[] = $comment_id;
+        update_comment_meta($comment_id, 'migrated', '1');
+    } //foreach comments
 
-    }
+    $skuLogFile = fopen(LOG_PATH . '/skuLog.csv', 'w');
+    fwrite($skuLogFile, implode(',',$emptySkus));
+    fclose($skuLogFile);
 
-}
-function gf_test_comment(){
-    $data = array(
-        'comment_post_ID' => 422450,
-        'comment_author' => 'admin',
-        'comment_author_email' => 'admin@admin.com',
-        'comment_author_url' => 'http://www.catswhocode.com',
-        'comment_content' => 'Test Test Test',
-        'comment_author_IP' => '127.0.0.1',
-        'comment_agent' => 'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; fr; rv:1.9.2.3) Gecko/20100401 Firefox/3.6.3',
-        'comment_date' => date('Y-m-d H:i:s'),
-        'comment_date_gmt' => date('Y-m-d H:i:s'),
-        'comment_approved' => 1,
-    );
-
-    return $comment_id = wp_insert_comment($data);
+    $userLogFile = fopen(LOG_PATH . '/usersLog.csv', 'w');
+    fwrite($userLogFile, implode(',',$emptyUsers));
+    fclose($userLogFile);
+    echo '<p>Uspešno importovano ' . count($successfulComments) . ' komentara</p>';
 }
