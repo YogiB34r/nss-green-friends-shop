@@ -245,7 +245,7 @@ jQuery(document).ready(function () {
     var preventSearch = false, timer, searchQuery, delay = 300;
     jQuery(".gf-search-form").on('keyup', '.gf-search-box', function (e) {
         var _this = jQuery(this);
-    //     prevent further search when enter detected
+        //     prevent further search when enter detected
         if (e.keyCode === 13 || e.keyCode === 99) {
             preventSearch = true;
             return false;
@@ -347,42 +347,42 @@ jQuery(document).ready(function ($) {
     }
 
     function startSlider(selector) {
-        $(selector).on('init', function(slick) {
-            $('.gf-product-slider').css("visibility","visible");
+        $(selector).on('init', function (slick) {
+            $('.gf-product-slider').css("visibility", "visible");
         })
             .slick({
-            infinite: true,
-            // slidesToShow: gfSliderColumnCount,
-            slidesToShow: $(selector).parents('.gf-product-slider').data('sliderItemCount'),
-            // slidesToScroll: gfSliderColumnCount,
-            slidesToScroll: $(selector).parents('.gf-product-slider').data('sliderItemCount'),
-            arrows: false,
-            dots: false,
-            lazyLoad: 'ondemand',
-            responsive: [{
-                breakpoint: 1024,
-                settings: {
-                    slidesToShow: 3,
-                    slidesToScroll: 3,
-                    infinite: true
-                }
-            },
-                {
-                    breakpoint: 600,
+                infinite: true,
+                // slidesToShow: gfSliderColumnCount,
+                slidesToShow: $(selector).parents('.gf-product-slider').data('sliderItemCount'),
+                // slidesToScroll: gfSliderColumnCount,
+                slidesToScroll: $(selector).parents('.gf-product-slider').data('sliderItemCount'),
+                arrows: false,
+                dots: false,
+                lazyLoad: 'ondemand',
+                responsive: [{
+                    breakpoint: 1024,
                     settings: {
-                        slidesToShow: 2,
-                        slidesToScroll: 2
+                        slidesToShow: 3,
+                        slidesToScroll: 3,
+                        infinite: true
                     }
                 },
-                {
-                    breakpoint: 480,
-                    settings: {
-                        slidesToShow: 2,
-                        slidesToScroll: 2
+                    {
+                        breakpoint: 600,
+                        settings: {
+                            slidesToShow: 2,
+                            slidesToScroll: 2
+                        }
+                    },
+                    {
+                        breakpoint: 480,
+                        settings: {
+                            slidesToShow: 2,
+                            slidesToScroll: 2
+                        }
                     }
-                }
-            ]
-        });
+                ]
+            });
     }
 
     function hookSliderEvents() {
@@ -436,14 +436,18 @@ jQuery('.gf-archive-description-button').click(function () {
     jQuery('.gf-archive-description p').toggleClass('gf-display-category-description');
 });
 jQuery(document).ready(function ($) {
-    $('.tnp-email').attr('title','Ovo polje mora biti popunjeno').attr('onInvalid','this.setCustomValidity(\'Neispravna email adresa\')').attr('onInput','this.setCustomValidity(\'\')');
-    $('.tnp-privacy').attr('title','Da bi ste nastavili morate čekirati ovo polje').attr('onInvalid','this.setCustomValidity(\'Morate prihvatiti politiku privatnosti\')')
+    $('.tnp-email').attr('title', 'Ovo polje mora biti popunjeno').attr('onInvalid', 'this.setCustomValidity(\'Neispravna email adresa\')').attr('onInput', 'this.setCustomValidity(\'\')');
+    $('.tnp-privacy').attr('title', 'Da bi ste nastavili morate čekirati ovo polje').attr('onInvalid', 'this.setCustomValidity(\'Morate prihvatiti politiku privatnosti\')');
+    $('.tnp-privacy').attr('onchange', 'this.setCustomValidity(\'\')');
 });
+
 function showPassword() {
     var x = jQuery('#password');
     if (x.attr('type') === "password") {
         x.attr('type', "text");
     } else {
-        x.attr('type',  "password");
+        x.attr('type', "password");
     }
 }
+
+// this.setCustomValidity('')
