@@ -3509,3 +3509,7 @@ button[name='update_cart'] {
 #show-password-checkbox {
     margin-right: 5px;
 }
+
+.saved-sale{
+    color: #333 !important;
+}
