@@ -57,43 +57,43 @@ function gf_check_if_user_is_migrated($user, $password)
     return $user;
 }
 
-//remove_filter('authenticate', 'wp_authenticate_username_password');
-//
-//add_filter('authenticate', 'gf_authenticate_username_password', 20, 3);
-///**
-// * Remove Wordpress filer and write our own with changed error text.
-// */
-//function gf_authenticate_username_password($user, $username, $password)
-//{
-//
-//    if (is_a($user, 'WP_User'))
-//        return $user;
-//
-//    if (empty($username) || empty($password)) {
-//        if (is_wp_error($user))
-//            return $user;
-//
-//        $error = new WP_Error();
-//
-//        if (empty($username))
-//            return new WP_Error('invalid_username', sprintf(__('<strong>GREŠKA</strong>: Polje korisničko ime ne može biti prazno.'), wp_lostpassword_url()));
-//
-//        if (empty($password))
-//            return new WP_Error('invalid_username', sprintf(__('<strong>GREŠKA</strong>: Polje lozinka ne može biti prazno.'), wp_lostpassword_url()));
-//
-//        return $error;
-//    }
-//
-//    if (!$user)
-//        return new WP_Error('invalid_username', sprintf(__('<strong>GREŠKA</strong>: Nepostojeće korisničko ime ili email. <a href="%s" title="Lozinka izgubljena">Izgubili ste lozinku</a>?'), wp_lostpassword_url()));
-//
-//    $user = apply_filters('wp_authenticate_user', $user, $password);
-//
-//    if (is_wp_error($user))
-//        return $user;
-//
-//    return $user;
-//}
+remove_filter('authenticate', 'wp_authenticate_username_password');
+
+add_filter('authenticate', 'gf_authenticate_username_password', 20, 3);
+/**
+ * Remove Wordpress filer and write our own with changed error text.
+ */
+function gf_authenticate_username_password($user, $username, $password)
+{
+
+    if (is_a($user, 'WP_User'))
+        return $user;
+
+    if (empty($username) || empty($password)) {
+        if (is_wp_error($user))
+            return $user;
+
+        $error = new WP_Error();
+
+        if (empty($username))
+            return new WP_Error('invalid_username', sprintf(__('<strong>GREŠKA</strong>: Polje korisničko ime ne može biti prazno.'), wp_lostpassword_url()));
+
+        if (empty($password))
+            return new WP_Error('invalid_username', sprintf(__('<strong>GREŠKA</strong>: Polje lozinka ne može biti prazno.'), wp_lostpassword_url()));
+
+        return $error;
+    }
+
+    if (!$user)
+        return new WP_Error('invalid_username', sprintf(__('<strong>GREŠKA</strong>: Nepostojeće korisničko ime ili email. <a href="%s" title="Lozinka izgubljena">Izgubili ste lozinku</a>?'), wp_lostpassword_url()));
+
+    $user = apply_filters('wp_authenticate_user', $user, $password);
+
+    if (is_wp_error($user))
+        return $user;
+
+    return $user;
+}
 
 
 add_action('validate_password_reset', 'gf_validate_password_reset', 10, 2);
