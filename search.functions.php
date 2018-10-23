@@ -83,6 +83,10 @@ function parse_search_category_aggregation(\Elastica\ResultSet $resultSet) {
     foreach ($resultSet->getAggregation('category')['buckets'] as $bucket) {
         $counts[$bucket['key']] = $bucket['doc_count'];
     }
+    $catIds = array_keys($counts);
+    if (count($catIds) === 0) {
+        return [];
+    }
 
     $args = array(
         'taxonomy'     => 'product_cat',
