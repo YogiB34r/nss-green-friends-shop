@@ -475,6 +475,9 @@ function gf_cart_refresh_update_qty()
             jQuery('div.woocommerce').on('click', 'input.qty', function () {
                 jQuery("[name='update_cart']").trigger("click");
             });
+            jQuery('div.woocommerce').on('change', 'input.qty', function () {
+                jQuery("[name='update_cart']").trigger("click");
+            });
         </script>
         <?php
     }

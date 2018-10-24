@@ -3517,3 +3517,6 @@ button[name='update_cart'] {
 .widget_gf_newsletter_widget h2 {
     width: 50% !important;
 }
+.woocommerce-cart .woocommerce-shipping-destination{
+    display: none !important;
+}
