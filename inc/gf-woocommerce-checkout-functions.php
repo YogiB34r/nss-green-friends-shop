@@ -166,3 +166,8 @@ function woo_custom_order_formatted_billing_address($address, $order)
 ////    $order = wc_get_order( $order_id );
 ////    var_dump($order);
 //}
+add_action( 'woocommerce_thankyou', 'bbloomer_add_content_thankyou' );
+
+function bbloomer_add_content_thankyou() {
+    echo 'purchase! Come back and use the code "<strong>Back4More</strong>" to receive a 20% discount on your next purchase!</p>';
+}

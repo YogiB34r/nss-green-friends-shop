@@ -574,3 +574,10 @@ function gf_migrate_comments()
     fclose($userLogFile);
     echo '<p>Uspešno importovano ' . count($successfulComments) . ' komentara</p>';
 }
+
+
+function gf_unrequire_wc_state_field( $fields ) {
+    $fields['shipping_state']['required'] = false;
+    return $fields;
+}
+add_filter( 'woocommerce_shipping_fields', 'gf_unrequire_wc_state_field' );
