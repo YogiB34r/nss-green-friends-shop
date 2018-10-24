@@ -1905,9 +1905,16 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title {
     .gf-navigation-wrapper > .gf-my-account {
         display: none;
     }
-
-    .gf-radio-search-wrapper {
-        display: none;
+    .gf-radio-search-wrapper{
+        margin-bottom: 10px;
+    }
+    .gf-radio-search-wrapper form{
+        display: flex;
+        max-width: 95%;
+        margin: auto;
+    }
+    .gf-search-radio-button-wrapper-mobile{
+        margin-right: 15px;
     }
 
     .gf-radio-search-wrapper--mobile {

@@ -581,3 +581,4 @@ function gf_unrequire_wc_state_field( $fields ) {
     return $fields;
 }
 add_filter( 'woocommerce_shipping_fields', 'gf_unrequire_wc_state_field' );
+
