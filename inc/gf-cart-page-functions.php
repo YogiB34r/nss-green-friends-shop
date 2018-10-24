@@ -20,26 +20,26 @@ function gf_cart_display_seller_info()
 }
 
 
-///*
-// * Display total cart weight on cart & order page
-// */
-//add_action('woocommerce_review_order_before_shipping', 'bbloomer_print_cart_weight');
-//add_action('woocommerce_cart_totals_before_shipping', 'bbloomer_print_cart_weight');
-//function bbloomer_print_cart_weight($posted)
-//{
-//    global $woocommerce;
-//    $html =
-//        '<tr class="shipping">
-//			<th>' . __('Težina korpe') . '</th>
-//				<td data-title="Tezina">
-//					<span class="woocommerce-Price-amount amount">' . $woocommerce->cart->cart_contents_weight . '<span class="woocommerce-Price-currencySymbol">' . get_option('woocommerce_weight_unit') . '</span></span>
-//				</td>
-//		</tr>';
-//
-//    if (is_cart() or is_checkout()) {
-//        echo $html;
-//    }
-//}
+/*
+ * Display total cart weight on cart & order page
+ */
+add_action('woocommerce_review_order_before_shipping', 'bbloomer_print_cart_weight');
+add_action('woocommerce_cart_totals_before_shipping', 'bbloomer_print_cart_weight');
+function bbloomer_print_cart_weight($posted)
+{
+    global $woocommerce;
+    $html =
+        '<tr class="shipping">
+			<th>' . __('Težina korpe') . '</th>
+				<td data-title="Tezina">
+					<span class="woocommerce-Price-amount amount">' . $woocommerce->cart->cart_contents_weight . '<span class="woocommerce-Price-currencySymbol">' . get_option('woocommerce_weight_unit') . '</span></span>
+				</td>
+		</tr>';
+
+    if (is_cart() or is_checkout()) {
+        echo $html;
+    }
+}
 
 
 remove_action('woocommerce_proceed_to_checkout', 'woocommerce_button_proceed_to_checkout', 20);
@@ -93,99 +93,99 @@ function gf_translate_shipping($name, $package)
     return 'Dostava';
 }
 
-//add_filter('woocommerce_shipping_package_name', 'gf_translate_shipping', 10, 3);
-//
-///**
-//  * Display shipping category and price
-//  */
-//add_filter('woocommerce_package_rates', 'bbloomer_woocommerce_tiered_shipping', 10, 2);
-//function bbloomer_woocommerce_tiered_shipping($rates, $package)
-//{
-//    if (WC()->cart->cart_contents_weight <= 0.5) {
-//        if (isset($rates['flat_rate:3']))
-//            unset(
-//                $rates['flat_rate:4'],
-//                $rates['flat_rate:5'],
-//                $rates['flat_rate:6'],
-//                $rates['flat_rate:7'],
-//                $rates['flat_rate:8'],
-//                $rates['flat_rate:9'],
-//                $rates['flat_rate:10']);
-//    } elseif (WC()->cart->cart_contents_weight > 0.5 and WC()->cart->cart_contents_weight <= 2) {
-//        if (isset($rates['flat_rate:4']))
-//            unset(
-//                $rates['flat_rate:3'],
-//                $rates['flat_rate:5'],
-//                $rates['flat_rate:6'],
-//                $rates['flat_rate:7'],
-//                $rates['flat_rate:8'],
-//                $rates['flat_rate:9'],
-//                $rates['flat_rate:10']);
-//    } elseif (WC()->cart->cart_contents_weight > 2 and WC()->cart->cart_contents_weight <= 5) {
-//        if (isset($rates['flat_rate:5']))
-//            unset(
-//                $rates['flat_rate:3'],
-//                $rates['flat_rate:4'],
-//                $rates['flat_rate:6'],
-//                $rates['flat_rate:7'],
-//                $rates['flat_rate:8'],
-//                $rates['flat_rate:9'],
-//                $rates['flat_rate:10']);
-//    } elseif (WC()->cart->cart_contents_weight > 5 and WC()->cart->cart_contents_weight <= 10) {
-//        if (isset($rates['flat_rate:6']))
-//            unset(
-//                $rates['flat_rate:3'],
-//                $rates['flat_rate:4'],
-//                $rates['flat_rate:5'],
-//                $rates['flat_rate:7'],
-//                $rates['flat_rate:8'],
-//                $rates['flat_rate:9'],
-//                $rates['flat_rate:10']);
-//    } elseif (WC()->cart->cart_contents_weight > 10 and WC()->cart->cart_contents_weight <= 20) {
-//        if (isset($rates['flat_rate:7']))
-//            unset(
-//                $rates['flat_rate:3'],
-//                $rates['flat_rate:4'],
-//                $rates['flat_rate:5'],
-//                $rates['flat_rate:6'],
-//                $rates['flat_rate:8'],
-//                $rates['flat_rate:9'],
-//                $rates['flat_rate:10']);
-//    } elseif (WC()->cart->cart_contents_weight > 20 and WC()->cart->cart_contents_weight <= 30) {
-//        if (isset($rates['flat_rate:8']))
-//            unset(
-//                $rates['flat_rate:3'],
-//                $rates['flat_rate:4'],
-//                $rates['flat_rate:5'],
-//                $rates['flat_rate:6'],
-//                $rates['flat_rate:7'],
-//                $rates['flat_rate:9'],
-//                $rates['flat_rate:10']);
-//    } elseif (WC()->cart->cart_contents_weight > 30 and WC()->cart->cart_contents_weight <= 50) {
-//        if (isset($rates['flat_rate:9']))
-//            unset(
-//                $rates['flat_rate:3'],
-//                $rates['flat_rate:4'],
-//                $rates['flat_rate:5'],
-//                $rates['flat_rate:6'],
-//                $rates['flat_rate:7'],
-//                $rates['flat_rate:8'],
-//                $rates['flat_rate:10']);
-//    } elseif (WC()->cart->cart_contents_weight > 50) {
-//        if (isset($rates['flat_rate:10'])) {
-//            $cartWeight = WC()->cart->cart_contents_weight;
-//            $myExtraWeight = $cartWeight - 50;
-//            $myNewPrice = 500 + (10 * $myExtraWeight);
-//            $rates['flat_rate:10']->set_cost($myNewPrice);
-//            unset(
-//                $rates['flat_rate:3'],
-//                $rates['flat_rate:4'],
-//                $rates['flat_rate:5'],
-//                $rates['flat_rate:6'],
-//                $rates['flat_rate:7'],
-//                $rates['flat_rate:8'],
-//                $rates['flat_rate:9']);
-//        }
-//    }
-//    return $rates;
-//}
+add_filter('woocommerce_shipping_package_name', 'gf_translate_shipping', 10, 3);
+
+/**
+  * Display shipping category and price
+  */
+add_filter('woocommerce_package_rates', 'bbloomer_woocommerce_tiered_shipping', 10, 2);
+function bbloomer_woocommerce_tiered_shipping($rates, $package)
+{
+    if (WC()->cart->cart_contents_weight <= 0.5) {
+        if (isset($rates['flat_rate:3']))
+            unset(
+                $rates['flat_rate:4'],
+                $rates['flat_rate:5'],
+                $rates['flat_rate:6'],
+                $rates['flat_rate:7'],
+                $rates['flat_rate:8'],
+                $rates['flat_rate:9'],
+                $rates['flat_rate:10']);
+    } elseif (WC()->cart->cart_contents_weight > 0.5 and WC()->cart->cart_contents_weight <= 2) {
+        if (isset($rates['flat_rate:4']))
+            unset(
+                $rates['flat_rate:3'],
+                $rates['flat_rate:5'],
+                $rates['flat_rate:6'],
+                $rates['flat_rate:7'],
+                $rates['flat_rate:8'],
+                $rates['flat_rate:9'],
+                $rates['flat_rate:10']);
+    } elseif (WC()->cart->cart_contents_weight > 2 and WC()->cart->cart_contents_weight <= 5) {
+        if (isset($rates['flat_rate:5']))
+            unset(
+                $rates['flat_rate:3'],
+                $rates['flat_rate:4'],
+                $rates['flat_rate:6'],
+                $rates['flat_rate:7'],
+                $rates['flat_rate:8'],
+                $rates['flat_rate:9'],
+                $rates['flat_rate:10']);
+    } elseif (WC()->cart->cart_contents_weight > 5 and WC()->cart->cart_contents_weight <= 10) {
+        if (isset($rates['flat_rate:6']))
+            unset(
+                $rates['flat_rate:3'],
+                $rates['flat_rate:4'],
+                $rates['flat_rate:5'],
+                $rates['flat_rate:7'],
+                $rates['flat_rate:8'],
+                $rates['flat_rate:9'],
+                $rates['flat_rate:10']);
+    } elseif (WC()->cart->cart_contents_weight > 10 and WC()->cart->cart_contents_weight <= 20) {
+        if (isset($rates['flat_rate:7']))
+            unset(
+                $rates['flat_rate:3'],
+                $rates['flat_rate:4'],
+                $rates['flat_rate:5'],
+                $rates['flat_rate:6'],
+                $rates['flat_rate:8'],
+                $rates['flat_rate:9'],
+                $rates['flat_rate:10']);
+    } elseif (WC()->cart->cart_contents_weight > 20 and WC()->cart->cart_contents_weight <= 30) {
+        if (isset($rates['flat_rate:8']))
+            unset(
+                $rates['flat_rate:3'],
+                $rates['flat_rate:4'],
+                $rates['flat_rate:5'],
+                $rates['flat_rate:6'],
+                $rates['flat_rate:7'],
+                $rates['flat_rate:9'],
+                $rates['flat_rate:10']);
+    } elseif (WC()->cart->cart_contents_weight > 30 and WC()->cart->cart_contents_weight <= 50) {
+        if (isset($rates['flat_rate:9']))
+            unset(
+                $rates['flat_rate:3'],
+                $rates['flat_rate:4'],
+                $rates['flat_rate:5'],
+                $rates['flat_rate:6'],
+                $rates['flat_rate:7'],
+                $rates['flat_rate:8'],
+                $rates['flat_rate:10']);
+    } elseif (WC()->cart->cart_contents_weight > 50) {
+        if (isset($rates['flat_rate:10'])) {
+            $cartWeight = WC()->cart->cart_contents_weight;
+            $myExtraWeight = $cartWeight - 50;
+            $myNewPrice = 500 + (10 * $myExtraWeight);
+            $rates['flat_rate:10']->set_cost($myNewPrice);
+            unset(
+                $rates['flat_rate:3'],
+                $rates['flat_rate:4'],
+                $rates['flat_rate:5'],
+                $rates['flat_rate:6'],
+                $rates['flat_rate:7'],
+                $rates['flat_rate:8'],
+                $rates['flat_rate:9']);
+        }
+    }
+    return $rates;
+}
