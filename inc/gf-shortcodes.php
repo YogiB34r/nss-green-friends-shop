@@ -159,7 +159,7 @@ function gf_mobile_search_form()
         <div class="gf-autocomplete-results suggesstion-box suggesstion-box-mobile"></div>
     </div>
 </form>
-<div class="gf-radio-search-wrapper">
+<div class="gf-radio-search-wrapper-mobile">
     <?php if (get_queried_object() && is_product_category()): ?>
         <form>
             <div class="gf-search-radio-button-wrapper-mobile">

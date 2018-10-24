@@ -1870,6 +1870,10 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title {
 .gf-footer-section{
     padding: 0;
 }
+.gf-radio-search-wrapper-mobile{
+    display: none;
+    color: #f45411;
+}
 @media only screen and (max-width: 767px) {
     .woocommerce ul.products li.product, .woocommerce-page ul.products li.product {
         width: 46% !important;
@@ -1905,10 +1909,11 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title {
     .gf-navigation-wrapper > .gf-my-account {
         display: none;
     }
-    .gf-radio-search-wrapper{
+    .gf-radio-search-wrapper-mobile{
         margin-bottom: 10px;
+        display: block;
     }
-    .gf-radio-search-wrapper form{
+    .gf-radio-search-wrapper-mobile form{
         display: flex;
         max-width: 95%;
         margin: auto;
