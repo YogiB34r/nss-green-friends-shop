@@ -450,4 +450,22 @@ function showPassword() {
     }
 }
 
-// this.setCustomValidity('')
+jQuery(document).ready(function ($) {
+    if ($('#search-radiobutton-cat').is(':checked')) {
+        $('.s-radio-btn-1').addClass("color-orange");
+        $('.s-radio-btn-2').removeClass("color-orange");
+    }
+
+    $('#search-radiobutton-main').click(function () {
+        if ($(this).is(':checked')) {
+            $('.s-radio-btn-2').addClass("color-orange");
+            $('.s-radio-btn-1').removeClass("color-orange");
+        }
+    });
+    $('#search-radiobutton-cat').click(function () {
+        if ($(this).is(':checked')) {
+            $('.s-radio-btn-1').addClass("color-orange");
+            $('.s-radio-btn-2').removeClass("color-orange");
+        }
+    });
+});
