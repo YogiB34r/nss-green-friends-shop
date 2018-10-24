@@ -2206,7 +2206,6 @@ body.single-product .product .entry-summary a.button.product_type_variable {
 
 .tnp-email, .tnp-submit {
     width: 50% !important;
-    float: left;!important;
 }
 
 .tnp-submit {
@@ -3514,9 +3513,7 @@ button[name='update_cart'] {
 .saved-sale{
     color: #333 !important;
 }
-.widget_gf_newsletter_widget h2 {
-    width: 50% !important;
-}
+
 .woocommerce-cart .woocommerce-shipping-destination{
     display: none !important;
 }
