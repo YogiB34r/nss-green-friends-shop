@@ -40,7 +40,7 @@ function gf_order_fields($fields)
         "billing_address_2",
         "billing_city",
         "billing_postcode",
-        "billing_country",
+//        "billing_country",
         "billing_email",
         "billing_phone"
 
@@ -105,23 +105,24 @@ function gf_checkbox_for_company()
     }
 }
 
-add_action( 'woocommerce_order_details_after_order_table', 'nolo_custom_field_display_cust_order_meta', 10, 1 );
+add_action('woocommerce_order_details_after_order_table', 'nolo_custom_field_display_cust_order_meta', 10, 1);
 
-function nolo_custom_field_display_cust_order_meta($order){
+function nolo_custom_field_display_cust_order_meta($order)
+{
     $value = get_post_meta($order->get_id(), '_billing_pib', true);
     if (empty($value)) {
         return;
     }
 
-    echo '<p><strong>'._('Kompanija').':</strong> ' . $order->get_billing_company(). '</p>';
-    echo '<p><strong>'._('PIB').':</strong> ' . $value. '</p>';
+    echo '<p><strong>' . _('Kompanija') . ':</strong> ' . $order->get_billing_company() . '</p>';
+    echo '<p><strong>' . _('PIB') . ':</strong> ' . $value . '</p>';
 }
 
 
+add_filter('woocommerce_order_formatted_billing_address', 'woo_custom_order_formatted_billing_address', 10, 2);
 
-add_filter( 'woocommerce_order_formatted_billing_address' , 'woo_custom_order_formatted_billing_address', 10, 2 );
-
-function woo_custom_order_formatted_billing_address( $address, $order ){
+function woo_custom_order_formatted_billing_address($address, $order)
+{
 //    $order = new WC_Order($order);
 
     $address = array(
@@ -135,3 +136,33 @@ function woo_custom_order_formatted_billing_address( $address, $order ){
 
     return $address;
 }
+
+
+//add_action('woocommerce_review_order_before_submit', 'gf_add_newsletter_checkbox_on_checkout');
+//function gf_add_newsletter_checkbox_on_checkout()
+//{
+//    echo '<input type="checkbox" name="gf_newsletter_checkout" checked><lable>Želim da primam obaveštenja o specijalnim promocijama na email</lable>';
+//}
+
+//
+//add_action('woocommerce_review_order_after_submit', 'my_test_f');
+//function my_test_f()
+//{
+//    $array = [];
+//    $parse = parse_str($_POST['post_data'], $array);
+//    if (is_user_logged_in()) {
+//        $user_email = wp_get_current_user()->user_email;
+//    } else {
+//
+//        $user_email = $array['billing_email'];
+//    }
+////    var_dump($_POST);
+////    TNP::subscribe(['email'=>'emailsometest@address.com', 'status' => 'C']);
+//}
+//add_action( 'woocommerce_checkout_process', 'action_woocommerce_checkout_process', 10, 1 );
+//function action_woocommerce_checkout_process($order_id){
+////    var_dump($_POST);
+////        die();
+////    $order = wc_get_order( $order_id );
+////    var_dump($order);
+//}
