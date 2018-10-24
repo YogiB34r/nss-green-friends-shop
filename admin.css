@@ -66,3 +66,45 @@ GF SORTABLE CATEGORIES
 .ui-icon {
     float: right;
 }
+
+/*ORDERS*/
+.order-status{
+    font-weight: bold !important;
+}
+.order-status.status-cekaseuplata,
+.order-status.status-finalizovano{
+    background-color: #5b841b !important;
+    color: #fff !important;
+}
+
+.order-status.status-u-pripremi,
+.order-status.status-u-pripremiplaceno{
+    background-color: yellow !important;
+    color: #000 !important;
+}
+
+.order-status.status-naruceno,
+.order-status.status-spz-pakovanje,
+.order-status.status-spz-slanje{
+    background-color: #80B0FF !important;
+    color: #fff !important;
+}
+
+.order-status.status-poslato{
+    background-color: #FFA3A3   !important;
+    color: #fff !important;
+}
+
+.order-status.status-isporuceno{
+    background-color: #005CF3 !important;
+    color: #fff !important;
+}
+
+.order-status.status-reklamacija,
+.order-status.status-reklamacija-pnns,
+.order-status.status-stornirano,
+.order-status.status-stornirano-pn,
+.order-status.status-vracena-posiljka{
+    background-color: #D50000 !important;
+    color: #fff !important;
+}
