@@ -13,10 +13,6 @@
 
 <body <?php body_class(); ?>>
 <div id="page" class="hfeed site">
-    <?php
-//    $array = WC_Checkout::get_posted_data();
-//    var_dump($array);
-    ?>
     <header id="masthead" class="site-header" role="banner">
         <div class="container-fluid container--navigation">
             <div class="gf-top-bar">
