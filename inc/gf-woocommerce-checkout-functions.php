@@ -40,7 +40,7 @@ function gf_order_fields($fields)
         "billing_address_2",
         "billing_city",
         "billing_postcode",
-//        "billing_country",
+        "billing_country",
         "billing_email",
         "billing_phone"
 
