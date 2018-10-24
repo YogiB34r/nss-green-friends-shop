@@ -138,36 +138,32 @@ function woo_custom_order_formatted_billing_address($address, $order)
 }
 
 
-//add_action('woocommerce_review_order_before_submit', 'gf_add_newsletter_checkbox_on_checkout');
-//function gf_add_newsletter_checkbox_on_checkout()
-//{
-//    echo '<input type="checkbox" name="gf_newsletter_checkout" checked><lable>Želim da primam obaveštenja o specijalnim promocijama na email</lable>';
-//}
+add_action('woocommerce_review_order_before_submit', 'gf_add_newsletter_checkbox_on_checkout');
+function gf_add_newsletter_checkbox_on_checkout($checkout)
+{
+    woocommerce_form_field('gf_newsletter_checkout', array(
+        'type' => 'checkbox',
+        'class' => array('input-checkbox'),
+        'label' => __('Želim da primam obaveštenja o specijalnim promocijama na email'),
+        'required' => false,
+    ), true);
+}
 
-//
-//add_action('woocommerce_review_order_after_submit', 'my_test_f');
-//function my_test_f()
-//{
-//    $array = [];
-//    $parse = parse_str($_POST['post_data'], $array);
-//    if (is_user_logged_in()) {
-//        $user_email = wp_get_current_user()->user_email;
-//    } else {
-//
-//        $user_email = $array['billing_email'];
-//    }
-////    var_dump($_POST);
-////    TNP::subscribe(['email'=>'emailsometest@address.com', 'status' => 'C']);
-//}
-//add_action( 'woocommerce_checkout_process', 'action_woocommerce_checkout_process', 10, 1 );
-//function action_woocommerce_checkout_process($order_id){
-////    var_dump($_POST);
-////        die();
-////    $order = wc_get_order( $order_id );
-////    var_dump($order);
-//}
-//add_action( 'woocommerce_thankyou', 'bbloomer_add_content_thankyou' );
-//
-//function bbloomer_add_content_thankyou() {
-//    echo 'purchase! Come back and use the code "<strong>Back4More</strong>" to receive a 20% discount on your next purchase!</p>';
-//}
+add_action('woocommerce_checkout_update_order_meta', 'my_custom_checkout_field_update_order_meta');
+
+function my_custom_checkout_field_update_order_meta($order_id)
+{
+    if ($_POST['gf_newsletter_checkout']) update_post_meta($order_id, 'gf_newsletter_checkout', esc_attr($_POST['gf_newsletter_checkout']));
+}
+
+add_action('woocommerce_thankyou', 'my_test_f', 10, 1);
+function my_test_f($orderid)
+{
+    $order = wc_get_order($orderid);
+    $email = $order->get_billing_email();
+    $newsletter_value = $order->get_meta('gf_newsletter_checkout', true);
+
+    if ($newsletter_value == 1) {
+        TNP::subscribe(['email' => $email, 'status' => 'C']);
+    }
+}
