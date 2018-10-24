@@ -22,8 +22,8 @@ function gf_cart_display_seller_info() {
 /*
  * Display total cart weight on cart & order page
  */
-add_action('woocommerce_review_order_before_shipping', 'bbloomer_print_cart_weight');
-add_action('woocommerce_cart_totals_before_shipping', 'bbloomer_print_cart_weight');
+add_action('woocommerce_review_order_before_shipping', 'bbloomer_print_cart_weight', 1);
+add_action('woocommerce_cart_totals_before_shipping', 'bbloomer_print_cart_weight', 1);
 function bbloomer_print_cart_weight($posted) {
     global $woocommerce;
     $html =
