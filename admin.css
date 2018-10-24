@@ -68,6 +68,11 @@ GF SORTABLE CATEGORIES
 }
 
 /*ORDERS*/
+
+.post-type-shop_order .wp-list-table .column-order_status {
+    width: 10ch !important;
+}
+
 .order-status{
     font-weight: bold !important;
 }
@@ -107,4 +112,9 @@ GF SORTABLE CATEGORIES
 .order-status.status-vracena-posiljka{
     background-color: #D50000 !important;
     color: #fff !important;
+}
+
+.gf-admin-phone-order .checkbox{
+    margin-top: 20px;
+    font-size: 18px;
 }
