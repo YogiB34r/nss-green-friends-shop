@@ -88,11 +88,6 @@ if ($printMenu) {
 
 
 function printOrder(WC_Order $order) {
-
-
-    $pdv = 1.2;
-    var_dump($order->get_shipping_total());
-    var_dump($order->get_shipping_total() / $pdv);
 ?>
     <style>
         .gf-print-bill-wrapper{
