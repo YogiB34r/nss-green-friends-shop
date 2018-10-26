@@ -1873,6 +1873,7 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title {
 .gf-radio-search-wrapper-mobile{
     display: none;
     color: #333;
+    padding-left: 10px;
 }
 .color-orange{
     color: #f45411;
