@@ -249,5 +249,24 @@ jQuery(document).ready(function ($) {
         jQuery('.gf-admin-orders-pib-field').hide();
     })
 
+
+
+
+    //Add new product page, required fields
+    jQuery('.post-type-product #title').attr('required', true);
+    jQuery('.post-type-product #titlewrap').attr('class', 'required');
+
+    jQuery('.post-type-product #postdivrich').attr('class', 'required');
+    jQuery('.post-type-product #product_catdiv h2 span').attr('class', 'required');
+    jQuery('.post-type-product #postimagediv h2 span').attr('class', 'required');
+    jQuery('.post-type-product #postimagediv h2 span').attr('class', 'required');
+    jQuery('.post-type-product ._regular_price_field label').attr('class', 'required-price');
+
+
+
+
+
+
+
 });
 

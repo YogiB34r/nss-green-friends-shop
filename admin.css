@@ -118,3 +118,16 @@ GF SORTABLE CATEGORIES
     margin-top: 20px;
     font-size: 18px;
 }
+
+.required:before {
+    content:"*";
+    color:red;
+    font-size: 24px;
+    display: block;
+    text-align: right;
+}
+.required-price:after{
+    content:" *";
+    color:red;
+    font-size: 24px;
+}
