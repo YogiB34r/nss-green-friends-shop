@@ -716,3 +716,20 @@ function gf_get_products_without_image(){
 }
 
 
+
+add_filter('manage_edit-shop_order_columns', 'gf_add_order_print');
+function gf_add_order_print($order_columns) {
+    $order_columns['test'] = "Test";
+
+    return $order_columns;
+}
+
+add_action('manage_shop_order_posts_custom_column' , 'gf_get_order_print_url');
+function gf_get_order_print_url($colname) {
+    global $the_order;
+
+    if( $colname == 'test' ) {
+        echo '<a href="/back-ajax/?action=printOrder&id='. $the_order->get_id() .'" title="Print" target="_blank">Print</a>';
+//        echo $the_order->get_meta('gf_order_created_method');
+    }
+}
