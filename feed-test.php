@@ -91,6 +91,8 @@ function renderActions1() {
 }
 
 function gf_start_import1($wpdb, $supplierId, $offset = 0, $limit = 100) {
+
+
     $httpClient = new \GuzzleHttp\Client();
     $redis = new Redis();
     $redis->connect(REDIS_HOST);
@@ -98,6 +100,9 @@ function gf_start_import1($wpdb, $supplierId, $offset = 0, $limit = 100) {
 
     $key = 'importFeedQueue:' . SUPPLIERS[$supplierId]['name'] .':';
     $importer = new Nss\Feed\Importer($redis, $wpdb, $httpClient, $key);
+
+    var_dump($importer->getCount());
+
     return $importer->importItems($offset, $limit);
 }
 
