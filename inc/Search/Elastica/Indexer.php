@@ -2,15 +2,16 @@
 
 namespace GF\Search\Elastica;
 
+use GF\Search\Elastica\Config\ConfigInterface;
+
 class Indexer
 {
-    static function index(\Elastica\Client $elasticaClient)
+    static function index(\Elastica\Client $elasticaClient, ConfigInterface $config)
     {
         global $wpdb;
-        ini_set('max_execution_time', '600');
+        ini_set('max_execution_time', '1200');
 
-        $elasticaIndex = $elasticaClient->getIndex('nss');
-        $elasticaType = $elasticaIndex->getType('products');
+        $elasticaType = $elasticaClient->getIndex($config->getIndex())->getType($config->getType());
 //        $perPage = 500;
         $perPage = 50;
 
@@ -47,7 +48,6 @@ class Indexer
                 } catch (\Exception $e) {
                     var_dump($e->getMessage());
                 }
-
             }
         }
         echo 'sync complete';

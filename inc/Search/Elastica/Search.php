@@ -30,7 +30,7 @@ class Search
     {
         $this->client = $elasticaClient;
         $this->search = new \Elastica\Search($elasticaClient);
-        $this->search->addIndex('nss')->addType('products');
+        $this->search->addIndex('product')->addType('product');
     }
 
     public function category($categoryId, $keywords = null, $limit = 0, $currentPage = 1, $order = '')

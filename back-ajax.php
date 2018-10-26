@@ -22,8 +22,10 @@ $config = array(
 
 //include(__DIR__ . "/inc/Search/Elastica/Search.php");
 include(__DIR__ . "/inc/Search/Elastica/Indexer.php");
-include(__DIR__ . "/inc/Search/Elastica/SetupProducts.php");
-include(__DIR__ . "/inc/Search/Elastica/SetupTerms.php");
+include(__DIR__ . "/inc/Search/Elastica/Config/ConfigInterface.php");
+include(__DIR__ . "/inc/Search/Elastica/Config/Product.php");
+include(__DIR__ . "/inc/Search/Elastica/Config/Term.php");
+include(__DIR__ . "/inc/Search/Elastica/Setup.php");
 
 if (isset($_GET['action'])) {
     $config = array(
@@ -34,11 +36,12 @@ if (isset($_GET['action'])) {
 
     switch ($_GET['action']) {
         case 'createIndex':
-            $products = new \GF\Search\Elastica\SetupProducts($elasticaClient);
-            $terms = new \GF\Search\Elastica\SetupTerms($elasticaClient);
+//            $products = new \GF\Search\Elastica\SetupProducts($elasticaClient);
+            $productSetup = new \GF\Search\Elastica\Setup($elasticaClient, new \GF\Search\Elastica\Config\Product());
+            $termSetup = new \GF\Search\Elastica\Setup($elasticaClient, new \GF\Search\Elastica\Config\Term());
             $recreate = true;
-//            $products->createIndex($recreate);
-            $terms->createIndex($recreate);
+            $productSetup->createIndex($recreate);
+            $termSetup->createIndex($recreate);
 
             break;
 
@@ -51,7 +54,7 @@ if (isset($_GET['action'])) {
             break;
 
         case 'syncIndex':
-            \GF\Search\Elastica\Indexer::index($elasticaClient);
+            \GF\Search\Elastica\Indexer::index($elasticaClient, new \GF\Search\Elastica\Config\Product());
 
             break;
     }
