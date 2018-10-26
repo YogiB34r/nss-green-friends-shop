@@ -1870,6 +1870,13 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title {
 .gf-footer-section{
     padding: 0;
 }
+.gf-radio-search-wrapper-mobile{
+    display: none;
+    color: #333;
+}
+.color-orange{
+    color: #f45411;
+}
 @media only screen and (max-width: 767px) {
     .woocommerce ul.products li.product, .woocommerce-page ul.products li.product {
         width: 46% !important;
@@ -1905,9 +1912,20 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title {
     .gf-navigation-wrapper > .gf-my-account {
         display: none;
     }
-
-    .gf-radio-search-wrapper {
+    .gf-radio-search-wrapper-mobile{
+        margin-bottom: 10px;
+        display: block;
+    }
+    .gf-radio-search-wrapper{
         display: none;
+    }
+    .gf-radio-search-wrapper-mobile form{
+        display: flex;
+        max-width: 95%;
+        margin: auto;
+    }
+    .gf-search-radio-button-wrapper-mobile{
+        margin-right: 15px;
     }
 
     .gf-radio-search-wrapper--mobile {
@@ -2206,7 +2224,6 @@ body.single-product .product .entry-summary a.button.product_type_variable {
 
 .tnp-email, .tnp-submit {
     width: 50% !important;
-    float: left;!important;
 }
 
 .tnp-submit {
@@ -2964,7 +2981,7 @@ ul.products.columns-4.list li > .price {
 }
 
 .gf-radio-search-wrapper label {
-    color: #f45411;
+    /*color: #f45411;*/
     cursor: pointer;
 }
 
@@ -3354,6 +3371,7 @@ p.woocommerce-thankyou-order-received {
 
 .gf-search-radio-button-wrapper {
     display: inline-flex;
+    margin-right: 15px;
 }
 
 @media only screen and (min-width: 768px) and (max-width: 1023px) {
@@ -3514,6 +3532,8 @@ button[name='update_cart'] {
 .saved-sale{
     color: #333 !important;
 }
-.widget_gf_newsletter_widget h2 {
-    width: 50% !important;
+
+.woocommerce-cart .woocommerce-shipping-destination{
+    display: none !important;
 }
+

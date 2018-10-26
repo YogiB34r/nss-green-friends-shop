@@ -159,16 +159,16 @@ function gf_mobile_search_form()
         <div class="gf-autocomplete-results suggesstion-box suggesstion-box-mobile"></div>
     </div>
 </form>
-<div class="gf-radio-search-wrapper">
+<div class="gf-radio-search-wrapper-mobile">
     <?php if (get_queried_object() && is_product_category()): ?>
         <form>
-            <div class="gf-search-radio-button-wrapper-mobile">
-                <input class="search-radio-box" type="radio" id="search-radiobutton-cat" name="search-radiobutton" checked="checked" value="category" />
-                <label for="search-radiobutton-cat"><?= get_queried_object()->name ?></label>
+            <div class="gf-search-radio-button-wrapper s-radio-btn-1">
+                <input class="search-radio-box " type="radio" id="search-radiobutton-cat" name="search-radiobutton" checked="checked" value="category" />
+                <label for="search-radiobutton-cat "><?= get_queried_object()->name ?></label>
             </div>
-            <div class="gf-search-radio-button-wrapper-mobile">
+            <div class="gf-search-radio-button-wrapper s-radio-btn-2">
                 <input class="search-radio-box" type="radio" id="search-radiobutton-main" name="search-radiobutton" value="shop" />
-                <label for="search-radiobutton-main">Pretraga celog sajta</label>
+                <label for="search-radiobutton-main" >Pretraga celog sajta</label>
             </div>
         </form>
     <?php endif ;?>

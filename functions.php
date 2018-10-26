@@ -475,6 +475,9 @@ function gf_cart_refresh_update_qty()
             jQuery('div.woocommerce').on('click', 'input.qty', function () {
                 jQuery("[name='update_cart']").trigger("click");
             });
+            jQuery('div.woocommerce').on('change', 'input.qty', function () {
+                jQuery("[name='update_cart']").trigger("click");
+            });
         </script>
         <?php
     }
@@ -571,3 +574,145 @@ function gf_migrate_comments()
     fclose($userLogFile);
     echo '<p>Uspešno importovano ' . count($successfulComments) . ' komentara</p>';
 }
+
+
+function gf_unrequire_wc_state_field( $fields ) {
+    $fields['shipping_state']['required'] = false;
+    return $fields;
+}
+add_filter( 'woocommerce_shipping_fields', 'gf_unrequire_wc_state_field' );
+
+//admin order list - date column
+add_action( 'manage_posts_custom_column', 'misha_date_clmn' );
+function misha_date_clmn( $column_name ) {
+    global $post;
+    if( $column_name  == 'order_date' ) {
+        $t_time = get_the_time( __( 'm/d/Y H:i', 'woocommerce' ), $post );
+        echo $t_time . '<br />';
+    }
+
+}
+
+
+
+//***** ORDERS *****
+
+add_filter('manage_edit-shop_order_columns', 'gf_order_payment_method_column' );
+function gf_order_payment_method_column( $order_columns ) {
+    $order_columns['payment_method_column'] = "Način plaćanja";
+    return $order_columns;
+}
+add_action( 'manage_shop_order_posts_custom_column' , 'gf_get_order_payment_method_column' );
+function gf_get_order_payment_method_column( $colname ) {
+    global $the_order; // the global order object
+
+    if( $colname == 'payment_method_column' ) {
+        echo $the_order->get_payment_method_title();
+    }
+}
+add_filter('manage_edit-shop_order_columns', 'gf_order_phone_column' );
+function gf_order_phone_column( $order_columns ) {
+    $order_columns['order_phone_column'] = "Telefonom / www";
+    return $order_columns;
+}
+
+add_action( 'manage_shop_order_posts_custom_column' , 'gf_get_order_phone_column' );
+function gf_get_order_phone_column( $colname ) {
+    global $the_order;
+
+    if( $colname == 'order_phone_column' ) {
+        echo $the_order->get_meta('gf_order_created_method');
+    }
+}
+
+add_filter( 'manage_edit-shop_order_columns', 'gf_custom_column_ordering_for_admin_list_order' );
+function gf_custom_column_ordering_for_admin_list_order( $product_columns ) {
+
+    return array(
+        'cb' => '<input type="checkbox" />', // checkbox for bulk actions
+        'order_number' => 'Narudžbina',
+        'payment_method_column' => 'Način plaćanja',
+        'order_phone_column' => 'Telefonom / WWW',
+        'order_date' => 'Datum',
+        'order_total' => 'Ukupno',
+        'order_status' => 'Status',
+    );
+
+}
+
+add_action( 'woocommerce_admin_order_data_after_order_details', 'gf_admin_phone_order_field');
+function gf_admin_phone_order_field() {
+//    echo '<p class="form-field form-field-wide">Poručeno telefonom?</p>
+//            <input type="radio" name="phone_order"><label for="">Da</label>';
+    woocommerce_form_field('gf_phone_order', array(
+        'type' => 'checkbox',
+        'class' => array('gf-admin-phone-order'),
+        'label' => __('Poručivanje telefonom'),
+        'required' => false,
+    ), true);
+}
+
+add_action( 'save_post_shop_order', 'gf_manual_order_created', 10, 3 );
+function gf_manual_order_created ( $post_id, $post, $update ) {
+
+    $order = new WC_Order( $post_id );
+
+    // For testing purpose
+    $trigger_status = get_post_meta( $post_id, '_hook_is_triggered', true );
+
+    // 1. Fired the first time you hit create a new order (before saving it)
+    if( ! $update )
+        update_post_meta( $post_id, '_hook_is_triggered', 'Create new order' ); // Testing
+
+    if( $update ){
+        // 2. Fired when saving a new order
+        if( 'Create new order' == $trigger_status ){
+            update_post_meta( $post_id, '_hook_is_triggered', 'Save the new order' ); // Testing
+            $phone_order_value = $_POST['gf_phone_order'];
+            if($phone_order_value == 1){
+                update_post_meta( $post_id, 'gf_order_created_method', 'Telefonom' ); // Testing
+            }else{
+                update_post_meta( $post_id, 'gf_order_created_method', 'WWW' ); // Testing
+            }
+        }
+        // 3. Fired when Updating an order
+        else{
+            update_post_meta( $post_id, '_hook_is_triggered', 'Update  order' ); // Testing
+            $phone_order_value = $_POST['gf_phone_order'];
+            if($phone_order_value == 1){
+                update_post_meta( $post_id, 'gf_order_created_method', 'Telefonom' ); // Testing
+            }else{
+                update_post_meta( $post_id, 'gf_order_created_method', 'WWW' ); // Testing
+            }
+        }
+    }
+}
+
+add_action('woocommerce_review_order_before_submit', 'gf_add_www_field_on_checkout');
+function gf_add_www_field_on_checkout($checkout)
+{
+    woocommerce_form_field('gf_www_orders', array(
+        'type' => 'hidden',
+    ), true);
+}
+
+add_action('woocommerce_checkout_update_order_meta', 'gf_custom_checkout_field_update_order_meta_created_method');
+
+function gf_custom_checkout_field_update_order_meta_created_method($order_id)
+{
+    if ($_POST['gf_www_orders']) update_post_meta($order_id, 'gf_order_created_method', 'WWW');
+}
+
+
+
+
+
+function gf_get_products_without_image(){
+    global $wpdb;
+    $sql = "SELECT ID FROM wp_posts WHERE ID NOT IN (select post_id from wp_postmeta WHERE meta_key='_thumbnail_id') AND post_type='product'";
+    $result = $wpdb->get_results($sql);
+
+    return $result;
+}
+
+
