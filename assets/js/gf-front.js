@@ -9,10 +9,10 @@ jQuery(document).ready(function () {
     }
 
     var radioValue = '';
-    jQuery(".gf-search-form").submit(function () {
+    jQuery(".gf-search-form, .gf-search-form--mobile").submit(function () {
         var radioValue = jQuery('input[name=search-radiobutton]:checked').val();
         if (radioValue === 'category') {
-            jQuery(".gf-search-form").attr("action", "");
+            jQuery(".gf-search-form, .gf-search-form--mobile").attr("action", "");
         }
     });
     jQuery('label[for="search-checkbox"]').click(function () {
@@ -451,21 +451,22 @@ function showPassword() {
 }
 
 jQuery(document).ready(function ($) {
-    if ($('#search-radiobutton-cat').is(':checked')) {
+    $('.search-radiobutton-cat').prop('checked', true);
+    // $('#search-radiobutton-cat').bind( "click" );
+    $('.s-radio-btn-1').addClass("color-orange");
+
+    $('.s-radio-btn-1, .search-radiobutton-cat').click(function () {
+        $('.search-radiobutton-cat').prop('checked', true);
+        $('.search-radiobutton-main').prop('checked', false);
         $('.s-radio-btn-1').addClass("color-orange");
         $('.s-radio-btn-2').removeClass("color-orange");
-    }
+    });
 
-    $('#search-radiobutton-main').click(function () {
-        if ($(this).is(':checked')) {
-            $('.s-radio-btn-2').addClass("color-orange");
-            $('.s-radio-btn-1').removeClass("color-orange");
-        }
+    $('.s-radio-btn-2, .search-radiobutton-main').click(function () {
+        $('.search-radiobutton-cat').prop('checked', false);
+        $('.search-radiobutton-main').prop('checked', true);
+        $('.s-radio-btn-2').addClass("color-orange");
+        $('.s-radio-btn-1').removeClass("color-orange");
     });
-    $('#search-radiobutton-cat').click(function () {
-        if ($(this).is(':checked')) {
-            $('.s-radio-btn-1').addClass("color-orange");
-            $('.s-radio-btn-2').removeClass("color-orange");
-        }
-    });
+
 });
