@@ -70,10 +70,28 @@ if (isset($_GET['action'])) {
 
             break;
 
+        case 'printPreorder':
+            $printMenu = false;
+            $order = wc_get_order($_GET['id']);
+            printPreorder($order);
+
+            break;
+
         case 'printOrder':
             $printMenu = false;
             $order = wc_get_order($_GET['id']);
             printOrder($order);
+
+            break;
+
+        case 'exportJitexOrder':
+            $printMenu = false;
+            $order = wc_get_order($_GET['id']);
+            exportJitexOrder($order);
+
+            break;
+
+        case 'adresnica':
 
             break;
     }
@@ -86,175 +104,53 @@ if ($printMenu) {
 <?php
 }
 
+function createAdresnica() {
+
+}
+
+function exportJitexOrder(WC_Order $order) {
+    $string = '';
+    foreach ($order->get_items() as $item) {
+        $p = wc_get_product($item->get_product()->get_id());
+        if ($p->get_parent_id()) {
+            $p = wc_get_product($p->get_parent_id());
+        }
+
+        $variation = '';
+        if (get_class($p) === WC_Product_Variation::class)
+        foreach (array_values($p->get_variation_attributes())[0] as $value) {
+            if (strstr($item->get_name(), $value)) {
+                $variation = $value;
+            }
+        }
+
+        $name = $order->get_billing_first_name() .' '. $order->get_billing_last_name();
+        $variantId = $p->get_sku() . $variation;
+        $variantName = $item->get_name();
+        $date = $order->get_date_created()->format('d.m.Y');
+        $modifier = (float) '1' .'.'. (int) number_format($p->get_meta('pdv'));
+        $priceNoPdv = number_format((int) $p->get_price() / $modifier, 2, ',', '.');
+        $priceFormated =number_format($p->get_price(), 2, ',', '.');
+        $string .= $name."\t".$order->get_billing_address_1()."\t".$order->get_billing_postcode()."\t".$order->get_billing_city()."\t"."Srbija"."\t".
+        $order->get_billing_phone()."\t".$order->get_order_number()."\t".$date."\t".$order->get_payment_method_title()."\t".$variantId."\t".$variantName."\t".
+            $item->get_quantity()."\t".$priceNoPdv."\t".$priceFormated."\t".$order->get_billing_company()."\r\n";
+    }
+    $shippingNoPdv = number_format($order->get_shipping_total() / 1.2, 2, ',', '.');
+
+    $string .= $name."\t".$order->get_billing_address_1()."\t".$order->get_billing_postcode()."\t".$order->get_billing_city()."\t"."Srbija"."\t".
+        $order->get_billing_phone()."\t".$order->get_order_number()."\t".$date."\t".$order->get_payment_method_title()."\t9999\tDostava\t1\t".
+        $shippingNoPdv."\t".number_format($order->get_shipping_total(), 2, ',', '.')."\t".$order->get_billing_company();
+
+    header('Content-Disposition: attachment; filename="' . $order->get_order_number() . '.txt' . '"');
+    header("Content-Transfer-Encoding: binary");
+    header('Expires: 0');
+    header('Pragma: no-cache');
+    print iconv('utf-8','windows-1250',str_replace(array('Ð', 'ð'), array('Đ', 'đ'), $string));
+}
 
 function printOrder(WC_Order $order) {
-?>
-    <style>
-        .gf-print-bill-wrapper{
-            width: 80%;
-            padding: 5px;
-            margin: auto;
-            border: 1px solid;
-        }
-        .gf-print-bill-number{
-            width: 100%;
-        }
-        .gf-print-bill-header{
-            width: 100%;
-            text-align: center;
-            margin-top: 50px;
-            font-weight: bold;
-        }
-        .gf-print-bill-info-wrapper{
-            width: 75%;
-            margin: auto;
-            margin-top: 40px;
-            display: flex;
-        }
-        .gf-print-bill__customer-info, .gf-print-bill__shipping-info{
-            width: 50%;
-        }
-        .gf-print-bill__shipping-info{
-            text-align: right;
-        }
-        .gf-print-bill-info-wrapper p{
-            margin: 0;
-        }
-        .gf-print-bill__date-number-method{
-            margin-top: 30px;
-        }
-        .gf-print-bill-table{
-            width: 75%;
-            margin: auto;
-            margin-top: 50px;
-        }
-        .gf-print-bill-table th{
-            border-bottom: 1px solid;
-        }
-        .gf-print-bill-table tfoot{
-            border-top: 1px solid;
-            font-weight: bolder;
-        }
-        .gf-print-bill-table__total{
-            margin-right: auto;
-        }
-    </style>
-    <div class="gf-print-bill-wrapper">
-        <div class="gf-print-bill-number">
-            <p>Račun br. <?=$order->get_order_number()?></p>
-        </div>
-        <div class="gf-print-bill-header">
-            <h3>NALOG ZA PRIPREMU POSILJKE / NARUČIVANJE PROIZVODA</h3>
-        </div>
-        <div class="gf-print-bill-info-wrapper">
-            <div class="gf-print-bill__customer-info">
-                <h4>PODACI O NARUČIOCU / PODACI ZA RAČUN</h4>
-                <p>Ime i prezime: <?=$order->get_billing_first_name() .' '. $order->get_billing_last_name()?></p>
-                <p>Adresa: <?=$order->get_billing_address_1()?>,</p>
-                <p><?=$order->get_billing_postcode() .', '. $order->get_billing_city()?></p>
-                <p>Telefon: <?=$order->get_billing_phone()?></p>
-                <div class="gf-print-bill__date-number-method">
-                    <p>Broj narudžbenice: <?=$order->get_order_number()?></p>
-                    <p>Datum naručivanja: <?=$order->get_date_created()->format('d/m/Y')?></p>
-                    <p>Način plaćanja: <?=$order->get_payment_method_title()?></p>
-                </div>
-            </div>
-            <div class="gf-print-bill__shipping-info">
-                <h4>ADRESA KUPCA ZA ISPORUKU</h4>
-                <p><?=$order->get_shipping_first_name() .' '. $order->get_shipping_last_name()?></p>
-                <p><?=$order->get_shipping_address_1()?></p>
-                <p><?=$order->get_shipping_postcode() .', '. $order->get_shipping_city() . ', Srbija'?></p>
-            </div>
-        </div>
-        <table class="gf-print-bill-table">
-            <tr>
-                <th>Proizvod</th>
-                <th>kol</th>
-                <th>osnovica</th>
-                <th>PDV</th>
-                <th>iznos PDV</th>
-                <th>Cena din</th>
-            </tr>
-        <?php
-            foreach ($order->get_items() as $item) {
-                $product = wc_get_product($item->get_product()->get_id());
-                if ($product->get_parent_id()) {
-                    $product = wc_get_product($product->get_parent_id());
-                }
-
-            /* @var \WC_Product $product */
-            //        var_dump($product->get_meta_data());
-//            var_dump($product->get_meta('pdv'));
-//            var_dump($product->get_price());
-//            var_dump($item->get_quantity());
-
-            $modifier = (float) '1' .'.'. (int) number_format($product->get_meta('pdv'));
-            $priceNoPdv = (int) $product->get_price() / $modifier;
-            $pdvInDin = $product->get_price() - $priceNoPdv;
-
-            $shippingNoPdv = number_format($order->get_shipping_total() / 1.2);
-            $shippingPdvInDin = $order->get_shipping_total() - $shippingNoPdv;
-        ?>
-            <tr>
-                <td><?=$product->get_name()?></td>
-                <td><?=$item->get_quantity()?></td>
-                <td><?=number_format($priceNoPdv, 2)?></td>
-                <td><?=$product->get_meta('pdv')?> %</td>
-                <td><?=number_format($pdvInDin)?></td>
-                <td><?=$product->get_price()?> din</td>
-            </tr>
-            <?php } ?>
-            <tr>
-                <td>&nbsp;</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>Zbir</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><?=$order->get_total() - $order->get_shipping_total() ?> din</td>
-            </tr>
-            <tr>
-                <td>&nbsp;</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>Dostava</td>
-                <td></td>
-                <td><?=$shippingNoPdv?></td>
-                <td>20%</td>
-                <td><?=$shippingPdvInDin?> din</td>
-                <td><?=$order->get_shipping_total()?> din</td>
-            </tr>
-            <tr>
-                <td>&nbsp;</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tfoot>
-            <tr>
-                <td class="">TOTAL</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><?=$order->get_total()?> din</td>
-            </tr>
-            </tfoot>
-        </table>
-    </div>
-<?php
+    require (__DIR__ . '/templates/orders/printRacun.phtml');
+}
+function printPreorder(WC_Order $order) {
+    require (__DIR__ . '/templates/orders/printPredracun.phtml');
 }
