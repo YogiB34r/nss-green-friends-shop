@@ -632,6 +632,7 @@ function gf_get_order_phone_column($colname)
         echo $the_order->get_meta('gf_order_created_method');
     }
 }
+
 add_filter('manage_edit-shop_order_columns', 'gf_order_shipping_price_column');
 function gf_order_shipping_price_column($order_columns)
 {
@@ -645,7 +646,7 @@ function gf_get_order_shipping_price_column($colname)
     global $the_order;
 
     if ($colname == 'order_shipping_price_column') {
-        echo $the_order->get_shipping_total().'din.';
+        echo $the_order->get_shipping_total() . 'din.';
     }
 }
 
@@ -742,11 +743,16 @@ function gf_get_products_without_image()
 
 
 add_filter('manage_edit-shop_order_columns', 'gf_add_order_print');
+
 function gf_add_order_print($order_columns)
 {
     $order_columns['test'] = "Test";
+    function gf_add_order_print($order_columns)
+    {
+        $order_columns['customActions'] = "Actions";
 
-    return $order_columns;
+        return $order_columns;
+    }
 }
 
 add_action('manage_shop_order_posts_custom_column', 'gf_get_order_print_url');
@@ -754,9 +760,19 @@ function gf_get_order_print_url($colname)
 {
     global $the_order;
 
+
     if ($colname == 'test') {
         echo '<a href="/back-ajax/?action=printOrder&id=' . $the_order->get_id() . '" title="Print" target="_blank">Print</a>';
+
+        if ($colname === 'customActions') {
+//        echo '<a class="button" href="/back-ajax/?action=printOrder&id='. $the_order->get_id() .'" title="Print racuna" target="_blank">Racun</a>';
+            echo '&nbsp;';
+            echo '<a class="button" href="/back-ajax/?action=printPreorder&id=' . $the_order->get_id() . '" title="Print predracuna" target="_blank">Predracun</a>';
+            echo '&nbsp;';
+            echo '<a class="button" href="/back-ajax/?action=exportJitexOrder&id=' . $the_order->get_id() . '" title="Export za Jitex" target="_blank">Export</a>';
+
 //        echo $the_order->get_meta('gf_order_created_method');
+        }
     }
 }
 
