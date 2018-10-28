@@ -59,6 +59,7 @@ function setNewProductSku($id, $post, $update) {
     }
 }
 
+
 add_action('woocommerce_process_product_meta', 'syncToElastic', 666, 3);
 function syncToElastic($id, WP_Post $post) {
     $product = wc_get_product($id);
