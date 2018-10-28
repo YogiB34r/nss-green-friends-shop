@@ -7,6 +7,7 @@ ini_set('max_execution_time', '30');
 require(__DIR__ . DIRECTORY_SEPARATOR . "user.functions.php");
 require(__DIR__ . DIRECTORY_SEPARATOR . "search.functions.php");
 require(__DIR__ . DIRECTORY_SEPARATOR . "util.functions.php");
+require(__DIR__ . DIRECTORY_SEPARATOR . "cron.functions.php");
 
 add_action('after_setup_theme', 'wc_support');
 function wc_support()
