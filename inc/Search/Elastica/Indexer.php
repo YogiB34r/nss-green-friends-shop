@@ -36,12 +36,12 @@ class Indexer
     {
         global $wpdb;
 
-        $perPage = 5000;
+        $perPage = 50;
 
-//        for ($i = 0; $i < 40; $i++) {
-        for ($i = 0; $i < 4; $i++) {
+        for ($i = 0; $i < 40; $i++) {
+//        for ($i = 0; $i < 4; $i++) {
             $offset = $i * $perPage;
-            echo $sql = "SELECT ID FROM wp_posts WHERE post_type = 'product' LIMIT {$offset}, {$perPage};";
+            $sql = "SELECT ID FROM wp_posts WHERE post_type = 'product' LIMIT {$offset}, {$perPage};";
             $result = $wpdb->get_results($sql);
             $wpdb->flush();
             if (count($result) > 0) {

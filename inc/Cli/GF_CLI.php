@@ -6,8 +6,8 @@ class Cli
 {
     public function fixItems()
     {
-        $pages = 2;
-        $limit = 7000;
+        $pages = 21;
+        $limit = 1000;
 
         $diff = [];
         $html = '';
@@ -20,7 +20,6 @@ class Cli
             ));
 
             $fields = [];
-            $count = 0;
             foreach ($products_ids as $product_id) {
                 $total++;
                 $product = wc_get_product($product_id);
@@ -32,14 +31,13 @@ class Cli
                     continue;
                 }
                 if ($product->get_sku() === '') {
-                    var_dump($product->get_id());
-                    var_dump($product->get_name());
-                    var_dump($product->get_meta('supplier'));
-                    continue;
+                    $product->set_sku($product->get_id());
                 }
                 $data = $this->fetchItemData($product->get_sku(), $product->get_name(), $product->get_meta('supplier'));
 
                 if (!$data) {
+                    $product->set_status('draft');
+                    $product->save();
                     continue;
                 }
 
@@ -108,9 +106,8 @@ class Cli
                     $diff[$product->get_sku() .'#'. $product->get_id()] = $fields;
                     $product->save();
                 }
-                $count++;
-                if ($count % 1000 === 0) {
-                    echo 'passed 1000 items' . PHP_EOL;
+                if ($total % 1000 === 0) {
+                    echo 'passed '.$total.' items' . PHP_EOL;
                 }
             }
         }
