@@ -6,29 +6,14 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 global $wpdb;
-
 $config = array(
     'host' => ES_HOST,
     'port' => 9200
 );
-
-//$cache = new GF_Cache();
-
-//$cache->redis->delete('gf-megamenu-mobile');
-//$cache->redis->delete('gf-megamenu');
-//
-//gf_category_megamenu_shortcode();
-//gf_category_mobile_toggle_shortcode();
-//
-//exit();
-
+$printMenu = true;
 
 //$sw = new \Symfony\Component\Stopwatch\Stopwatch();
 //$sw->start('gfmain');
-
-//if (isset($_GET['testVendor'])) {
-//    gf_change_supplier_id_by_vendor_id();
-//}
 
 //include(__DIR__ . "/inc/Search/Elastica/Search.php");
 include(__DIR__ . "/inc/Search/Elastica/Indexer.php");
@@ -37,13 +22,9 @@ include(__DIR__ . "/inc/Search/Elastica/Config/Product.php");
 include(__DIR__ . "/inc/Search/Elastica/Config/Term.php");
 include(__DIR__ . "/inc/Search/Elastica/Setup.php");
 
-$printMenu = true;
+
 
 if (isset($_GET['action'])) {
-    $config = array(
-        'host' => ES_HOST,
-        'port' => 9200
-    );
     $elasticaClient = new \Elastica\Client($config);
 
     switch ($_GET['action']) {
@@ -94,6 +75,11 @@ if (isset($_GET['action'])) {
         case 'adresnica':
 
             break;
+
+        case 'updateItems':
+            updateItems();
+
+            break;
     }
 }
 if ($printMenu) {
@@ -103,6 +89,7 @@ if ($printMenu) {
 <a href="/back-ajax/?action=getList">test</a>
 <?php
 }
+
 
 function createAdresnica() {
 
