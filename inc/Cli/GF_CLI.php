@@ -6,102 +6,114 @@ class Cli
 {
     public function fixItems()
     {
-        $page = 4;
-        $limit = 5000;
+        $pages = 2;
+        $limit = 7000;
 
         $diff = [];
         $html = '';
         $total = 0;
-//    for ($i = 2; $i < $pages; $i++) {
-        $products_ids = wc_get_products(array(
-            'limit' => $limit,
-            'return' => 'ids',
-            'paged' => $page
-        ));
-        $fields = [];
-        $count = 0;
-        foreach ($products_ids as $product_id) {
-            $total++;
-            $product = wc_get_product($product_id);
-            if (!$product) {
-                throw new \Exception('not found. ' . $product_id);
-            }
-            // a sport
-            if ($product->get_meta('supplier') == 319) {
-                continue;
-            }
-            if ($product->get_sku() === '') {
-                var_dump($product->get_id());
-                var_dump($product->get_name());
-                var_dump($product->get_meta('supplier'));
-                continue;
-            }
-            $data = $this->fetchItemData($product->get_sku(), $product->get_name(), $product->get_meta('supplier'));
+        for ($i = 1; $i < $pages; $i++) {
+            $products_ids = wc_get_products(array(
+                'limit' => $limit,
+                'return' => 'ids',
+                'paged' => $i
+            ));
 
-            if (!$data) {
-                continue;
-            }
-
-            if ($data->sku !== $product->get_sku()) {
-                $fields['sku'] = $data->sku;
-            }
-            if ($data->status === 1 && $product->get_status() !== 'publish' ||
-                $data->status === 0 && $product->get_status() !== 'draft') {
-                $fields['status'] = $data->status;
-            }
-            if ($data->stockStatus === 1 && $product->get_stock_status() !== 'instock' ||
-                $data->stockStatus === 0 && $product->get_stock_status() !== 'outofstock') {
-                $fields['stockStatus'] = $data->stockStatus;
-                if ($data->stockStatus) {
-                    $product->set_stock_status('instock');
-                } else {
-                    $product->set_stock_status('outofstock');
+            $fields = [];
+            $count = 0;
+            foreach ($products_ids as $product_id) {
+                $total++;
+                $product = wc_get_product($product_id);
+                if (!$product) {
+                    throw new \Exception('not found. ' . $product_id);
                 }
-            }
+                // a sport
+                if ($product->get_meta('supplier') == 319) {
+                    continue;
+                }
+                if ($product->get_sku() === '') {
+                    var_dump($product->get_id());
+                    var_dump($product->get_name());
+                    var_dump($product->get_meta('supplier'));
+                    continue;
+                }
+                $data = $this->fetchItemData($product->get_sku(), $product->get_name(), $product->get_meta('supplier'));
 
-            $images = explode(',', $data->images);
-            //has different images
-            if (has_post_thumbnail($product->get_id())) {
-                if (count($images) - 1 !== count($product->get_gallery_image_ids())) {
-//                    $fields['images'] = 'different';
-                    if (!$this->handleImage($data->images, $product->get_id())) {
-                        $html .= 'failed to save image for sku ' . $product->get_sku();
+                if (!$data) {
+                    continue;
+                }
+
+                if ($data->sku !== $product->get_sku()) {
+                    $fields['sku'] = $data->sku;
+                }
+                if ($data->status === 1 && $product->get_status() !== 'publish' ||
+                    $data->status === 0 && $product->get_status() !== 'draft') {
+                    $fields['status'] = $data->status;
+                }
+                if ($data->stockStatus === 1 && $product->get_stock_status() !== 'instock' ||
+                    $data->stockStatus === 0 && $product->get_stock_status() !== 'outofstock') {
+                    $fields['stockStatus'] = $data->stockStatus;
+                    $children = get_posts(array(
+                        'post_parent'   => $product->get_id(),
+                        'posts_per_page'=> -1,
+                        'post_type'   => 'product_variation'
+                    ));
+                    if ($data->stockStatus) {
+                        $stockStatus = 'instock';
                     } else {
-                        $html .= '<p>Updated images for productId: '.$product->get_id().'</p>';
+                        $stockStatus = 'outofstock';
+                    }
+                    $product->set_stock_status($stockStatus);
+                    foreach ($children as $child) {
+                        $variation = wc_get_product($child->ID);
+                        $variation->set_stock_status($stockStatus);
+                        $variation->save();
                     }
                 }
-            } else {
-//                $fields['images'] = 'none';
-                if (!$this->handleImage($data->images, $product->get_id())) {
-                    $html .= 'failed to create image for sku ' . $product->get_sku();
+
+                $images = explode(',', $data->images);
+                //has different images
+                if (has_post_thumbnail($product->get_id())) {
+                    if (count($images) - 1 !== count($product->get_gallery_image_ids())) {
+    //                    $fields['images'] = 'different';
+                        if (!$this->handleImage($data->images, $product->get_id())) {
+                            $html .= 'failed to save image for sku ' . $product->get_sku();
+                        } else {
+                            $html .= '<p>Updated images for productId: '.$product->get_id().'</p>';
+                        }
+                    }
                 } else {
-                    $html .= '<p>Created images for productId: '.$product->get_id().'</p>';
+    //                $fields['images'] = 'none';
+                    if (!$this->handleImage($data->images, $product->get_id())) {
+                        $html .= 'failed to create image for sku ' . $product->get_sku();
+                    } else {
+                        $html .= '<p>Created images for productId: '.$product->get_id().'</p>';
+                    }
+                }
+                if ($data->pdv !== $product->get_meta('pdv')) {
+                    $fields['pdv'] = $data->pdv;
+                    $product->update_meta_data('pdv', $data->pdv);
+    //                var_dump('pdv differs');
+                }
+                if ($data->vendorId != $product->get_meta('supplier')) {
+                    $fields['vendorId'] = $data->vendorId;
+                    $product->update_meta_data('supplier', $data->vendorId);
+                }
+                if ($data->quantity != $product->get_meta('quantity')) {
+                    $fields['quantity'] = $data->quantity;
+                    $product->update_meta_data('quantity', $data->quantity);
+                }
+
+                if (!empty($fields)) {
+                    $diff[$product->get_sku() .'#'. $product->get_id()] = $fields;
+                    $product->save();
+                }
+                $count++;
+                if ($count % 1000 === 0) {
+                    echo 'passed 1000 items' . PHP_EOL;
                 }
             }
-            if ($data->pdv !== $product->get_meta('pdv')) {
-                $fields['pdv'] = $data->pdv;
-                $product->update_meta_data('pdv', $data->pdv);
-//                var_dump('pdv differs');
-            }
-            if ($data->vendorId != $product->get_meta('supplier')) {
-                $fields['vendorId'] = $data->vendorId;
-                $product->update_meta_data('supplier', $data->vendorId);
-            }
-            if ($data->quantity != $product->get_meta('quantity')) {
-                $fields['quantity'] = $data->quantity;
-                $product->update_meta_data('quantity', $data->quantity);
-            }
-
-            if (!empty($fields)) {
-                $diff[$product->get_sku() .'#'. $product->get_id()] = $fields;
-                $product->save();
-            }
-            $count++;
-            if ($count % 1000 === 0) {
-                echo 'passed 1000 items' . PHP_EOL;
-            }
         }
-//    }
         $html .= 'total of items parsed: '. $total . PHP_EOL;
         $html .= 'Differences' . PHP_EOL;
         $html .= print_r($diff, true);
@@ -109,7 +121,7 @@ class Cli
         \WP_CLI::success($html);
     }
 
-    function handleImage($images, $postId) {
+    private function handleImage($images, $postId) {
         $explodedImages = explode(',', $images);
         if ($images == '' || count($explodedImages) === 0) {
             return false;
@@ -147,7 +159,7 @@ class Cli
         return true;
     }
 
-    function fetchItemData($sku, $name, $supplier) {
+    private function fetchItemData($sku, $name, $supplier) {
         $url = "https://185.29.100.160/cms/work/itemsApi.php?id=" . $sku;
         $httpClient = new \GuzzleHttp\Client(['verify' => false]);
         $response = $httpClient->send(new \GuzzleHttp\Psr7\Request('GET', $url));

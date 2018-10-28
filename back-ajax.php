@@ -75,11 +75,6 @@ if (isset($_GET['action'])) {
         case 'adresnica':
 
             break;
-
-        case 'updateItems':
-            updateItems();
-
-            break;
     }
 }
 if ($printMenu) {

@@ -2,7 +2,7 @@
 //ini_set('upload_max_size', '128M');
 //ini_set('post_max_size', '128M');
 //ini_set('max_execution_time', '80');
-ini_set('max_execution_time', '30');
+ini_set('max_execution_time', '40');
 
 require(__DIR__ . DIRECTORY_SEPARATOR . "user.functions.php");
 require(__DIR__ . DIRECTORY_SEPARATOR . "search.functions.php");
@@ -760,7 +760,6 @@ add_action('manage_shop_order_posts_custom_column', 'gf_get_order_print_url');
 function gf_get_order_print_url($colname)
 {
     global $the_order;
-
 
     if ($colname == 'test') {
         echo '<a href="/back-ajax/?action=printOrder&id=' . $the_order->get_id() . '" title="Print" target="_blank">Print</a>';
