@@ -42,8 +42,14 @@ if (isset($_GET['action'])) {
 
 function createAdresnica($orderId) {
     $order = wc_get_order($orderId);
+    $html = '';
 
     require (__DIR__ . '/templates/orders/adresnica.phtml');
+
+    $html2pdf = new \Spipu\Html2Pdf\Html2Pdf();
+    $html2pdf->writeHTML($html);
+    $name = 'Adresnica-'.$order->get_order_number().'.pdf';
+    $html2pdf->output($name, 'D');
 }
 
 function exportJitexOrder(WC_Order $order) {
