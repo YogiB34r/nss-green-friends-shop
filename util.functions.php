@@ -173,7 +173,7 @@ function gf_change_supplier_id_by_vendor_id() {
             'paged' => $i
         ));
         foreach ($products_ids as $product_id) {
-            if (get_post_meta($product_id, 'synced', true) != 1) {
+            if (get_post_meta($product_id, 'syncedVendors', true) != 1) {
                 $vendorId = (int) get_post_meta($product_id, 'supplier', true);
                 if ($vendorId === 0) {
                     var_dump($product_id);
@@ -212,12 +212,12 @@ function gf_change_supplier_id_by_vendor_id() {
                 $userId = $wpdb->get_var($sql);
                 if (!$userId) {
                     if (!in_array($vendorId, $failedMatchIds)) {
-                        $failedMatchIds[] = $vendorId;
+                        $failedMatchIds[$vendorId] = $product_id;
                     }
                     continue;
                 }
                 update_post_meta($product_id, 'supplier', $userId);
-                add_post_meta($product_id, 'synced', true);
+                add_post_meta($product_id, 'syncedVendors', true);
             } else {
                 if (!in_array($product_id, $alreadySyncedIds)) {
                     $alreadySyncedIds[] = $product_id;
@@ -230,8 +230,8 @@ function gf_change_supplier_id_by_vendor_id() {
     }
     echo 'Nisu pronađeni dobavljachi za sledeće vendorid-eve: ' . count($failedMatchIds);
     echo '<ul>';
-    foreach ($failedMatchIds as $failedMatchId) {
-        echo '<li>' . $failedMatchId . '</li>';
+    foreach ($failedMatchIds as $vendorId => $ids) {
+        echo '<li>' . $vendorId . print_r($ids, true) .'</li>';
     }
     echo '</ul>';
 
