@@ -50,9 +50,9 @@ class Setup
             var_dump($response->getError());
             exit();
         }
-        $msg = $mapping->getType()->getName() . ' type mapping created.' . PHP_EOL;
+        $msg = $mapping->getType()->getName() . ' index created.' . PHP_EOL;
         if ($recreate) {
-            $msg = 'index recreated.';
+            $msg = $mapping->getType()->getName() . ' index recreated.';
         }
 
         echo $msg;

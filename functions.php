@@ -2,11 +2,12 @@
 //ini_set('upload_max_size', '128M');
 //ini_set('post_max_size', '128M');
 //ini_set('max_execution_time', '80');
-ini_set('max_execution_time', '30');
+ini_set('max_execution_time', '40');
 
 require(__DIR__ . DIRECTORY_SEPARATOR . "user.functions.php");
-require(__DIR__ . DIRECTORY_SEPARATOR . "/search.functions.php");
-require(__DIR__ . DIRECTORY_SEPARATOR . "/util.functions.php");
+require(__DIR__ . DIRECTORY_SEPARATOR . "search.functions.php");
+require(__DIR__ . DIRECTORY_SEPARATOR . "util.functions.php");
+require(__DIR__ . DIRECTORY_SEPARATOR . "cron.functions.php");
 
 add_action('after_setup_theme', 'wc_support');
 function wc_support()
@@ -459,16 +460,12 @@ function gf_my_account_shop_button()
 }
 
 add_action('woocommerce_before_checkout_shipping_form', 'gf_checkout_shipping_notice');
-function gf_checkout_shipping_notice()
-{
+function gf_checkout_shipping_notice() {
     echo '<div class ="gf-checkout-shipping-notice p-3" >Ukoliko se adresa za dostavu razlikuje od navedene u detaljima naplate, popunite sledeća polja:</div>';
 }
 
-
 add_action('wp_footer', 'gf_cart_refresh_update_qty');
-
-function gf_cart_refresh_update_qty()
-{
+function gf_cart_refresh_update_qty() {
     if (is_cart()) {
         ?>
         <script type="text/javascript">
@@ -484,8 +481,7 @@ function gf_cart_refresh_update_qty()
 }
 
 add_filter('woocommerce_account_menu_items', 'gf_remove_my_account_links');
-function gf_remove_my_account_links($menu_links)
-{
+function gf_remove_my_account_links($menu_links) {
 
     unset($menu_links['dashboard']); // Addresses
 
@@ -500,9 +496,7 @@ function gf_remove_my_account_links($menu_links)
 }
 
 add_filter('post_date_column_time', 'gf_custom_post_date_column_time', 10, 2);
-
-function gf_custom_post_date_column_time($h_time, $post)
-{
+function gf_custom_post_date_column_time($h_time, $post) {
 
     $h_time = get_the_time(__('d/m/Y', 'woocommerce'), $post);
 
@@ -510,8 +504,7 @@ function gf_custom_post_date_column_time($h_time, $post)
 }
 
 add_action('woocommerce_cart_collaterals', 'gf_cart_page_extra_buttons');
-function gf_cart_page_extra_buttons()
-{
+function gf_cart_page_extra_buttons() {
     if (!is_user_logged_in()) {
         echo '<a class="gf-cart-extra-buttons d-block p-3 mb-3" href="/moj-nalog">REGISTRUJ SE</a>
               <a class="gf-cart-extra-buttons d-block p-3" href="/placanje">NASTAVI KUPOVINU BEZ REGISTRACIJE</a>';
@@ -519,8 +512,7 @@ function gf_cart_page_extra_buttons()
 }
 
 //Migrate comments from old site
-function gf_migrate_comments()
-{
+function gf_migrate_comments() {
     $rows = array_map('str_getcsv', file(__DIR__ . '/reviews.csv'));
     $header = array_shift($rows);
     $csv = array();
@@ -683,7 +675,6 @@ function gf_admin_phone_order_field()
 add_action('save_post_shop_order', 'gf_manual_order_created', 10, 3);
 function gf_manual_order_created($post_id, $post, $update)
 {
-
     $order = new WC_Order($post_id);
 
     // For testing purpose
@@ -731,28 +722,12 @@ function gf_custom_checkout_field_update_order_meta_created_method($order_id)
     if ($_POST['gf_www_orders']) update_post_meta($order_id, 'gf_order_created_method', 'WWW');
 }
 
-
-function gf_get_products_without_image()
-{
-    global $wpdb;
-    $sql = "SELECT ID FROM wp_posts WHERE ID NOT IN (select post_id from wp_postmeta WHERE meta_key='_thumbnail_id') AND post_type='product'";
-    $result = $wpdb->get_results($sql);
-
-    return $result;
-}
-
-
 add_filter('manage_edit-shop_order_columns', 'gf_add_order_print');
-
 function gf_add_order_print($order_columns)
 {
-    $order_columns['test'] = "Test";
-    function gf_add_order_print($order_columns)
-    {
-        $order_columns['customActions'] = "Actions";
+    $order_columns['customActions'] = "Actions";
 
-        return $order_columns;
-    }
+    return $order_columns;
 }
 
 add_action('manage_shop_order_posts_custom_column', 'gf_get_order_print_url');
@@ -760,19 +735,15 @@ function gf_get_order_print_url($colname)
 {
     global $the_order;
 
-
-    if ($colname == 'test') {
-        echo '<a href="/back-ajax/?action=printOrder&id=' . $the_order->get_id() . '" title="Print" target="_blank">Print</a>';
-
-        if ($colname === 'customActions') {
+    if ($colname == 'customActions') {
 //        echo '<a class="button" href="/back-ajax/?action=printOrder&id='. $the_order->get_id() .'" title="Print racuna" target="_blank">Racun</a>';
-            echo '&nbsp;';
-            echo '<a class="button" href="/back-ajax/?action=printPreorder&id=' . $the_order->get_id() . '" title="Print predracuna" target="_blank">Predracun</a>';
-            echo '&nbsp;';
-            echo '<a class="button" href="/back-ajax/?action=exportJitexOrder&id=' . $the_order->get_id() . '" title="Export za Jitex" target="_blank">Export</a>';
-
+        echo '&nbsp;';
+        echo '<a class="button" href="/back-ajax/?action=printPreorder&id=' . $the_order->get_id() . '" title="Print predracuna" target="_blank">Predracun</a>';
+        echo '&nbsp;';
+        echo '<a class="button" href="/back-ajax/?action=exportJitexOrder&id=' . $the_order->get_id() . '" title="Export za Jitex" target="_blank">Export</a>';
+        echo '&nbsp;';
+        echo '<a class="button" href="/back-ajax/?action=adresnica&id=' . $the_order->get_id() . '" title="Kreiraj adresnicu" target="_blank">Adresnica</a>';
 //        echo $the_order->get_meta('gf_order_created_method');
-        }
     }
 }
 
