@@ -18,9 +18,40 @@ if (defined('WP_CLI') && WP_CLI) {
 
     \WP_CLI::add_command('createElasticIndex', 'createElasticIndex');
     \WP_CLI::add_command('syncElasticIndex', 'syncElasticIndex');
+
+    \WP_CLI::add_command('passAllProducts', 'passAllProducts');
 }
 
+function gf_get_products_without_image()
+{
+    global $wpdb;
+    $sql = "SELECT ID FROM wp_posts WHERE ID NOT IN (select post_id from wp_postmeta WHERE meta_key='_thumbnail_id') AND post_type='product'";
+    $result = $wpdb->get_results($sql);
 
+    return $result;
+}
+
+function passAllProducts() {
+    $pages = 21;
+    $limit = 1000;
+
+    gf_change_supplier_id_by_vendor_id();
+    exit();
+
+
+    for ($i = 1; $i < $pages; $i++) {
+        $products_ids = wc_get_products(array(
+            'limit' => $limit,
+            'return' => 'ids',
+            'paged' => $i
+        ));
+
+        foreach ($products_ids as $product_id) {
+            $product = wc_get_product($product_id);
+
+        }
+    }
+}
 
 function fixItems() {
     ini_set('max_execution_time', 1200);
@@ -32,10 +63,10 @@ function fixItems() {
 function createElasticIndex() {
     $elasticaClient = new \GF\Search\Factory\ElasticClientFactory();
     $productSetupFactory = new \GF\Search\Factory\ProductSetupFactory($elasticaClient);
-    $termSetupFactory = new \GF\Search\Factory\TermSetupFactory($elasticaClient);
+//    $termSetupFactory = new \GF\Search\Factory\TermSetupFactory($elasticaClient);
     $recreate = true;
     $productSetupFactory->make()->createIndex($recreate);
-    $termSetupFactory->make()->createIndex($recreate);
+//    $termSetupFactory->make()->createIndex(false);
 }
 
 function syncElasticIndex() {

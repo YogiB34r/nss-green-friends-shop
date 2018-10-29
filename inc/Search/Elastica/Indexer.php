@@ -36,9 +36,9 @@ class Indexer
     {
         global $wpdb;
 
-        $perPage = 50;
+        $perPage = 200;
 
-        for ($i = 0; $i < 40; $i++) {
+        for ($i = 0; $i < 100; $i++) {
 //        for ($i = 0; $i < 4; $i++) {
             $offset = $i * $perPage;
             $sql = "SELECT ID FROM wp_posts WHERE post_type = 'product' LIMIT {$offset}, {$perPage};";
@@ -48,12 +48,9 @@ class Indexer
                 $documents = [];
                 foreach ($result as $value) {
                     $product = wc_get_product($value->ID);
-//                    if ($product->get_sku() == 3601493) {
-//                        var_dump($product);
-//                        die();
-//                    } else {
-//                        continue;
-//                    }
+                    if ($product->get_id() == 446611) {
+                        continue;
+                    }
                     if (!$product) {
                         var_dump($product);
                         var_dump('Could not find product for postId : ', $value->ID);
@@ -72,7 +69,7 @@ class Indexer
                     $documents = [];
                     if (!$response->isOk() || $response->hasError()) {
                         var_dump($response->getError());
-                        die();
+//                        die();
                     }
                     echo sprintf('stored %s items.', $response->count());
                     unset($response);
@@ -92,12 +89,12 @@ class Indexer
         $cats = [];
         foreach ($product->get_category_ids() as $category_id) {
             $cat = get_term_by('id', $category_id, 'product_cat');
-            if($cat->parent === 0){
+            if ($cat->parent === 0){
                 $cat_lvl = 1;
-            }else{
+            } else {
                 if (get_term($cat->parent, 'product_cat')->parent === 0){
                     $cat_lvl = 2;
-                }else{
+                } else{
                     $cat_lvl = 3;
                 }
             }
@@ -152,11 +149,6 @@ class Indexer
         } else {
             $gfProduct = $wpdb->get_results($sql)[0];
             $viewCount = $gfProduct->viewCount;
-        }
-
-        if ($product->get_id() == 444086 || $product->get_sku() == 444086) {
-            var_dump($product->get_data());
-            die();
         }
 
         $data = [
