@@ -21,7 +21,7 @@ if ($sexyShopCats){
  * Has to be called on top in order to properly set all required filters
  */
 $sortedProducts = false;
-$useElastic = false;
+$useElastic = true;
 
 /* @TODO make it better ... */
 if (get_query_var('term') !== '') {
