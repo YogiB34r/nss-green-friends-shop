@@ -34,13 +34,16 @@ if (isset($_GET['action'])) {
             break;
 
         case 'adresnica':
+            createAdresnica($_GET['id']);
 
             break;
     }
 }
 
-function createAdresnica() {
+function createAdresnica($orderId) {
+    $order = wc_get_order($orderId);
 
+    require (__DIR__ . '/templates/orders/adresnica.phtml');
 }
 
 function exportJitexOrder(WC_Order $order) {

@@ -735,18 +735,15 @@ function gf_get_order_print_url($colname)
 {
     global $the_order;
 
-    if ($colname == 'test') {
-        echo '<a href="/back-ajax/?action=printOrder&id=' . $the_order->get_id() . '" title="Print" target="_blank">Print</a>';
-
-        if ($colname === 'customActions') {
+    if ($colname == 'customActions') {
 //        echo '<a class="button" href="/back-ajax/?action=printOrder&id='. $the_order->get_id() .'" title="Print racuna" target="_blank">Racun</a>';
-            echo '&nbsp;';
-            echo '<a class="button" href="/back-ajax/?action=printPreorder&id=' . $the_order->get_id() . '" title="Print predracuna" target="_blank">Predracun</a>';
-            echo '&nbsp;';
-            echo '<a class="button" href="/back-ajax/?action=exportJitexOrder&id=' . $the_order->get_id() . '" title="Export za Jitex" target="_blank">Export</a>';
-
+        echo '&nbsp;';
+        echo '<a class="button" href="/back-ajax/?action=printPreorder&id=' . $the_order->get_id() . '" title="Print predracuna" target="_blank">Predracun</a>';
+        echo '&nbsp;';
+        echo '<a class="button" href="/back-ajax/?action=exportJitexOrder&id=' . $the_order->get_id() . '" title="Export za Jitex" target="_blank">Export</a>';
+        echo '&nbsp;';
+        echo '<a class="button" href="/back-ajax/?action=adresnica&id=' . $the_order->get_id() . '" title="Kreiraj adresnicu" target="_blank">Adresnica</a>';
 //        echo $the_order->get_meta('gf_order_created_method');
-        }
     }
 }
 

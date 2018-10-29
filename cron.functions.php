@@ -35,9 +35,27 @@ function passAllProducts() {
     $pages = 21;
     $limit = 1000;
 
-    gf_change_supplier_id_by_vendor_id();
+    global $wpdb;
+    $sql = "SELECT * FROM wp_nss_backorder WHERE status = 1 AND backOrderId > 116";
+    $result = $wpdb->get_results($sql);
+    foreach ($result as $order) {
+//        $supplier = get_users(array(
+//            'meta_key' => 'vendorid',
+//            'meta_value' => $order->supplierId,
+//            'number' => 1,
+//            'count_total' => false
+//        ))[0];
+        $vendorId = get_user_meta($order->supplierId, 'vendorid');
+//        if (isset($supplier->ID)) {
+            $sql = "UPDATE wp_nss_backorder SET supplierId = {$vendorId[0]} WHERE backOrderId = {$order->backOrderId}";
+            if (!$wpdb->query($sql)) {
+                echo 'query failed';
+                echo $sql;
+            }
+//        }
+    }
+    echo 'done';
     exit();
-
 
     for ($i = 1; $i < $pages; $i++) {
         $products_ids = wc_get_products(array(
