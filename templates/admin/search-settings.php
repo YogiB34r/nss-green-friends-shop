@@ -30,8 +30,7 @@ class Gf_Search_Wp_List_Table
     public function list_table_page($search)
     {
         $searchListTable = new Search_List_Table([], $search);
-        $searchListTable->prepare_items();
-        ?>
+        $searchListTable->prepare_items(); ?>
         <div class="wrap">
             <div id="icon-users" class="icon32"></div>
             <h2>Podešavanje pretrage</h2>
@@ -222,10 +221,11 @@ class Search_List_Table extends WP_List_Table
 //        return $actions;
 //    }
 
-    function column_cb($item)
+    public function column_cb($item)
     {
         return sprintf(
-            '<input type="checkbox" name="searchQuery[]" value="%s" />', $item['id']
+            '<input type="checkbox" name="searchQuery[]" value="%s" />',
+            $item['id']
         );
     }
 
@@ -234,7 +234,8 @@ class Search_List_Table extends WP_List_Table
      *
      * @param int $id query ID
      */
-    public static function delete_searchQuery( $id ) {
+    public static function delete_searchQuery($id)
+    {
         global $wpdb;
 
         $wpdb->delete(

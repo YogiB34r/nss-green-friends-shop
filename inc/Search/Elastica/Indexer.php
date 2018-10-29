@@ -4,9 +4,10 @@ namespace GF\Search\Elastica;
 
 class Indexer
 {
-    static function index(\Elastica\Client $elasticaClient)
+    public static function index(\Elastica\Client $elasticaClient)
     {
         global $wpdb;
+
         ini_set('max_execution_time', '600');
 
         $elasticaIndex = $elasticaClient->getIndex('nss');
@@ -47,25 +48,24 @@ class Indexer
                 } catch (\Exception $e) {
                     var_dump($e->getMessage());
                 }
-
             }
         }
         echo 'sync complete';
     }
 
-    static function parseWcProduct(\WC_Product $product)
+    public static function parseWcProduct(\WC_Product $product)
     {
         global $wpdb;
 
         $cats = [];
         foreach ($product->get_category_ids() as $category_id) {
             $cat = get_term_by('id', $category_id, 'product_cat');
-            if($cat->parent === 0){
+            if ($cat->parent === 0) {
                 $cat_lvl = 1;
-            }else{
-                if (get_term($cat->parent, 'product_cat')->parent === 0){
+            } else {
+                if (get_term($cat->parent, 'product_cat')->parent === 0) {
                     $cat_lvl = 2;
-                }else{
+                } else {
                     $cat_lvl = 3;
                 }
             }
@@ -96,9 +96,9 @@ class Indexer
         }
         $product_link = get_permalink((int) $product->get_id());
         $salePrice = 0;
-        if ($product->is_type('variable')){
+        if ($product->is_type('variable')) {
             $regularPrice = $product->get_variation_regular_price();
-        }else{
+        } else {
             $regularPrice = $product->get_regular_price();
         }
         $price = $regularPrice;
@@ -152,7 +152,7 @@ class Indexer
         return new \Elastica\Document($product->get_id(), $data);
     }
 
-    static function calculateOrderingRating(\WC_Product $product)
+    public static function calculateOrderingRating(\WC_Product $product)
     {
         $ponder = 10;
         if ($product->is_on_sale()) {
@@ -175,7 +175,7 @@ class Indexer
         ((int) !$product->is_in_stock() * $stockPonder);
     }
 
-    static function extractFullTextBoostedFields(\WC_Product $product, $attributes, $cats)
+    public static function extractFullTextBoostedFields(\WC_Product $product, $attributes, $cats)
     {
         $text = $product->get_name();
         $text .= ' ' . $product->get_meta('pa_proizvodjac');
@@ -198,7 +198,7 @@ class Indexer
         return $text;
     }
 
-    static function extractFullTextFields(\WC_Product $product, $attributes, $cats)
+    public static function extractFullTextFields(\WC_Product $product, $attributes, $cats)
     {
         $text = $product->get_name();
         $text .= ' ' . $product->get_meta('pa_proizvodjac');
@@ -222,6 +222,4 @@ class Indexer
 
         return $text;
     }
-
-
 }

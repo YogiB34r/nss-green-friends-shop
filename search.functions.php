@@ -67,7 +67,8 @@ function gf_elastic_search_with_data($input, $limit = 0)
 }
 
 
-function applySearchPageTitle($title) {
+function applySearchPageTitle($title)
+{
     $page_title = sprintf('Rezultati pretrage za: &ldquo;%s&rdquo;', wc_get_loop_prop('query'));
 
     if (wc_get_loop_prop('current_page')) {
@@ -78,7 +79,8 @@ function applySearchPageTitle($title) {
     return $page_title;
 }
 
-function parse_search_category_aggregation(\Elastica\ResultSet $resultSet) {
+function parse_search_category_aggregation(\Elastica\ResultSet $resultSet)
+{
     $counts = [];
     foreach ($resultSet->getAggregation('category')['buckets'] as $bucket) {
         $counts[$bucket['key']] = $bucket['doc_count'];
@@ -129,7 +131,8 @@ function parse_search_category_aggregation(\Elastica\ResultSet $resultSet) {
     $GLOBALS['gf-search']['facets']['category'] = $cats;
 }
 
-function get_search_category_aggregation() {
+function get_search_category_aggregation()
+{
     return $GLOBALS['gf-search']['facets']['category'];
 }
 
@@ -178,12 +181,18 @@ function gf_get_category_query()
     return gf_parse_post_ids_for_list($allIds);
 }
 
-add_action('admin_menu', function (){
-    add_menu_page('Pretraga', 'Podesavanje pretrage', 'edit_pages',
-    'gf-search-settings', 'handleAdminSearchSettings');
+add_action('admin_menu', function () {
+    add_menu_page(
+        'Pretraga',
+        'Podesavanje pretrage',
+        'edit_pages',
+    'gf-search-settings',
+        'handleAdminSearchSettings'
+    );
 });
 
-function handleAdminSearchSettings() {
+function handleAdminSearchSettings()
+{
     $config = array(
         'host' => ES_HOST,
         'port' => 9200
@@ -192,5 +201,27 @@ function handleAdminSearchSettings() {
     $termSearch = new \GF\Search\Elastica\TermSearch($client);
 //    $result = $term->getTerms();
     require(__DIR__ . "/templates/admin/search-settings.php");
+}
 
+add_action('admin_menu', function () {
+    add_menu_page(
+        'Lista proizvoda',
+        'Nasa lista proizvoda',
+        'edit_pages',
+    'gf-product-list',
+        'ourListOfProducts'
+    );
+});
+
+function ourListOfProducts()
+{
+    if (isset($_GET['s']) && $_GET['s'] !== '') {
+        $s = $_GET['s'];
+        // var_dump($s);
+        // die();
+        $searchResult = gf_elastic_search($s);
+        // var_dump($searchResult);
+        // die();
+    }
+    require(__DIR__ . "/templates/admin/list-product-search-settings.php");
 }
