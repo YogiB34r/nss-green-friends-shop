@@ -749,5 +749,21 @@ function gf_get_order_print_url($colname)
 
 
 
+add_filter( 'gettext', 'theme_sort_change', 20, 3 );
+function theme_sort_change( $translated_text, $text, $domain ) {
 
+    if ( is_woocommerce() ) {
+
+        switch ( $translated_text ) {
+
+            case 'Sort by latest' :
+
+                $translated_text = __( 'Sortiraj po najnovijem', 'theme_text_domain' );
+                break;
+        }
+
+    }
+
+    return $translated_text;
+}
 
