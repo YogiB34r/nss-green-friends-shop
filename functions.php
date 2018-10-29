@@ -747,3 +747,36 @@ function gf_get_order_print_url($colname)
     }
 }
 
+// ako zatreba za neki prevod koji ne mozemo da nadjemo
+//add_filter( 'gettext', 'theme_sort_change', 20, 3 );
+//function theme_sort_change( $translated_text, $text, $domain ) {
+//
+//    if ( is_woocommerce() ) {
+//
+//        switch ( $translated_text ) {
+//
+//            case 'Sort by latest' :
+//
+//                $translated_text = __( 'Sortiraj po najnovijem', 'theme_text_domain' );
+//                break;
+//        }
+//
+//    }
+//
+//    return $translated_text;
+//}
+
+add_filter('woocommerce_catalog_orderby', 'wc_customize_product_sorting');
+
+function wc_customize_product_sorting($sorting_options){
+    $sorting_options = array(
+        'menu_order' => __( 'Sorting', 'woocommerce' ),
+        'popularity' => __( 'Sort by popularity', 'woocommerce' ),
+        'rating'     => __( 'Sort by average rating', 'woocommerce' ),
+        'date'       => __( 'Sort by newness', 'woocommerce' ),
+        'price'      => __( 'Sort by price: low to high', 'woocommerce' ),
+        'price-desc' => __( 'Sort by price: high to low', 'woocommerce' ),
+    );
+
+    return $sorting_options;
+}
