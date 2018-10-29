@@ -174,7 +174,7 @@ class Product_List_Table extends WP_List_Table
         if ($query->have_posts()) {
             while ($query->have_posts()) : $query->the_post();
 
-            // wc_get_template_part('content', 'product');
+
             $product_id = get_the_ID();
             // var_dump($product_id);
             // die();
@@ -320,7 +320,7 @@ class Product_List_Table extends WP_List_Table
 
         // var_dump(isset($_GET['product_cat']));
         // die();
-        if (!isset($_GET['product_cat']) || $_GET['product_cat'] === '') {
+        if (!isset($_REQUEST['product_cat']) || $_REQUEST['product_cat'] === '') {
             wc_product_dropdown_categories(
                 array(
                     'option_select_text' => __('Filter by category', 'woocommerce'),
@@ -394,7 +394,7 @@ class Product_List_Table extends WP_List_Table
     }
 }
 ?>
-<script>
+<!-- <script>
     jQuery(document).ready(function () {
         jQuery('.toplevel_page_gf-product-list').on('click', '#', function () {
             var parent = jQuery(this).parent();
@@ -422,4 +422,4 @@ class Product_List_Table extends WP_List_Table
             inputElement.parent().children().show();
         });
     });
-</script>
+</script> -->
