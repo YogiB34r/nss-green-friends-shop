@@ -780,3 +780,32 @@ function wc_customize_product_sorting($sorting_options){
 
     return $sorting_options;
 }
+
+//add_action('woocommerce_order_items_meta_display', 'addItemStatusToOrderItemList');
+
+//add_action('woocommerce_admin_order_item_values', 'addItemStatusToOrderItemList');
+
+add_action('woocommerce_before_order_itemmeta', 'addItemStatusToOrderItemList', 10, 3);
+function addItemStatusToOrderItemList($itemId, $item, $c) {
+    /* @var WC_Order_Item_Product $item */
+    if (get_class($item) === WC_Order_Item_Product::class) {
+        global $wpdb;
+
+        $sql = "SELECT * FROM wp_nss_backorderItems WHERE orderId = {$_GET['post']} AND itemId = {$item->get_product_id()}";
+        $result = $wpdb->get_results($sql);
+        if (empty($result)) {
+            echo '<p>Status proizvoda: NARUČEN</p>';
+        } else {
+            if ($result[0]->status == 1) {
+                echo '<p>Status proizvoda: SPREMAN ZA PAKOVANJE</p>';
+            } elseif ($result[0]->status == 0) {
+                echo '<p>Status proizvoda: NARUČEN</p>';
+            } else {
+                echo '<p>Status proizvoda: NEMA NA STANJU !</p>';
+            }
+        }
+        echo '<p>Broj naloga: '.$result[0]->backOrderId.'</p>';
+        //https://nonstopshop.rs/wp-admin/admin.php?page=nss-orders&tab=backOrderProcess&id=18
+    }
+
+}
