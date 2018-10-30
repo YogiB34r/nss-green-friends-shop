@@ -38,10 +38,9 @@ if (isset($_GET['action'])) {
 
             break;
 
-        case 'dailyExpressCsv':
-            $arg = array('orderby' => 'date', 'status' => ['u-pripremiplaceno', 'u-pripremi'], 'posts_per_page' => '500');
+        case 'dailyExpressCsv': // wc-spz-slanje
+            $arg = array('orderby' => 'date', 'status' => ['spz-pakovanje', 'spz-slanje'], 'posts_per_page' => '500');
             $orders = WC_get_orders($arg);
-//            var_dump(count($orders));
             createDailyExport($orders);
 
             break;
@@ -79,7 +78,7 @@ function createDailyExport($orders) {
         endif;
         $otkupnina = 0;
         if ($order->get_payment_method_title() == 'Pouzećem') {
-            $otkupnina = number_format($order->get_total(), 0);
+            $otkupnina = number_format($order->get_total(), 0, '', '');
         }
         $weight = 0;
         $category = '';
@@ -137,7 +136,7 @@ function createDailyExport($orders) {
         }
     }
 
-    echo 'done';
+    echo 'done. exported '.count($orders).' orders.';
 }
 
 function createAdresnica($orderId) {
