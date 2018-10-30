@@ -697,7 +697,7 @@ function gf_manual_order_created($post_id, $post, $update)
         } // 3. Fired when Updating an order
         else {
             update_post_meta($post_id, '_hook_is_triggered', 'Update  order'); // Testing
-            $phone_order_value = $_POST['gf_phone_order'];
+            $phone_order_value = isset($_POST['gf_phone_order']) ? $_POST['gf_phone_order'] : 0;
             if ($phone_order_value == 1) {
                 update_post_meta($post_id, 'gf_order_created_method', 'Telefonom'); // Testing
             } else {
