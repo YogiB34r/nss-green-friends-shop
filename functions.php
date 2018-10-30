@@ -660,16 +660,18 @@ function gf_custom_column_ordering_for_admin_list_order($product_columns)
 }
 
 add_action('woocommerce_admin_order_data_after_order_details', 'gf_admin_phone_order_field');
-function gf_admin_phone_order_field()
+function gf_admin_phone_order_field($order)
 {
-//    echo '<p class="form-field form-field-wide">Poručeno telefonom?</p>
-//            <input type="radio" name="phone_order"><label for="">Da</label>';
+    $checked = true;
+    if($order->get_meta('gf_order_created_method') == 'WWW'){
+        $checked = false;
+    }
     woocommerce_form_field('gf_phone_order', array(
         'type' => 'checkbox',
         'class' => array('gf-admin-phone-order'),
         'label' => __('Poručivanje telefonom'),
         'required' => false,
-    ), true);
+    ), $checked);
 }
 
 add_action('save_post_shop_order', 'gf_manual_order_created', 10, 3);
