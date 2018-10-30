@@ -34,13 +34,18 @@ class Gf_Product_Wp_list_Table
 
         <form id="posts-filter" method="get" >
         <input type="hidden" name="page" class="post_status_page" value="gf-product-list" />
+
          <?php $productListTable->search_box('Search products'); ?>
         <input type="hidden" name="post_status" class="post_status_page" value="all" />
         <input type="hidden" name="post_type" class="post_type_page" value="product" />
         <div class="wrap">
             <div id="icon-users" class="icon32"></div>
-            <h2>Custom products list</h2>
+            <a href="http://nss.local/wp-admin/post-new.php?post_type=product" class="page-title-action">Add New</a>
+            <a href="http://nss.local/wp-admin/edit.php?post_type=product&amp;page=product_importer" class="page-title-action">Import</a>
+            <a href="http://nss.local/wp-admin/edit.php?post_type=product&amp;page=product_exporter" class="page-title-action">Export</a>
+            <h2 class="wp-custom-heading-inline">Custom products list</h2>
 
+            <?php $productListTable->bulk_actions(); ?>
             <?php $productListTable->render_products_category(); ?>
             <?php $productListTable->render_products_type(); ?>
             <?php $productListTable->render_products_stock_status(); ?>
@@ -152,23 +157,27 @@ class Product_List_Table extends WP_List_Table
      */
     private function table_data()
     {
-        $args = array('post_type' => 'product', 'posts_per_page' => 100);
+        // default arguments array
+        $arguments = array('post_type' => 'product', 'posts_per_page' => 100);
 
+        // filter part of the table data
         if ($_REQUEST['filter_action'] === 'Filter') {
-            $args['action'] = -1;
-            $args['paged'] = 1;
-            $args['action2'] = -1;
+            $arguments['action'] = -1;
+            $arguments['paged'] = 1;
+            $arguments['action2'] = -1;
             if ($_REQUEST['product_type'] !== '') {
-                $args['product_type'] = $_REQUEST['product_type'];
+                $arguments['product_type'] = $_REQUEST['product_type'];
             } elseif ($_REQUEST['stock_status'] !== '') {
-                $args['stock_status'] = $_REQUEST['stock_status'];
+                $arguments['stock_status'] = $_REQUEST['stock_status'];
+            } elseif ($_REQUEST['product_cat'] !== '') {
+                $arguments['product_cat'] = $_REQUEST['product_cat'];
             }
         }
 
-        // var_dump($args);
+        // var_dump($arguments);
         // die();
 
-        $query = new WP_Query($args);
+        $query = new WP_Query($arguments);
         // }
 
         if ($query->have_posts()) {
@@ -179,7 +188,6 @@ class Product_List_Table extends WP_List_Table
             // var_dump($product_id);
             // die();
             $product = wc_get_product($product_id);
-            // $name = get_the_title();
             $name = '<a href="' . esc_url(admin_url('post.php?post=' . get_the_ID() . ' &action=edit')) . ' ">' . esc_html(get_the_title()) . '</a>';
             $sku = get_post_meta($product_id, '_sku', true);
             $price = get_post_meta($product_id, '_price', true)  . 'din';
@@ -309,6 +317,10 @@ class Product_List_Table extends WP_List_Table
         //@TODO process bulk delete action
     }
 
+    public function bulk_action()
+    {
+    }
+
 
     /**
      * Render the product category filter for the list table.
@@ -316,31 +328,22 @@ class Product_List_Table extends WP_List_Table
      * @since 3.5.0
      */
     public function render_products_category()
-    {        // $categories_count = (int) wp_count_terms('product_cat');
-
-        // var_dump(isset($_GET['product_cat']));
-        // die();
-        if (!isset($_REQUEST['product_cat']) || $_REQUEST['product_cat'] === '') {
+    {
+        if ($_REQUEST['product_cat'] !== '') {
+            wc_product_dropdown_categories(
+                array(
+                    'option_select_text' => __('Filter by category', 'woocommerce'),
+                    'hide_empty'         => 0,
+                    'selected' => $_REQUEST['product_cat']
+                )
+            );
+        } else {
             wc_product_dropdown_categories(
                 array(
                     'option_select_text' => __('Filter by category', 'woocommerce'),
                     'hide_empty'         => 0,
                 )
             );
-        } else {
-            // var_dump('Hello');
-        // die();
-        $current_category_slug = isset($_GET['product_cat']) ? wc_clean(wp_unslash($_GET['product_cat'])) : false; // WPCS: input var ok, CSRF ok.
-
-        // var_dump($current_category_slug);
-            // die();
-            $current_category      = $current_category_slug ? get_term_by('slug', $current_category_slug, 'product_cat') : false; ?>
-            <select class="wc-category-search" name="product_cat" data-placeholder="<?php esc_attr_e('Filter by category', 'woocommerce'); ?>" data-allow_clear="true">
-                <?php if ($current_category_slug && $current_category) : ?>
-                    <option value="<?php echo esc_attr($current_category_slug); ?>" selected="selected"><?php echo esc_html($current_category->name); ?><option>
-                <?php endif; ?>
-            </select>
-            <?php
         }
     }
 
@@ -394,32 +397,3 @@ class Product_List_Table extends WP_List_Table
     }
 }
 ?>
-<!-- <script>
-    jQuery(document).ready(function () {
-        jQuery('.toplevel_page_gf-product-list').on('click', '#', function () {
-            var parent = jQuery(this).parent();
-            console.log(parent);
-            var data = {
-                term: jQuery(this).data('query'),
-                url: parent.find('input').val()
-            };
-            jQuery.post('/gf-ajax/?saveSearchRedirect=1', data, function (response) {
-                if (response == 1) {
-                    parent.find('input').prop('readonly', true);
-                    parent.find('button').hide();
-                    alert('Upit izmenjen.');
-                }
-            });
-        });
-
-        jQuery('.toplevel_page_gf-search-settings').on('click', '.showRedirect', function () {
-            var inputElement = jQuery(this).parent().prev().find('input');
-            if (inputElement.hasClass('redirected')) {
-                inputElement.prop('readonly', false);
-            } else {
-                inputElement.show();
-            }
-            inputElement.parent().children().show();
-        });
-    });
-</script> -->
