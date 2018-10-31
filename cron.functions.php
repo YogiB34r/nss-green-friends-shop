@@ -20,15 +20,33 @@ if (defined('WP_CLI') && WP_CLI) {
     \WP_CLI::add_command('syncElasticIndex', 'syncElasticIndex');
 
     \WP_CLI::add_command('passAllProducts', 'passAllProducts');
+    \WP_CLI::add_command('passAllUsers', 'passAllUsers');
+
 }
 
-function gf_get_products_without_image()
-{
+function gf_get_products_without_image() {
     global $wpdb;
     $sql = "SELECT ID FROM wp_posts WHERE ID NOT IN (select post_id from wp_postmeta WHERE meta_key='_thumbnail_id') AND post_type='product'";
     $result = $wpdb->get_results($sql);
 
     return $result;
+}
+
+function passAllUsers() {
+    global $wpdb;
+    $args = array(
+        'role'    => 'Supplier',
+        'orderby' => 'user_nicename',
+        'order'   => 'ASC'
+    );
+    /* @var WP_User $user */
+    foreach (get_users($args) as $user) {
+        $userMeta = get_user_meta($user->ID);
+        $sql = "SELECT gfax FROM gvendor WHERE  gvendorid = {$user->vendorid}";
+        $result = $wpdb->get_results($sql);
+        update_user_meta($user->ID, 'description', $result[0]->gfax);
+        wp_update_user( array( 'ID' => $user->ID, 'display_name' => $userMeta['vendor_name'][0] ) );
+    }
 }
 
 function passAllProducts() {

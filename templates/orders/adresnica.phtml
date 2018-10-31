@@ -3,11 +3,25 @@
  * @var \WC_Order $order
  */
 $generator = new \Picqer\Barcode\BarcodeGeneratorHTML();
+$generator = new \Picqer\Barcode\BarcodeGeneratorSVG();
 
 $html = '<html>
 <header>
 <title>Adresnica-'.$order.'.pdf</title>
+<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+<meta content="utf-8" http-equiv="encoding">
+<script>
+    function printDiv() {
+        var w = window.open();
+        w.document.write(document.getElementById(\'content-print\').innerHTML);
+        w.print();
+        w.close();
+    }
+</script>
 <style>
+svg {
+display: block;
+}
     body, body p, p {
         font-size: 18px;
     }
@@ -15,13 +29,12 @@ $html = '<html>
         width: 100%;
         padding: 5px;
         margin: auto;
-        border: 1px solid;
     }
     .gf-print-bill-number{
         width: 100%;
         padding: 50px;
         padding-bottom:0;
-        font-size: 24px;
+        font-size: 20px;
     }
     .gf-print-bill-info-wrapper{
         margin-left: 50px;
@@ -38,16 +51,16 @@ $html = '<html>
     }
 </style>
 </header>
-<body>';
+<body onload="printDiv()">';
 
-$html .= '<div class="gf-print-bill-wrapper">
+$html .= '<div class="gf-print-bill-wrapper" id="content-print">
     <div class="gf-print-bill-number">';
 
     $dailyExpressFormat = 'SS' . $order->get_date_created()->format('dm')
-        . str_replace('201', '', $order->get_date_created()->format('Y'))
+        . str_replace('2018', '', $order->get_date_created()->format('Y'))
         . $order->get_id();
-    $html .= $generator->getBarcode($dailyExpressFormat, $generator::TYPE_CODE_128, 2, 50);
-    $html .= $dailyExpressFormat;
+    $html .= $generator->getBarcode($dailyExpressFormat, $generator::TYPE_CODE_128, 1, 40);
+    $html .= '<span style="width: 123px;">'.$dailyExpressFormat . '</span>';
 
 $html .= '</div>
     <div class="gf-print-bill-info-wrapper">
@@ -91,3 +104,5 @@ $html .= '</div>
 </body>
 </html>
 ';
+echo $html;
+exit();

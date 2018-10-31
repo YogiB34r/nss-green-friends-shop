@@ -44,6 +44,7 @@ if (isset($_GET['action'])) {
             createDailyExport($orders);
 
             break;
+
     }
 }
 
@@ -79,6 +80,7 @@ function createDailyExport($orders) {
         $otkupnina = 0;
         if ($order->get_payment_method_title() == 'Pouzećem') {
             $otkupnina = number_format($order->get_total(), 0, '', '');
+            $otkupnina = $otkupnina * 100;
         }
         $weight = 0;
         $category = '';
@@ -147,6 +149,7 @@ function createAdresnica($orderId) {
 
     require (__DIR__ . '/templates/orders/adresnica.phtml');
 
+//    $html2pdf = new \Spipu\Html2Pdf\Html2Pdf('P', 'A4', 'en', true, 'Windows-1252');
     $html2pdf = new \Spipu\Html2Pdf\Html2Pdf();
     $html2pdf->writeHTML($html);
     $name = 'Adresnica-'.$order->get_order_number().'.pdf';
