@@ -3537,4 +3537,7 @@ button[name='update_cart'] {
 .woocommerce-cart .woocommerce-shipping-destination{
     display: none !important;
 }
+.woocommerce-Price-currencySymbol{
+    margin-left: 4px !important;
+}
 
