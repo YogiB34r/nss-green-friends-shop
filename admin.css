@@ -105,6 +105,16 @@ GF SORTABLE CATEGORIES
     color: #fff !important;
 }
 
+.order-status.status-spz-slanje{
+    background-color: #cc00ff !important;
+    color: #fff !important;
+}
+
+.order-status.status-isporuceno{
+    background-color: #6600cc !important;
+    color: #fff !important;
+}
+
 .order-status.status-reklamacija,
 .order-status.status-reklamacija-pnns,
 .order-status.status-stornirano,
