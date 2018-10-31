@@ -460,12 +460,14 @@ function gf_my_account_shop_button()
 }
 
 add_action('woocommerce_before_checkout_shipping_form', 'gf_checkout_shipping_notice');
-function gf_checkout_shipping_notice() {
+function gf_checkout_shipping_notice()
+{
     echo '<div class ="gf-checkout-shipping-notice p-3" >Ukoliko se adresa za dostavu razlikuje od navedene u detaljima naplate, popunite sledeća polja:</div>';
 }
 
 add_action('wp_footer', 'gf_cart_refresh_update_qty');
-function gf_cart_refresh_update_qty() {
+function gf_cart_refresh_update_qty()
+{
     if (is_cart()) {
         ?>
         <script type="text/javascript">
@@ -481,7 +483,8 @@ function gf_cart_refresh_update_qty() {
 }
 
 add_filter('woocommerce_account_menu_items', 'gf_remove_my_account_links');
-function gf_remove_my_account_links($menu_links) {
+function gf_remove_my_account_links($menu_links)
+{
 
     unset($menu_links['dashboard']); // Addresses
 
@@ -496,7 +499,8 @@ function gf_remove_my_account_links($menu_links) {
 }
 
 add_filter('post_date_column_time', 'gf_custom_post_date_column_time', 10, 2);
-function gf_custom_post_date_column_time($h_time, $post) {
+function gf_custom_post_date_column_time($h_time, $post)
+{
 
     $h_time = get_the_time(__('d/m/Y', 'woocommerce'), $post);
 
@@ -504,7 +508,8 @@ function gf_custom_post_date_column_time($h_time, $post) {
 }
 
 add_action('woocommerce_cart_collaterals', 'gf_cart_page_extra_buttons');
-function gf_cart_page_extra_buttons() {
+function gf_cart_page_extra_buttons()
+{
     if (!is_user_logged_in()) {
         echo '<a class="gf-cart-extra-buttons d-block p-3 mb-3" href="/moj-nalog">REGISTRUJ SE</a>
               <a class="gf-cart-extra-buttons d-block p-3" href="/placanje">NASTAVI KUPOVINU BEZ REGISTRACIJE</a>';
@@ -512,7 +517,8 @@ function gf_cart_page_extra_buttons() {
 }
 
 //Migrate comments from old site
-function gf_migrate_comments() {
+function gf_migrate_comments()
+{
     $rows = array_map('str_getcsv', file(__DIR__ . '/reviews.csv'));
     $header = array_shift($rows);
     $csv = array();
@@ -663,7 +669,7 @@ add_action('woocommerce_admin_order_data_after_order_details', 'gf_admin_phone_o
 function gf_admin_phone_order_field($order)
 {
     $checked = true;
-    if($order->get_meta('gf_order_created_method') == 'WWW'){
+    if ($order->get_meta('gf_order_created_method') == 'WWW') {
         $checked = false;
     }
     woocommerce_form_field('gf_phone_order', array(
@@ -692,7 +698,12 @@ function gf_manual_order_created($post_id, $post, $update)
             update_post_meta($post_id, '_hook_is_triggered', 'Save the new order'); // Testing
             $phone_order_value = $_POST['gf_phone_order'];
             if ($phone_order_value == 1) {
-                update_post_meta($post_id, 'gf_order_created_method', 'Telefonom'); // Testing
+                update_post_meta($post_id, 'gf_order_created_method', 'Telefonom');
+                if ($_POST['_payment_method'] == 'bacs') {
+                    $_POST['order_status'] = 'wc-cekaseuplata';
+                } else {
+                    $_POST['order_status'] = 'wc-u-pripremi';
+                }
             } else {
                 update_post_meta($post_id, 'gf_order_created_method', 'WWW'); // Testing
             }
@@ -705,7 +716,23 @@ function gf_manual_order_created($post_id, $post, $update)
             } else {
                 update_post_meta($post_id, 'gf_order_created_method', 'WWW'); // Testing
             }
+
         }
+    }
+
+}
+
+add_action('save_post', 'redirect_page');
+function redirect_page()
+{
+    $type = get_post_type();
+
+    switch ($type) {
+        case "shop_order":
+            $url = admin_url() . 'edit.php?post_type=shop_order';
+            wp_redirect($url);
+            exit;
+            break;
     }
 }
 
@@ -770,14 +797,15 @@ function gf_get_order_print_url($colname)
 
 add_filter('woocommerce_catalog_orderby', 'wc_customize_product_sorting');
 
-function wc_customize_product_sorting($sorting_options){
+function wc_customize_product_sorting($sorting_options)
+{
     $sorting_options = array(
-        'menu_order' => __( 'Sorting', 'woocommerce' ),
-        'popularity' => __( 'Sort by popularity', 'woocommerce' ),
-        'rating'     => __( 'Sort by average rating', 'woocommerce' ),
-        'date'       => __( 'Sort by newness', 'woocommerce' ),
-        'price'      => __( 'Sort by price: low to high', 'woocommerce' ),
-        'price-desc' => __( 'Sort by price: high to low', 'woocommerce' ),
+        'menu_order' => __('Sorting', 'woocommerce'),
+        'popularity' => __('Sort by popularity', 'woocommerce'),
+        'rating' => __('Sort by average rating', 'woocommerce'),
+        'date' => __('Sort by newness', 'woocommerce'),
+        'price' => __('Sort by price: low to high', 'woocommerce'),
+        'price-desc' => __('Sort by price: high to low', 'woocommerce'),
     );
 
     return $sorting_options;
@@ -788,7 +816,8 @@ function wc_customize_product_sorting($sorting_options){
 //add_action('woocommerce_admin_order_item_values', 'addItemStatusToOrderItemList');
 
 add_action('woocommerce_before_order_itemmeta', 'addItemStatusToOrderItemList', 10, 3);
-function addItemStatusToOrderItemList($itemId, $item, $c) {
+function addItemStatusToOrderItemList($itemId, $item, $c)
+{
     /* @var WC_Order_Item_Product $item */
     if (get_class($item) === WC_Order_Item_Product::class) {
         global $wpdb;
@@ -806,7 +835,7 @@ function addItemStatusToOrderItemList($itemId, $item, $c) {
                 echo '<p>Status proizvoda: NEMA NA STANJU !</p>';
             }
         }
-        echo '<p>Broj naloga: '.$result[0]->backOrderId.'</p>';
+        echo '<p>Broj naloga: ' . $result[0]->backOrderId . '</p>';
         //https://nonstopshop.rs/wp-admin/admin.php?page=nss-orders&tab=backOrderProcess&id=18
     }
 
