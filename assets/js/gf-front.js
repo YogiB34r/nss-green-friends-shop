@@ -27,11 +27,11 @@ jQuery(document).ready(function () {
         $clamp(element, {clamp: 3, useNativeClamp: false});
     });
 
-    jQuery('.gf-sticker--center').each(function () {
-        if (jQuery(this).parent().parent().is('.products .product') || jQuery(this).parent().parent().is('.gf-category-box__item')) {
-            jQuery(this).addClass('gf-sticker--loop-grid');
-        }
-    });
+    // jQuery('.gf-sticker--center').each(function () {
+    //     if (jQuery(this).parent().parent().is('.products .product') || jQuery(this).parent().parent().is('.gf-category-box__item')) {
+    //         jQuery(this).addClass('gf-sticker--loop-grid');
+    //     }
+    // });
 
     if (jQuery('.products').hasClass('list')) {
         jQuery('.products .gf-sticker--center').toggleClass('gf-sticker--loop-list');

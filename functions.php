@@ -266,7 +266,7 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products)
             $classes .= ' sale ';
         }
         if ($product->getStockStatus() == 0) {
-            $classes .= ' outofstock';
+            $classes .= ' outofstock ';
         }
         // klase koje mozda zatrebaju za <li> 'instock sale shipping-taxable purchasable product-type-simple'
         $classes .= " instock ";
