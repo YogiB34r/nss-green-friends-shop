@@ -131,3 +131,6 @@ GF SORTABLE CATEGORIES
     color:red;
     font-size: 24px;
 }
+.gf-backorders-filters p{
+    float: none;
+}
