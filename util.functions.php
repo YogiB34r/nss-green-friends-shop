@@ -243,3 +243,28 @@ function gf_change_supplier_id_by_vendor_id() {
 //    echo '</ul>';
 }
 
+add_action('admin_menu', function (){
+    add_menu_page('Import cenovnika', 'Import cenovnika', 'edit_pages', 'pricelist-import', function() {
+        pricelist_import_page();
+    });
+});
+
+function pricelist_import_page() {
+    $updater = new \GF\Util\PricelistUpdate();
+    if (isset($_FILES['cenovnik'])) {
+        echo $updater->updatePricesAndStatuses($_FILES['cenovnik']);
+    } else {
+        echo $updater->getUploadForm();
+    }
+}
+
+function get_product_by_sku( $sku ) {
+    global $wpdb;
+
+    $product_id = $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key='_sku' AND meta_value='%s' LIMIT 1", $sku ) );
+    if ($product_id){
+        return new WC_Product( $product_id );
+    }
+
+    return null;
+}

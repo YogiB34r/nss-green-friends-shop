@@ -45,7 +45,65 @@ if (isset($_GET['action'])) {
 
             break;
 
+        case 'jitexItemExport':
+            ini_set('memory_limit', '1500M');
+            ini_set('max_execution_time', '300');
+            createJitexItemExport();
+
+            break;
+
     }
+}
+
+function createJitexItemExport() {
+    $csv = '';
+    for ($i=1; $i<15; $i++) {
+        $args = array(
+            'post_type' => 'product',
+            'posts_per_page' => 2000,
+            'page' => $i,
+            'status' => 'publish'
+        );
+        $products = wc_get_products($args);
+
+        /* @var $product WC_Product_Simple|WC_Product_Variable */
+        foreach($products as $product) {
+            if($product->get_meta('pdv') >= 10) {
+                $taxcalc = (int) ('1' . $product->get_meta('pdv'));
+            } else {
+                $taxcalc = (int) ('10' . (int) $product->get_meta('pdv'));
+            }
+
+            $csv .= @iconv('utf-8','windows-1250',  $product->get_sku()."\t".trim(mb_strtoupper($product->get_name(), 'UTF-8'))."\t".
+                    str_replace('.', ',', $product->get_meta('pdv'))."\t".str_replace('.', ',', round($product->get_price() * 100 / (double) $taxcalc, 2))."\t".
+                    str_replace('.', ',', round($product->get_price(), 2)))."\r\n";
+
+            if (get_class($product) === WC_Product_Variable::class) {
+                $passedIds = [];
+                foreach ($product->get_available_variations() as $variations) {
+                    foreach ($variations['attributes'] as $variation) {
+                        $itemIdSize = $product->get_sku() . $variation;
+                        if (!in_array($itemIdSize, $passedIds)) {
+                            $passedIds[] = $itemIdSize;
+                            $csv .= iconv('utf-8','windows-1250',  $itemIdSize."\t".
+                                    trim(mb_strtoupper($product->get_name() . ' ' . $variation, 'UTF-8'))."\t".
+                                    str_replace('.',',',$product->get_meta('pdv'))."\t".str_replace('.', ',', round($product->get_price() * 100 / (double) $taxcalc, 2))."\t".
+                                    str_replace('.', ',', round($product->get_price(), 2)))."\r\n";
+//                                var_dump($product->get_sku() . $variation);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    header("Cache-Control: public");
+    header("Content-Description: File Transfer");
+    header('Content-type: text/plain');
+    header("Content-Disposition: attachment; filename=".date('d-m-Y H:i:s').'.txt');
+    header('Content-Transfer-Encoding: binary');
+
+    echo $csv;
 }
 
 function createDailyExport($orders) {
@@ -136,6 +194,7 @@ function createDailyExport($orders) {
         if (!fputcsv($tmpFile, $csvArray, '|')) {
             die('eerrorr');
         }
+        $order->update_status('poslato');
     }
 
     echo 'done. exported '.count($orders).' orders.';
@@ -160,16 +219,18 @@ function exportJitexOrder(WC_Order $order) {
     $string = '';
     foreach ($order->get_items() as $item) {
         $p = wc_get_product($item->get_product()->get_id());
-        if ($p->get_parent_id()) {
-            $p = wc_get_product($p->get_parent_id());
-        }
 
         $variation = '';
-        if (get_class($p) === WC_Product_Variation::class)
-        foreach (array_values($p->get_variation_attributes())[0] as $value) {
-            if (strstr($item->get_name(), $value)) {
-                $variation = $value;
+        if (get_class($p) === WC_Product_Variation::class) {
+            foreach (array_values($p->get_variation_attributes())[0] as $value) {
+                if (strstr($item->get_name(), $value)) {
+                    $variation = $value;
+                }
             }
+        }
+
+        if ($p->get_parent_id()) {
+            $p = wc_get_product($p->get_parent_id());
         }
 
         $name = $order->get_billing_first_name() .' '. $order->get_billing_last_name();
@@ -183,6 +244,8 @@ function exportJitexOrder(WC_Order $order) {
         $order->get_billing_phone()."\t".$order->get_order_number()."\t".$date."\t".$order->get_payment_method_title()."\t".$variantId."\t".$variantName."\t".
             $item->get_quantity()."\t".$priceNoPdv."\t".$priceFormated."\t".$order->get_billing_company()."\r\n";
     }
+    $order->update_meta_data('jitexExportCreated', 1);
+    $order->save();
     $shippingNoPdv = number_format($order->get_shipping_total() / 1.2, 2, ',', '.');
 
     $string .= $name."\t".$order->get_billing_address_1()."\t".$order->get_billing_postcode()."\t".$order->get_billing_city()."\t"."Srbija"."\t".

@@ -33,6 +33,7 @@ require(__DIR__ . "/inc/Search/Search.php");
 require(__DIR__ . "/inc/Search/Elastica/Search.php");
 require(__DIR__ . "/inc/Search/Elastica/TermSearch.php");
 require(__DIR__ . "/inc/CheckoutHelper/CheckoutHelper.php");
+require(__DIR__ . '/inc/Util/PricelistUpdate.php');
 
 add_action('after_setup_theme', 'require_on_init');
 
@@ -765,11 +766,15 @@ function gf_get_order_print_url($colname)
     global $the_order;
 
     if ($colname == 'customActions') {
+        $jitexDoneStyle = '';
+        if ($the_order->get_meta('jitexExportCreated')) {
+            $jitexDoneStyle = 'style="color:white;background-color:gray;font-style:italic;"';
+        }
 //        echo '<a class="button" href="/back-ajax/?action=printOrder&id='. $the_order->get_id() .'" title="Print racuna" target="_blank">Racun</a>';
         echo '&nbsp;';
         echo '<a class="button" href="/back-ajax/?action=printPreorder&id=' . $the_order->get_id() . '" title="Print predracuna" target="_blank">Predracun</a>';
         echo '&nbsp;';
-        echo '<a class="button" href="/back-ajax/?action=exportJitexOrder&id=' . $the_order->get_id() . '" title="Export za Jitex" target="_blank">Export</a>';
+        echo '<a class="button" '.$jitexDoneStyle.' href="/back-ajax/?action=exportJitexOrder&id=' . $the_order->get_id() . '" title="Export za Jitex" target="_blank">Export</a>';
         echo '&nbsp;';
         echo '<a class="button" href="/back-ajax/?action=adresnica&id=' . $the_order->get_id() . '" title="Kreiraj adresnicu" target="_blank">Adresnica</a>';
 //        echo $the_order->get_meta('gf_order_created_method');
@@ -819,13 +824,13 @@ add_action('woocommerce_before_order_itemmeta', 'addItemStatusToOrderItemList', 
 function addItemStatusToOrderItemList($itemId, $item, $c)
 {
     /* @var WC_Order_Item_Product $item */
-    if (get_class($item) === WC_Order_Item_Product::class) {
+    if ($_GET['post'] && get_class($item) === WC_Order_Item_Product::class) {
         global $wpdb;
 
         $sql = "SELECT * FROM wp_nss_backorderItems WHERE orderId = {$_GET['post']} AND itemId = {$item->get_product_id()}";
         $result = $wpdb->get_results($sql);
         if (empty($result)) {
-            echo '<p>Status proizvoda: NARUČEN</p>';
+            echo '<p>Status proizvoda: ČEKA NARUČIVANJE</p>';
         } else {
             if ($result[0]->status == 1) {
                 echo '<p>Status proizvoda: SPREMAN ZA PAKOVANJE</p>';
@@ -840,3 +845,20 @@ function addItemStatusToOrderItemList($itemId, $item, $c)
     }
 
 }
+
+function gf_remove_processing_status($statuses){
+    if(isset($statuses['wc-processing'])){
+        unset($statuses['wc-processing']);
+    }
+    if(isset($statuses['wc-pending'])){
+        unset($statuses['wc-pending']);
+    }
+    if(isset($statuses['wc-cancelled'])){
+        unset($statuses['wc-cancelled']);
+    }
+    if(isset($statuses['wc-failed'])){
+        unset($statuses['wc-failed']);
+    }
+    return $statuses;
+}
+//add_filter( 'wc_order_statuses', 'gf_remove_processing_status', 6666666 );

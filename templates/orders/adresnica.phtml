@@ -5,6 +5,12 @@
 $generator = new \Picqer\Barcode\BarcodeGeneratorHTML();
 $generator = new \Picqer\Barcode\BarcodeGeneratorSVG();
 
+$companyInfo = false;
+if ($order->get_meta('_billing_pib') != '') {
+    $companyInfo = '<p>Ime firme: '.$order->get_billing_company().'</p>';
+    $companyInfo .= '<p>Pib: '.$order->get_meta('_billing_pib').'</p>';
+}
+
 $html = '<html>
 <header>
 <title>Adresnica-'.$order.'.pdf</title>
@@ -75,13 +81,22 @@ $html .= '</div>
         </div></td>
             <td width="300"><div class="gf-print-bill__shipping-info">
             <h4>Primalac:</h4>';
+
             if ($order->get_shipping_address_1() !== ''):
-                $html .= '<p>'.$order->get_shipping_first_name() .' '. $order->get_shipping_last_name().'</p>
-                <p>'.$order->get_shipping_address_1().'</p>
+                if ($companyInfo) {
+                    $html .= $companyInfo;
+                } else {
+                    $html .= '<p>'.$order->get_shipping_first_name() .' '. $order->get_shipping_last_name().'</p>';
+                }
+                $html .= '<p>'.$order->get_shipping_address_1().'</p>
                 <p>'.$order->get_shipping_postcode() .', '. $order->get_shipping_city() . ', Srbija</p>';
             else:
-                $html .= '<p>'.$order->get_billing_first_name() .' '. $order->get_billing_last_name().'</p>
-                <p>'.$order->get_billing_address_1().',</p>
+                if ($companyInfo) {
+                    $html .= $companyInfo;
+                } else {
+                    $html .= '<p>'.$order->get_billing_first_name() .' '. $order->get_billing_last_name().'</p>';
+                }
+                $html .= '<p>'.$order->get_billing_address_1().',</p>
                 <p>'.$order->get_billing_postcode() .', '. $order->get_billing_city().'</p>';
             endif;
             $html .= '<p>Int. broj : '.$order->get_order_number().'</p>
