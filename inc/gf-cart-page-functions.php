@@ -189,3 +189,24 @@ function bbloomer_woocommerce_tiered_shipping($rates, $package)
     }
     return $rates;
 }
+
+add_action('woocommerce_before_cart', 'gf_cart_limit_notice');
+function gf_cart_limit_notice(){
+    global $woocommerce;
+    if($woocommerce->cart->total > 20000){
+        $message = 'OBAVEŠTENJE: Plaćanje pouzećem nije omogućeno za narudžbine koje iznose preko 20.000 din.';
+        wc_print_notice( $message, 'notice');
+    }
+}
+add_filter( 'woocommerce_available_payment_gateways', 'bbloomer_unset_gateway_by_category' );
+
+function bbloomer_unset_gateway_by_category( $available_gateways ) {
+    global $woocommerce;
+    $unset = false;
+    $category_ids = array( 8, 37 );
+    if($woocommerce->cart->total > 20000){
+        $unset = true;
+    }
+    if ( $unset == true ) unset( $available_gateways['cod'] );
+    return $available_gateways;
+}
