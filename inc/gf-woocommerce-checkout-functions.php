@@ -167,4 +167,3 @@ function my_test_f($orderid)
         TNP::subscribe(['email' => $email, 'status' => 'C']);
     }
 }
-

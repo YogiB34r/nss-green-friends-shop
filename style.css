@@ -1279,6 +1279,9 @@ body.home .saved-sale {
 .gf-category-expander__col__subcategory {
     font-weight: 400;
 }
+.gf-expander__subcategory-list h2{
+    font-size: 16px;
+}
 
 .gf-category-expander__footer {
     text-align: center;
