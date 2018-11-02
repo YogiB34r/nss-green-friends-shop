@@ -9,9 +9,9 @@
 //require (ABSPATH . 'wp-content/plugins/nss-feed-import/classes/Importer.php');
 //require ('classes/NSS_Log.php');
 
-ini_set('max_execution_time', 1200);
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
+//ini_set('max_execution_time', 1200);
+//ini_set('display_errors', 1);
+//error_reporting(E_ALL);
 
 gf_feed1();
 

@@ -1,9 +1,8 @@
 <?php
 /* Template Name: back ajax */
 
-ini_set('max_execution_time', 1200);
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
+
+//ini_set('display_errors', 1);
 
 global $wpdb;
 
@@ -11,6 +10,8 @@ global $wpdb;
 //$sw->start('gfmain');
 
 if (isset($_GET['action'])) {
+    ini_set('max_execution_time', 1200);
+    error_reporting(E_ALL);
     switch ($_GET['action']) {
         case 'printPreorder':
             $printMenu = false;
@@ -107,7 +108,7 @@ function createJitexItemExport() {
 }
 
 function createDailyExport($orders) {
-    ini_set('display_errors', 1);
+//    ini_set('display_errors', 1);
     $adresnicaFields = [
         'ReferenceID','SBranchID','SName','SAddress','STownID','STown','SCName','SCPhone','PuBranchID','PuName',
         'PuAddress','PuTownID','PuTown','PuCName','PuCPhone','RBranchID','RName','RAddress','RTownID','RTown','RCName',
@@ -233,8 +234,11 @@ function exportJitexOrder(WC_Order $order) {
         if ($p->get_parent_id()) {
             $p = wc_get_product($p->get_parent_id());
         }
-
         $name = $order->get_billing_first_name() .' '. $order->get_billing_last_name();
+        if ($order->get_meta('_billing_pib') != '') {
+            $name = $order->get_billing_company() .' '. $order->get_meta('_billing_pib');
+        }
+
         $variantId = $p->get_sku() . $variation;
         $variantName = $item->get_name();
         $date = $order->get_date_created()->format('d.m.Y');

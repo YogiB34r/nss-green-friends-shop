@@ -690,10 +690,19 @@ function gf_manual_order_created($post_id, $post, $update)
     $trigger_status = get_post_meta($post_id, '_hook_is_triggered', true);
 
     // 1. Fired the first time you hit create a new order (before saving it)
-    if (!$update)
+    if (!$update) {
         update_post_meta($post_id, '_hook_is_triggered', 'Create new order'); // Testing
+    }
 
-    if ($update) {
+    if (isset($_POST['gf_phone_order']) && $order->get_status() === "pending") {
+        if ($_POST['_payment_method'] == 'bacs') {
+            $_POST['order_status'] = 'wc-cekaseuplata';
+        } else {
+            $_POST['order_status'] = 'wc-u-pripremi';
+        }
+    }
+
+    if ($update && isset($_POST['gf_phone_order'])) {
         // 2. Fired when saving a new order
         if ('Create new order' == $trigger_status) {
             update_post_meta($post_id, '_hook_is_triggered', 'Save the new order'); // Testing
@@ -828,7 +837,7 @@ add_action('woocommerce_before_order_itemmeta', 'addItemStatusToOrderItemList', 
 function addItemStatusToOrderItemList($itemId, $item, $c)
 {
     /* @var WC_Order_Item_Product $item */
-    if ($_GET['post'] && get_class($item) === WC_Order_Item_Product::class) {
+    if (isset($_GET['post']) && $_GET['post'] && get_class($item) === WC_Order_Item_Product::class) {
         global $wpdb;
 
         $sql = "SELECT * FROM wp_nss_backorderItems WHERE orderId = {$_GET['post']} AND itemId = {$item->get_product_id()}";
