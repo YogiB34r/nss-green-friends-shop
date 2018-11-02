@@ -21,12 +21,11 @@ if (defined('WP_CLI') && WP_CLI) {
     \WP_CLI::add_command('passAllUsers', 'passAllUsers');
 
     \WP_CLI::add_command('createXmlExport', 'getItemExport');
-
 }
 
 ini_set('max_execution_time', 1200);
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
+//ini_set('display_errors', 1);
+//error_reporting(E_ALL);
 
 function getItemExport() {
     global $wpdb;

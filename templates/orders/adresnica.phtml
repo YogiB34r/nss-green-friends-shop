@@ -6,10 +6,10 @@ $generator = new \Picqer\Barcode\BarcodeGeneratorHTML();
 $generator = new \Picqer\Barcode\BarcodeGeneratorSVG();
 
 $companyInfo = false;
-if ($order->get_meta('_billing_pib') != '') {
-    $companyInfo = '<p>Ime firme: '.$order->get_billing_company().'</p>';
-    $companyInfo .= '<p>Pib: '.$order->get_meta('_billing_pib').'</p>';
-}
+//if ($order->get_meta('_billing_pib') != '') {
+//    $companyInfo = '<p>Ime firme: '.$order->get_billing_company().'</p>';
+//    $companyInfo .= '<p>Pib: '.$order->get_meta('_billing_pib').'</p>';
+//}
 
 $html = '<html>
 <header>

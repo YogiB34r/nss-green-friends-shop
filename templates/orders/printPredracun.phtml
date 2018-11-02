@@ -1,63 +1,85 @@
 <?php
 /* @var WC_Order $order */
 ?>
-<style>
-    body{
-        font-family: Verdana;
-    }
-    h2 {
-        font-size: 18px;
-    }
-    h4 {
-        font-size: 14px;
-    }
-    p {
-        font-size: 14px;
-    }
-    .gf-print-bill-wrapper{
-        width: 100%;
-        padding: 5px;
-        margin: auto;
-    }
-    .gf-print-bill-header{
-        width: 100%;
-        text-align: center;
-        font-weight: bold;
-        text-transform: uppercase;
-    }
-    .gf-print-bill-info-wrapper{
-        width: 90%;
-        margin: auto;
-        margin-bottom: 20px;
-    }
-    .gf-print-bill-info-wrapper p{
-        margin: 0;
-    }
-    .gf-print-bill-table{
-        width: 90%;
-        margin: auto;
-        border: solid 1px black;
-        text-align: center;
-    }
-    .gf-print-bill-table thead{
-        border: solid 1px black;
-    }
-    .gf-print-bill-table tfoot{
-        border-top: 1px solid;
-        font-weight: bolder;
-    }
-    .print-predracun{
-        width: 90%;
-        margin: 0 auto;
-    }
-    .print-predracun h4, .print-predracun p, h4{
-        margin: 0;
-    }
-    .gf-print-bill__customer-info{
-        margin-top: 30px;
-        margin-left: 5px;
-    }
-</style>
+<html>
+<head>
+    <style type="text/css" media="print">
+        /*.page {*/
+            /*-webkit-transform: rotate(-90deg);*/
+            /*-moz-transform:rotate(-90deg);*/
+            /*filter:progid:DXImageTransform.Microsoft.BasicImage(rotation=3);*/
+        /*}*/
+        body {
+            transform: rotate(270deg) translate(-250mm, 0);
+            transform-origin: 0 0;
+            margin: 20px;
+        }
+        .gf-print-bill-wrapper{
+            width: 276mm;
+            height: 190mm;
+        }
+    </style>
+    <style>
+        body{
+            font-family: Verdana;
+        }
+        h2 {
+            font-size: 18px;
+        }
+        h4 {
+            font-size: 14px;
+        }
+        p {
+            font-size: 14px;
+        }
+        .gf-print-bill-wrapper{
+            width: 110%;
+            padding: 5px;
+            margin: auto;
+        }
+        .gf-print-bill-header{
+            width: 120%;
+            text-align: center;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .gf-print-bill-info-wrapper{
+            width: 120%;
+            margin: auto;
+            margin-bottom: 20px;
+        }
+        .gf-print-bill-info-wrapper p{
+            margin: 0;
+        }
+        .gf-print-bill-table{
+            width: 120%;
+            margin: auto;
+            border: solid 1px black;
+            text-align: center;
+            font-size:14px;
+        }
+        .gf-print-bill-table thead{
+            border: solid 1px black;
+        }
+        .gf-print-bill-table tfoot{
+            border-top: 1px solid;
+            font-weight: bolder;
+        }
+        .print-predracun{
+            width: 100%;
+            margin: 0 auto;
+        }
+        .print-predracun h4, .print-predracun p, h4{
+            margin: 0;
+        }
+        .gf-print-bill__customer-info{
+            margin-top: 30px;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+
 <div class="gf-print-bill-wrapper">
     <div class="gf-print-bill-header">
         <h2>Predračun broj <?=$order->get_order_number()?></h2>
@@ -119,12 +141,12 @@
     <table class="gf-print-bill-table">
         <thead>
         <tr>
-            <th width="400">Artikal</th>
-            <th width="100">Količina</th>
-            <th width="170">Osnovica po kom.</th>
-            <th>Poreska stopa</th>
-            <th>Iznos PDV</th>
-            <th>Cena sa PDV-om</th>
+            <th width="30%" style="text-align: left">Artikal</th>
+            <th width="5%">Količina</th>
+            <th width="13%">Osnovica po kom.</th>
+            <th width="13%">Poreska stopa</th>
+            <th width="13%">Iznos PDV</th>
+            <th style="text-align: right">Cena sa PDV-om</th>
         </tr>
         </thead>
     </table>
@@ -145,11 +167,11 @@
             ?>
             <tr>
 <!--                <td>(<?=$product->get_sku()?>) <?=$product->get_name()?></td> -->
-                <td width="400" style="text-align: left"><?=$product->get_name()?></td>
-                <td width="100"><?=$item->get_quantity()?></td>
-                <td width="170"><?=number_format($priceNoPdv, 2)?></td>
-                <td><?=$product->get_meta('pdv')?> %</td>
-                <td><?=number_format($pdvInDin, 2)?></td>
+                <td width="30%" style="text-align: left"><?=$product->get_name()?></td>
+                <td width="5%"><?=$item->get_quantity()?></td>
+                <td width="14%"><?=number_format($priceNoPdv, 2)?></td>
+                <td width="13%"><?=$product->get_meta('pdv')?> %</td>
+                <td width="14%"><?=number_format($pdvInDin, 2)?></td>
                 <td style="text-align: right"><?=number_format($product->get_price(), 2)?> din </td>
             </tr>
         <?php } ?>
@@ -189,3 +211,5 @@
         </tr>
     </table>
 </div>
+</body>
+</html>
