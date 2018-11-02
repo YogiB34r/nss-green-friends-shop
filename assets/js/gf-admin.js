@@ -247,10 +247,7 @@ jQuery(document).ready(function ($) {
 
     jQuery('.edit_address').click(function () {
         jQuery('.gf-admin-orders-pib-field').hide();
-    })
-
-
-
+    });
 
     //Add new product page, required fields
     jQuery('.post-type-product #title').attr('required', true);
@@ -263,10 +260,14 @@ jQuery(document).ready(function ($) {
     jQuery('.post-type-product ._regular_price_field label').attr('class', 'required-price');
 
 
-
-
-
-
+    jQuery('.nssOrderJitexExport, .nssOrderAdresnica').click(function() {
+    // jQuery('.nssOrderJitexExport').click(function() {
+        jQuery(this).css({
+            color:'white',
+            backgroundColor:'gray',
+            fontStyle:'italic'
+        });
+    });
 
 });
 

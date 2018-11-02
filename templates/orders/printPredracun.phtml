@@ -2,121 +2,133 @@
 /* @var WC_Order $order */
 ?>
 <style>
+    body{
+        font-family: Verdana;
+    }
+    h2 {
+        font-size: 18px;
+    }
+    h4 {
+        font-size: 14px;
+    }
+    p {
+        font-size: 14px;
+    }
     .gf-print-bill-wrapper{
-        width: 80%;
+        width: 100%;
         padding: 5px;
         margin: auto;
-        border: 1px solid;
-    }
-    .gf-print-bill-number{
-        width: 100%;
     }
     .gf-print-bill-header{
         width: 100%;
         text-align: center;
-        margin-top: 50px;
         font-weight: bold;
+        text-transform: uppercase;
     }
     .gf-print-bill-info-wrapper{
-        width: 75%;
+        width: 90%;
         margin: auto;
-        margin-top: 40px;
-        display: flex;
-    }
-    .gf-print-bill__customer-info, .gf-print-bill__shipping-info{
-        width: 50%;
-    }
-    .gf-print-bill__shipping-info{
-        text-align: right;
+        margin-bottom: 20px;
     }
     .gf-print-bill-info-wrapper p{
         margin: 0;
     }
-    .gf-print-bill__date-number-method{
-        margin-top: 30px;
-    }
     .gf-print-bill-table{
-        width: 75%;
+        width: 90%;
         margin: auto;
-        margin-top: 50px;
+        border: solid 1px black;
+        text-align: center;
     }
-    .gf-print-bill-table th{
-        border-bottom: 1px solid;
+    .gf-print-bill-table thead{
+        border: solid 1px black;
     }
     .gf-print-bill-table tfoot{
         border-top: 1px solid;
         font-weight: bolder;
     }
-    .gf-print-bill-table__total{
-        margin-right: auto;
+    .print-predracun{
+        width: 90%;
+        margin: 0 auto;
+    }
+    .print-predracun h4, .print-predracun p, h4{
+        margin: 0;
+    }
+    .gf-print-bill__customer-info{
+        margin-top: 30px;
+        margin-left: 5px;
     }
 </style>
 <div class="gf-print-bill-wrapper">
-    <div class="gf-print-bill-number">
-        <p></p>
-    </div>
     <div class="gf-print-bill-header">
-        <h3>Predračun broj <?=$order->get_order_number()?></h3>
+        <h2>Predračun broj <?=$order->get_order_number()?></h2>
     </div>
+    <br />
+    <table class="print-predracun">
+        <tr>
+            <td width="50%"><h4>PODACI O NARUČIOCU</h4></td>
+            <td width="10%"></td>
+            <td><h4>ADRESA KUPCA ZA ISPORUKU</h4></td>
+        </tr>
+        <tr>
+            <td><p>Ime i prezime: <?=$order->get_billing_first_name() .' '. $order->get_billing_last_name()?></p>
+                <p>Adresa: <?=$order->get_billing_address_1()?>,
+                <?=$order->get_billing_postcode() .', '. $order->get_billing_city()?></p>
+                <p>Telefon: <?=$order->get_billing_phone()?></p>
+            </td>
+            <td></td>
+            <td><?php $companyInfo = false; ?>
+                <?php if ($order->get_meta('_billing_pib') != '') {
+                    $companyInfo = '<p>Ime firme: '.$order->get_billing_company().'</p>';
+                    $companyInfo .= '<p>Pib: '.$order->get_meta('_billing_pib').'</p>';
+                } ?>
+                <?php if ($order->get_shipping_address_1() !== ''): ?>
+                    <?php if ($companyInfo): ?>
+                        <?=$companyInfo?>
+                    <?php else: ?>
+                        <p><?=$order->get_shipping_first_name() .' '. $order->get_shipping_last_name()?></p>
+                    <?php endif; ?>
+
+                    <p><?=$order->get_shipping_address_1()?></p>
+                    <p><?=$order->get_shipping_postcode() .', '. $order->get_shipping_city() . ', Srbija'?></p>
+                <?php else: ?>
+                    <?php if ($companyInfo): ?>
+                        <?=$companyInfo?>
+                    <?php else: ?>
+                        <p>Ime i prezime: <?=$order->get_billing_first_name() .' '. $order->get_billing_last_name()?></p>
+                    <?php endif; ?>
+                    <p>Adresa: <?=$order->get_billing_address_1()?>,</p>
+                    <p><?=$order->get_billing_postcode() .', '. $order->get_billing_city()?></p>
+                    <p>Telefon: <?=$order->get_billing_phone()?></p>
+                <?php endif; ?></td>
+        </tr>
+    </table>
+
     <div class="gf-print-bill-info-wrapper">
         <div class="gf-print-bill__customer-info">
             <h4>PODACI O PRODAVCU</h4>
             <p>NonStopShop DOO</p>
             <p>PIB: 109837860</p>
-            <p>160-487203-63</p>
-            <p>Poziv na broj : <?=$order->get_order_number()?></p>
-        </div>
-
-        <div class="gf-print-bill__customer-info">
-            <h4>PODACI O NARUČIOCU / PODACI ZA RAČUN</h4>
-            <p>Ime i prezime: <?=$order->get_billing_first_name() .' '. $order->get_billing_last_name()?></p>
-            <p>Adresa: <?=$order->get_billing_address_1()?>,</p>
-            <p><?=$order->get_billing_postcode() .', '. $order->get_billing_city()?></p>
-            <p>Telefon: <?=$order->get_billing_phone()?></p>
-            <div class="gf-print-bill__date-number-method">
-                <p>Broj narudžbenice: <?=$order->get_order_number()?></p>
-                <p>Datum naručivanja: <?=$order->get_date_created()->format('d/m/Y')?></p>
-                <p>Način plaćanja: <?=$order->get_payment_method_title()?></p>
-            </div>
-        </div>
-        <div class="gf-print-bill__shipping-info">
-            <h4>ADRESA KUPCA ZA ISPORUKU</h4>
-            <?php $companyInfo = false; ?>
-            <?php if ($order->get_meta('_billing_pib') != '') {
-                $companyInfo = '<p>Ime firme: '.$order->get_billing_company().'</p>';
-                $companyInfo .= '<p>Pib: '.$order->get_meta('_billing_pib').'</p>';
-            } ?>
-            <?php if ($order->get_shipping_address_1() !== ''): ?>
-                <?php if ($companyInfo): ?>
-                    <?=$companyInfo?>
-                <?php else: ?>
-                    <p><?=$order->get_shipping_first_name() .' '. $order->get_shipping_last_name()?></p>
-                <?php endif; ?>
-
-                <p><?=$order->get_shipping_address_1()?></p>
-                <p><?=$order->get_shipping_postcode() .', '. $order->get_shipping_city() . ', Srbija'?></p>
-            <?php else: ?>
-                <?php if ($companyInfo): ?>
-                    <?=$companyInfo?>
-                <?php else: ?>
-                    <p>Ime i prezime: <?=$order->get_billing_first_name() .' '. $order->get_billing_last_name()?></p>
-                <?php endif; ?>
-                <p>Adresa: <?=$order->get_billing_address_1()?>,</p>
-                <p><?=$order->get_billing_postcode() .', '. $order->get_billing_city()?></p>
-                <p>Telefon: <?=$order->get_billing_phone()?></p>
-            <?php endif; ?>
-
+            <p>MB: 21251712</p>
+            <p>Tekući račun: 160-487203-63</p>
+            <p>Poziv na broj: <?=$order->get_order_number()?></p>
+            <p>Datum naručivanja: <?=$order->get_date_created()->format('d/m/Y')?></p>
+            <p>Način plaćanja: <?=$order->get_payment_method_title()?></p>
         </div>
     </div>
+
     <table class="gf-print-bill-table">
+        <thead>
         <tr>
-            <th>Proizvod</th>
-            <th>kol</th>
-            <th>osnovica</th>
-            <th>PDV</th>
-            <th>iznos PDV</th>
-            <th>Cena din</th>
+            <th width="400">Artikal</th>
+            <th width="100">Količina</th>
+            <th width="170">Osnovica po kom.</th>
+            <th>Poreska stopa</th>
+            <th>Iznos PDV</th>
+            <th>Cena sa PDV-om</th>
         </tr>
+        </thead>
+    </table>
+    <table class="gf-print-bill-table">
         <?php
         foreach ($order->get_items() as $item) {
             $product = wc_get_product($item->get_product()->get_id());
@@ -132,12 +144,13 @@
             $shippingPdvInDin = $order->get_shipping_total() - $shippingNoPdv;
             ?>
             <tr>
-                <td>(<?=$product->get_sku()?>) <?=$product->get_name()?></td>
-                <td><?=$item->get_quantity()?></td>
-                <td><?=number_format($priceNoPdv, 2)?></td>
+<!--                <td>(<?=$product->get_sku()?>) <?=$product->get_name()?></td> -->
+                <td width="400" style="text-align: left"><?=$product->get_name()?></td>
+                <td width="100"><?=$item->get_quantity()?></td>
+                <td width="170"><?=number_format($priceNoPdv, 2)?></td>
                 <td><?=$product->get_meta('pdv')?> %</td>
-                <td><?=number_format($pdvInDin)?></td>
-                <td><?=$product->get_price()?> din</td>
+                <td><?=number_format($pdvInDin, 2)?></td>
+                <td style="text-align: right"><?=number_format($product->get_price(), 2)?> din </td>
             </tr>
         <?php } ?>
         <tr>
@@ -149,28 +162,12 @@
             <td></td>
         </tr>
         <tr>
-            <td>Zbir</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td><?=$order->get_total() - $order->get_shipping_total() ?> din</td>
-        </tr>
-        <tr>
-            <td>&nbsp;</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Dostava</td>
+            <td style="text-align: left">Troškovi dostave</td>
             <td></td>
             <td><?=$shippingNoPdv?></td>
             <td>20%</td>
-            <td><?=$shippingPdvInDin?> din</td>
-            <td><?=$order->get_shipping_total()?> din</td>
+            <td><?=number_format($shippingPdvInDin, 2)?> din</td>
+            <td style="text-align: right"><?=number_format($order->get_shipping_total(), 2)?> din </td>
         </tr>
         <tr>
             <td>&nbsp;</td>
@@ -180,15 +177,15 @@
             <td></td>
             <td></td>
         </tr>
-        <tfoot>
+    </table>
+    <table class="gf-print-bill-table">
         <tr>
-            <td class="">TOTAL</td>
+            <td class="" style="text-align: left">UKUPNO ZA UPLATU</td>
             <td></td>
             <td></td>
             <td></td>
             <td></td>
-            <td><?=$order->get_total()?> din</td>
+            <td style="text-align: right"><b><?=number_format($order->get_total(), 2)?> din</b></td>
         </tr>
-        </tfoot>
     </table>
 </div>

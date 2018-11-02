@@ -204,6 +204,7 @@ function createAdresnica($orderId) {
     $order = wc_get_order($orderId);
     $html = '';
     $order->update_status('spz-slanje');
+    $order->update_meta_data('adresnicaCreated', 1);
     $order->save();
 
     require (__DIR__ . '/templates/orders/adresnica.phtml');

@@ -62,9 +62,7 @@ display: block;
 $html .= '<div class="gf-print-bill-wrapper" id="content-print">
     <div class="gf-print-bill-number">';
 
-    $dailyExpressFormat = 'SS' . $order->get_date_created()->format('dm')
-        . str_replace('2018', '', $order->get_date_created()->format('Y'))
-        . $order->get_id();
+    $dailyExpressFormat = 'SS' . $order->get_date_created()->format('dm') . $order->get_id();
     $html .= $generator->getBarcode($dailyExpressFormat, $generator::TYPE_CODE_128, 1, 40);
     $html .= '<span style="width: 123px;">'.$dailyExpressFormat . '</span>';
 

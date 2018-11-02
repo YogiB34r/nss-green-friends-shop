@@ -767,16 +767,20 @@ function gf_get_order_print_url($colname)
 
     if ($colname == 'customActions') {
         $jitexDoneStyle = '';
+        $adresnicaDoneStyle = '';
         if ($the_order->get_meta('jitexExportCreated')) {
             $jitexDoneStyle = 'style="color:white;background-color:gray;font-style:italic;"';
+        }
+        if ($the_order->get_meta('adresnicaCreated')) {
+            $adresnicaDoneStyle = 'style="color:white;background-color:gray;font-style:italic;"';
         }
 //        echo '<a class="button" href="/back-ajax/?action=printOrder&id='. $the_order->get_id() .'" title="Print racuna" target="_blank">Racun</a>';
         echo '&nbsp;';
         echo '<a class="button" href="/back-ajax/?action=printPreorder&id=' . $the_order->get_id() . '" title="Print predracuna" target="_blank">Predracun</a>';
         echo '&nbsp;';
-        echo '<a class="button" '.$jitexDoneStyle.' href="/back-ajax/?action=exportJitexOrder&id=' . $the_order->get_id() . '" title="Export za Jitex" target="_blank">Export</a>';
+        echo '<a class="button nssOrderJitexExport" '.$jitexDoneStyle.' href="/back-ajax/?action=exportJitexOrder&id=' . $the_order->get_id() . '" title="Export za Jitex" target="_blank">Export</a>';
         echo '&nbsp;';
-        echo '<a class="button" href="/back-ajax/?action=adresnica&id=' . $the_order->get_id() . '" title="Kreiraj adresnicu" target="_blank">Adresnica</a>';
+        echo '<a class="button nssOrderAdresnica" '.$adresnicaDoneStyle.' href="/back-ajax/?action=adresnica&id=' . $the_order->get_id() . '" title="Kreiraj adresnicu" target="_blank">Adresnica</a>';
 //        echo $the_order->get_meta('gf_order_created_method');
     }
 }

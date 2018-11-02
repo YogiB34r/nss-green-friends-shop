@@ -88,8 +88,8 @@ add_action('woocommerce_checkout_process', 'gf_checkbox_for_company');
 function gf_checkbox_for_company()
 {
     if (isset($_POST['billing_company_checkbox'])) {
-        if (strlen($_POST['billing_pib']) != 8 && strlen($_POST['billing_pib']) != 0)
-            wc_add_notice(__('PIB mora imati tacno osam cifara'), 'error');
+        if (strlen($_POST['billing_pib']) != 9 && strlen($_POST['billing_pib']) != 0)
+            wc_add_notice(__('PIB mora imati tačno devet cifara'), 'error');
         if (strlen($_POST['billing_pib']) === 0) {
             wc_add_notice(__('Pib je obavezno polje'), 'error');
         }
