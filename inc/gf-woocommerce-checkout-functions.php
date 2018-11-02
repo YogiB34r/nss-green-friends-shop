@@ -167,3 +167,4 @@ function gf_newsletter_on_checkout_page($orderid)
         TNP::subscribe(['email' => $email, 'status' => 'C']);
     }
 }
+
