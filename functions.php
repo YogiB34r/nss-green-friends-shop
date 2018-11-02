@@ -691,7 +691,7 @@ function gf_manual_order_created($post_id, $post, $update)
 
     // 1. Fired the first time you hit create a new order (before saving it)
     if (!$update) {
-        update_post_meta($post_id, '_hook_is_triggered', 'Create new order'); // Testing
+        update_post_meta($post_id, '_hook_is_triggered', 'Create new order');
     }
 
     if (isset($_POST['gf_phone_order']) && $order->get_status() === "pending") {
@@ -705,7 +705,7 @@ function gf_manual_order_created($post_id, $post, $update)
     if ($update && isset($_POST['gf_phone_order'])) {
         // 2. Fired when saving a new order
         if ('Create new order' == $trigger_status) {
-            update_post_meta($post_id, '_hook_is_triggered', 'Save the new order'); // Testing
+            update_post_meta($post_id, '_hook_is_triggered', 'Save the new order');
             $phone_order_value = $_POST['gf_phone_order'];
             if ($phone_order_value == 1) {
                 update_post_meta($post_id, 'gf_order_created_method', 'Telefonom');
@@ -715,16 +715,16 @@ function gf_manual_order_created($post_id, $post, $update)
                     $_POST['order_status'] = 'wc-u-pripremi';
                 }
             } else {
-                update_post_meta($post_id, 'gf_order_created_method', 'WWW'); // Testing
+                update_post_meta($post_id, 'gf_order_created_method', 'WWW');
             }
         } // 3. Fired when Updating an order
         else {
-            update_post_meta($post_id, '_hook_is_triggered', 'Update  order'); // Testing
+            update_post_meta($post_id, '_hook_is_triggered', 'Update  order');
             $phone_order_value = isset($_POST['gf_phone_order']) ? $_POST['gf_phone_order'] : 0;
             if ($phone_order_value == 1) {
-                update_post_meta($post_id, 'gf_order_created_method', 'Telefonom'); // Testing
+                update_post_meta($post_id, 'gf_order_created_method', 'Telefonom');
             } else {
-                update_post_meta($post_id, 'gf_order_created_method', 'WWW'); // Testing
+                update_post_meta($post_id, 'gf_order_created_method', 'WWW');
             }
 
         }
