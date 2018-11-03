@@ -628,7 +628,12 @@ function gf_get_order_phone_column($colname)
     global $the_order;
 
     if ($colname == 'order_phone_column') {
-        echo $the_order->get_meta('gf_order_created_method');
+        $via = 'WWW';
+        if ($the_order->get_created_via() == 'admin') {
+            $via = 'PHONE';
+        }
+        echo $via;
+//        echo $the_order->get_meta('gf_order_created_method');
     }
 }
 
@@ -696,39 +701,42 @@ function gf_manual_order_created($post_id, $post, $update)
 
     if (isset($_POST['gf_phone_order']) && $order->get_status() === "pending") {
         if ($_POST['_payment_method'] == 'bacs') {
-            $_POST['order_status'] = 'wc-cekaseuplata';
+//            $_POST['order_status'] = 'wc-cekaseuplata';
+            $order->set_status('cekaseuplata');
         } else {
-            $_POST['order_status'] = 'wc-u-pripremi';
+            $order->set_status('u-pripremi');
+//            $_POST['order_status'] = 'wc-u-pripremi';
         }
+        $order->save();
     }
 
-    if ($update && isset($_POST['gf_phone_order'])) {
-        // 2. Fired when saving a new order
-        if ('Create new order' == $trigger_status) {
-            update_post_meta($post_id, '_hook_is_triggered', 'Save the new order');
-            $phone_order_value = $_POST['gf_phone_order'];
-            if ($phone_order_value == 1) {
-                update_post_meta($post_id, 'gf_order_created_method', 'Telefonom');
-                if ($_POST['_payment_method'] == 'bacs') {
-                    $_POST['order_status'] = 'wc-cekaseuplata';
-                } else {
-                    $_POST['order_status'] = 'wc-u-pripremi';
-                }
-            } else {
-                update_post_meta($post_id, 'gf_order_created_method', 'WWW');
-            }
-        } // 3. Fired when Updating an order
-        else {
-            update_post_meta($post_id, '_hook_is_triggered', 'Update  order');
-            $phone_order_value = isset($_POST['gf_phone_order']) ? $_POST['gf_phone_order'] : 0;
-            if ($phone_order_value == 1) {
-                update_post_meta($post_id, 'gf_order_created_method', 'Telefonom');
-            } else {
-                update_post_meta($post_id, 'gf_order_created_method', 'WWW');
-            }
-
-        }
-    }
+//    if ($update && isset($_POST['gf_phone_order'])) {
+//        // 2. Fired when saving a new order
+//        if ('Create new order' == $trigger_status) {
+//            update_post_meta($post_id, '_hook_is_triggered', 'Save the new order');
+//            $phone_order_value = $_POST['gf_phone_order'];
+//            if ($phone_order_value == 1) {
+//                update_post_meta($post_id, 'gf_order_created_method', 'Telefonom');
+//                if ($_POST['_payment_method'] == 'bacs') {
+//                    $_POST['order_status'] = 'wc-cekaseuplata';
+//                } else {
+//                    $_POST['order_status'] = 'wc-u-pripremi';
+//                }
+//            } else {
+//                update_post_meta($post_id, 'gf_order_created_method', 'WWW');
+//            }
+//        } // 3. Fired when Updating an order
+//        else {
+//            update_post_meta($post_id, '_hook_is_triggered', 'Update  order');
+//            $phone_order_value = isset($_POST['gf_phone_order']) ? $_POST['gf_phone_order'] : 0;
+//            if ($phone_order_value == 1) {
+//                update_post_meta($post_id, 'gf_order_created_method', 'Telefonom');
+//            } else {
+//                update_post_meta($post_id, 'gf_order_created_method', 'WWW');
+//            }
+//
+//        }
+//    }
 
 }
 

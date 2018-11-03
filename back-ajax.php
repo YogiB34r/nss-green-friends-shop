@@ -115,7 +115,8 @@ function createDailyExport($orders) {
         'RCPhone','DlTypeID','PaymentBy','PaymentType','BuyOut','Value','Mass','ReturnDoc','SMS_Sender','Packages','Note', 'Content'
     ];
 
-    $tmpFile = fopen(ABSPATH . '/wp-content/uploads/daily.csv', 'wa');
+    $adresnicaPath = ABSPATH . '/wp-content/uploads/daily.csv';
+    $tmpFile = fopen($adresnicaPath, 'wa');
 
     //insert csv header
     if (!fputcsv($tmpFile, $adresnicaFields, '|')) {
@@ -195,10 +196,14 @@ function createDailyExport($orders) {
         if (!fputcsv($tmpFile, $csvArray, '|')) {
             die('eerrorr');
         }
-        $order->update_status('poslato');
+//        $order->update_status('poslato');
     }
 
-    echo 'done. exported '.count($orders).' orders.';
+    header('Content-Disposition: attachment; filename="adresnica-' . date('dmy') . '.csv' . '"');
+    header("Content-Transfer-Encoding: binary");
+    header('Expires: 0');
+    header('Pragma: no-cache');
+    echo file_get_contents($adresnicaPath);
 }
 
 function createAdresnica($orderId) {
@@ -217,7 +222,12 @@ function createAdresnica($orderId) {
     $html2pdf->output($name, 'D');
 }
 
-function exportJitexOrder(WC_Order $order) {
+function exportJitexOrder(
+    WC_Order $order,
+    $test,
+    $tes12,
+    $test123
+) {
     $string = '';
     foreach ($order->get_items() as $item) {
         $p = wc_get_product($item->get_product()->get_id());
@@ -270,3 +280,7 @@ function printOrder(WC_Order $order) {
 function printPreorder(WC_Order $order) {
     require (__DIR__ . '/templates/orders/printPredracun.phtml');
 }
+
+
+
+
