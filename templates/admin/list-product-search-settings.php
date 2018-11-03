@@ -318,7 +318,7 @@ class Product_List_Table extends WP_List_Table
     }
 
     public function bulk_action()
-    {
+    {e
     }
 
 
