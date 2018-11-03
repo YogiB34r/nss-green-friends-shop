@@ -7,7 +7,7 @@ if (count($categories) != 0) {
     foreach ($categories as $category) {
         $url = $category['url'] . '?query=' . $_GET['query'];
         $html .= '<div class="col-sm-6 col-xs-6 col-md-3 gf-expander-module-first-line">';
-        $html .= '<h2><a class="gf-expander-first-line-parent" href="' . $url . '">' . $category['name'] .' ('.$category['count'].') </a></h2>';
+        $html .= '<a class="gf-expander-first-line-parent" href="' . $url . '">' . $category['name'] .' ('.$category['count'].') </a>';
         $html .= '</div>';
     }
 

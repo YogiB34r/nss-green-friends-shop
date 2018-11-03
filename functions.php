@@ -293,7 +293,7 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products)
 //        $html .= add_stickers_to_products_soldout($classes);
         $html .= '</a>';
         $html .= '<a href="' . $product->dto['permalink'] . '" title="' . $product->getName() . '">';
-        $html .= '<h3>' . $product->getName() . '</h3>';
+        $html .= '<h5>' . $product->getName() . '</h5>';
         $html .= '</a>';
         $html .= '<span class="price">';
         if ($saved_percentage > 0) {
