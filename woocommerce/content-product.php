@@ -52,7 +52,7 @@ $classes = ob_get_clean();
     </a>
     <a href="<?php echo get_permalink($product->get_id()) ?>"
        title="<?php echo esc_attr($product->get_title() ? $product->get_title() : $product->get_id()); ?>">
-        <h5><?php the_title();?></h5>
+        <h3><?php the_title();?></h3>
     </a>
     <span class="price"><?php echo $product->get_price_html(); ?></span>
     <div class="loop-short-description"><?=strip_tags($product->get_short_description())?></div>
