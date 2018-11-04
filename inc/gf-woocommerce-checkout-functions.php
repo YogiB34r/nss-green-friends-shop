@@ -153,7 +153,9 @@ add_action('woocommerce_checkout_update_order_meta', 'my_custom_checkout_field_u
 
 function my_custom_checkout_field_update_order_meta($order_id)
 {
-    if ($_POST['gf_newsletter_checkout']) update_post_meta($order_id, 'gf_newsletter_checkout', esc_attr($_POST['gf_newsletter_checkout']));
+    if (isset($_POST['gf_newsletter_checkout']) && $_POST['gf_newsletter_checkout']) {
+        update_post_meta($order_id, 'gf_newsletter_checkout', esc_attr($_POST['gf_newsletter_checkout']));
+    }
 }
 
 add_action('woocommerce_thankyou', 'gf_newsletter_on_checkout_page', 10, 1);
