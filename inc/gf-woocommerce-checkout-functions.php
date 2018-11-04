@@ -212,3 +212,26 @@ add_action('woocommerce_checkout_update_order_meta', 'gf_custom_checkout_field_u
 function gf_custom_checkout_field_update_order_meta_created_method($order_id) {
     if (isset($_POST['gf_www_orders']) && $_POST['gf_www_orders']) update_post_meta($order_id, 'gf_order_created_method', 'WWW');
 }
+
+
+/**
+ * Change the checkout city field to a dropdown field.
+ */
+function gf_change_city_field_to_dropdown( $fields ) {
+    global $wpdb;
+    $sql = "SELECT * FROM wp_nss_city";
+    $result = $wpdb->get_results($sql);
+    $cities = [];
+    foreach ($result as $city){
+        $cities[$city->gname] = $city->gname;
+    }
+    
+    $city_args = wp_parse_args( array(
+        'type' => 'select',
+        'options' => $cities,
+    ), $fields['shipping']['shipping_city'] );
+    $fields['shipping']['shipping_city'] = $city_args;
+    $fields['billing']['billing_city'] = $city_args; // Also change for billing field
+    return $fields;
+}
+add_filter( 'woocommerce_checkout_fields', 'gf_change_city_field_to_dropdown' );
