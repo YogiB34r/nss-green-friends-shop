@@ -163,9 +163,9 @@ function woo_new_product_tab($tabs) {
  * Customize product data tabs
  */
 add_filter('woocommerce_product_tabs', 'woo_custom_description_tab', 98);
-function woo_custom_description_tab($tabs){
-    $tabs['description']['callback'] = 'woo_custom_description_tab_content';    // Custom description callback
-    $tabs['description']['priority'] = 50;
+function woo_custom_description_tab($tabs) {
+    $tabs['description']['callback'] = 'woo_custom_description_tab_content';
+    $tabs['description']['priority'] = 10;
 
     return $tabs;
 }

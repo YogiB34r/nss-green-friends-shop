@@ -8,6 +8,7 @@ function gf_woocommerce_billing_field_checkbox($fields)
         'clear' => true,
         'type' => 'checkbox',
         'class' => array('gf-company-checkbox'),
+        'priority' => 10
     );
 
     return $fields;
@@ -22,6 +23,7 @@ function gf_woocommerce_billing_field_pib($fields)
         'clear' => true, //
         'type' => 'text',
         'class' => array('gf-billing-field-pib'),
+        'priority' => 20
     );
 
     return $fields;
@@ -69,9 +71,6 @@ function gf_checkout_field_display_admin_order_meta($order)
 add_filter('woocommerce_email_order_meta_fields', 'gf_order_meta_keys', 10, 3);
 function gf_order_meta_keys($fields, $sent_to_admin, $order)
 {
-//    $keys[] = '_billing_pib';
-//    return $keys;
-
     $value = get_post_meta($order->id, '_billing_pib', true);
     if (empty($value)) {
         return;
@@ -105,9 +104,9 @@ function gf_checkbox_for_company()
     }
 }
 
-add_action('woocommerce_order_details_after_order_table', 'nolo_custom_field_display_cust_order_meta', 10, 1);
+add_action('woocommerce_order_details_after_order_table', 'custom_field_display_cust_order_meta', 10, 1);
 
-function nolo_custom_field_display_cust_order_meta($order)
+function custom_field_display_cust_order_meta($order)
 {
     $value = get_post_meta($order->get_id(), '_billing_pib', true);
     if (empty($value)) {
@@ -118,13 +117,8 @@ function nolo_custom_field_display_cust_order_meta($order)
     echo '<p><strong>' . _('PIB') . ':</strong> ' . $value . '</p>';
 }
 
-
 add_filter('woocommerce_order_formatted_billing_address', 'woo_custom_order_formatted_billing_address', 10, 2);
-
-function woo_custom_order_formatted_billing_address($address, $order)
-{
-//    $order = new WC_Order($order);
-
+function woo_custom_order_formatted_billing_address($address, $order) {
     $address = array(
         'first_name' => $order->get_billing_first_name(),
         'last_name' => $order->get_billing_last_name(),
@@ -132,35 +126,33 @@ function woo_custom_order_formatted_billing_address($address, $order)
         'address_2' => $order->get_billing_address_2(),
         'city' => $order->get_billing_city(),
         'postcode' => $order->get_billing_postcode(),
+        'priority' => 50
     );
 
     return $address;
 }
 
-
 add_action('woocommerce_review_order_before_submit', 'gf_add_newsletter_checkbox_on_checkout');
-function gf_add_newsletter_checkbox_on_checkout($checkout)
-{
+function gf_add_newsletter_checkbox_on_checkout($checkout) {
     woocommerce_form_field('gf_newsletter_checkout', array(
         'type' => 'checkbox',
         'class' => array('input-checkbox'),
         'label' => __('Želim da primam obaveštenja o specijalnim promocijama na email'),
         'required' => false,
+        'priority' => 50
     ), true);
 }
 
 add_action('woocommerce_checkout_update_order_meta', 'my_custom_checkout_field_update_order_meta');
 
-function my_custom_checkout_field_update_order_meta($order_id)
-{
-    if (isset($_POST['gf_newsletter_checkout']) && $_POST['gf_newsletter_checkout']) {
-        update_post_meta($order_id, 'gf_newsletter_checkout', esc_attr($_POST['gf_newsletter_checkout']));
-    }
+
+
+function my_custom_checkout_field_update_order_meta($order_id) {
+    if (isset($_POST['gf_newsletter_checkout']) && $_POST['gf_newsletter_checkout']) update_post_meta($order_id, 'gf_newsletter_checkout', esc_attr($_POST['gf_newsletter_checkout']));
 }
 
 add_action('woocommerce_thankyou', 'gf_newsletter_on_checkout_page', 10, 1);
-function gf_newsletter_on_checkout_page($orderid)
-{
+function gf_newsletter_on_checkout_page($orderid) {
     $order = wc_get_order($orderid);
     $email = $order->get_billing_email();
     $newsletter_value = $order->get_meta('gf_newsletter_checkout', true);
