@@ -23,8 +23,8 @@ function gf_check_if_slug_is_in_url_and_product_count()
     return $resault;
 }
 
-function gf_check_for_second_level_categories()
-{
+//@TODO fix typo here !!
+function gf_check_for_second_level_categories() {
     global $wp;
     $resault = '';
     $request_path = explode('/', $wp->request);
@@ -58,9 +58,7 @@ function gf_check_for_second_level_categories()
 
 
 add_action('woocommerce_archive_description', 'gf_display_categories_on_archive_page', 15);
-//Na nekim kategorijama $categories lepo uhvati kategorije a na nekima ne vraca nista 
-function gf_display_categories_on_archive_page()
-{
+function gf_display_categories_on_archive_page() {
     if (is_product_category() and !isset($_GET['query'])) {
         get_template_part('templates/template-parts/category-page/gf-module-for-categories');
     }

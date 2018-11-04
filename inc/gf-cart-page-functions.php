@@ -79,28 +79,25 @@ function custom_wc_empty_cart_message()
     echo $custum_html;
 }
 
-function wc_empty_cart_redirect_url()
-{
+add_filter('woocommerce_return_to_shop_redirect', 'wc_empty_cart_redirect_url');
+function wc_empty_cart_redirect_url() {
     return get_home_url();
 }
 
-add_filter('woocommerce_return_to_shop_redirect', 'wc_empty_cart_redirect_url');
 
 //They only way to translate shipping
-function gf_translate_shipping($name, $package)
-{
+add_filter('woocommerce_shipping_package_name', 'gf_translate_shipping', 10, 3);
+function gf_translate_shipping($name, $package) {
 //    return sprintf( _nx( 'Dostava', 'Dostava %d', ( $i + 1 ), 'shipping packages', 'green-friends' ), ( $i + 1 ) );
     return 'Dostava';
 }
 
-add_filter('woocommerce_shipping_package_name', 'gf_translate_shipping', 10, 3);
 
 /**
   * Display shipping category and price
   */
 add_filter('woocommerce_package_rates', 'bbloomer_woocommerce_tiered_shipping', 10, 2);
-function bbloomer_woocommerce_tiered_shipping($rates, $package)
-{
+function bbloomer_woocommerce_tiered_shipping($rates, $package) {
     if (WC()->cart->cart_contents_weight <= 0.5) {
         if (isset($rates['flat_rate:3']))
             unset(
@@ -199,11 +196,9 @@ function gf_cart_limit_notice(){
     }
 }
 add_filter( 'woocommerce_available_payment_gateways', 'bbloomer_unset_gateway_by_category' );
-
 function bbloomer_unset_gateway_by_category( $available_gateways ) {
     global $woocommerce;
     $unset = false;
-    $category_ids = array( 8, 37 );
     if($woocommerce->cart->total > 20000){
         $unset = true;
     }
