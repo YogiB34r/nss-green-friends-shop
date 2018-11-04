@@ -741,8 +741,7 @@ function gf_manual_order_created($post_id, $post, $update)
 }
 
 add_action('save_post', 'redirect_page');
-function redirect_page()
-{
+function redirect_page() {
     $type = get_post_type();
 
     switch ($type) {
@@ -755,31 +754,26 @@ function redirect_page()
 }
 
 add_action('woocommerce_review_order_before_submit', 'gf_add_www_field_on_checkout');
-function gf_add_www_field_on_checkout($checkout)
-{
+function gf_add_www_field_on_checkout($checkout) {
     woocommerce_form_field('gf_www_orders', array(
         'type' => 'hidden',
     ), true);
 }
 
 add_action('woocommerce_checkout_update_order_meta', 'gf_custom_checkout_field_update_order_meta_created_method');
-
-function gf_custom_checkout_field_update_order_meta_created_method($order_id)
-{
-    if ($_POST['gf_www_orders']) update_post_meta($order_id, 'gf_order_created_method', 'WWW');
+function gf_custom_checkout_field_update_order_meta_created_method($order_id) {
+    if (isset($_POST['gf_www_orders']) && $_POST['gf_www_orders']) update_post_meta($order_id, 'gf_order_created_method', 'WWW');
 }
 
 add_filter('manage_edit-shop_order_columns', 'gf_add_order_print');
-function gf_add_order_print($order_columns)
-{
+function gf_add_order_print($order_columns) {
     $order_columns['customActions'] = "Actions";
 
     return $order_columns;
 }
 
 add_action('manage_shop_order_posts_custom_column', 'gf_get_order_print_url');
-function gf_get_order_print_url($colname)
-{
+function gf_get_order_print_url($colname) {
     global $the_order;
 
     if ($colname == 'customActions') {
@@ -822,9 +816,7 @@ function gf_get_order_print_url($colname)
 //}
 
 add_filter('woocommerce_catalog_orderby', 'wc_customize_product_sorting');
-
-function wc_customize_product_sorting($sorting_options)
-{
+function wc_customize_product_sorting($sorting_options) {
     $sorting_options = array(
         'menu_order' => __('Sorting', 'woocommerce'),
         'popularity' => __('Sort by popularity', 'woocommerce'),
@@ -837,20 +829,15 @@ function wc_customize_product_sorting($sorting_options)
     return $sorting_options;
 }
 
-//add_action('woocommerce_order_items_meta_display', 'addItemStatusToOrderItemList');
-
-//add_action('woocommerce_admin_order_item_values', 'addItemStatusToOrderItemList');
-
 add_action('woocommerce_before_order_itemmeta', 'addItemStatusToOrderItemList', 10, 3);
-function addItemStatusToOrderItemList($itemId, $item, $c)
-{
+function addItemStatusToOrderItemList($itemId, $item, $c) {
     /* @var WC_Order_Item_Product $item */
     if (isset($_GET['post']) && $_GET['post'] && get_class($item) === WC_Order_Item_Product::class) {
         global $wpdb;
 
         $sql = "SELECT * FROM wp_nss_backorderItems WHERE orderId = {$_GET['post']} AND itemId = {$item->get_product_id()}";
         $result = $wpdb->get_results($sql);
-        if (empty($result)) {
+        if (empty($result) || !isset($result[0])) {
             echo '<p>Status proizvoda: ČEKA NARUČIVANJE</p>';
         } else {
             if ($result[0]->status == 1) {
@@ -860,11 +847,9 @@ function addItemStatusToOrderItemList($itemId, $item, $c)
             } else {
                 echo '<p>Status proizvoda: NEMA NA STANJU !</p>';
             }
+            echo '<p>Broj naloga: ' . $result[0]->backOrderId . '</p>';
         }
-        echo '<p>Broj naloga: ' . $result[0]->backOrderId . '</p>';
-        //https://nonstopshop.rs/wp-admin/admin.php?page=nss-orders&tab=backOrderProcess&id=18
     }
-
 }
 
 function gf_remove_processing_status($statuses){
@@ -883,3 +868,5 @@ function gf_remove_processing_status($statuses){
     return $statuses;
 }
 //add_filter( 'wc_order_statuses', 'gf_remove_processing_status', 6666666 );
+
+add_filter('members_check_parent_post_permission', function() {return false;});
