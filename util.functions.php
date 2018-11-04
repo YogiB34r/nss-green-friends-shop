@@ -119,30 +119,43 @@ function gf_get_third_level_categories($parent_id = null) {
 }
 
 function gf_check_level_of_category($cat_id) {
-    $result = null;
-    $top_level_ids = [];
-    $second_level_ids = [];
-    $third_level_ids = [];
-    foreach (gf_get_top_level_categories() as $category) {
-        $top_level_ids[] = $category->term_id;
+    $cat = get_term_by('id', $cat_id, 'product_cat');
+    if ($cat->parent === 0){
+        return 1;
+    } else {
+        if (get_term($cat->parent, 'product_cat')->parent === 0){
+            return 2;
+        } else{
+            return 3;
+        }
     }
-    foreach (gf_get_second_level_categories() as $category) {
-        $second_level_ids[] = $category->term_id;
-    }
-    foreach (gf_get_third_level_categories() as $category) {
-        $third_level_ids[] = $category->term_id;
-    }
-    if (in_array($cat_id, $top_level_ids)) {
-        $result = 1;
-    }
-    if (in_array($cat_id, $second_level_ids)) {
-        $result = 2;
-    }
-    if (in_array($cat_id, $third_level_ids)) {
-        $result = 3;
-    }
-    return $result;
 }
+
+//function gf_check_level_of_category($cat_id) {
+//    $result = null;
+//    $top_level_ids = [];
+//    $second_level_ids = [];
+//    $third_level_ids = [];
+//    foreach (gf_get_top_level_categories() as $category) {
+//        $top_level_ids[] = $category->term_id;
+//    }
+//    foreach (gf_get_second_level_categories() as $category) {
+//        $second_level_ids[] = $category->term_id;
+//    }
+//    foreach (gf_get_third_level_categories() as $category) {
+//        $third_level_ids[] = $category->term_id;
+//    }
+//    if (in_array($cat_id, $top_level_ids)) {
+//        $result = 1;
+//    }
+//    if (in_array($cat_id, $second_level_ids)) {
+//        $result = 2;
+//    }
+//    if (in_array($cat_id, $third_level_ids)) {
+//        $result = 3;
+//    }
+//    return $result;
+//}
 
 function gf_get_category_children_ids($slug) {
     $cat = get_term_by('slug', $slug, 'product_cat');
@@ -267,4 +280,61 @@ function get_product_by_sku( $sku ) {
     }
 
     return null;
+}
+
+//Migrate comments from old site
+function gf_migrate_comments()
+{
+    $rows = array_map('str_getcsv', file(__DIR__ . '/reviews.csv'));
+    $header = array_shift($rows);
+    $csv = array();
+    foreach ($rows as $row) {
+        $csv[] = array_combine($header, $row);
+    }
+    $successfulComments = [];
+    $emptySkus = [];
+    $emptyUsers = [];
+    foreach ($csv as $comment) {
+        $postId = wc_get_product_id_by_sku($comment['sku']);
+        if (!$postId) {
+            $emptySkus[] = $comment['sku'];
+            continue;
+        }
+        $user = get_user_by('email', $comment['Email']);
+        if (!$user) {
+            $emptyUsers[] = $comment['Email'];
+            continue;
+        }
+        $commentAuthor = $user->get('display_name');
+        $commentAuthorEmail = $user->get('user_email');
+        $commentAuthorUrl = $user->get('user_url');
+        $commentContent = $comment['comment'];
+        $userId = $user->get('ID');
+        $commentDate = $comment['date'];
+
+
+        $data = array(
+            'comment_post_ID' => $postId,
+            'comment_author' => $commentAuthor,
+            'comment_author_email' => $commentAuthorEmail,
+            'comment_author_url' => $commentAuthorUrl,
+            'comment_content' => $commentContent,
+            'comment_date' => $commentDate,
+            'comment_date_gmt' => $commentDate,
+            'comment_approved' => 1,
+            'user_id' => $userId,
+        );
+        $comment_id = wp_insert_comment($data);
+        $successfulComments[] = $comment_id;
+        update_comment_meta($comment_id, 'migrated', '1');
+    } //foreach comments
+
+    $skuLogFile = fopen(LOG_PATH . '/skuLog.csv', 'w');
+    fwrite($skuLogFile, implode(',', $emptySkus));
+    fclose($skuLogFile);
+
+    $userLogFile = fopen(LOG_PATH . '/usersLog.csv', 'w');
+    fwrite($userLogFile, implode(',', $emptyUsers));
+    fclose($userLogFile);
+    echo '<p>Uspešno importovano ' . count($successfulComments) . ' komentara</p>';
 }
