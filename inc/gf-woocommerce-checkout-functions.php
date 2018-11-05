@@ -149,7 +149,8 @@ function gf_newsletter_on_checkout_page($orderid) {
         TNP::subscribe(['email' => $email, 'status' => 'C']);
     }
 
-    if ($order->get_status() === "pending") {
+//    if ($order->get_status() === "pending") {
+    if ($order->get_status() === "on-hold") {
         if ($order->get_payment_method() === 'bacs') {
             $order->set_status('cekaseuplata');
         } elseif ($order->get_payment_method() === 'cod') {
@@ -184,11 +185,6 @@ function gf_order_created($post_id, $post, $update)
             $phone_order_value = $_POST['gf_phone_order'];
             if ($phone_order_value == 1) {
                 update_post_meta($post_id, 'gf_order_created_method', 'Telefonom');
-                if ($_POST['_payment_method'] == 'bacs') {
-                    $_POST['order_status'] = 'wc-cekaseuplata';
-                } else {
-                    $_POST['order_status'] = 'wc-u-pripremi';
-                }
             } else {
                 update_post_meta($post_id, 'gf_order_created_method', 'WWW');
             }
@@ -216,7 +212,7 @@ function gf_custom_checkout_field_update_order_meta_created_method($order_id) {
     if (isset($_POST['gf_www_orders']) && $_POST['gf_www_orders']) update_post_meta($order_id, 'gf_order_created_method', 'WWW');
 }
 
-
+add_filter( 'woocommerce_checkout_fields', 'gf_change_city_field_to_dropdown' );
 /**
  * Change the checkout city field to a dropdown field.
  */
@@ -237,4 +233,30 @@ function gf_change_city_field_to_dropdown( $fields ) {
     $fields['billing']['billing_city'] = $city_args; // Also change for billing field
     return $fields;
 }
-add_filter( 'woocommerce_checkout_fields', 'gf_change_city_field_to_dropdown' );
+
+
+add_action( 'woocommerce_order_status_changed', 'gf_processing_notification', 10, 1 );
+function gf_processing_notification($order_id, $checkout = null) {
+    $order = wc_get_order( $order_id );
+    if (in_array($order->get_status(), ['u-pripremi', 'cekaseuplata'])) {
+        // load the mailer class
+        $mailer = WC()->mailer();
+        $recipient = $order->get_billing_email();
+        $from = 'prodaja@nonstopshop.rs';
+        $headers = "Content-Type: text/html\r\n";
+        $headers .= "From: NonStopShop <'{$from}'>\r\n";
+        $headers .= "Reply-to: NonStopShop <'{$from}'>\r\n";
+        $subject = 'Vaša nonstopshop.rs narudžbina je primljena';
+        $template = 'emails/customer-processing-order.php';
+        $content = wc_get_template_html($template, [
+            'order' => $order,
+            'email_heading' => $subject,
+            'sent_to_admin' => true,
+            'plain_text' => false,
+            'email' => $mailer
+        ]);
+
+        $mailer->send($recipient, $subject, $content, $headers);
+    }
+}
+
