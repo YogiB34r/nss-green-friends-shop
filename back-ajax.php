@@ -53,6 +53,14 @@ if (isset($_GET['action'])) {
 
             break;
 
+        case 'saveOrderItemStatus':
+            $sql = "UPDATE wp_nss_backorderItems SET status = {$_GET['status']} WHERE backOrderId = {$_GET['backOrderId']}
+            AND orderId = {$_GET['orderId']} AND itemId = {$_GET['itemId']}";
+            $wpdb->query($sql);
+            echo 1;
+
+            break;
+
     }
 }
 
@@ -278,7 +286,17 @@ function printOrder(WC_Order $order) {
     require (__DIR__ . '/templates/orders/printRacun.phtml');
 }
 function printPreorder(WC_Order $order) {
+
+    ob_start();
     require (__DIR__ . '/templates/orders/printPredracun.phtml');
+    $html = ob_get_clean();
+
+    echo $html;
+
+//    $html2pdf = new \Spipu\Html2Pdf\Html2Pdf();
+//    $html2pdf->writeHTML($html);
+//    $name = 'Racun-'.$order->get_order_number().'.pdf';
+//    $html2pdf->output($name, 'D');
 }
 
 

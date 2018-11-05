@@ -545,17 +545,69 @@ function addItemStatusToOrderItemList($itemId, $item, $c) {
 
         $sql = "SELECT * FROM wp_nss_backorderItems WHERE orderId = {$_GET['post']} AND itemId = {$item->get_product_id()}";
         $result = $wpdb->get_results($sql);
+        echo '<p>Broj naloga: ' . $result[0]->backOrderId . '</p>';
         if (empty($result) || !isset($result[0])) {
             echo '<p>Status proizvoda: ČEKA NARUČIVANJE</p>';
         } else {
+            echo '<p>';
+            echo 'Status proizvoda: <span class="orderItemStatus">';
             if ($result[0]->status == 1) {
-                echo '<p>Status proizvoda: SPREMAN ZA PAKOVANJE</p>';
+                echo 'SPREMAN ZA PAKOVANJE';
             } elseif ($result[0]->status == 0) {
-                echo '<p>Status proizvoda: NARUČEN</p>';
+                echo 'NARUČEN';
             } else {
-                echo '<p>Status proizvoda: NEMA NA STANJU !</p>';
+                echo 'NEMA NA STANJU !';
             }
-            echo '<p>Broj naloga: ' . $result[0]->backOrderId . '</p>';
+            echo '</span>';
+            ?>
+            <a href="#" class="editOrderItemStatus">izmeni</a>
+            <span style="display: none" class="orderItemStatusWrapper">
+                <select >
+                    <option value="-1">Nema na stanju</option>
+                    <option value="0">Naručen</option>
+                    <option value="1">Spreman za pakovanje</option>
+                </select>
+                <a href="#" class="saveOrderItemStatus">snimi</a>
+            </span>
+
+            </p>
+            <script>
+                jQuery(document).ready(function(){
+                    jQuery('.editOrderItemStatus').click(function(e){
+                        e.preventDefault();
+                        jQuery(this).hide();
+                        jQuery('.orderItemStatusWrapper').show();
+                    });
+
+                    jQuery('.saveOrderItemStatus').click(function(e){
+                        e.preventDefault();
+                        var data = {
+                            backOrderId: <?=$result[0]->backOrderId?>,
+                            itemId: <?=$item->get_product_id()?>,
+                            orderId: <?=$_GET['post']?>,
+                            status: jQuery('.orderItemStatusWrapper select').val()
+                        };
+                        jQuery.get('/back-ajax/?action=saveOrderItemStatus', data, function(response) {
+                            if (response) {
+                                jQuery('.orderItemStatusWrapper').hide();
+                                jQuery('.editOrderItemStatus').show();
+                                var newStatus = '';
+                                console.log(data.status);
+                                if (data.status == -1) {
+                                    newStatus = 'NEMA NA STANJU !';
+                                } else if (data.status == 0) {
+                                    newStatus = 'NARUČEN';
+                                } else {
+                                    newStatus = 'SPREMAN ZA PAKOVANJE';
+                                }
+                                jQuery('.orderItemStatus').html(newStatus);
+                                console.log(jQuery('.orderItemStatus').html());
+                            }
+                        });
+                    });
+                });
+            </script>
+            <?php
         }
     }
 }
