@@ -59,7 +59,7 @@
                 <p style="min-height: 5px;min-width: 80px">97</p>
             </div>
             <div style="border:1px solid;text-align: center;display: inline-block;margin-left: 0px">
-                <p style="min-height: 5px;min-width: 220px"><?= $dateCreated .'-'. $order->get_id()?></p>
+                <p style="min-height: 5px;min-width: 220px"><?= $order->get_order_number()?></p>
             </div>
         </div>
     </div>

@@ -269,5 +269,14 @@ jQuery(document).ready(function ($) {
         });
     });
 
+    jQuery('#_payment_method').change(function () {
+        if (jQuery(this).val() == 'bacs') {
+            status = 'wc-cekaseuplata';
+            jQuery('#order_status').val(status).trigger('change');
+        } else if (jQuery(this).val() == 'cod') {
+            status = 'wc-u-pripremi';
+            jQuery('#order_status').val(status).trigger('change');
+        }
+    });
 });
 

@@ -48,9 +48,6 @@ class Indexer
                 $documents = [];
                 foreach ($result as $value) {
                     $product = wc_get_product($value->ID);
-                    if ($product->get_id() == 446611) {
-                        continue;
-                    }
                     if (!$product) {
                         var_dump($product);
                         var_dump('Could not find product for postId : ', $value->ID);

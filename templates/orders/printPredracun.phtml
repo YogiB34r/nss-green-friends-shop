@@ -3,25 +3,10 @@
 ?>
 <html>
 <head>
-    <style type="text/css" media="print">
-        /*.page {*/
-            /*-webkit-transform: rotate(-90deg);*/
-            /*-moz-transform:rotate(-90deg);*/
-            /*filter:progid:DXImageTransform.Microsoft.BasicImage(rotation=3);*/
-        /*}*/
-        body {
-            transform: rotate(270deg) translate(-250mm, 0);
-            transform-origin: 0 0;
-            margin: 20px;
-        }
-        .gf-print-bill-wrapper{
-            width: 276mm;
-            height: 190mm;
-        }
-    </style>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
     <style>
         body{
-            font-family: Verdana;
+            font-family: Verdana, Arial, Helvetica, sans-serif;
         }
         h2 {
             font-size: 18px;
@@ -33,26 +18,25 @@
             font-size: 14px;
         }
         .gf-print-bill-wrapper{
-            width: 110%;
+            width: 100%;
             padding: 5px;
             margin: auto;
         }
         .gf-print-bill-header{
-            width: 120%;
+            width: 100%;
             text-align: center;
             font-weight: bold;
             text-transform: uppercase;
         }
         .gf-print-bill-info-wrapper{
-            width: 120%;
-            margin: auto;
-            margin-bottom: 20px;
+            width: 100%;
+            margin: 0 auto 20px;
         }
         .gf-print-bill-info-wrapper p{
             margin: 0;
         }
         .gf-print-bill-table{
-            width: 120%;
+            width: 100%;
             margin: auto;
             border: solid 1px black;
             text-align: center;
@@ -88,7 +72,7 @@
     <table class="print-predracun">
         <tr>
             <td width="50%"><h4>PODACI O NARUČIOCU</h4></td>
-            <td width="10%"></td>
+            <td>&nbsp;</td>
             <td><h4>ADRESA KUPCA ZA ISPORUKU</h4></td>
         </tr>
         <tr>
@@ -166,11 +150,11 @@
             $shippingPdvInDin = $order->get_shipping_total() - $shippingNoPdv;
             ?>
             <tr>
-<!--                <td>(<?=$product->get_sku()?>) <?=$product->get_name()?></td> -->
-                <td width="30%" style="text-align: left"><?=$product->get_name()?></td>
-                <td width="5%"><?=$item->get_quantity()?></td>
-                <td width="14%"><?=number_format($priceNoPdv, 2)?></td>
-                <td width="13%"><?=$product->get_meta('pdv')?> %</td>
+                <td width="30%" style="text-align: left">(<?=$product->get_sku()?>) <?=$product->get_name()?></td>
+<!--                <td width="30%" style="text-align: left"><?=$product->get_name()?></td> -->
+                <td width="7%"><?=$item->get_quantity()?></td>
+                <td width="15%"><?=number_format($priceNoPdv, 2)?></td>
+                <td width="14%"><?=$product->get_meta('pdv')?> %</td>
                 <td width="14%"><?=number_format($pdvInDin, 2)?></td>
                 <td style="text-align: right"><?=number_format($product->get_price(), 2)?> din </td>
             </tr>

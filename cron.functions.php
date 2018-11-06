@@ -21,11 +21,18 @@ if (defined('WP_CLI') && WP_CLI) {
     \WP_CLI::add_command('passAllUsers', 'passAllUsers');
 
     \WP_CLI::add_command('createXmlExport', 'getItemExport');
+
+    \WP_CLI::add_command('fixItemVendor', 'fixItemVendor');
 }
 
 ini_set('max_execution_time', 1200);
 //ini_set('display_errors', 1);
 //error_reporting(E_ALL);
+
+function fixItemVendor() {
+    $cli = new \GF\Cli();
+    $cli->fixItems();
+}
 
 function getItemExport() {
     global $wpdb;
@@ -149,39 +156,23 @@ function passAllProducts() {
     $limit = 1000;
 
     global $wpdb;
-    $sql = "SELECT * FROM wp_nss_backorder WHERE status = 1 AND backOrderId > 116";
-    $result = $wpdb->get_results($sql);
-    foreach ($result as $order) {
-//        $supplier = get_users(array(
-//            'meta_key' => 'vendorid',
-//            'meta_value' => $order->supplierId,
-//            'number' => 1,
-//            'count_total' => false
-//        ))[0];
-        $vendorId = get_user_meta($order->supplierId, 'vendorid');
-//        if (isset($supplier->ID)) {
-            $sql = "UPDATE wp_nss_backorder SET supplierId = {$vendorId[0]} WHERE backOrderId = {$order->backOrderId}";
-            if (!$wpdb->query($sql)) {
-                echo 'query failed';
-                echo $sql;
-            }
-//        }
-    }
-    echo 'done';
-    exit();
 
-    for ($i = 1; $i < $pages; $i++) {
+//    for ($i = 1; $i < $pages; $i++) {
         $products_ids = wc_get_products(array(
-            'limit' => $limit,
+//            'limit' => $limit,
+            'limit' => 2000,
             'return' => 'ids',
-            'paged' => $i
+            'status' => 'pending',
+//            'paged' => $i
         ));
 
         foreach ($products_ids as $product_id) {
             $product = wc_get_product($product_id);
-
+            $product->set_status('publish');
+            $product->save();
         }
-    }
+        echo 'done';
+//    }
 }
 
 function createElasticIndex() {

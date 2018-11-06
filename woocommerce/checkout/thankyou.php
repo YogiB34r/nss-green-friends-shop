@@ -44,7 +44,7 @@ if (wc()->session->get('gf_billing_pib') || wc()->session->get('gf_billing_compa
 
         <?php else : ?>
 
-            <p class="woocommerce-notice woocommerce-notice--success woocommerce-thankyou-order-received"><?php echo apply_filters('woocommerce_thankyou_order_received_text', __('Thank you. Your order has been received.', 'woocommerce'), $order); ?></p>
+            <p class="woocommerce-notice woocommerce-notice--success woocommerce-thankyou-order-received"><?php echo __('Thank you. Your order has been received.', 'woocommerce'); ?></p>
 
             <ul class="woocommerce-order-overview woocommerce-thankyou-order-details order_details">
 
@@ -86,7 +86,7 @@ if (wc()->session->get('gf_billing_pib') || wc()->session->get('gf_billing_compa
 
     <?php else : ?>
 
-        <p class="woocommerce-notice woocommerce-notice--success woocommerce-thankyou-order-received"><?php echo apply_filters('woocommerce_thankyou_order_received_text', __('Thank you. Your order has been received.', 'woocommerce'), null); ?></p>
+        <p class="woocommerce-notice woocommerce-notice--success woocommerce-thankyou-order-received"><?php echo __('Thank you. Your order has been received.', 'woocommerce'); ?></p>
 
     <?php endif; ?>
 
