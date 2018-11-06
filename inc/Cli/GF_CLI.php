@@ -10,7 +10,7 @@ class Cli
         $limit = 100;
 
 //        $increment = 1;
-        $start = 50;
+        $start = 100;
         $end = $start + 50;
 
         $diff = [];
