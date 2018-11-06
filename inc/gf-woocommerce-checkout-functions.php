@@ -62,7 +62,7 @@ function gf_checkout_field_display_admin_order_meta($order) {
 //Action to add custom field to order emails
 add_filter('woocommerce_email_order_meta_fields', 'gf_order_meta_keys', 10, 3);
 function gf_order_meta_keys($fields, $sent_to_admin, $order) {
-    $value = get_post_meta($order->id, '_billing_pib', true);
+    $value = get_post_meta($order->get_id(), '_billing_pib', true);
     if (empty($value)) {
         return;
     }
@@ -179,18 +179,14 @@ function gf_order_created($post_id, $post, $update)
 {
     $order = new WC_Order($post_id);
     if ($update && isset($_POST['gf_phone_order'])) {
-        // 2. Fired when saving a new order
+        $phone_order_value = $_POST['gf_phone_order'];
         if (!$update) {
-            update_post_meta($post_id, '_hook_is_triggered', 'Save the new order');
-            $phone_order_value = $_POST['gf_phone_order'];
             if ($phone_order_value == 1) {
                 update_post_meta($post_id, 'gf_order_created_method', 'Telefonom');
             } else {
                 update_post_meta($post_id, 'gf_order_created_method', 'WWW');
             }
-        } else { // 3. Fired when Updating an order
-            update_post_meta($post_id, '_hook_is_triggered', 'Update  order');
-            $phone_order_value = isset($_POST['gf_phone_order']) ? $_POST['gf_phone_order'] : 0;
+        } else {
             if ($phone_order_value == 1) {
                 update_post_meta($post_id, 'gf_order_created_method', 'Telefonom');
             } else {
