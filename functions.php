@@ -614,3 +614,31 @@ function addItemStatusToOrderItemList($itemId, $item, $c) {
 
 // prevent bug with members plugin
 add_filter('members_check_parent_post_permission', function() {return false;});
+
+
+// ADDING A CUSTOM COLUMN TITLE TO ADMIN PRODUCTS LIST
+add_filter( 'manage_edit-product_columns', 'gf_supplier_product_list_column',11);
+function gf_supplier_product_list_column($columns)
+{
+    //add columns
+    $columns['supplier'] = __( 'Dobavljač','woocommerce'); // title
+    return $columns;
+}
+
+// ADDING THE DATA FOR EACH PRODUCTS BY COLUMN (EXAMPLE)
+add_action( 'manage_product_posts_custom_column' , 'gf_supplier_product_list_column_content', 10, 2 );
+function gf_supplier_product_list_column_content( $column, $product_id )
+{
+    global $post;
+
+
+    $supplier_id = get_post_meta($product_id, 'supplier', true);
+    var_dump(get_user_by('ID', $supplier_id));
+    $supplier_name = get_user_by('ID', $supplier_id)->display_name;
+    switch ( $column )
+    {
+        case 'supplier' :
+            echo $supplier_name; // display the data
+            break;
+    }
+}
