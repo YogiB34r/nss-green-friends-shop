@@ -581,7 +581,8 @@ function gf_supplier_product_list_column_content( $column, $product_id )
 
 
     $supplier_id = get_post_meta($product_id, 'supplier', true);
-    $supplier_name = get_user_by('ID', $supplier_id)->user_login;
+    var_dump(get_user_by('ID', $supplier_id));
+    $supplier_name = get_user_by('ID', $supplier_id)->display_name;
     switch ( $column )
     {
         case 'supplier' :
