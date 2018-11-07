@@ -10,13 +10,13 @@ class Cli
         $limit = 100;
 
 //        $increment = 1;
-        $start = 100;
+        $start = 150;
         $end = $start + 50;
 
         $diff = [];
         $html = '';
         $total = 0;
-        $updated = 0;
+        $updated = [];
 //        for ($i = 1; $i < $pages; $i++) {
         for ($i = $start; $i < $end; $i++) {
             $products_ids = wc_get_products(array(
@@ -27,11 +27,18 @@ class Cli
 
             $fields = [];
             foreach ($products_ids as $product_id) {
+                if (in_array($product_id, [399196, 434830])) {
+                    continue;
+                }
+                $product = wc_get_product($product_id);
+                if (in_array((int) $product->get_meta('supplier'), [192655])) {
+                    continue;
+                }
                 if ($total % $limit === 0) {
                     echo 'passed '.$total.' items' . PHP_EOL;
                 }
                 $total++;
-                $product = wc_get_product($product_id);
+
                 if (!$product) {
                     throw new \Exception('not found. ' . $product_id);
                 }
@@ -117,23 +124,23 @@ class Cli
 
                     if (!$user1) {
                         $user1 = get_user_by('description', $data->vendorEmail);
-//                        if ($data->vendorEmail === 'rajko.djuric@ringier.rs') {
-//                            $updated++;
-//                            $product->update_meta_data('supplier', 373);
-//                            $product->save();
-//                        } else {
+                        if ($data->vendorEmail === 'rajko.djuric@ringier.rs') {
+                            $updated[] = $product->get_id();
+                            $product->update_meta_data('supplier', 373);
+                            $product->save();
+                        } else {
                             var_dump($data->vendorEmail);
                             var_dump($user1);
                             echo 'vendor not found : ';
                             var_dump($data);
                             die();
-//                        }
+                        }
 
                     }
 
                     // trouble ahead
                     if ((int) $product->get_meta('supplier') !== $user1[0]->ID) {
-                        $updated++;
+                        $updated[] = $product->get_id();
                         //update by vendor email
                         echo 'update by email';
                         $product->update_meta_data('supplier', $user1[0]->ID);
@@ -145,15 +152,72 @@ class Cli
                 } else {
                     //trouble ahead
                     if ((int) $product->get_meta('supplier') !== $user[0]->ID) {
-                        $updated++;
+                        $updated[] = $product->get_id();
                         $user1 = get_users(array('meta_key' => 'description', 'meta_value' => trim($data->vendorEmail)));
                         if ($user[0]->ID !== $user1[0]->ID) {
                             if (strstr($data->vendorEmail, 'rajko.djuric@ringier.rs')) {
+                                echo 'updated rajko item';
                                 $product->update_meta_data('supplier', 373);
+                                $product->save();
+                            } elseif ($product->get_meta('supplier') == 102) {
+                                echo 'updated biljana item';
+                                $product->update_meta_data('supplier', 125);
                                 $product->save();
                             } elseif ($product->get_meta('supplier') == 207) {
                                 echo 'updated fantazija item';
                                 $product->update_meta_data('supplier', 230);
+                                $product->save();
+                            } elseif ($product->get_meta('supplier') == 47) {
+                                echo 'updated egmont item';
+                                $product->update_meta_data('supplier', 68);
+                                $product->save();
+                            } elseif ($product->get_meta('supplier') == 95) {
+                                echo 'updated aiki item';
+                                $product->update_meta_data('supplier', 118);
+                                $product->save();
+                            } elseif ($product->get_meta('supplier') == 83) {
+                                echo 'updated acs item';
+                                $product->update_meta_data('supplier', 107);
+                                $product->save();
+                            } elseif ($product->get_meta('supplier') == 64) {
+                                echo 'updated acs item';
+                                $product->update_meta_data('supplier', 86);
+                                $product->save();
+                            } elseif ($product->get_meta('supplier') == 228) {
+                                echo 'updated ftb item';
+                                $product->update_meta_data('supplier', 246);
+                                $product->save();
+                            } elseif ($product->get_meta('supplier') == 170) {
+                                echo 'updated ftb item';
+                                $product->update_meta_data('supplier', 195);
+                                $product->save();
+                            } elseif ($product->get_meta('supplier') == 146) {
+                                echo 'updated ftb item';
+                                $product->update_meta_data('supplier', 129);
+                                $product->save();
+                            } elseif ($product->get_meta('supplier') == 208) {
+                                echo 'updated gorenje item';
+                                $product->update_meta_data('supplier', 192655);
+                                $product->save();
+                            } elseif ($product->get_meta('supplier') == 23) {
+                                echo 'updated get item';
+                                $product->update_meta_data('supplier', 44);
+                                $product->save();
+                            } elseif ($product->get_meta('supplier') == 88) {
+                                echo 'updated logis item';
+                                $product->update_meta_data('supplier', 112);
+                                $product->save();
+                            } elseif ($product->get_meta('supplier') == 84) {
+                                echo 'updated kgt item';
+                                $product->update_meta_data('supplier', 108);
+                                $product->save();
+                            } elseif ($product->get_meta('supplier') == 77) {
+                                echo 'updated kgt item';
+                                $product->update_meta_data('supplier', 101);
+                                $product->save();
+                            } elseif ($product->get_meta('supplier') == 54) {
+                                echo 'updated kgt item';
+                                $product->update_meta_data('supplier', 75);
                                 $product->save();
                             } else {
                                 var_dump('wrong data');
@@ -195,10 +259,11 @@ class Cli
             }
         }
         $html .= 'total of items parsed: '. $total . PHP_EOL;
-        $html .= 'total of items updated: '. $updated . PHP_EOL;
+        $html .= 'total of items updated: '. count($updated) . PHP_EOL;
         $html .= 'Differences' . PHP_EOL;
         $html .= print_r($diff, true);
         echo $html;
+        var_dump($updated);
 
         \WP_CLI::success($html);
     }

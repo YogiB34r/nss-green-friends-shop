@@ -234,7 +234,7 @@ function gf_change_city_field_to_dropdown( $fields ) {
 add_action( 'woocommerce_order_status_changed', 'gf_processing_notification', 10, 1 );
 function gf_processing_notification($order_id, $checkout = null) {
     $order = wc_get_order( $order_id );
-    if (in_array($order->get_status(), ['u-pripremi', 'cekaseuplata'])) {
+    if (in_array($order->get_status(), ['u-pripremi', 'cekaseuplata']) && $order->get_meta('backOrderUndo') == '') {
         // load the mailer class
         $mailer = WC()->mailer();
         $recipient = $order->get_billing_email();
