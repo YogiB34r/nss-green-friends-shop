@@ -22,7 +22,7 @@ if (defined('WP_CLI') && WP_CLI) {
 
     \WP_CLI::add_command('createXmlExport', 'getItemExport');
 
-    \WP_CLI::add_command('fixItemVendor', 'fixItemVendor');
+//    \WP_CLI::add_command('fixItemVendor', 'fixItemVendor');
 }
 
 ini_set('max_execution_time', 1200);
@@ -51,7 +51,9 @@ function getItemExport() {
 
         foreach ($products_ids as $product_id) {
             $product = wc_get_product($product_id);
-            $root = createXml($xmlDoc, $product, $root);
+            if ($product->is_in_stock()) {
+                $root = createXml($xmlDoc, $product, $root);
+            }
         }
     }
 
