@@ -192,7 +192,7 @@ function printPreorder(WC_Order $order) {
     require (__DIR__ . '/templates/orders/printPredracun.phtml');
     $html = ob_get_clean();
 
-//    echo $html;
+    echo $html;
 
 //    $html2pdf = new \Spipu\Html2Pdf\Html2Pdf();
 //    $html2pdf->writeHTML($html);

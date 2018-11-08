@@ -256,3 +256,9 @@ function gf_processing_notification($order_id, $checkout = null) {
     }
 }
 
+add_filter('woocommerce_valid_order_statuses_for_payment', 'appendValidPaymentStatuses');
+function appendValidPaymentStatuses($statuses) {
+    array_push($statuses, 'u-obradi');
+
+    return $statuses;
+}

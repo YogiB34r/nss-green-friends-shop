@@ -22,6 +22,14 @@ if (defined('WP_CLI') && WP_CLI) {
 
     \WP_CLI::add_command('createXmlExport', 'getItemExport');
 
+    $factory = new \Nss\Feed\FeedFactory();
+
+    //feed processing
+    $supplierId = 666;
+    \WP_CLI::add_command('feed', $factory(), $supplierId);
+//    \WP_CLI::add_command('parseFeed', 'resetQueue', $supplierId);
+//    \WP_CLI::add_command('parseFeed', 'importItems', $supplierId);
+
 //    \WP_CLI::add_command('fixItemVendor', 'fixItemVendor');
 }
 
