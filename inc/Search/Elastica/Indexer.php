@@ -148,6 +148,7 @@ class Indexer
             $viewCount = $gfProduct->viewCount;
         }
 
+
         $data = [
             'postId' => $product->get_id(),
             'category' => $cats,
