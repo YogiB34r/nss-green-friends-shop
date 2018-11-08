@@ -22,7 +22,7 @@ if (defined('WP_CLI') && WP_CLI) {
 
     \WP_CLI::add_command('createXmlExport', 'getItemExport');
 
-    \WP_CLI::add_command('fixItemVendor', 'fixItemVendor');
+//    \WP_CLI::add_command('fixItemVendor', 'fixItemVendor');
 }
 
 ini_set('max_execution_time', 1200);
@@ -51,7 +51,9 @@ function getItemExport() {
 
         foreach ($products_ids as $product_id) {
             $product = wc_get_product($product_id);
-            $root = createXml($xmlDoc, $product, $root);
+            if ($product->is_in_stock()) {
+                $root = createXml($xmlDoc, $product, $root);
+            }
         }
     }
 
@@ -194,32 +196,23 @@ function syncElasticIndex() {
     $indexer->indexAll();
 }
 
-//@TODO save sku operation does not work !?!?!?!
-//add_action('save_post_product', 'setNewProductSku', 10, 3);
-function setNewProductSku($id, $post, $update) {
-    var_dump('setNewProductSku');
+//add_action('woocommerce_process_product_meta', 'syncToElastic', 666, 3);
+//function syncToElastic($id, WP_Post $post) {
+add_action('woocommerce_update_product', 'syncToElastic', 10, 1);
+function syncToElastic($id) {
     $product = wc_get_product($id);
-    if ($product->get_sku() == "") {
-        $product->set_sku($product->get_id());
-        $product->save();
-    }
-}
-
-
-add_action('woocommerce_process_product_meta', 'syncToElastic', 666, 3);
-function syncToElastic($id, WP_Post $post) {
-    $product = wc_get_product($id);
-    if ($product && strtolower($product->get_status()) != 'auto-draft' && strtolower($product->get_name()) != 'auto-draft'
-    ) {
+    if ($product && strtolower($product->get_status()) != 'auto-draft' && strtolower($product->get_name()) != 'auto-draft') {
 //        && $product->get_sku() != '') {
 
+        if ($product->get_sku() == "") {
+            $product->set_sku($product->get_id());
+            $product->save();
+        }
         $productConfig = new \GF\Search\Elastica\Config\Product();
         $elasticaClientFactory = new \GF\Search\Factory\ElasticClientFactory();
-        $productType = $elasticaClientFactory->make()->getIndex($productConfig->getIndex())
-            ->getType($productConfig->getType());
+        $productType = $elasticaClientFactory->make()->getIndex($productConfig->getIndex())->getType($productConfig->getType());
         $indexer = new \GF\Search\Elastica\Indexer($productType);
         $indexer->indexProduct($product);
     }
 }
-
 

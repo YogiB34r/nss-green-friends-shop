@@ -41,13 +41,16 @@ class PricelistUpdate
                     $notFoundItems[] = $itemInfo;
                     continue;
                 }
+
                 $product->update_meta_data('input_price', $itemInfo[1]);
                 if ($itemInfo[3] > 0) {
-                    $product->set_price($itemInfo[2]);
-                    $product->set_regular_price($itemInfo[3]);
-                    $product->set_sale_price($itemInfo[2]);
+                    $product->set_price((int) $itemInfo[2]);
+                    $product->set_regular_price((int) $itemInfo[3]);
+                    $product->set_sale_price((int) $itemInfo[2]);
                 } else {
-                    $product->set_price($itemInfo[2]);
+                    $product->set_price((int) $itemInfo[2]);
+                    $product->set_regular_price((int) $itemInfo[2]);
+
                 }
                 $status = 'publish';
                 if ($itemInfo[4] == 2) {
@@ -98,10 +101,11 @@ class PricelistUpdate
 
     protected function readFile($fileInfo)
     {
-        move_uploaded_file($fileInfo['tmp_name'], '/tmp/cenovnik.tmp.xls');
+//        $targetFile = '/tmp/' . $fileInfo['tmp_name'];
+//        move_uploaded_file($fileInfo['tmp_name'], $targetFile);
         $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xls();
         $reader->setReadDataOnly(true);
-        $data = $reader->load('/tmp/cenovnik.tmp.xls');
+        $data = $reader->load($fileInfo['tmp_name']);
 
         return $data;
     }

@@ -40,8 +40,7 @@ if (isset($_GET['action'])) {
             break;
 
         case 'dailyExpressCsv': // wc-spz-slanje
-//            $arg = array('orderby' => 'date', 'status' => ['spz-pakovanje', 'spz-slanje'], 'posts_per_page' => '500');
-            $arg = array('orderby' => 'date', 'status' => ['spz-slanje'], 'posts_per_page' => '500');
+            $arg = array('orderby' => 'date', 'status' => ['spz-pakovanje', 'spz-slanje'], 'posts_per_page' => '500');
             $orders = WC_get_orders($arg);
             createDailyExport($orders);
 
@@ -116,8 +115,6 @@ function createJitexItemExport() {
     echo $csv;
 }
 
-
-
 function createAdresnica($orderId) {
     $order = wc_get_order($orderId);
     $html = '';
@@ -134,7 +131,12 @@ function createAdresnica($orderId) {
     $html2pdf->output($name, 'D');
 }
 
-function exportJitexOrder(WC_Order $order) {
+function exportJitexOrder(
+    WC_Order $order,
+    $test,
+    $tes12,
+    $test123
+) {
     $string = '';
     foreach ($order->get_items() as $item) {
         $p = wc_get_product($item->get_product()->get_id());
@@ -152,9 +154,8 @@ function exportJitexOrder(WC_Order $order) {
             $p = wc_get_product($p->get_parent_id());
         }
         $name = $order->get_billing_first_name() .' '. $order->get_billing_last_name();
-        if ($order->get_billing_company() != '') {
-//            $name = $order->get_billing_company() .' '. $order->get_meta('_billing_pib');
-            $name = $order->get_billing_company();
+        if ($order->get_meta('_billing_pib') != '') {
+            $name = $order->get_billing_company() .' '. $order->get_meta('_billing_pib');
         }
 
         $variantId = $p->get_sku() . $variation;
@@ -165,7 +166,7 @@ function exportJitexOrder(WC_Order $order) {
         $priceFormated =number_format($p->get_price(), 2, ',', '.');
         $string .= $name."\t".$order->get_billing_address_1()."\t".$order->get_billing_postcode()."\t".$order->get_billing_city()."\t"."Srbija"."\t".
         $order->get_billing_phone()."\t".$order->get_order_number()."\t".$date."\t".$order->get_payment_method_title()."\t".$variantId."\t".$variantName."\t".
-            $item->get_quantity()."\t".$priceNoPdv."\t".$priceFormated."\t".$order->get_billing_company()."\t".$order->get_meta('_billing_pib')."\r\n";
+            $item->get_quantity()."\t".$priceNoPdv."\t".$priceFormated."\t".$order->get_billing_company()."\r\n";
     }
     $order->update_meta_data('jitexExportCreated', 1);
     $order->save();
@@ -173,7 +174,7 @@ function exportJitexOrder(WC_Order $order) {
 
     $string .= $name."\t".$order->get_billing_address_1()."\t".$order->get_billing_postcode()."\t".$order->get_billing_city()."\t"."Srbija"."\t".
         $order->get_billing_phone()."\t".$order->get_order_number()."\t".$date."\t".$order->get_payment_method_title()."\t9999\tDostava\t1\t".
-        $shippingNoPdv."\t".number_format($order->get_shipping_total(), 2, ',', '.');
+        $shippingNoPdv."\t".number_format($order->get_shipping_total(), 2, ',', '.')."\t".$order->get_billing_company();
 
     header('Content-Disposition: attachment; filename="' . $order->get_order_number() . '.txt' . '"');
     header("Content-Transfer-Encoding: binary");
@@ -191,7 +192,7 @@ function printPreorder(WC_Order $order) {
     require (__DIR__ . '/templates/orders/printPredracun.phtml');
     $html = ob_get_clean();
 
-    echo $html;
+//    echo $html;
 
 //    $html2pdf = new \Spipu\Html2Pdf\Html2Pdf();
 //    $html2pdf->writeHTML($html);
