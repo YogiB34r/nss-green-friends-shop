@@ -10,6 +10,7 @@ if (!$wcproduct) {
 //  get_template_part( 404 ); exit();
     header("HTTP/1.1 302 Moved Temporary");
     header('Location: '.  home_url());
+    exit();
 }
 
 $url = get_permalink($wcproduct->get_id());

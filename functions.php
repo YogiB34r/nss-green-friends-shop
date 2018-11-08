@@ -545,10 +545,10 @@ function addItemStatusToOrderItemList($itemId, $item, $c) {
 
         $sql = "SELECT * FROM wp_nss_backorderItems WHERE orderId = {$_GET['post']} AND itemId = {$item->get_product_id()}";
         $result = $wpdb->get_results($sql);
-        echo '<p>Broj naloga: ' . $result[0]->backOrderId . '</p>';
         if (empty($result) || !isset($result[0])) {
             echo '<p>Status proizvoda: ČEKA NARUČIVANJE</p>';
         } else {
+            echo '<p>Broj naloga: ' . $result[0]->backOrderId . '</p>';
             echo '<p>';
             echo 'Status proizvoda: <span class="orderItemStatus">';
             if ($result[0]->status == 1) {
