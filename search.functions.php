@@ -225,3 +225,12 @@ function ourListOfProducts()
     }
     require(__DIR__ . "/templates/admin/list-product-search-settings.php");
 }
+
+add_action('admin_menu', function () {
+    add_menu_page('Lista porudzbina', 'Nasa lista porudzbina', 'edit_pages', 'gf-order-list', 'ourListOfOrders');
+});
+
+function ourListOfOrders()
+{
+    require(__DIR__ . "/templates/admin/list-order-search.php");
+}
