@@ -39,13 +39,23 @@ class Gf_Order_Wp_List_Table
     public function list_table_page()
     {
         $orderListTable = new Order_List_Table;
-
         $orderListTable->prepare_items(); ?>
-        <div class="wrap">
-            <div id="icon-users" class="icon32"></div>
-            <h2>Custom order lista</h2>
-            <?php $orderListTable->display(); ?>
-        </div>
+
+        <form id="posts-filter" method="GET">
+            <input type="hidden" name="page" value="gf-order-list" />
+            <?php $orderListTable->search_box('Search orders'); ?>
+
+            <input type="hidden" name="post_status" class="post_status_page" value="all" />
+            <input type="hidden" name="pos_type" class="post_type_page" value="shop_order">
+
+            <div class="wrap">
+                <div id="icon-users" class="icon32"></div>
+                <h2>Custom order lista</h2>
+                    <?php $orderListTable->order_months_dropdown('shop_order') ?>
+                    <?php submit_button('Filter', 'submit,', 'filter_action', '', false, array( 'id' => 'post_query_submit' )); ?>
+                    <?php $orderListTable->display(); ?>
+            </div>
+        </form>
     <?php
     }
 }
@@ -240,5 +250,90 @@ class Order_List_Table extends Wp_List_Table
             '<input type="checkbox" name="id[]" value="%s" />',
             $item['id']
         );
+    }
+
+    public function order_months_dropdown($post_type)
+    {
+        global $wpdb, $wp_locale;
+
+        /**
+        * Filters whether to remove the 'Months' drop-down from the post list table.
+        *
+        * @param bool   $disable   Whether to disable the drop-down. Default false.
+        * @param string $post_type The post type.
+        */
+        if (apply_filters('disable_months_dropdown', false, $post_type)) {
+            return;
+        }
+
+        $extra_checks = "AND post_status != 'auto-draft'";
+        if (! isset($_GET['post_status']) || 'trash' !== $_GET['post_status']) {
+            $extra_checks .= " AND post_status != 'trash'";
+        } elseif (isset($_GET['post_status'])) {
+            $extra_checks = $wpdb->prepare(' AND post_status = %s', $_GET['post_status']);
+        }
+
+        $months = $wpdb->get_results($wpdb->prepare("
+            SELECT DISTINCT DAY( post_date ) AS day, MONTH( post_date ) AS month, YEAR( post_date ) as year
+            FROM $wpdb->posts
+            WHERE post_type = %s
+            $extra_checks
+            ORDER BY post_date DESC
+        ", $post_type));
+
+        // var_dump($months);
+        // die();
+
+        /**
+         * Filters the 'Months' drop-down results.
+         *
+         * @since 3.7.0
+         *
+         * @param object $months    The months drop-down query results.
+         * @param string $post_type The post type.
+         */
+        $months = apply_filters('months_dropdown_results', $months, $post_type);
+
+        $month_count = count($months);
+
+        if (!$month_count || (1 == $month_count && 0 == $months[0]->month)) {
+            return;
+        }
+
+        $m = isset($_GET['m']) ? (int) $_GET['m'] : 0; ?>
+        <label for="filter-by-date" class="screen-reader-text"><?php _e('Filter by date'); ?></label>
+        <select name="m" id="filter-by-date">
+            <option<?php selected($m, 0); ?> value="0"><?php _e('All dates'); ?></option>
+<?php
+        foreach ($months as $arc_row) {
+            if (0 == $arc_row->year) {
+                continue;
+            }
+
+            $day = $arc_row->day;
+            $month = zeroise($arc_row->month, 2);
+            $year = $arc_row->year;
+
+            printf(
+                "<option %s value='%s'>%s</option>\n",
+                selected($m, $day . $month . $year, false),
+                esc_attr($arc_row->day . $month . $arc_row->year),
+                /* translators: 1: month name, 2: 4-digit year */
+                sprintf(__('%1$d %2$s %3$d'), $day, $wp_locale->get_month($month), $year)
+            );
+        } ?>
+        </select>
+<?php
+    }
+
+    public function render_customer_filter()
+    {
+        $user_string = '';
+        $user_id = '';
+
+        if (!empty($_GET['_customer_user'])) {
+            $user_id = absint($_GET['_customer_user']);
+            $user = get_user_by('id', $user_id);
+        }
     }
 }
