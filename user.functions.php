@@ -23,17 +23,17 @@ function gf_authenticate_username_password($user, $username, $password) {
 
         return $error;
     }
+    $user = get_user_by('email', $username);
 
     if (!$user)
         return new WP_Error('invalid_username', sprintf(__('<strong>GREŠKA</strong>: Nepostojeće korisničko ime ili email. <a href="%s" title="Lozinka izgubljena">Izgubili ste lozinku</a>?'), wp_lostpassword_url()));
 
-    $user = get_user_by('email', $username);
     if (get_user_meta($user->ID, 'migrated', true) == 1) {
         return gf_migrate_user_password($user, $password);
     } else {
         if (!wp_check_password($password, $user->user_pass, $user->ID))
             return new WP_Error('incorrect_password', sprintf(__('<strong>GREŠKA</strong>: Lozinka koju ste uneli za korisničko ime <strong>%1$s</strong> nije ispravna. <a href="%2$s" title="Lozinka izgubljena">Izgubili ste lozinku</a>?'),
-                $user->data->user_login, wp_lostpassword_url()));
+                $user->user_login, wp_lostpassword_url()));
 
         $user = apply_filters('wp_authenticate_user', $user, $password);
     }

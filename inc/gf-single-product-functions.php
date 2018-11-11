@@ -1,39 +1,15 @@
 <?php
-function gf_wc_breadcrumbs_single_product()
-{
+function gf_wc_breadcrumbs_single_product() {
     woocommerce_breadcrumb();
 }
 
 add_action('woocommerce_before_single_product', 'gf_wc_breadcrumbs_single_product', 10);
-
 remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_excerpt', 20);
-
 remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_meta', 40);
 
 add_action('woocommerce_single_product_summary', 'gf_get_single_product_meta', 9);
 function gf_get_single_product_meta()
 {
-    /**
-     * Single Product Meta
-     *
-     * This template can be overridden by copying it to yourtheme/woocommerce/single-product/meta.php.
-     *
-     * HOWEVER, on occasion WooCommerce will need to update template files and you
-     * (the theme developer) will need to copy the new files to your theme to
-     * maintain compatibility. We try to do this as little as possible, but it does
-     * happen. When this occurs the version of the template file will be bumped and
-     * the readme will list any important changes.
-     *
-     * @see        https://docs.woocommerce.com/document/template-structure/
-     * @author        WooThemes
-     * @package    WooCommerce/Templates
-     * @version     3.0.0
-     */
-
-    if (!defined('ABSPATH')) {
-        exit;
-    }
-
     global $product;
     ?>
     <div class="product_meta">
@@ -147,27 +123,23 @@ remove_action('woocommerce_after_single_variation', 'woocommerce_single_product_
 remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_title', 5);
 add_action('woocommerce_before_single_product', 'woocommerce_template_single_title', 11);
 
+/**
+ * Customize product data tabs
+ */
 add_filter('woocommerce_product_tabs', 'woo_new_product_tab');
 function woo_new_product_tab($tabs) {
-    // Adds the new tab
     $tabs['narucivanje_tab'] = array(
         'title' => __('Naručivanje i plaćanje', 'woocommerce'),
         'priority' => 50,
         'callback' => 'woo_new_product_tab_content'
     );
+    $tabs['description']['callback'] = 'woo_custom_description_tab_content';
+    $tabs['description']['priority'] = 10;
+    $tabs['description']['title'] = 'Opis';
 
     return $tabs;
 }
 
-/**
- * Customize product data tabs
- */
-add_filter('woocommerce_product_tabs', 'woo_custom_description_tab', 98);
-function woo_custom_description_tab($tabs){
-    $tabs['description']['callback'] = 'woo_custom_description_tab_content';    // Custom description callback
-
-    return $tabs;
-}
 function woo_custom_description_tab_content(){
     global $product;
 //    global $post;

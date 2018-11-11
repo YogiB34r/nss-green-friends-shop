@@ -247,7 +247,36 @@ jQuery(document).ready(function ($) {
 
     jQuery('.edit_address').click(function () {
         jQuery('.gf-admin-orders-pib-field').hide();
-    })
+    });
 
+    //Add new product page, required fields
+    jQuery('.post-type-product #title').attr('required', true);
+    jQuery('.post-type-product #titlewrap').attr('class', 'required');
+
+    jQuery('.post-type-product #postdivrich').attr('class', 'required');
+    jQuery('.post-type-product #product_catdiv h2 span').attr('class', 'required');
+    jQuery('.post-type-product #postimagediv h2 span').attr('class', 'required');
+    jQuery('.post-type-product #postimagediv h2 span').attr('class', 'required');
+    jQuery('.post-type-product ._regular_price_field label').attr('class', 'required-price');
+
+
+    jQuery('.nssOrderJitexExport, .nssOrderAdresnica').click(function() {
+    // jQuery('.nssOrderJitexExport').click(function() {
+        jQuery(this).css({
+            color:'white',
+            backgroundColor:'gray',
+            fontStyle:'italic'
+        });
+    });
+
+    jQuery('#_payment_method').change(function () {
+        if (jQuery(this).val() == 'bacs') {
+            status = 'wc-cekaseuplata';
+            jQuery('#order_status').val(status).trigger('change');
+        } else if (jQuery(this).val() == 'cod') {
+            status = 'wc-u-pripremi';
+            jQuery('#order_status').val(status).trigger('change');
+        }
+    });
 });
 

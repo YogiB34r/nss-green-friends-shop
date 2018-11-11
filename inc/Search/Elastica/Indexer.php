@@ -2,22 +2,43 @@
 
 namespace GF\Search\Elastica;
 
+use Elastica\Type;
+
 class Indexer
 {
-    public static function index(\Elastica\Client $elasticaClient)
+    private $elasticaType;
+
+    public function __construct(Type $elasticaType)
+    {
+        $this->elasticaType = $elasticaType;
+    }
+
+    public function indexProduct(\WC_Product $product)
+    {
+        try {
+            $response = $this->elasticaType->addDocument($this->parseWcProduct($product));
+            if (!$response->isOk() || $response->hasError()) {
+                var_dump($response->getError());
+                die();
+            }
+            unset($response);
+            $this->elasticaType->getIndex()->refresh();
+        } catch (\Exception $e) {
+            \NSS_Log::log($e->getMessage(), \NSS_Log::LEVEL_ERROR);
+        }
+    }
+
+    /**
+     * Batch index
+     */
+    public function indexAll()
     {
         global $wpdb;
 
-        ini_set('max_execution_time', '600');
+        $perPage = 200;
 
-        $elasticaIndex = $elasticaClient->getIndex('nss');
-        $elasticaType = $elasticaIndex->getType('products');
-//        $perPage = 500;
-        $perPage = 50;
-
-//        for ($i = 0; $i < 40; $i++) {
-        for ($i = 0; $i < 400; $i++) {
-//        for ($i = 0; $i < 1; $i++) {
+        for ($i = 0; $i < 100; $i++) {
+//        for ($i = 0; $i < 4; $i++) {
             $offset = $i * $perPage;
             $sql = "SELECT ID FROM wp_posts WHERE post_type = 'product' LIMIT {$offset}, {$perPage};";
             $result = $wpdb->get_results($sql);
@@ -31,20 +52,24 @@ class Indexer
                         var_dump('Could not find product for postId : ', $value->ID);
                         continue;
                     }
-                    $documents[] = static::parseWcProduct($product);
+                    // @TODO auto saved empty drafts !?
+                    if ($product->get_name() == "AUTO-DRAFT") {
+                        continue;
+                    }
+                    $documents[] = $this->parseWcProduct($product);
                 }
                 unset($result);
 
                 try {
-                    $response = $elasticaType->addDocuments($documents);
+                    $response = $this->elasticaType->addDocuments($documents);
                     $documents = [];
                     if (!$response->isOk() || $response->hasError()) {
                         var_dump($response->getError());
-                        die();
+//                        die();
                     }
                     echo sprintf('stored %s items.', $response->count());
                     unset($response);
-                    $elasticaType->getIndex()->refresh();
+                    $this->elasticaType->getIndex()->refresh();
                 } catch (\Exception $e) {
                     var_dump($e->getMessage());
                 }
@@ -53,7 +78,7 @@ class Indexer
         echo 'sync complete';
     }
 
-    public static function parseWcProduct(\WC_Product $product)
+    private function parseWcProduct(\WC_Product $product)
     {
         global $wpdb;
 
@@ -88,6 +113,10 @@ class Indexer
                 }
             }
         }
+        // @TODO solve better. when no sku detected, use post id.
+        if ($product->get_sku() == "") {
+            $product->set_sku($product->get_id());
+        }
 
         $thumbnail = '<img src="' . wc_placeholder_img_src() . '" alt="Placeholder" width="200px" height="200px" />';
         if (has_post_thumbnail($product->get_id())) {
@@ -107,10 +136,17 @@ class Indexer
             $price = $salePrice;
         }
         $sql = "SELECT * FROM wp_gf_products WHERE postId = {$product->get_id()}";
+        $viewCount = 0;
         if (!isset($wpdb->get_results($sql)[0])) {
-            throw new \Exception('could not find gf product for ' . $product->get_id());
+            $data = sprintf('%s: %s', date('Y:m:d H:i:s'), 'could not find gf product for ' . $product->get_id());
+            $filePath = LOG_PATH . 'debug-cli.log';
+            file_put_contents($filePath, $data . PHP_EOL, FILE_APPEND);
+//            throw new \Exception('could not find gf product for ' . $product->get_id());
+        } else {
+            $gfProduct = $wpdb->get_results($sql)[0];
+            $viewCount = $gfProduct->viewCount;
         }
-        $gfProduct = $wpdb->get_results($sql)[0];
+
 
         $data = [
             'postId' => $product->get_id(),
@@ -143,7 +179,7 @@ class Indexer
                 'price' => (int) $price,
                 'rating' => $product->get_meta('rating'),
                 'date' => strtotime($product->get_date_created()),
-                'viewCount' => $gfProduct->viewCount,
+                'viewCount' => $viewCount,
                 'stock' => (int) $product->is_in_stock(),
                 'published' => (int) $product->is_visible(),
                 'default' => static::calculateOrderingRating($product),
@@ -152,7 +188,11 @@ class Indexer
         return new \Elastica\Document($product->get_id(), $data);
     }
 
-    public static function calculateOrderingRating(\WC_Product $product)
+    /**
+     * @param \WC_Product $product
+     * @return int
+     */
+    private function calculateOrderingRating(\WC_Product $product)
     {
         $ponder = 10;
         if ($product->is_on_sale()) {
@@ -162,20 +202,16 @@ class Indexer
             $ponder = 1;
         }
 
-
         return $ponder;
-
-
-        $actionPonder = 50;
-        $statusPonder = 20;
-        $stockPonder = -100;
-
-        return ((int) $product->is_on_sale() * $actionPonder) +
-        ((int) $product->is_visible() * $statusPonder) +
-        ((int) !$product->is_in_stock() * $stockPonder);
     }
 
-    public static function extractFullTextBoostedFields(\WC_Product $product, $attributes, $cats)
+    /**
+     * @param \WC_Product $product
+     * @param $attributes
+     * @param $cats
+     * @return string
+     */
+    private function extractFullTextBoostedFields(\WC_Product $product, $attributes, $cats)
     {
         $text = $product->get_name();
         $text .= ' ' . $product->get_meta('pa_proizvodjac');
@@ -198,7 +234,13 @@ class Indexer
         return $text;
     }
 
-    public static function extractFullTextFields(\WC_Product $product, $attributes, $cats)
+    /**
+     * @param \WC_Product $product
+     * @param $attributes
+     * @param $cats
+     * @return string
+     */
+    private function extractFullTextFields(\WC_Product $product, $attributes, $cats)
     {
         $text = $product->get_name();
         $text .= ' ' . $product->get_meta('pa_proizvodjac');

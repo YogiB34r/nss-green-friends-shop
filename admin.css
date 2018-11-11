@@ -68,6 +68,11 @@ GF SORTABLE CATEGORIES
 }
 
 /*ORDERS*/
+
+.post-type-shop_order .wp-list-table .column-order_status {
+    width: 10ch !important;
+}
+
 .order-status{
     font-weight: bold !important;
 }
@@ -100,6 +105,16 @@ GF SORTABLE CATEGORIES
     color: #fff !important;
 }
 
+.order-status.status-spz-slanje{
+    background-color: #cc00ff !important;
+    color: #fff !important;
+}
+
+.order-status.status-isporuceno{
+    background-color: #6600cc !important;
+    color: #fff !important;
+}
+
 .order-status.status-reklamacija,
 .order-status.status-reklamacija-pnns,
 .order-status.status-stornirano,
@@ -107,4 +122,25 @@ GF SORTABLE CATEGORIES
 .order-status.status-vracena-posiljka{
     background-color: #D50000 !important;
     color: #fff !important;
+}
+
+.gf-admin-phone-order .checkbox{
+    margin-top: 20px;
+    font-size: 18px;
+}
+
+.required:before {
+    content:"*";
+    color:red;
+    font-size: 24px;
+    display: block;
+    text-align: right;
+}
+.required-price:after{
+    content:" *";
+    color:red;
+    font-size: 24px;
+}
+.gf-backorders-filters p{
+    float: none;
 }

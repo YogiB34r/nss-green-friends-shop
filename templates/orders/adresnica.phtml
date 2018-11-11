@@ -1,0 +1,121 @@
+<?php
+/**
+ * @var \WC_Order $order
+ */
+$generator = new \Picqer\Barcode\BarcodeGeneratorHTML();
+$generator = new \Picqer\Barcode\BarcodeGeneratorSVG();
+
+$companyInfo = false;
+//if ($order->get_meta('_billing_pib') != '') {
+//    $companyInfo = '<p>Ime firme: '.$order->get_billing_company().'</p>';
+//    $companyInfo .= '<p>Pib: '.$order->get_meta('_billing_pib').'</p>';
+//}
+
+$html = '<html>
+<header>
+<title>Adresnica-'.$order.'.pdf</title>
+<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+<meta content="utf-8" http-equiv="encoding">
+<script>
+    function printDiv() {
+        var w = window.open();
+        w.document.write(document.getElementById(\'content-print\').innerHTML);
+        w.print();
+        w.close();
+    }
+</script>
+<style>
+svg {
+display: block;
+}
+    body, body p, p {
+        font-size: 18px;
+    }
+    .gf-print-bill-wrapper{
+        width: 100%;
+        padding: 5px;
+        margin: auto;
+    }
+    .gf-print-bill-number{
+        width: 100%;
+        padding: 50px;
+        padding-bottom:0;
+        font-size: 20px;
+    }
+    .gf-print-bill-info-wrapper{
+        margin-left: 50px;
+        margin-top: 40px;
+    }
+    .gf-print-bill__shipping-info{
+        text-align: left;
+    }
+    .gf-print-bill-info-wrapper p{
+        margin: 0;
+    }
+    .gf-print-bill__date-number-method{
+        margin-top: 30px;
+    }
+</style>
+</header>
+<body onload="printDiv()">';
+
+$html .= '<div class="gf-print-bill-wrapper" id="content-print">
+    <div class="gf-print-bill-number">';
+
+    $dailyExpressFormat = 'SS' . $order->get_date_created()->format('dm') . $order->get_id();
+    $html .= $generator->getBarcode($dailyExpressFormat, $generator::TYPE_CODE_128, 1, 40);
+    $html .= '<span style="width: 123px;">'.$dailyExpressFormat . '</span>';
+
+$html .= '</div>
+    <div class="gf-print-bill-info-wrapper">
+    <table>
+        <tr>    
+            <td width="300"><div class="gf-print-bill__customer-info">
+            <h4>Pošiljalac:</h4>
+            <p>Non Stop Shop d.o.o.</p>
+            <p>Žorža Klemansoa 19</p>
+            <p>11000 Beograd</p>
+            <p>(Stari Grad)</p>
+        </div></td>
+            <td width="300"><div class="gf-print-bill__shipping-info">
+            <h4>Primalac:</h4>';
+
+            if ($order->get_shipping_address_1() !== ''):
+                if ($companyInfo) {
+                    $html .= $companyInfo;
+                } else {
+                    $html .= '<p>'.$order->get_shipping_first_name() .' '. $order->get_shipping_last_name().'</p>';
+                }
+                $html .= '<p>'.$order->get_shipping_address_1().'</p>
+                <p>'.$order->get_shipping_postcode() .', '. $order->get_shipping_city() . ', Srbija</p>';
+            else:
+                if ($companyInfo) {
+                    $html .= $companyInfo;
+                } else {
+                    $html .= '<p>'.$order->get_billing_first_name() .' '. $order->get_billing_last_name().'</p>';
+                }
+                $html .= '<p>'.$order->get_billing_address_1().',</p>
+                <p>'.$order->get_billing_postcode() .', '. $order->get_billing_city().'</p>';
+            endif;
+            $html .= '<p>Int. broj : '.$order->get_order_number().'</p>
+            <p>Telefon primaoca : '.$order->get_billing_phone().'</p>
+            <p>SMS : </p>
+            <p>Vrednost: 0,00</p>';
+        if ($order->get_payment_method_title() == 'Pouzećem'):
+            $html .= '<p>Otkupnina: '.number_format($order->get_total(), 0).'</p>
+            <p>Pošiljalac - Virman</p>';
+        else:
+            $html .= '<p>Otkupnina: 0,00</p>
+            <p>Pošiljalac - Virman</p>';
+        endif;
+    $html .= '</div></td>
+        </tr>
+    </table>';
+
+    $html .= '</div>
+</div>
+</body>
+</html>
+';
+echo $html;
+exit();

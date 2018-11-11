@@ -160,7 +160,6 @@ function gf_get_category_items_from_elastic()
     $search = new \GF\Search\Search(new \GF\Search\Adapter\Elastic($elasticaSearch));
     $cat = get_term_by('slug', get_query_var('term'), 'product_cat');
     $resultSet = $search->getItemsForCategory($cat->term_id, $query, $per_page, $currentPage);
-
     parse_search_category_aggregation($resultSet);
 
     wc_set_loop_prop('total', $resultSet->getTotalHits());

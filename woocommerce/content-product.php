@@ -13,6 +13,8 @@
  * @see     https://docs.woocommerce.com/document/template-structure/
  * @package WooCommerce/Templates
  * @version 3.4.0
+ *
+ * @var WC_Product $product
  */
 
 defined('ABSPATH') || exit;
@@ -29,25 +31,28 @@ $classes = ob_get_clean();
 <li <?=$classes?>>
     <a href="<?php echo get_permalink($product->get_id()) ?>"
        title="<?php echo esc_attr($product->get_title() ? $product->get_title() : $product->get_id()); ?>">
-        <?= add_stickers_to_products_on_sale($classes);
-        add_stickers_to_products_new($product);
-        echo add_stickers_to_products_soldout($classes);
+        <?php
+        if (function_exists('add_stickers_to_products_on_sale')) {
+            echo add_stickers_to_products_on_sale($classes);
+        }
+        if (function_exists('add_stickers_to_products_new')) {
+            add_stickers_to_products_new($product);
+        }
+        if (function_exists('add_stickers_to_products_soldout')) {
+            add_stickers_to_products_soldout($classes);
+        }
         ?>
-        <?php if (has_post_thumbnail($product->get_id())):
-//            $image = wp_get_attachment_image_src(get_post_thumbnail_id($product->get_id()), 'single-post-thumbnail');
-//            get_the_post_thumbnail_url($product->get_id(), 'single-post-thumbnail');
-            ?>
+        <?php if (has_post_thumbnail($product->get_id())): ?>
             <img src="<?=get_the_post_thumbnail_url($product->get_id(), 'shop_catalog')?>" class="attachment-post-thumbnail size-post-thumbnail wp-post-image"
                  alt="<?=$product->get_title()?>" width="200" height="200" />
-<?php // srcset="https://nss.ha.rs/wp-content/uploads/2018/10/02/34/2960630.jpg 500w, https://nss.ha.rs/wp-content/uploads/2018/10/02/34/2960630-150x150.jpg 150w, https://nss.ha.rs/wp-content/uploads/2018/10/02/34/2960630-300x300.jpg 300w, https://nss.ha.rs/wp-content/uploads/2018/10/02/34/2960630-100x100.jpg 100w" sizes="(max-width: 500px) 100vw, 500px" ';
-//            echo get_the_post_thumbnail($product->get_id());
+<?php // srcset="/wp-content/uploads/2018/10/02/34/2960630.jpg 500w, /wp-content/uploads/2018/10/02/34/2960630-150x150.jpg 150w, /wp-content/uploads/2018/10/02/34/2960630-300x300.jpg 300w, /wp-content/uploads/2018/10/02/34/2960630-100x100.jpg 100w" sizes="(max-width: 500px) 100vw, 500px" ';
         else:
             echo '<img src="' . wc_placeholder_img_src() . '" alt="Placeholder" width="300px" height="300px" />';
         endif; ?>
     </a>
     <a href="<?php echo get_permalink($product->get_id()) ?>"
        title="<?php echo esc_attr($product->get_title() ? $product->get_title() : $product->get_id()); ?>">
-        <h5><?php the_title();?></h5>
+        <h3><?php the_title();?></h3>
     </a>
     <span class="price"><?php echo $product->get_price_html(); ?></span>
     <div class="loop-short-description"><?=strip_tags($product->get_short_description())?></div>

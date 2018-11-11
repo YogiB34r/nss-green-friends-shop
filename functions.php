@@ -2,11 +2,12 @@
 //ini_set('upload_max_size', '128M');
 //ini_set('post_max_size', '128M');
 //ini_set('max_execution_time', '80');
-ini_set('max_execution_time', '30');
+ini_set('max_execution_time', '40');
 
 require(__DIR__ . DIRECTORY_SEPARATOR . "user.functions.php");
-require(__DIR__ . DIRECTORY_SEPARATOR . "/search.functions.php");
-require(__DIR__ . DIRECTORY_SEPARATOR . "/util.functions.php");
+require(__DIR__ . DIRECTORY_SEPARATOR . "search.functions.php");
+require(__DIR__ . DIRECTORY_SEPARATOR . "util.functions.php");
+require(__DIR__ . DIRECTORY_SEPARATOR . "cron.functions.php");
 
 add_action('after_setup_theme', 'wc_support');
 function wc_support()
@@ -18,6 +19,7 @@ function wc_support()
     add_theme_support('yoast-seo-breadcrumbs');
 }
 
+add_action('after_setup_theme', 'require_on_init');
 function require_on_init()
 {
     foreach (glob(get_stylesheet_directory() . "/inc/*.php") as $file) {
@@ -32,12 +34,11 @@ require(__DIR__ . "/inc/Search/Search.php");
 require(__DIR__ . "/inc/Search/Elastica/Search.php");
 require(__DIR__ . "/inc/Search/Elastica/TermSearch.php");
 require(__DIR__ . "/inc/CheckoutHelper/CheckoutHelper.php");
+require(__DIR__ . '/inc/Util/PricelistUpdate.php');
 
-add_action('after_setup_theme', 'require_on_init');
 
 add_filter('woocommerce_currency_symbol', 'change_existing_currency_symbol', 10, 2);
-function change_existing_currency_symbol($currency_symbol, $currency)
-{
+function change_existing_currency_symbol($currency_symbol, $currency) {
     $currency_symbol = 'din.';
 
     return $currency_symbol;
@@ -50,8 +51,7 @@ add_filter('upload_dir', 'upload_dir_filter');
  * @param $uploads
  * @return mixed
  */
-function upload_dir_filter($uploads)
-{
+function upload_dir_filter($uploads) {
     //$day = date('d');
     $day = date('d/i');
     $uploads['path'] .= '/' . $day;
@@ -65,8 +65,7 @@ function upload_dir_filter($uploads)
  *
  * @param array $args
  */
-function woocommerce_breadcrumb($args = array())
-{
+function woocommerce_breadcrumb($args = array()) {
     $args = wp_parse_args($args, apply_filters('woocommerce_breadcrumb_defaults', array(
         'delimiter' => '&nbsp;&#47;&nbsp;',
         'wrap_before' => '<nav class="woocommerce-breadcrumb" ' . (is_single() ? 'itemprop="breadcrumb"' : '') . '>',
@@ -90,8 +89,7 @@ function woocommerce_breadcrumb($args = array())
  *
  * @return array
  */
-function gf_print_styles()
-{
+function gf_print_styles() {
     $result = [];
     $result['scripts'] = [];
     $result['styles'] = [];
@@ -115,8 +113,7 @@ function gf_print_styles()
  *
  * @param WP_Query $sortedProducts
  */
-function gf_custom_search_output(WP_Query $sortedProducts)
-{
+function gf_custom_search_output(WP_Query $sortedProducts) {
     if ($sortedProducts->have_posts()):
 //        global $sw;
         wc_setup_loop();
@@ -135,8 +132,7 @@ function gf_custom_search_output(WP_Query $sortedProducts)
     endif;
 }
 
-function parseAttributes()
-{
+function parseAttributes() {
     $redis = new GF_Cache();
     $atributes = unserialize($redis->redis->get('attributes-collection'));
     if ($atributes === false) {
@@ -265,7 +261,7 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products)
             $classes .= ' sale ';
         }
         if ($product->getStockStatus() == 0) {
-            $classes .= ' outofstock';
+            $classes .= ' outofstock ';
         }
         // klase koje mozda zatrebaju za <li> 'instock sale shipping-taxable purchasable product-type-simple'
         $classes .= " instock ";
@@ -291,7 +287,7 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products)
 //        $html .= add_stickers_to_products_soldout($classes);
         $html .= '</a>';
         $html .= '<a href="' . $product->dto['permalink'] . '" title="' . $product->getName() . '">';
-        $html .= '<h5>' . $product->getName() . '</h5>';
+        $html .= '<h3>' . $product->getName() . '</h3>';
         $html .= '</a>';
         $html .= '<span class="price">';
         if ($saved_percentage > 0) {
@@ -315,7 +311,6 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products)
     echo $html;
 }
 
-
 function woocommerce_pagination()
 {
     $args = array(
@@ -332,79 +327,15 @@ function woocommerce_pagination()
     wc_get_template('loop/pagination.php', $args);
 }
 
-
-//maybe we will need this function...
-//function gf_custom_add_to_cart_message($message, $products)
-//{
-//    $titles = array();
-//    $count = 0;
-//    $show_qty = true;
-//    if (!is_array($products)) {
-//        $products = array($products => 1);
-//        $show_qty = false;
-//    }
-//    if (!$show_qty) {
-//        $products = array_fill_keys(array_keys($products), 1);
-//    }
-//    foreach ($products as $product_id => $qty) {
-//        $titles[] = ($qty > 1 ? absint($qty) . ' &times; ' : '') . sprintf(_x('&ldquo;%s&rdquo;', 'Item name in quotes', 'woocommerce'), strip_tags(get_the_title($product_id)));
-//        $count += $qty;
-//    }
-//    $titles = array_filter($titles);
-//    $added_text = sprintf(_n('%s has been added to your cart.', '%s have been added to your cart.', $count, 'woocommerce'), wc_format_list_of_items($titles));
-//    // Output success messages.
-//    if ('yes' === get_option('woocommerce_cart_redirect_after_add')) {
-//        $return_to = apply_filters('woocommerce_continue_shopping_redirect', wc_get_raw_referer() ? wp_validate_redirect(wc_get_raw_referer(), false) : wc_get_page_permalink('shop'));
-//        $message = sprintf('<a href="%s" class="button wc-forward">%s</a> %s', esc_url($return_to), esc_html__('Continue shopping', 'woocommerce'), esc_html($added_text));
-//    } else {
-//        $message = sprintf('<a href="%s" class="button wc-forward">%s</a> %s', esc_url(wc_get_page_permalink('cart')), esc_html__('View cart', 'woocommerce'), esc_html($added_text));
-//    }
-//
-//    if (has_filter('wc_add_to_cart_message')) {
-//        wc_deprecated_function('The wc_add_to_cart_message filter', '3.0', 'wc_add_to_cart_message_html');
-//        $message = apply_filters('wc_add_to_cart_message', $message, $product_id);
-//    }
-//    return $message;
-//}
-
-
-//function remove_country_field_billing($fields)
-//{
-//    unset($fields['billing_country']);
-//    unset($fields['billing_state']);
-//    return $fields;
-//
-//}
-//add_filter('woocommerce_billing_fields', 'remove_country_field_billing');
-//function remove_country_field_shipping($fields)
-//{
-//    unset($fields['shipping_country']);
-//    unset($fields['shipping_state']);
-//    return $fields;
-//}
-//add_filter('woocommerce_shipping_fields', 'remove_country_field_shipping');
-
-//function custom_override_checkout_fields( $fields ) {
-//    unset($fields['billing']['billing_country']);
-//    unset($fields['shipping_country']);
-//
-//    return $fields;
-//}
-//add_filter( 'woocommerce_checkout_fields' , 'custom_override_checkout_fields' );
-
-
+add_action('wp_print_scripts', 'iconic_remove_password_strength', 10);
 function iconic_remove_password_strength()
 {
     wp_dequeue_script('wc-password-strength-meter');
 }
 
-add_action('wp_print_scripts', 'iconic_remove_password_strength', 10);
-
 
 add_action('woocommerce_save_account_details_errors', 'wooc_validate_custom_field', 10, 2);
-
-function wooc_validate_custom_field($args, $user)
-{
+function wooc_validate_custom_field($args, $user) {
     $user_id = $user->ID;
     $user_pass_hash = get_user_by('id', $user_id)->user_pass;
     if (isset($_POST['password_current']) && !empty($_POST['password_current'])) {
@@ -418,11 +349,7 @@ function wooc_validate_custom_field($args, $user)
 }
 
 add_action('woocommerce_before_account_navigation', 'gf_my_account_shop_button', 1);
-function gf_my_account_shop_button()
-{
-    if (!defined('ABSPATH')) {
-        exit; // Exit if accessed directly
-    }
+function gf_my_account_shop_button() {
     global $wp;
     $request = explode('/', $wp->request);
     $page = end($request);
@@ -458,15 +385,7 @@ function gf_my_account_shop_button()
     echo '</div>';
 }
 
-add_action('woocommerce_before_checkout_shipping_form', 'gf_checkout_shipping_notice');
-function gf_checkout_shipping_notice()
-{
-    echo '<div class ="gf-checkout-shipping-notice p-3" >Ukoliko se adresa za dostavu razlikuje od navedene u detaljima naplate, popunite sledeća polja:</div>';
-}
-
-
 add_action('wp_footer', 'gf_cart_refresh_update_qty');
-
 function gf_cart_refresh_update_qty()
 {
     if (is_cart()) {
@@ -484,25 +403,14 @@ function gf_cart_refresh_update_qty()
 }
 
 add_filter('woocommerce_account_menu_items', 'gf_remove_my_account_links');
-function gf_remove_my_account_links($menu_links)
-{
-
+function gf_remove_my_account_links($menu_links) {
     unset($menu_links['dashboard']); // Addresses
-
-    //unset( $menu_links['dashboard'] ); // Dashboard
-    //unset( $menu_links['payment-methods'] ); // Payment Methods
-    //unset( $menu_links['orders'] ); // Orders
-    //unset( $menu_links['downloads'] ); // Downloads
-    //unset( $menu_links['edit-account'] ); // Account details
-    //unset( $menu_links['customer-logout'] ); // Logout
 
     return $menu_links;
 }
 
 add_filter('post_date_column_time', 'gf_custom_post_date_column_time', 10, 2);
-
-function gf_custom_post_date_column_time($h_time, $post)
-{
+function gf_custom_post_date_column_time($h_time, $post) {
 
     $h_time = get_the_time(__('d/m/Y', 'woocommerce'), $post);
 
@@ -510,75 +418,174 @@ function gf_custom_post_date_column_time($h_time, $post)
 }
 
 add_action('woocommerce_cart_collaterals', 'gf_cart_page_extra_buttons');
-function gf_cart_page_extra_buttons()
-{
+function gf_cart_page_extra_buttons() {
     if (!is_user_logged_in()) {
         echo '<a class="gf-cart-extra-buttons d-block p-3 mb-3" href="/moj-nalog">REGISTRUJ SE</a>
               <a class="gf-cart-extra-buttons d-block p-3" href="/placanje">NASTAVI KUPOVINU BEZ REGISTRACIJE</a>';
     }
 }
 
-//Migrate comments from old site
-function gf_migrate_comments()
-{
-    $rows = array_map('str_getcsv', file(__DIR__ . '/reviews.csv'));
-    $header = array_shift($rows);
-    $csv = array();
-    foreach ($rows as $row) {
-        $csv[] = array_combine($header, $row);
+//admin order list - date column
+add_action('manage_posts_custom_column', 'gf_date_clmn');
+function gf_date_clmn($column_name) {
+    global $post;
+    if ($column_name == 'order_date') {
+        $t_time = get_the_time(__('m/d/Y H:i', 'woocommerce'), $post);
+        echo $t_time . '<br />';
     }
-    $successfulComments = [];
-    $emptySkus = [];
-    $emptyUsers = [];
-    foreach ($csv as $comment) {
-        $postId = wc_get_product_id_by_sku($comment['sku']);
-        if (!$postId) {
-            $emptySkus[] = $comment['sku'];
-            continue;
-        }
-        $user = get_user_by('email', $comment['Email']);
-        if (!$user) {
-            $emptyUsers[] = $comment['Email'];
-            continue;
-        }
-        $commentAuthor = $user->get('display_name');
-        $commentAuthorEmail = $user->get('user_email');
-        $commentAuthorUrl = $user->get('user_url');
-        $commentContent = $comment['comment'];
-        $userId = $user->get('ID');
-        $commentDate = $comment['date'];
-
-
-        $data = array(
-            'comment_post_ID' => $postId,
-            'comment_author' => $commentAuthor,
-            'comment_author_email' => $commentAuthorEmail,
-            'comment_author_url' => $commentAuthorUrl,
-            'comment_content' => $commentContent,
-            'comment_date' => $commentDate,
-            'comment_date_gmt' => $commentDate,
-            'comment_approved' => 1,
-            'user_id' => $userId,
-        );
-        $comment_id = wp_insert_comment($data);
-        $successfulComments[] = $comment_id;
-        update_comment_meta($comment_id, 'migrated', '1');
-    } //foreach comments
-
-    $skuLogFile = fopen(LOG_PATH . '/skuLog.csv', 'w');
-    fwrite($skuLogFile, implode(',',$emptySkus));
-    fclose($skuLogFile);
-
-    $userLogFile = fopen(LOG_PATH . '/usersLog.csv', 'w');
-    fwrite($userLogFile, implode(',',$emptyUsers));
-    fclose($userLogFile);
-    echo '<p>Uspešno importovano ' . count($successfulComments) . ' komentara</p>';
 }
 
+//***** ORDERS - admin *****
+//add_filter('manage_edit-shop_order_columns', 'gf_order_payment_method_column');
+//function gf_order_payment_method_column($order_columns) {
+//    $order_columns['payment_method_column'] = "Način plaćanja";
+//    $order_columns['order_phone_column'] = "Telefonom / www";
+//    $order_columns['order_shipping_price_column'] = "Dostava";
+//
+//    return $order_columns;
+//}
 
-function gf_unrequire_wc_state_field( $fields ) {
-    $fields['shipping_state']['required'] = false;
-    return $fields;
+add_filter('manage_edit-shop_order_columns', 'gf_custom_column_ordering_for_admin_list_order');
+function gf_custom_column_ordering_for_admin_list_order($product_columns) {
+    return array(
+        'cb' => '<input type="checkbox" />', // checkbox for bulk actions
+        'order_number' => 'Narudžbina',
+        'payment_method_column' => 'Način plaćanja',
+        'order_phone_column' => 'Telefonom / WWW',
+        'order_date' => 'Datum',
+        'order_shipping_price_column' => 'Dostava',
+        'order_total' => 'Ukupno',
+        'order_status' => 'Status',
+        'customActions' => 'Actions',
+    );
 }
-add_filter( 'woocommerce_shipping_fields', 'gf_unrequire_wc_state_field' );
 
+add_action('manage_shop_order_posts_custom_column', 'gf_get_order_payment_method_column');
+function gf_get_order_payment_method_column($colname) {
+    global $the_order; // the global order object
+
+    if ($colname == 'payment_method_column') {
+        echo $the_order->get_payment_method_title();
+    }
+    if ($colname == 'order_phone_column') {
+        $via = 'WWW';
+        if ($the_order->get_created_via() == 'admin') {
+            $via = 'PHONE';
+        }
+        echo $via;
+//        echo $the_order->get_meta('gf_order_created_method');
+    }
+    if ($colname == 'order_shipping_price_column') {
+        echo $the_order->get_shipping_total() . 'din.';
+    }
+    if ($colname == 'customActions') {
+        $jitexDoneStyle = '';
+        $adresnicaDoneStyle = '';
+        if ($the_order->get_meta('jitexExportCreated')) {
+            $jitexDoneStyle = 'style="color:white;background-color:gray;font-style:italic;"';
+        }
+        if ($the_order->get_meta('adresnicaCreated')) {
+            $adresnicaDoneStyle = 'style="color:white;background-color:gray;font-style:italic;"';
+        }
+//        echo '<a class="button" href="/back-ajax/?action=printOrder&id='. $the_order->get_id() .'" title="Print racuna" target="_blank">Racun</a>';
+        echo '&nbsp;';
+        echo '<a class="button" href="/back-ajax/?action=printPreorder&id=' . $the_order->get_id() . '" title="Print predracuna" target="_blank">Predracun</a>';
+        echo '&nbsp;';
+        echo '<a class="button nssOrderJitexExport" '.$jitexDoneStyle.' href="/back-ajax/?action=exportJitexOrder&id=' . $the_order->get_id() . '" title="Export za Jitex" target="_blank">Export</a>';
+        echo '&nbsp;';
+        echo '<a class="button nssOrderAdresnica" '.$adresnicaDoneStyle.' href="/back-ajax/?action=adresnica&id=' . $the_order->get_id() . '" title="Kreiraj adresnicu" target="_blank">Adresnica</a>';
+//        echo $the_order->get_meta('gf_order_created_method');
+    }
+}
+
+add_action('woocommerce_admin_order_data_after_order_details', 'gf_admin_phone_order_field');
+function gf_admin_phone_order_field($order) {
+    $checked = true;
+    if ($order->get_meta('gf_order_created_method') == 'WWW') {
+        $checked = false;
+    }
+    woocommerce_form_field('gf_phone_order', array(
+        'type' => 'checkbox',
+        'class' => array('gf-admin-phone-order'),
+        'label' => __('Poručivanje telefonom'),
+        'required' => false,
+    ), $checked);
+}
+
+add_action('save_post', 'redirect_page');
+function redirect_page() {
+    switch (get_post_type()) {
+        case "shop_order":
+            $url = admin_url() . 'edit.php?post_type=shop_order';
+            wp_redirect($url);
+            exit;
+            break;
+    }
+}
+
+add_filter('woocommerce_catalog_orderby', 'wc_customize_product_sorting');
+function wc_customize_product_sorting($sorting_options) {
+    $sorting_options = array(
+        'menu_order' => __('Sorting', 'woocommerce'),
+        'popularity' => __('Sort by popularity', 'woocommerce'),
+        'rating' => __('Sort by average rating', 'woocommerce'),
+        'date' => __('Sort by newness', 'woocommerce'),
+        'price' => __('Sort by price: low to high', 'woocommerce'),
+        'price-desc' => __('Sort by price: high to low', 'woocommerce'),
+    );
+
+    return $sorting_options;
+}
+
+add_action('woocommerce_before_order_itemmeta', 'addItemStatusToOrderItemList', 10, 3);
+function addItemStatusToOrderItemList($itemId, $item, $c) {
+    /* @var WC_Order_Item_Product $item */
+    if (isset($_GET['post']) && $_GET['post'] && get_class($item) === WC_Order_Item_Product::class) {
+        global $wpdb;
+
+        $sql = "SELECT * FROM wp_nss_backorderItems WHERE orderId = {$_GET['post']} AND itemId = {$item->get_product_id()}";
+        $result = $wpdb->get_results($sql);
+        if (empty($result) || !isset($result[0])) {
+            echo '<p>Status proizvoda: ČEKA NARUČIVANJE</p>';
+        } else {
+            if ($result[0]->status == 1) {
+                echo '<p>Status proizvoda: SPREMAN ZA PAKOVANJE</p>';
+            } elseif ($result[0]->status == 0) {
+                echo '<p>Status proizvoda: NARUČEN</p>';
+            } else {
+                echo '<p>Status proizvoda: NEMA NA STANJU !</p>';
+            }
+            echo '<p>Broj naloga: ' . $result[0]->backOrderId . '</p>';
+        }
+    }
+}
+
+// prevent bug with members plugin
+add_filter('members_check_parent_post_permission', function() {return false;});
+
+
+// ADDING A CUSTOM COLUMN TITLE TO ADMIN PRODUCTS LIST
+add_filter( 'manage_edit-product_columns', 'gf_supplier_product_list_column',11);
+function gf_supplier_product_list_column($columns)
+{
+    //add columns
+    $columns['supplier'] = __( 'Dobavljač','woocommerce'); // title
+    return $columns;
+}
+
+// ADDING THE DATA FOR EACH PRODUCTS BY COLUMN (EXAMPLE)
+add_action( 'manage_product_posts_custom_column' , 'gf_supplier_product_list_column_content', 10, 2 );
+function gf_supplier_product_list_column_content( $column, $product_id )
+{
+    global $post;
+
+
+    $supplier_id = get_post_meta($product_id, 'supplier', true);
+    $supplier_name = get_user_by('ID', $supplier_id)->display_name;
+    switch ( $column )
+    {
+        case 'supplier' :
+            echo $supplier_name; // display the data
+            break;
+    }
+}

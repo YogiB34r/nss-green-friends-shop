@@ -9,10 +9,10 @@ jQuery(document).ready(function () {
     }
 
     var radioValue = '';
-    jQuery(".gf-search-form").submit(function () {
+    jQuery(".gf-search-form, .gf-search-form--mobile").submit(function () {
         var radioValue = jQuery('input[name=search-radiobutton]:checked').val();
         if (radioValue === 'category') {
-            jQuery(".gf-search-form").attr("action", "");
+            jQuery(".gf-search-form, .gf-search-form--mobile").attr("action", "");
         }
     });
     jQuery('label[for="search-checkbox"]').click(function () {
@@ -27,11 +27,11 @@ jQuery(document).ready(function () {
         $clamp(element, {clamp: 3, useNativeClamp: false});
     });
 
-    jQuery('.gf-sticker--center').each(function () {
-        if (jQuery(this).parent().parent().is('.products .product') || jQuery(this).parent().parent().is('.gf-category-box__item')) {
-            jQuery(this).addClass('gf-sticker--loop-grid');
-        }
-    });
+    // jQuery('.gf-sticker--center').each(function () {
+    //     if (jQuery(this).parent().parent().is('.products .product') || jQuery(this).parent().parent().is('.gf-category-box__item')) {
+    //         jQuery(this).addClass('gf-sticker--loop-grid');
+    //     }
+    // });
 
     if (jQuery('.products').hasClass('list')) {
         jQuery('.products .gf-sticker--center').toggleClass('gf-sticker--loop-list');
@@ -417,6 +417,16 @@ jQuery(document).ready(function ($) {
         });
     }
 
+    // initiate checkout page event
+    if (window.location.pathname.search('placanje')) {
+        fbq('track', 'InitiateCheckout');
+    }
+
+    // initiate checkout completed page event
+    if (window.location.pathname.search('placanje')) {
+        fbq('track', 'Purchase', {value: jQuery('.woocommerce-order-overview__total .woocommerce-Price-amount').text().split('din.')[0], currency: 'RSD'});
+    }
+
 });
 jQuery(document).ready(function ($) {
     $('#ship-to-different-address-checkbox').click(); //@TODO kad se sredi css treba izbrisati
@@ -451,21 +461,22 @@ function showPassword() {
 }
 
 jQuery(document).ready(function ($) {
-    if ($('#search-radiobutton-cat').is(':checked')) {
+    $('.search-radiobutton-cat').prop('checked', true);
+    // $('#search-radiobutton-cat').bind( "click" );
+    $('.s-radio-btn-1').addClass("color-orange");
+
+    $('.s-radio-btn-1, .search-radiobutton-cat').click(function () {
+        $('.search-radiobutton-cat').prop('checked', true);
+        $('.search-radiobutton-main').prop('checked', false);
         $('.s-radio-btn-1').addClass("color-orange");
         $('.s-radio-btn-2').removeClass("color-orange");
-    }
+    });
 
-    $('#search-radiobutton-main').click(function () {
-        if ($(this).is(':checked')) {
-            $('.s-radio-btn-2').addClass("color-orange");
-            $('.s-radio-btn-1').removeClass("color-orange");
-        }
+    $('.s-radio-btn-2, .search-radiobutton-main').click(function () {
+        $('.search-radiobutton-cat').prop('checked', false);
+        $('.search-radiobutton-main').prop('checked', true);
+        $('.s-radio-btn-2').addClass("color-orange");
+        $('.s-radio-btn-1').removeClass("color-orange");
     });
-    $('#search-radiobutton-cat').click(function () {
-        if ($(this).is(':checked')) {
-            $('.s-radio-btn-1').addClass("color-orange");
-            $('.s-radio-btn-2').removeClass("color-orange");
-        }
-    });
+
 });

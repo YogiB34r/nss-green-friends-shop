@@ -20,33 +20,13 @@ function gf_register_sidebars()
             'description' => '',
         ),
         array(
-            'name' => __('Search form mobile', '' . $theme->get('TextDomain') . ''),
-            'id' => 'gf-search-form-mobile',
-            'description' => '',
-        ),
-        array(
-            'name' => __('Header cart/account/mobile navigation', '' . $theme->get('TextDomain') . ''),
-            'id' => 'gf-header-row-2-col-3',
-            'description' => '',
-        ),
-        array(
             'name' => __('Home images slider/banners(desktop)', '' . $theme->get('TextDomain') . ''),
             'id' => 'gf-homepage-row-1',
             'description' => '',
         ),
         array(
-            'name' => __('Home images slider/banners(mobile)', '' . $theme->get('TextDomain') . ''),
-            'id' => 'gf-homepage-row-1-mobile',
-            'description' => '',
-        ),
-        array(
             'name' => __('Homepage product sliders', '' . $theme->get('TextDomain') . ''),
             'id' => 'gf-homepage-row-2',
-            'description' => '',
-        ),
-        array(
-            'name' => __('Homepage product sliders (mobile)', '' . $theme->get('TextDomain') . ''),
-            'id' => 'gf-homepage-row-3',
             'description' => '',
         ),
         array(
@@ -66,14 +46,35 @@ function gf_register_sidebars()
             'description' => 'Category page sidebar',
         ),
         array(
-            'name' => __('Category Sidebar (product filters for mobile)', '' . $theme->get('TextDomain') . ''),
-            'id' => 'gf-category-sidebar-product-filters',
-            'description' => 'Category page sidebar (product filters for mobile)',
-        ),
-        array(
             'name' => __('Sidebar (single product page)', '' . $theme->get('TextDomain') . ''),
             'id' => 'gf-sidebar-single-productpage',
             'description' => 'Sidebar (single product page)',
+        ),
+
+        array(
+            'name' => __('Header Search form (mobile)', '' . $theme->get('TextDomain') . ''),
+            'id' => 'gf-search-form-mobile',
+            'description' => '',
+        ),
+        array(
+            'name' => __('Header cart/account/mobile navigation', '' . $theme->get('TextDomain') . ''),
+            'id' => 'gf-header-row-2-col-3',
+            'description' => '',
+        ),
+        array(
+            'name' => __('Home images slider/banners(mobile)', '' . $theme->get('TextDomain') . ''),
+            'id' => 'gf-homepage-row-1-mobile',
+            'description' => '',
+        ),
+        array(
+            'name' => __('Homepage product sliders (mobile)', '' . $theme->get('TextDomain') . ''),
+            'id' => 'gf-homepage-row-3',
+            'description' => '',
+        ),
+        array(
+            'name' => __('Category Sidebar (product filters for mobile)', '' . $theme->get('TextDomain') . ''),
+            'id' => 'gf-category-sidebar-product-filters',
+            'description' => 'Category page sidebar (product filters for mobile)',
         ),
     );
 
