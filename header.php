@@ -26,6 +26,14 @@
         <img height="1" width="1" src="https://www.facebook.com/tr?id=264258047766442&ev=PageView&noscript=1"/>
     </noscript>
     <!-- End Facebook Pixel Code -->
+    <script>
+        if (window.location.pathname === '/' && window.location.host.search('nonstopshop.rs')) {
+            window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+            ga('create', 'UA-108239528-1', { 'cookieDomain': 'nonstopshop.rs' } );
+            // Plugins
+            ga('send', 'pageview');
+        }
+    </script>
 </head>
 
 <body <?php body_class(); ?>>

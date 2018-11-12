@@ -13,34 +13,30 @@ include(__DIR__ . "/inc/Search/Factory/ProductSetupFactory.php");
 include(__DIR__ . "/inc/Search/Factory/TermSetupFactory.php");
 
 if (defined('WP_CLI') && WP_CLI) {
-    // add cli commands
+    ini_set('max_execution_time', 1200);
+    ini_set('display_errors', 1);
+    error_reporting(E_ALL);
+
+
+    // elastic operations
     \WP_CLI::add_command('createElasticIndex', 'createElasticIndex');
     \WP_CLI::add_command('syncElasticIndex', 'syncElasticIndex');
 
+    //debug
     \WP_CLI::add_command('passAllProducts', 'passAllProducts');
     \WP_CLI::add_command('passAllUsers', 'passAllUsers');
 
     \WP_CLI::add_command('createXmlExport', 'getItemExport');
 
-    $factory = new \Nss\Feed\FeedFactory();
-
     //feed processing
-    $supplierId = 666;
-    \WP_CLI::add_command('feed', $factory(), $supplierId);
-//    \WP_CLI::add_command('parseFeed', 'resetQueue', $supplierId);
-//    \WP_CLI::add_command('parseFeed', 'importItems', $supplierId);
+    $factory = new \Nss\Feed\FeedFactory();
+    $feed = $factory();
+    \WP_CLI::add_command('feed', $feed);
 
-//    \WP_CLI::add_command('fixItemVendor', 'fixItemVendor');
+    \WP_CLI::add_command('fixItemVendor', 'fixItemVendor');
 }
 
-ini_set('max_execution_time', 1200);
-//ini_set('display_errors', 1);
-//error_reporting(E_ALL);
 
-function fixItemVendor() {
-    $cli = new \GF\Cli();
-    $cli->fixItems();
-}
 
 function getItemExport() {
     global $wpdb;
@@ -132,7 +128,10 @@ function createXml(DOMDocument $xmlDoc, WC_Product $item, $root) {
     return $root;
 }
 
-
+function fixItemVendor() {
+    $cli = new \GF\Cli();
+    $cli->fixItems();
+}
 
 
 
@@ -162,27 +161,8 @@ function passAllUsers() {
 }
 
 function passAllProducts() {
-    $pages = 21;
-    $limit = 1000;
-
-    global $wpdb;
-
-//    for ($i = 1; $i < $pages; $i++) {
-        $products_ids = wc_get_products(array(
-//            'limit' => $limit,
-            'limit' => 2000,
-            'return' => 'ids',
-            'status' => 'pending',
-//            'paged' => $i
-        ));
-
-        foreach ($products_ids as $product_id) {
-            $product = wc_get_product($product_id);
-            $product->set_status('publish');
-            $product->save();
-        }
-        echo 'done';
-//    }
+    $cli = new \GF\Cli();
+    $cli->collectSkus();
 }
 
 function createElasticIndex() {

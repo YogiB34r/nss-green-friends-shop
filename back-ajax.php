@@ -95,9 +95,9 @@ function createJitexItemExport() {
                         if (!in_array($itemIdSize, $passedIds)) {
                             $passedIds[] = $itemIdSize;
                             $csv .= iconv('utf-8','windows-1250',  $itemIdSize."\t".
-                                    trim(mb_strtoupper($product->get_name() . ' ' . $variation, 'UTF-8'))."\t".
-                                    str_replace('.',',',$product->get_meta('pdv'))."\t".str_replace('.', ',', round($product->get_price() * 100 / (double) $taxcalc, 2))."\t".
-                                    str_replace('.', ',', round($product->get_price(), 2)))."\r\n";
+                            trim(mb_strtoupper($product->get_name() . ' ' . $variation, 'UTF-8'))."\t".
+                            str_replace('.',',',$product->get_meta('pdv'))."\t".str_replace('.', ',', round($product->get_price() * 100 / (double) $taxcalc, 2))."\t".
+                            str_replace('.', ',', round($product->get_price(), 2)))."\r\n";
 //                                var_dump($product->get_sku() . $variation);
                         }
                     }
@@ -109,7 +109,7 @@ function createJitexItemExport() {
     header("Cache-Control: public");
     header("Content-Description: File Transfer");
     header('Content-type: text/plain');
-    header("Content-Disposition: attachment; filename=".date('d-m-Y H:i:s').'.txt');
+    header("Content-Disposition: attachment; filename=".date('d-m-Y H:i:s').'.txt"');
     header('Content-Transfer-Encoding: binary');
 
     echo $csv;
@@ -131,12 +131,7 @@ function createAdresnica($orderId) {
     $html2pdf->output($name, 'D');
 }
 
-function exportJitexOrder(
-    WC_Order $order,
-    $test,
-    $tes12,
-    $test123
-) {
+function exportJitexOrder(WC_Order $order) {
     $string = '';
     foreach ($order->get_items() as $item) {
         $p = wc_get_product($item->get_product()->get_id());
@@ -159,7 +154,7 @@ function exportJitexOrder(
         }
 
         $variantId = $p->get_sku() . $variation;
-        $variantName = $item->get_name();
+        $variantName = str_replace('-', '', $item->get_name());
         $date = $order->get_date_created()->format('d.m.Y');
         $modifier = (float) '1' .'.'. (int) number_format($p->get_meta('pdv'));
         $priceNoPdv = number_format((int) $p->get_price() / $modifier, 2, ',', '.');

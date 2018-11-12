@@ -58,6 +58,8 @@ class PricelistUpdate
                 }
                 if ($itemInfo[4] == 3) {
                     $product->set_stock_status('outofstock');
+                } else {
+                    $product->set_stock_status('instock');
                 }
                 $product->set_status($status);
                 $product->save();
