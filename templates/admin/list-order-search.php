@@ -190,8 +190,20 @@ class Order_List_Table extends Wp_List_Table
             $order_shiping_price = $order_data['shipping_total'] . ' ' . $order_data['currency'];
             $order_status = $order_data['status'];
             $order_date_modified = $order_data['date_modified']->date('d-m-Y H:i:s');
+
+            /**
+             *
+             * Get Customs ustom actions for order customs list
+             *
+             */
             $jitexDoneStyle = '';
             $adresnicaDoneStyle = '';
+            if ($order->get_meta('jitexExportCreated')) {
+                $jitexDoneStyle = 'style="color:white;background-color:gray;font-style:italic;"';
+            }
+            if ($order->get_meta('adresnicaCreated')) {
+                $adresnicaDoneStyle = 'style="color:white;background-color:gray;font-style:italic;"';
+            }
 
             $customs_order_actions =
             '<a class="button" href="/back-ajax/?action=printPreorder&id=' . $order_id . '" title="Print predracuna" target="_blank">Predracun</a>' .
