@@ -28,8 +28,6 @@ class Gf_Order_Wp_List_Table
         $this->list_table_page();
     }
 
-
-
     /**
      *
      * Display list table page.
@@ -39,7 +37,29 @@ class Gf_Order_Wp_List_Table
     public function list_table_page()
     {
         $orderListTable = new Order_List_Table;
-        $orderListTable->prepare_items(); ?>
+        $orderListTable->prepare_items();
+
+        /* Here we iterate through orders data to see all values for customers and dates */
+        $ordersData = $orderListTable->table_data();
+        $registered_customers = [];
+        foreach ($ordersData as $orderData) {
+            if (in_array($registered_customers, $orderData['order_customer_data'])) {
+                continue;
+            } else {
+                $registered_customers [] = $orderData['order_customer_data'];
+                $registered_customers_sort = array_unique($registered_customers);
+                unset($orderData['order_customer_data']);
+            }
+        }
+        $order_dates = [];
+        foreach ($ordersData as $orderData) {
+            if (in_array($order_dates, $orderData['order_date'])) {
+                continue;
+            } else {
+                $order_dates [] = $orderData['order_date'];
+                $order_dates_sort = array_unique($order_dates);
+            }
+        } ?>
 
         <form id="posts-filter" method="GET">
             <input type="hidden" name="page" value="gf-order-list" />
@@ -51,12 +71,25 @@ class Gf_Order_Wp_List_Table
             <div class="wrap">
                 <div id="icon-users" class="icon32"></div>
                 <h2>Custom order lista</h2>
-                    <?php $orderListTable->render_customer_filter(); ?>
-                    <?php $orderListTable->order_months_dropdown('shop_order') ?>
+                  <div class= row>
+                    <select  name="m" id="filter-by-date">
+                          <option value="">- All Dates -</option>
+                            <?php foreach ($order_dates_sort as $date) {
+            echo '<option value="' . $date . '">' . $date . '</option>';
+        } ?>
+                    </select>
+
+                    <select class="wc-customer-search" name="_customer_user" data-placeholder="<?php esc_attr_e('Filter by registered customer', woocomerce); ?>" data-allow_clear ="true">
+                          <option value="">- All registered customers -</option>
+                            <?php foreach ($registered_customers_sort as $customer) {
+            echo '<option value="' . $customer . '">' . $customer . '</option>';
+        } ?>
+                    </select>
                     <?php submit_button('Filter', 'submit,', 'filter_action', '', false, array( 'id' => 'post_query_submit' )); ?>
-                    <?php $orderListTable->display(); ?>
             </div>
+          </div>
         </form>
+         <?php $orderListTable->display(); ?>
     <?php
     }
 }
@@ -83,14 +116,46 @@ class Order_List_Table extends Wp_List_Table
      */
     public function prepare_items()
     {
+        $ordersData = $this->table_data();
+
+        /**
+        *
+        * Here we implement get filters data
+        *
+        */
+
+        /* Here we implement search filter */
+        if (isset($_GET['s']) && !empty($_GET['s'])) {
+            $filterKey = trim($_GET['s']);
+            //Dodate elastic ovde?
+        }
+
+        /* Here we implement filter for dates */
+        if (isset($_GET['m']) && !empty($_GET['m'])) {
+            $filterKey = trim($_GET['m']);
+            // var_dump($filterKey);
+            // die();
+            if ($filterKey !== '') {
+                $ordersData = $this->date_filter_table_data($ordersData, $filterKey);
+            }
+        }
+
+        /* Here we implement customer user filter */
+        if (isset($_GET['_customer_user']) && !empty($_GET['_customer_user'])) {
+            $filterKey = trim($_GET['_customer_user']);
+            // var_dump($filterKey);
+            // die();
+            if ($filterKey !== '') {
+                $ordersData = $this->customer_filter_table_data($ordersData, $filterKey);
+            }
+        }
+
         $columns = $this->get_columns();
         $hidden = $this->get_hidden_columns();
         $sortable = $this->get_sortable_columns();
 
         /* Process bulk action */
         $this->process_bulk_action();
-
-        $ordersData = $this->table_data();
         usort($ordersData, array(&$this, 'sort_data'));
 
         $perPage = 30;
@@ -191,6 +256,8 @@ class Order_List_Table extends Wp_List_Table
             $order_status = $order_data['status'];
             $order_date_modified = $order_data['date_modified']->date('d-m-Y H:i:s');
 
+            $order_customer_name = $order_data['billing']['first_name'] . ' ' . $order_data['billing']['last_name'];
+
             /**
              *
              * Get Customs ustom actions for order customs list
@@ -211,8 +278,6 @@ class Order_List_Table extends Wp_List_Table
             '<a class="button nssOrderJitexExport" '.$jitexDoneStyle.' href="/back-ajax/?action=exportJitexOrder&id=' . $order->get_id() . '" title="Export za Jitex" target="_blank">Export</a>' .
             '&nbsp;' .
             '<a class="button nssOrderAdresnica" '.$adresnicaDoneStyle.' href="/back-ajax/?action=adresnica&id=' . $order->get_id() . '" title="Kreiraj adresnicu" target="_blank">Adresnica</a>';
-            // var_dump($customs_order_actions);
-            // die();
 
             $data[] = array(
                'id' => $order_id,
@@ -224,11 +289,10 @@ class Order_List_Table extends Wp_List_Table
                'order_total' => $order_total,
                'order_status' => $order_status,
                'customActions' => $customs_order_actions,
+               'order_customer_data' => $order_customer_name
                 );
         }
 
-        // var_dump($data);
-        // die();
         return $data;
     }
 
@@ -371,26 +435,58 @@ class Order_List_Table extends Wp_List_Table
 <?php
     }
 
-    public function render_customer_filter()
+    /**
+     * Filter function for customers .
+     *
+     * @param array $ordersData
+     * @param string $filterKey
+     *
+     * @return array
+     *
+     */
+    public function customer_filter_table_data($ordersData, $filterKey)
     {
-        $user_string = '';
-        $user_id = '';
+        $filtered_orders_table_data = array_values(
+            array_filter($ordersData, function ($row) use ($filterKey) {
+                foreach ($row as $key => $rowValue) {
+                    if ($key == 'order_customer_data') {
+                        if ($rowValue == $filterKey) {
+                            return true;
+                        }
+                    }
+                }
+            })
+      );
 
-        if (!empty($_GET['_customer_user'])) {
-            $user_id = absint($_GET['_customer_user']);
-            $user = get_user_by('id', $user_id);
+        return $filtered_orders_table_data;
+    }
 
 
-            $user_string = sprintf(
-                esc_html__('%1$s (#%2$s &ndash; %3$s)', 'woocommerce'),
-                $user->display_name,
-                absint($user->ID),
-                $user->user_email
-                );
-        } ?>
-        <select class="wc-customer-search" name="_customer_user" data-placeholder="<?php esc_attr_e('Filter by registered customer', woocomerce); ?>" data-allow_clear ="true">
-          <option value="<?php echo esc_attr($user_id); ?>" selected="selected"><?php echo wp_kses_post($user_string); ?></option>
-        </select>
-        <?php
+
+    /**
+    * Filter function for dates .
+    *
+    * @param array $ordersData
+    * @param string $filterKey
+    *
+    * @return array
+    *
+    */
+    public function date_filter_table_data($ordersData, $filterKey)
+    {
+        $filtered_dates_table_data = array_values(
+            array_filter($ordersData, function ($row) use ($filterKey) {
+                foreach ($row as $key => $rowValue) {
+                    // var_dump($row);
+                    // die();
+                    if ($key == 'order_date') {
+                        if ($rowValue == $filterKey) {
+                            return true;
+                        }
+                    }
+                }
+            })
+      );
+        return $filtered_dates_table_data;
     }
 }
