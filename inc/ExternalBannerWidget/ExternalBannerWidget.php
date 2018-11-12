@@ -2,30 +2,40 @@
 
 namespace GF\ExternalBannerWidget;
 
-add_action('admin_menu', 'gf_external_item_banners_widget_options_create_menu');
-function gf_external_item_banners_widget_options_create_menu()
-{
-    //create new top-level menu
-    add_menu_page('Carousel za partnerske sajtove', 'Carousel za partnere', 'administrator', 'external_item_banners_widget', function() {
-        $widget = new ExternalBannerWidget();
-        $widget->options_page();
-    }, null, 99);
-
-    //call register settings function
-    add_action('admin_init', 'register_external_item_banners_widget_options');
-}
-
-function register_external_item_banners_widget_options()
-{
-    register_setting('gf-external-item-banners-widget-group', 'external-item-banners-widget-articles');
-}
-
-
-
-
+//load_plugin_textdomain('gf-externalItemBannersWidget', '', plugins_url() . '/gf-externalItemBannersWidget/languages');
 
 class ExternalBannerWidget
 {
+    private $wpdb;
+
+    public function __construct(\wpdb $wpdb)
+    {
+        $this->wpdb = $wpdb;
+    }
+
+    public function render_html()
+    {
+        $get_items_sql = "SELECT * FROM `wp_nss_external_banners_widget`";
+        $data = $this->wpdb->get_results($get_items_sql);
+
+        $template = 'vertical';
+        $ref = 'blic';
+        if (isset($_GET['template']) && $_GET['template'] === 'horizontal') {
+            $template = 'horizontal';
+        }
+        if (isset($_GET['ref'])) {
+            $ref = $_GET['ref'];
+        }
+
+        require(get_stylesheet_directory() . "/templates/externalBannersWidget/layout.phtml");
+
+    }
+
+    public function register_widget_options()
+    {
+        register_setting('gf-external-item-banners-widget-group', 'external-item-banners-widget-articles');
+    }
+
     public function options_page()
     {
         ?>
@@ -59,10 +69,7 @@ class ExternalBannerWidget
                 <input type="submit" name="articleCreate" class="button button-primary" value="Create">
                 <input type="submit" name="articleUpdate" class="button button-primary" value="Update">
             </form>
-
             <?php
-
-            global $wpdb;
 
             //create
             if (isset($_POST['articleCreate']) || isset($_POST['articleUpdate'])) {
@@ -86,14 +93,14 @@ class ExternalBannerWidget
                     if (isset($_POST['articleCreate'])){
                         $sql_insert = "INSERT INTO wp_nss_external_banners_widget (itemId, title, description, salePrice, regularPrice, categoryUrl, itemUrl)
                         VALUES ({$itemId}, '{$title}', '{$description}', {$salePrice}, {$regularPrice}, '{$categoryUrl}', '{$itemUrl}')";
-                        $insert = $wpdb->query($sql_insert);
+                        $insert = $this->wpdb->query($sql_insert);
                         echo '<div class="notice notice-success is-dismissible"><p>Article created!</p></div>';
                     }
                     if (isset($_POST['articleUpdate'])){
                         $sql_update = "UPDATE wp_nss_external_banners_widget 
                                    SET itemId = $itemId, title = '{$title}', description = '{$description}', salePrice = $salePrice, regularPrice = $regularPrice, categoryUrl = '{$categoryUrl}', itemUrl = '{$itemUrl}' 
                                    WHERE itemId LIKE $itemId";
-                        $update = $wpdb->query($sql_update);
+                        $update = $this->wpdb->query($sql_update);
                         echo '<div class="notice notice-success is-dismissible"><p>Article updated!</p></div>';
                     }
 
@@ -107,7 +114,7 @@ class ExternalBannerWidget
                 if(isset($_POST['itemId']) && !empty($_POST['itemId'])){
                     $itemId = $_POST['itemId'];
                     $sql_delete = "DELETE FROM wp_nss_external_banners_widget WHERE itemId LIKE $itemId";
-                    $delete = $wpdb->query($sql_delete);
+                    $delete = $this->wpdb->query($sql_delete);
                     echo '<div class="notice notice-success is-dismissible"><p>Article deleted!</p></div>';
                 }
             }
@@ -115,7 +122,7 @@ class ExternalBannerWidget
             ?>
             <?php
             $get_items_sql = "SELECT * FROM `wp_nss_external_banners_widget`";
-            $items_result = $wpdb->get_results($get_items_sql);
+            $items_result = $this->wpdb->get_results($get_items_sql);
 
             ?>
             <h3>Product list</h3>
@@ -162,14 +169,7 @@ class ExternalBannerWidget
                 <?php endforeach; ?>
             </table>
         </div>
-
-
         <?php
     }
-
 }
-
-
-//load_plugin_textdomain('gf-externalItemBannersWidget', '', plugins_url() . '/gf-externalItemBannersWidget/languages');
-
 

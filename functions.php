@@ -35,6 +35,7 @@ require(__DIR__ . "/inc/Search/Elastica/Search.php");
 require(__DIR__ . "/inc/Search/Elastica/TermSearch.php");
 require(__DIR__ . "/inc/CheckoutHelper/CheckoutHelper.php");
 require(__DIR__ . '/inc/Util/PricelistUpdate.php');
+require(__DIR__ . '/inc/ExternalBannerWidget/ExternalBannerWidget.php');
 
 
 add_filter('woocommerce_currency_symbol', 'change_existing_currency_symbol', 10, 2);
@@ -591,16 +592,31 @@ function gf_supplier_product_list_column_content( $column, $product_id )
 }
 
 add_filter( 'woocommerce_checkout_fields' , 'gf_remove_apartment_checkout_fields' );
-
 function gf_remove_apartment_checkout_fields( $fields ) {
     unset($fields['billing']['billing_address_2']);
     unset($fields['shipping']['shipping_address_2']);
     return $fields;
 }
 
+add_filter( 'woocommerce_default_address_fields', 'gf_remove_unwanted_address_form_fields' );
 function gf_remove_unwanted_address_form_fields($fields) {
     unset( $fields ['company'] );
     unset( $fields ['address_2'] );
     return $fields;
 }
-add_filter( 'woocommerce_default_address_fields', 'gf_remove_unwanted_address_form_fields' );
+
+
+add_action('admin_menu', 'gf_external_item_banners_widget_options_create_menu');
+function gf_external_item_banners_widget_options_create_menu() {
+    global $wpdb;
+    $widget = new \GF\ExternalBannerWidget\ExternalBannerWidget($wpdb);
+    //create new top-level menu
+    add_menu_page('Carousel za partnerske sajtove', 'Carousel za partnere', 'administrator', 'external_item_banners_widget', function() use ($widget) {
+        $widget->options_page();
+    }, null, 666);
+
+    //call register settings function
+    add_action('admin_init', function() use ($widget) {
+        $widget->register_widget_options();
+    });
+}
