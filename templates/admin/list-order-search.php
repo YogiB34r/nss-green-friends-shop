@@ -123,7 +123,7 @@ class Order_List_Table extends Wp_List_Table
             'order_shipping_price' => 'Dostava',
             'order_total' => 'Ukupno',
             'order_status' => 'Status',
-            // 'customActions' => 'Actions',
+            'customActions' => 'Actions',
         );
 
         return $columns;
@@ -190,6 +190,17 @@ class Order_List_Table extends Wp_List_Table
             $order_shiping_price = $order_data['shipping_total'] . ' ' . $order_data['currency'];
             $order_status = $order_data['status'];
             $order_date_modified = $order_data['date_modified']->date('d-m-Y H:i:s');
+            $jitexDoneStyle = '';
+            $adresnicaDoneStyle = '';
+
+            $customs_order_actions =
+            '<a class="button" href="/back-ajax/?action=printPreorder&id=' . $order_id . '" title="Print predracuna" target="_blank">Predracun</a>' .
+            '&nbsp;' .
+            '<a class="button nssOrderJitexExport" '.$jitexDoneStyle.' href="/back-ajax/?action=exportJitexOrder&id=' . $order->get_id() . '" title="Export za Jitex" target="_blank">Export</a>' .
+            '&nbsp;' .
+            '<a class="button nssOrderAdresnica" '.$adresnicaDoneStyle.' href="/back-ajax/?action=adresnica&id=' . $order->get_id() . '" title="Kreiraj adresnicu" target="_blank">Adresnica</a>';
+            // var_dump($customs_order_actions);
+            // die();
 
             $data[] = array(
                'id' => $order_id,
@@ -200,7 +211,7 @@ class Order_List_Table extends Wp_List_Table
                'order_shipping_price' => $order_shiping_price,
                'order_total' => $order_total,
                'order_status' => $order_status,
-               // 'customActions' => 'Actions',
+               'customActions' => $customs_order_actions,
                 );
         }
 
@@ -230,6 +241,7 @@ class Order_List_Table extends Wp_List_Table
             case 'order_shipping_price':
             case 'order_total':
             case 'order_status':
+            case 'customActions':
                 return $item[$column_name];
             default:
                 return print_r($item, true);
