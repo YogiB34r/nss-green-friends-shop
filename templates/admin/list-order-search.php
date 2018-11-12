@@ -51,6 +51,7 @@ class Gf_Order_Wp_List_Table
             <div class="wrap">
                 <div id="icon-users" class="icon32"></div>
                 <h2>Custom order lista</h2>
+                    <?php $orderListTable->render_customer_filter(); ?>
                     <?php $orderListTable->order_months_dropdown('shop_order') ?>
                     <?php submit_button('Filter', 'submit,', 'filter_action', '', false, array( 'id' => 'post_query_submit' )); ?>
                     <?php $orderListTable->display(); ?>
@@ -115,10 +116,14 @@ class Order_List_Table extends Wp_List_Table
     {
         $columns = array(
             'cb' => '<input type=checkbox />',
-            'order' => 'Order',
-            'date' => 'Date',
-            'status' => 'Status',
-            'total' => 'Total'
+            'order' => 'Narudzbenica',
+            'payment_method' => 'Nacin placanja',
+            'order_phone_column' => 'Telefonom / WWW',
+            'order_date' => 'Datum',
+            'order_shipping_price' => 'Dostava',
+            'order_total' => 'Ukupno',
+            'order_status' => 'Status',
+            // 'customActions' => 'Actions',
         );
 
         return $columns;
@@ -145,8 +150,8 @@ class Order_List_Table extends Wp_List_Table
     {
         return array(
             'order' => array('order', false),
-            'date' => array('date', false),
-            'total' => array('date', false)
+            'order_date' => array('date', false),
+            'order_total' => array('date', false)
         );
     }
 
@@ -173,17 +178,29 @@ class Order_List_Table extends Wp_List_Table
         foreach ($orders as $order) {
             $order_data = $order->get_data();
             $order_id = $order_data['id'];
+
+            if ($order_data[created_via] === 'admin') {
+                $order_phone_column = 'Telefonom';
+            } else {
+                $order_phone_column = 'WWW';
+            }
             $order_name = '<a href="' . esc_url(admin_url('post.php?post=' . $order_data['id'] . ' &action=edit')) . ' "><strong>' . esc_html($order_number = $order_data['number'] . ' ' . $order_data['billing']['first_name'] . ' ' . $order_billing_last_name = $order_data['billing']['last_name']) . '<strong></a>';
+            $order_payment_method = $order_data['payment_method_title'];
             $order_total = $order_data['total'] . ' ' . $order_data['currency'];
+            $order_shiping_price = $order_data['shipping_total'] . ' ' . $order_data['currency'];
             $order_status = $order_data['status'];
             $order_date_modified = $order_data['date_modified']->date('d-m-Y H:i:s');
 
             $data[] = array(
                'id' => $order_id,
                'order' => $order_name,
-               'date' => $order_date_modified,
-               'status' => $order_status,
-               'total' => $order_total
+               'payment_method' => $order_payment_method,
+               'order_phone_column' => $order_phone_column,
+               'order_date' => $order_date_modified,
+               'order_shipping_price' => $order_shiping_price,
+               'order_total' => $order_total,
+               'order_status' => $order_status,
+               // 'customActions' => 'Actions',
                 );
         }
 
@@ -205,10 +222,14 @@ class Order_List_Table extends Wp_List_Table
     public function column_default($item, $column_name)
     {
         switch ($column_name) {
+
             case 'order':
-            case 'date':
-            case 'status':
-            case 'total':
+            case 'payment_method':
+            case 'order_phone_column':
+            case 'order_date':
+            case 'order_shipping_price':
+            case 'order_total':
+            case 'order_status':
                 return $item[$column_name];
             default:
                 return print_r($item, true);
@@ -334,6 +355,18 @@ class Order_List_Table extends Wp_List_Table
         if (!empty($_GET['_customer_user'])) {
             $user_id = absint($_GET['_customer_user']);
             $user = get_user_by('id', $user_id);
-        }
+
+
+            $user_string = sprintf(
+                esc_html__('%1$s (#%2$s &ndash; %3$s)', 'woocommerce'),
+                $user->display_name,
+                absint($user->ID),
+                $user->user_email
+                );
+        } ?>
+        <select class="wc-customer-search" name="_customer_user" data-placeholder="<?php esc_attr_e('Filter by registered customer', woocomerce); ?>" data-allow_clear ="true">
+          <option value="<?php echo esc_attr($user_id); ?>" selected="selected"><?php echo wp_kses_post($user_string); ?></option>
+        </select>
+        <?php
     }
 }
