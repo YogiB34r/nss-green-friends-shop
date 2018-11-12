@@ -589,3 +589,18 @@ function gf_supplier_product_list_column_content( $column, $product_id )
             break;
     }
 }
+
+add_filter( 'woocommerce_checkout_fields' , 'gf_remove_apartment_checkout_fields' );
+
+function gf_remove_apartment_checkout_fields( $fields ) {
+    unset($fields['billing']['billing_address_2']);
+    unset($fields['shipping']['shipping_address_2']);
+    return $fields;
+}
+
+function gf_remove_unwanted_address_form_fields($fields) {
+    unset( $fields ['company'] );
+    unset( $fields ['address_2'] );
+    return $fields;
+}
+add_filter( 'woocommerce_default_address_fields', 'gf_remove_unwanted_address_form_fields' );
