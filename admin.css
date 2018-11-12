@@ -149,3 +149,7 @@ GF SORTABLE CATEGORIES
 .external-item-banners-widget-Form input, .external-item-banners-widget-Form textarea{
     display: block;
 }
+
+.externalItemBannersWidget-table td{
+    vertical-align: middle;
+}

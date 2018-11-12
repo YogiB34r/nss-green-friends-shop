@@ -431,7 +431,7 @@ add_action('manage_posts_custom_column', 'gf_date_clmn');
 function gf_date_clmn($column_name) {
     global $post;
     if ($column_name == 'order_date') {
-        $t_time = get_the_time(__('m/d/Y H:i', 'woocommerce'), $post);
+        $t_time = get_the_time(__('d/m/Y H:i', 'woocommerce'), $post);
         echo $t_time . '<br />';
     }
 }
@@ -612,7 +612,7 @@ function gf_external_item_banners_widget_options_create_menu() {
     $widget = new \GF\ExternalBannerWidget\ExternalBannerWidget($wpdb);
     //create new top-level menu
     add_menu_page('Carousel za partnerske sajtove', 'Carousel za partnere', 'administrator', 'external_item_banners_widget', function() use ($widget) {
-        $widget->options_page();
+        $widget->admin();
     }, null, 666);
 
     //call register settings function
@@ -620,3 +620,83 @@ function gf_external_item_banners_widget_options_create_menu() {
         $widget->register_widget_options();
     });
 }
+
+
+function gf_get_order_dates(){
+    $query = new WC_Order_Query( array(
+        'limit' => -1,
+        'return' => 'ids'
+    ) );
+    $order_ids = $query->get_orders();
+
+    $same_date = '';
+    $order_dates = [];
+    foreach ($order_ids as $order_id){
+        $date = get_the_time(__('d/m/Y', 'woocommerce'), $order_id);
+        if($date !== $same_date){
+            $order_dates[] = $date;
+            $same_date = $date;
+        }
+
+    }
+
+    return $order_dates;
+}
+add_filter('query_vars', 'gf_order_date_register_query_vars' );
+function gf_order_date_register_query_vars( $qvars ){
+    //Add these query variables
+    $qvars[] = 'gf_order_date';
+    return $qvars;
+}
+
+
+add_action( 'restrict_manage_posts', 'gf_print_order_date_picker_admin_list' );
+function gf_print_order_date_picker_admin_list() {
+
+    global $typenow;
+    $order_dates = gf_get_order_dates();
+    if ($typenow == 'shop_order') {
+        $selected = get_query_var('gf_order_date');
+        $output = "<select name='gf_order_date' class='postform'>";
+        $output .= '<option '.selected($selected,0,false).' value="">Date picker</option>';
+        if ( ! empty( $order_dates ) ) {
+            foreach ($order_dates as $order_date):
+                $output .= "<option value='{$order_date}' ".selected($selected,$order_date,false).'>'.$order_date.'</option>';
+            endforeach;
+        }
+        $output .= "</select>";
+        echo $output;
+    }
+
+}
+
+add_action( 'pre_get_posts', 'gf_order_date_apply_filter' );
+function gf_order_date_apply_filter( $query ) {
+
+    $order_date_str = $query->get('gf_order_date');
+    $exploded_date = explode('/', $order_date_str);
+    if( !empty($order_date_str) ){
+
+        $meta_query = $query->get('meta_query');
+
+        if( empty($meta_query) )
+            $meta_query = array();
+
+
+
+        $meta_query[] = array(
+            'key' => 'post_date',
+            'value' => $order_date_str,
+            'compare' => 'LIKE',
+            'type' => 'DATE'
+        );
+//        $query->set('meta_query',$meta_query);
+        $query->set( 'day', $exploded_date[0]);
+        $query->set( 'monthnum', $exploded_date[1]);
+        $query->set( 'year', $exploded_date[2]);
+
+        var_dump($query);
+    }
+}
+
+
