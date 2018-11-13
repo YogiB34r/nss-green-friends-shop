@@ -606,7 +606,7 @@ function gf_remove_unwanted_address_form_fields($fields) {
 }
 
 
-add_action('admin_menu', 'gf_external_item_banners_widget_options_create_menu');
+//add_action('admin_menu', 'gf_external_item_banners_widget_options_create_menu');
 function gf_external_item_banners_widget_options_create_menu() {
     global $wpdb;
     $widget = new \GF\ExternalBannerWidget\ExternalBannerWidget($wpdb);
@@ -695,7 +695,7 @@ function gf_order_date_apply_filter( $query ) {
         $query->set( 'monthnum', $exploded_date[1]);
         $query->set( 'year', $exploded_date[2]);
 
-        var_dump($query);
+//        var_dump($query);
     }
 }
 

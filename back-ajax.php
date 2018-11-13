@@ -138,7 +138,7 @@ function exportJitexOrder(WC_Order $order) {
 
         $variation = '';
         if (get_class($p) === WC_Product_Variation::class) {
-            foreach (array_values($p->get_variation_attributes())[0] as $value) {
+            foreach ($p->get_variation_attributes() as $value) {
                 if (strstr($item->get_name(), $value)) {
                     $variation = $value;
                 }

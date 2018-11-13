@@ -4,7 +4,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta content="charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <link rel="stylesheet" href="flexslider.css?1" type="text/css" media="screen"/>
+    <link rel="stylesheet" href="<?=get_stylesheet_directory_uri()?>/assets/css/flexslider.css?1" type="text/css" media="screen"/>
 </head>
 <body class="loading">
 
@@ -17,17 +17,16 @@
                         <a target="_blank" href="https://www.nonstopshop.rs">Nonstopshop.rs</a>
                     </div>
                     <ul class="slides">
-                        <?php foreach ($data as $key => $item): var_dump($item); die(); ?>
-                            <?php $url = str_replace('nssWidget', $ref, $item->url); ?>
+                        <?php foreach ($data as $key => $item): ?>
+                            <?php $url = str_replace('nssWidget', $ref, $item->itemUrl); ?>
                             <?php if ($key > 7) { continue; } ?>
                             <?php $k = $key + 1; ?>
                             <li data-thumb="<?=$item->image?>">
-                                <a target="_blank" href="<?=$url . $k?>" title="<?=$item->title?>"><img src="<?=str_replace('small/', '', $item->image)?>" alt="<?=$item->title?>" /></a>
+                                <a target="_blank" href="<?=$url . $k?>" title="<?=$item->title?>"><img src="<?=$item->imageSrc?>" alt="<?=$item->title?>" /></a>
                                 <a target="_blank"  href="<?=$url . $k?>" title="<?=$item->title?>"><h2 class="flex-caption-title" style="text-align:center;"><?=$item->title?></h2></a>
-                                <!--<p class="flex-caption">Ovaj proizvod radi po prostom principu emitovanja ultrazvucnih talasa-->
-                                <!--koji su veoma neprijatni za...</p>-->
-                                <span class="caption-old-price"><?=$item->oldPrice?>din</span>
-                                <span class="caption-new-price"><?=$item->price?>din</span>
+                                <!--<p class="flex-caption"></p>-->
+                                <span class="caption-old-price"><?=$item->price?>din</span>
+                                <span class="caption-new-price"><?=$item->salePrice?>din</span>
                                 <span class="caption-savings">Ušteda: <?=$item->savingsDinars?>din (<?=$item->savingsPercentage?>%)</span>
                                 <a target="_blank" href="<?=$url . $k?>" class="caption-others">Pogledajte slične proizvode</a>
                             </li>
@@ -50,19 +49,19 @@
             </div>
             <ul class="slides">
                 <?php foreach ($data as $key => $item): ?>
-                    <?php $url = str_replace('nssWidget', $ref, $item->url); ?>
+                    <?php $url = str_replace('nssWidget', $ref, $item->itemUrl); ?>
                     <?php if ($key > 7) { continue; } ?>
                     <?php $k = $key + 1; ?>
                     <li>
                         <a target="_blank"  href="<?=$url . $k?>" title="<?=$item->title?>">
-                            <img src="<?=str_replace('small/', '', $item->image)?>" alt="<?=$item->title?>" width="200" height="150" />
+                            <img src="<?=str_replace('small/', '', $item->imageSrc)?>" alt="<?=$item->title?>" width="200" height="150" />
                         </a>
                         <div class="flex-caption">
                             <a target="_blank"  href="<?=$url . $k?>" title="<?=$item->title?>">
                                 <h3 class="flex-caption-title" style="text-align:center;"><?=$item->title?></h3>
                             </a>
-                            <span class="caption-old-price"><?=$item->oldPrice?>din</span>
-                            <span class="caption-new-price"><?=$item->price?>din</span>
+                            <span class="caption-old-price"><?=$item->price?>din</span>
+                            <span class="caption-new-price"><?=$item->salePrice?>din</span>
                             <span class="caption-savings">Ušteda: <?=$item->savingsDinars?>din (<?=$item->savingsPercentage?>%)</span>
                         </div>
                     </li>
@@ -79,9 +78,8 @@
 
 <!-- jQuery -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-<script>window.jQuery || document.write('<script src="js/libs/jquery-1.7.min.js">\x3C/script>')</script>
 <!-- FlexSlider -->
-<script defer src="jquery.flexslider-min.js"></script>
+<script defer src="<?=get_stylesheet_directory_uri()?>/assets/js/jquery.flexslider-min.js"></script>
 <script type="text/javascript">
     $(window).load(function () {
         $('.flexslider.vertical').flexslider({
@@ -110,7 +108,7 @@
     });
 </script>
 <!-- Optional FlexSlider Additions -->
-<script src="jquery.easing.js"></script>
-<script src="jquery.mousewheel.js"></script>
+<script src="<?=get_stylesheet_directory_uri()?>/assets/js/jquery.easing.js"></script>
+<script src="<?=get_stylesheet_directory_uri()?>/assets/js/jquery.mousewheel.js"></script>
 </body>
 </html>
