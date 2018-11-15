@@ -246,6 +246,7 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products)
 
     $i = 0;
     foreach ($products->getResults() as $productData) {
+        $productId = $productData->postId;
         $product = new \Nss\Feed\Product($productData->getData());
         $saved_price = $product->getRegularPrice() - $product->getSalePrice();
         $price = $product->getRegularPrice();
@@ -275,10 +276,11 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products)
         if ($i === 0) {
             $classes .= " first ";
         }
+//        var_dump($product->get);
         $classes .= " product type-product status-publish has-post-thumbnail shipping-taxable purchasable  ";
         $html .= '<li class="product-type-' . $product->getType() . $classes . '">';
         $html .= '<a href=" ' . $product->dto['permalink'] . ' " title=" ' . $product->getName() . ' ">';
-        $html .= add_stickers_to_products_on_sale($classes);
+        $html .= add_stickers_to_products_on_sale($classes, $productId);
 //        woocommerce_show_product_sale_flash('', '', '', $classes);
 //        add_stickers_to_products_new($product);
         $html .= $product->dto['thumbnail'];

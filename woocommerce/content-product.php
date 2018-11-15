@@ -32,8 +32,10 @@ $classes = ob_get_clean();
     <a href="<?php echo get_permalink($product->get_id()) ?>"
        title="<?php echo esc_attr($product->get_title() ? $product->get_title() : $product->get_id()); ?>">
         <?php
+
         if (function_exists('add_stickers_to_products_on_sale')) {
-            echo add_stickers_to_products_on_sale($classes);
+
+            echo add_stickers_to_products_on_sale($classes, $product->get_id());
         }
         if (function_exists('add_stickers_to_products_new')) {
             add_stickers_to_products_new($product);

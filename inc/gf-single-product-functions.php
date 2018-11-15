@@ -166,3 +166,17 @@ function gf_display_social_media_share_button()
     echo $html;
 
 }
+
+remove_action( 'woocommerce_before_single_product_summary', 'woocommerce_show_product_sale_flash', 10 );
+
+add_action('woocommerce_single_product_summary', 'show_sale_date_from_to_single_product', 13);
+function show_sale_date_from_to_single_product(){
+    global $product;
+
+    $product_sale_date_from = get_post_meta($product->get_id(), '_sale_price_dates_from', true);
+    $product_sale_date_to = get_post_meta($product->get_id(), '_sale_price_dates_to', true);
+
+    if($product_sale_date_from !== '' && $product_sale_date_to !== ''){
+        echo 'Akcija traje od '. date('d/m/Y', $product_sale_date_from).' do ' . date('d/m/Y', $product_sale_date_to) ;
+    }
+}
