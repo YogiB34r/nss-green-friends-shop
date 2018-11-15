@@ -701,4 +701,3 @@ function gf_order_date_apply_filter( $query ) {
     }
 }
 
-

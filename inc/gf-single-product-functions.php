@@ -1,5 +1,6 @@
 <?php
-function gf_wc_breadcrumbs_single_product() {
+function gf_wc_breadcrumbs_single_product()
+{
     woocommerce_breadcrumb();
 }
 
@@ -127,7 +128,8 @@ add_action('woocommerce_before_single_product', 'woocommerce_template_single_tit
  * Customize product data tabs
  */
 add_filter('woocommerce_product_tabs', 'woo_new_product_tab');
-function woo_new_product_tab($tabs) {
+function woo_new_product_tab($tabs)
+{
     $tabs['narucivanje_tab'] = array(
         'title' => __('Naručivanje i plaćanje', 'woocommerce'),
         'priority' => 50,
@@ -140,7 +142,8 @@ function woo_new_product_tab($tabs) {
     return $tabs;
 }
 
-function woo_custom_description_tab_content(){
+function woo_custom_description_tab_content()
+{
     global $product;
 //    global $post;
     echo '<p>' . htmlspecialchars_decode($product->get_description()) . '</p>';
@@ -157,10 +160,10 @@ function gf_display_social_media_share_button()
     $link = $post->guid;
     $media = get_the_post_thumbnail_url($post->ID);
     $html = '<div class="gf-social-share-buttons mb-4">';
-    $html .= '<div class="gf-social-share-button-single mr-2 gf-social-share-twitter"><a href="http://twitter.com/intent/tweet?status='.$title.'+'.$link.'" target="_blank"><i class="fab fa-twitter"></i></a></div>';
-    $html .= '<div class="gf-social-share-button-single mr-2 gf-social-share-facebook"><a href="http://www.facebook.com/share.php?u='.$link.'&title='.$title.'" target="_blank"><i class="fab fa-facebook-f"></i></a></div>';
-    $html .= '<div class="gf-social-share-button-single mr-2 gf-social-share-google"><a href="https://plus.google.com/share?url='.$link.'" target="_blank"><i class="fab fa-google-plus-g"></i></a></div>';
-    $html .= '<div class="gf-social-share-button-single mr-2 gf-social-share-pinterest"><a href="http://pinterest.com/pin/create/bookmarklet/?media='.$media.'&url='.$link.'&is_video=false&description='.$title.'" target="_blank"><i class="fab fa-pinterest-p"></i></a></div>';
+    $html .= '<div class="gf-social-share-button-single mr-2 gf-social-share-twitter"><a href="http://twitter.com/intent/tweet?status=' . $title . '+' . $link . '" target="_blank"><i class="fab fa-twitter"></i></a></div>';
+    $html .= '<div class="gf-social-share-button-single mr-2 gf-social-share-facebook"><a href="http://www.facebook.com/share.php?u=' . $link . '&title=' . $title . '" target="_blank"><i class="fab fa-facebook-f"></i></a></div>';
+    $html .= '<div class="gf-social-share-button-single mr-2 gf-social-share-google"><a href="https://plus.google.com/share?url=' . $link . '" target="_blank"><i class="fab fa-google-plus-g"></i></a></div>';
+    $html .= '<div class="gf-social-share-button-single mr-2 gf-social-share-pinterest"><a href="http://pinterest.com/pin/create/bookmarklet/?media=' . $media . '&url=' . $link . '&is_video=false&description=' . $title . '" target="_blank"><i class="fab fa-pinterest-p"></i></a></div>';
     $html .= '</div>';
 
     echo $html;
@@ -170,13 +173,30 @@ function gf_display_social_media_share_button()
 remove_action( 'woocommerce_before_single_product_summary', 'woocommerce_show_product_sale_flash', 10 );
 
 add_action('woocommerce_single_product_summary', 'show_sale_date_from_to_single_product', 13);
-function show_sale_date_from_to_single_product(){
+function show_sale_date_from_to_single_product()
+{
     global $product;
 
     $product_sale_date_from = get_post_meta($product->get_id(), '_sale_price_dates_from', true);
     $product_sale_date_to = get_post_meta($product->get_id(), '_sale_price_dates_to', true);
 
-    if($product_sale_date_from !== '' && $product_sale_date_to !== ''){
-        echo 'Akcija traje od '. date('d/m/Y', $product_sale_date_from).' do ' . date('d/m/Y', $product_sale_date_to) ;
+    if ($product_sale_date_from !== '' && $product_sale_date_to !== '') {
+        echo 'Akcija traje od ' . date('d/m/Y', $product_sale_date_from) . ' do ' . date('d/m/Y', $product_sale_date_to);
+    }
+}
+
+add_action('woocommerce_before_single_product_summary', 'check_if_product_have_sale_dates_and_print_sticker', 10);
+function check_if_product_have_sale_dates_and_print_sticker()
+{
+    global $product;
+
+    $product_sale_date_from = get_post_meta($product->get_id(), '_sale_price_dates_from', true);
+    $product_sale_date_to = get_post_meta($product->get_id(), '_sale_price_dates_to', true);
+
+    if ($product_sale_date_from !== '' && $product_sale_date_to !== '') {
+        $sale_sticker_src = get_option('image_select_sale');
+        echo '<span class="gf-sticker gf-sticker--sale gf-sticker--left">
+                <img src="'.$sale_sticker_src.'" alt="" height="64" width="64">
+                </span>';
     }
 }
