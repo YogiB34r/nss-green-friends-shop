@@ -4,105 +4,69 @@ namespace GF;
 
 class Cli
 {
-    public function collectSkus()
-    {
-        $limit = 1000;
-        $start = 1;
-        $end = $start + 50;
-
-        $ids = [];
-        for ($i = 1; $i < 21; $i++) {
-//        for ($i = $start; $i < $end; $i++) {
-            $products_ids = wc_get_products(array(
-                'limit' => $limit,
-//                'return' => 'ids',
-                'paged' => $i
-            ));
-            foreach ($products_ids as $product) {
-                $ids[] = $product->get_sku();
-            }
-
-//            $ids = array_merge($products_ids, $ids);
-        }
-        echo implode(',', $ids);
-    }
 
     public function fixItems()
     {
 //        $pages = 21;
-        $limit = 100;
+        $limit = 500;
 
 //        $increment = 1;
         $start = 70;
         $end = $start + 80;
+
 
         $diff = [];
         $html = '';
         $total = 0;
         $updated = [];
 //        for ($i = 1; $i < $pages; $i++) {
-        for ($i = $start; $i < $end; $i++) {
+//        for ($i = $start; $i < $end; $i++) {
             $products_ids = wc_get_products(array(
                 'limit' => $limit,
+                'meta_key' => 'supplier',
+                'meta_value' => 319,
                 'return' => 'ids',
-                'paged' => $i
+                'paged' => 1
             ));
 
             $fields = [];
             foreach ($products_ids as $product_id) {
-                if (in_array($product_id, [399196, 434830])) {
-                    continue;
-                }
+//                if (in_array($product_id, [399196, 434830])) {
+//                    continue;
+//                }
                 $product = wc_get_product($product_id);
-                if (in_array((int) $product->get_meta('supplier'), [192655])) {
-                    continue;
-                }
-                if ($total % $limit === 0) {
-                    echo 'passed '.$total.' items' . PHP_EOL;
-                }
                 $total++;
 
-                if (!$product) {
-                    throw new \Exception('not found. ' . $product_id);
-                }
-                // a sport
-                if ($product->get_meta('supplier') == 319) {
-                    continue;
-                }
-                if ($product->get_sku() === '') {
-                    $product->set_sku($product->get_id());
-                }
                 $data = $this->fetchItemData($product->get_sku(), $product->get_name(), $product->get_meta('supplier'));
-
+//                $user = get_users(array('meta_key' => 'vendorid', 'meta_value' => $data->vendorId));
                 if (!$data) {
-//                    $product->set_status('draft');
-//                    $fields['drafted'] = $product->;
-//                    $product->save();
+                    if (in_array($product->get_id(), [451028])) {
+                        continue;
+                    }
+                    $updated[] = $product->get_id();
+                    echo 'item not found remotely : ';
+                    var_dump($product->get_name());
+                    var_dump($product->get_id());
+                    var_dump($product->get_meta('supplier'));
+                    die();
+                    $product->update_meta_data('supplier', 27);
+                    $product->save();
+//                    die();
                     continue;
                 }
-
-//                $user = get_users(array('meta_key' => 'vendorid', 'meta_value' => $data->vendorId));
-//                $user = get_user_by('description', $data->vendorEmail);
-//                $user = get_users(array('meta_key' => 'description', 'meta_value' => $data->vendorEmail));
-                $user = get_users(array('meta_key' => 'vendorid', 'meta_value' => $data->vendorId));
-//                $user1 = get_users(array('meta_key' => 'description', 'meta_value' => $data->vendorEmail));
+                $user = get_users(array('meta_key' => 'description', 'meta_value' => $data->vendorEmail));
                 if (!$user) {
-//                    echo 'retry';
+                    echo 'not found by email, retry';
+                    die();
                     $user1 = get_users(array('meta_key' => 'description', 'meta_value' => trim($data->vendorEmail)));
 
                     if (!$user1[0]) {
                         $user1 = get_user_by('description', $data->vendorEmail);
-                        if ($data->vendorEmail === 'rajko.djuric@ringier.rs') {
-//                            $updated[] = $product->get_id();
-//                            $product->update_meta_data('supplier', 373);
-//                            $product->save();
-                        } else {
-                            var_dump($data->vendorEmail);
-                            var_dump($user1);
-                            echo 'vendor not found : ';
-                            var_dump($data);
-                            die();
-                        }
+                        var_dump($data->vendorEmail);
+                        var_dump($user1);
+                        echo 'vendor not found : ';
+                        var_dump($data);
+                        die();
                     }
 
                     // trouble ahead
@@ -120,57 +84,35 @@ class Cli
                     //trouble ahead
                     if ((int) $product->get_meta('supplier') !== $user[0]->ID) {
                         $updated[] = $product->get_id();
-                        $user1 = get_users(array('meta_key' => 'description', 'meta_value' => trim($data->vendorEmail)));
-                        if ($user[0]->ID !== $user1[0]->ID) {
-                            if (strstr($data->vendorEmail, 'rajko.djuric@ringier.rs')) {
-//                                echo 'updated rajko item';
-//                                $product->update_meta_data('supplier', 373);
-//                                $product->save();
-                            } else {
-                                var_dump('wrong data');
-                                var_dump($data);
-                                var_dump($product->get_id());
-                                var_dump($product->get_meta('supplier'));
-                                var_dump($user[0]->ID);
-                                var_dump($user[1]->ID);
-                                die();
-                            }
-                        } else {
-                            //just update by old vendor id
-                            echo 'update by old vendor id';
-//                            var_dump($data->vendorEmail);
-//                            var_dump($product->get_id());
-//                            var_dump($product->get_meta('supplier'));
+                        //update by old vendor
+                        echo 'update by vendor email to id : ' . $user[0]->ID;
+                        var_dump($product->get_name());
+//                        die();
+//                        if ($user[0]->ID !== 252) {
+//                            echo 'wrong vendor ?';
+//                            var_dump($product->get_name());
 //                            var_dump($user[0]->ID);
-                            $product->update_meta_data('supplier', $user[0]->ID);
-                            $product->save();
-                        }
+//                            var_dump($product->get_id());
+//                            die();
+//                        }
 
+                        $product->update_meta_data('supplier', $user[0]->ID);
+                        $product->save();
                     }
                 }
 
-//                if ($data->vendorId != $product->get_meta('supplier')) {
-//                    $fields['vendorId'] = $data->vendorId;
-//                    $product->update_meta_data('supplier', $data->vendorId);
-//                }
-
-//                if ($data->quantity != $product->get_meta('quantity')) {
-//                    $fields['quantity'] = $data->quantity;
-//                    $product->update_meta_data('quantity', $data->quantity);
-//                }
-
                 if (!empty($fields)) {
                     $diff[$product->get_sku() .'#'. $product->get_id()] = $fields;
-                    $product->save();
+//                    $product->save();
                 }
             }
-        }
+//        }
         $html .= 'total of items parsed: '. $total . PHP_EOL;
         $html .= 'total of items updated: '. count($updated) . PHP_EOL;
         $html .= 'Differences' . PHP_EOL;
         $html .= print_r($diff, true);
         echo $html;
-        var_dump($updated);
+//        var_dump($updated);
 
         \WP_CLI::success($html);
     }
