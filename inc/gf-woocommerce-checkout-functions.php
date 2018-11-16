@@ -214,7 +214,7 @@ add_filter( 'woocommerce_checkout_fields', 'gf_change_city_field_to_dropdown' );
  */
 function gf_change_city_field_to_dropdown( $fields ) {
     global $wpdb;
-    $sql = "SELECT * FROM wp_nss_city";
+    $sql = "SELECT * FROM wp_nss_city ORDER BY gname ASC";
     $result = $wpdb->get_results($sql);
     $cities = [];
     foreach ($result as $city){
@@ -224,9 +224,19 @@ function gf_change_city_field_to_dropdown( $fields ) {
     $city_args = wp_parse_args( array(
         'type' => 'select',
         'options' => $cities,
+        'input_class' => array(
+            'wc-enhanced-select',
+        )
     ), $fields['shipping']['shipping_city'] );
     $fields['shipping']['shipping_city'] = $city_args;
     $fields['billing']['billing_city'] = $city_args; // Also change for billing field
+
+    wc_enqueue_js( "
+	jQuery( ':input.wc-enhanced-select' ).filter( ':not(.enhanced)' ).each( function() {
+		var select2_args = { minimumResultsForSearch: 5 };
+		jQuery( this ).select2( select2_args ).addClass( 'enhanced' );
+	});" );
+
     return $fields;
 }
 
