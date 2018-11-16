@@ -246,6 +246,7 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products)
 
     $i = 0;
     foreach ($products->getResults() as $productData) {
+        $productId = $productData->postId;
         $product = new \Nss\Feed\Product($productData->getData());
         $saved_price = $product->getRegularPrice() - $product->getSalePrice();
         $price = $product->getRegularPrice();
@@ -275,10 +276,11 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products)
         if ($i === 0) {
             $classes .= " first ";
         }
+//        var_dump($product->get);
         $classes .= " product type-product status-publish has-post-thumbnail shipping-taxable purchasable  ";
         $html .= '<li class="product-type-' . $product->getType() . $classes . '">';
         $html .= '<a href=" ' . $product->dto['permalink'] . ' " title=" ' . $product->getName() . ' ">';
-        $html .= add_stickers_to_products_on_sale($classes);
+        $html .= add_stickers_to_products_on_sale($classes, $productId);
 //        woocommerce_show_product_sale_flash('', '', '', $classes);
 //        add_stickers_to_products_new($product);
         $html .= $product->dto['thumbnail'];
@@ -549,14 +551,66 @@ function addItemStatusToOrderItemList($itemId, $item, $c) {
         if (empty($result) || !isset($result[0])) {
             echo '<p>Status proizvoda: ČEKA NARUČIVANJE</p>';
         } else {
-            if ($result[0]->status == 1) {
-                echo '<p>Status proizvoda: SPREMAN ZA PAKOVANJE</p>';
-            } elseif ($result[0]->status == 0) {
-                echo '<p>Status proizvoda: NARUČEN</p>';
-            } else {
-                echo '<p>Status proizvoda: NEMA NA STANJU !</p>';
-            }
             echo '<p>Broj naloga: ' . $result[0]->backOrderId . '</p>';
+            echo '<p>';
+            echo 'Status proizvoda: <span class="orderItemStatus">';
+            if ($result[0]->status == 1) {
+                echo 'SPREMAN ZA PAKOVANJE';
+            } elseif ($result[0]->status == 0) {
+                echo 'NARUČEN';
+            } else {
+                echo 'NEMA NA STANJU !';
+            }
+            echo '</span>';
+            ?>
+            <a href="#" class="editOrderItemStatus">izmeni</a>
+            <span style="display: none" class="orderItemStatusWrapper">
+                <select>
+                    <option value="-1">Nema na stanju</option>
+                    <option value="0">Naručen</option>
+                    <option value="1">Spreman za pakovanje</option>
+                </select>
+                <a href="#" class="saveOrderItemStatus">snimi</a>
+            </span>
+
+            </p>
+            <script>
+                jQuery(document).ready(function () {
+                    jQuery('.editOrderItemStatus').click(function (e) {
+                        e.preventDefault();
+                        jQuery(this).hide();
+                        jQuery('.orderItemStatusWrapper').show();
+                    });
+
+                    jQuery('.saveOrderItemStatus').click(function (e) {
+                        e.preventDefault();
+                        var data = {
+                            backOrderId: <?=$result[0]->backOrderId?>,
+                            itemId: <?=$item->get_product_id()?>,
+                            orderId: <?=$_GET['post']?>,
+                            status: jQuery('.orderItemStatusWrapper select').val()
+                        };
+                        jQuery.get('/back-ajax/?action=saveOrderItemStatus', data, function (response) {
+                            if (response) {
+                                jQuery('.orderItemStatusWrapper').hide();
+                                jQuery('.editOrderItemStatus').show();
+                                var newStatus = '';
+                                console.log(data.status);
+                                if (data.status == -1) {
+                                    newStatus = 'NEMA NA STANJU !';
+                                } else if (data.status == 0) {
+                                    newStatus = 'NARUČEN';
+                                } else {
+                                    newStatus = 'SPREMAN ZA PAKOVANJE';
+                                }
+                                jQuery('.orderItemStatus').html(newStatus);
+                                console.log(jQuery('.orderItemStatus').html());
+                            }
+                        });
+                    });
+                });
+            </script>
+            <?php
         }
     }
 }
@@ -698,5 +752,4 @@ function gf_order_date_apply_filter( $query ) {
 //        var_dump($query);
     }
 }
-
 
