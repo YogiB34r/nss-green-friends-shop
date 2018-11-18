@@ -595,7 +595,6 @@ function addItemStatusToOrderItemList($itemId, $item, $c) {
                                 jQuery('.orderItemStatusWrapper').hide();
                                 jQuery('.editOrderItemStatus').show();
                                 var newStatus = '';
-                                console.log(data.status);
                                 if (data.status == -1) {
                                     newStatus = 'NEMA NA STANJU !';
                                 } else if (data.status == 0) {
@@ -604,7 +603,6 @@ function addItemStatusToOrderItemList($itemId, $item, $c) {
                                     newStatus = 'SPREMAN ZA PAKOVANJE';
                                 }
                                 jQuery('.orderItemStatus').html(newStatus);
-                                console.log(jQuery('.orderItemStatus').html());
                             }
                         });
                     });

@@ -4,6 +4,31 @@ namespace GF;
 
 class Cli
 {
+    public function saleItems()
+    {
+//        $pages = 21;
+        $limit = 5000;
+
+        $total = 0;
+        $updated = [];
+        $products_ids = wc_get_products(array(
+            'limit' => $limit,
+            'return' => 'ids',
+            'paged' => 5
+        ));
+
+        foreach ($products_ids as $product_id) {
+            $product = wc_get_product($product_id);
+            if ($product->is_on_sale()) {
+                $total++;
+                $product->set_date_on_sale_from('11/2/18');
+                $product->set_date_on_sale_to('12/1/18');
+                $product->save();
+            }
+        }
+        echo $total;
+    }
+
 
     public function fixItems()
     {

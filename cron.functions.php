@@ -157,8 +157,8 @@ function passAllUsers() {
 }
 
 function passAllProducts() {
-//    $cli = new \GF\Cli();
-//    $cli->fixItems();
+    $cli = new \GF\Cli();
+    $cli->saleItems();
 }
 
 function createElasticIndex() {
@@ -189,8 +189,9 @@ function syncToElastic($id) {
 //        && $product->get_sku() != '') {
 
         if ($product->get_sku() == "") {
+//            return;
             $product->set_sku($product->get_id());
-            $product->save();
+//            $product->save();
         }
         $productConfig = new \GF\Search\Elastica\Config\Product();
         $elasticaClientFactory = new \GF\Search\Factory\ElasticClientFactory();
