@@ -177,42 +177,46 @@ class Search
      */
     private function setSorting(Query $mainQuery, $boolQuery, $order)
     {
+        $functionQuery = new \Elastica\Query\FunctionScore();
+        $scoreFunction = new \Elastica\Script\Script('_score * doc["order_data.default"].value');
+        $functionQuery->addScriptScoreFunction($scoreFunction);
+        $functionQuery->setQuery($boolQuery);
+        $mainQuery->setQuery($functionQuery);
+//        $mainQuery->setSort(['_score' => 'desc']);
+        $mainQuery->addSort(['_score' => 'desc']);
+
         switch ($order) {
             case 'popularity':
-                $mainQuery->setSort(['order_data.viewCount' => 'desc']);
+                $mainQuery->addSort(['order_data.viewCount' => 'desc']);
 
                 break;
 
             //@TODO add sync for ratings
             case 'rating':
-                $mainQuery->setSort(['order_data.rating' => 'desc']);
+                $mainQuery->addSort(['order_data.rating' => 'desc']);
 
                 break;
 
             case 'date':
-                $functionQuery = new \Elastica\Query\FunctionScore();
-                $scoreFunction = new \Elastica\Script\Script('_score * doc["order_data.default"].value');
-                $functionQuery->addScriptScoreFunction($scoreFunction);
-                $functionQuery->setQuery($boolQuery);
-                $mainQuery->setQuery($functionQuery);
-                $mainQuery->setSort(['_score' => 'desc']);
+
+//                $mainQuery->addSort()
 //        $functionQuery->setScoreMode('sum');
 //        $functionQuery->setBoostMode('replace');
 
                 break;
 
             case 'price-desc':
-                $mainQuery->setSort(['order_data.price' => 'desc']);
+                $mainQuery->addSort(['order_data.price' => 'desc']);
 
                 break;
 
             case 'price':
-                $mainQuery->setSort(['order_data.price' => 'asc']);
+                $mainQuery->addSort(['order_data.price' => 'asc']);
 
                 break;
 
             default:
-                $mainQuery->setSort(['order_data.default' => 'desc']);
+                $mainQuery->addSort(['order_data.default' => 'desc']);
 
                 break;
         }
