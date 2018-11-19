@@ -190,7 +190,7 @@ function syncToElastic($id) {
 
         if ($product->get_sku() == "") {
 //            return;
-            $product->set_sku($product->get_id());
+            $product->set_sku(md5($product->get_id() . $product->get_name()));
 //            $product->save();
         }
         $productConfig = new \GF\Search\Elastica\Config\Product();

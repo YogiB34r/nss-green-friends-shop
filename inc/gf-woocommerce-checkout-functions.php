@@ -23,6 +23,14 @@ function gf_woocommerce_billing_field_pib($fields) {
         'class' => array('gf-billing-field-pib'),
         'priority' => 20
     );
+    $fields['billing']['billing_company'] = array(
+        'label' => __('Ime firme', 'woocommerce'),
+        'required' => false,
+        'clear' => true, //
+        'type' => 'text',
+        'class' => array('gf-billing-field-company'),
+        'priority' => 20
+    );
 
     return $fields;
 }
@@ -36,7 +44,7 @@ function gf_order_fields($fields) {
         "billing_company",
         "billing_pib",
         "billing_address_1",
-        "billing_address_2",
+//        "billing_address_2",
         "billing_city",
         "billing_postcode",
         "billing_country",
