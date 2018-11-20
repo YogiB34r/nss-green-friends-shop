@@ -1767,12 +1767,7 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title {
     .gf-expander-module-first-line{
         padding: 0px 10px;
     }
-    .gf-expander-module-first-line .gf-expander-first-line-parent{
-        font-size: 14px !important;
-    }
-    .gf-category-expander__col__subcategory{
-        font-size: 14px !important;
-    }
+    
 }
 
 @media only screen and (min-width: 1200px) {
