@@ -133,9 +133,9 @@ function createAdresnica($orderId) {
 
 function exportJitexOrder(WC_Order $order) {
     $string = '';
+    /* @var \WC_Order_Item_Product $item */
     foreach ($order->get_items() as $item) {
         $p = wc_get_product($item->get_product()->get_id());
-
         $variation = '';
         if (get_class($p) === WC_Product_Variation::class) {
             foreach ($p->get_variation_attributes() as $value) {
@@ -150,18 +150,18 @@ function exportJitexOrder(WC_Order $order) {
         }
         $name = $order->get_billing_first_name() .' '. $order->get_billing_last_name();
         if ($order->get_meta('_billing_pib') != '') {
-            $name = $order->get_billing_company() .' '. $order->get_meta('_billing_pib');
+            $name = $order->get_billing_company();
         }
 
         $variantId = $p->get_sku() . $variation;
         $variantName = str_replace('-', '', $item->get_name());
         $date = $order->get_date_created()->format('d.m.Y');
         $modifier = (float) '1' .'.'. (int) number_format($p->get_meta('pdv'));
-        $priceNoPdv = number_format((int) $p->get_price() / $modifier, 2, ',', '.');
-        $priceFormated =number_format($p->get_price(), 2, ',', '.');
+        $priceNoPdv = number_format((int) $item->get_total() / $modifier, 2, ',', '.');
+        $priceFormated = number_format($item->get_total(), 2, ',', '.');
         $string .= $name."\t".$order->get_billing_address_1()."\t".$order->get_billing_postcode()."\t".$order->get_billing_city()."\t"."Srbija"."\t".
         $order->get_billing_phone()."\t".$order->get_order_number()."\t".$date."\t".$order->get_payment_method_title()."\t".$variantId."\t".$variantName."\t".
-            $item->get_quantity()."\t".$priceNoPdv."\t".$priceFormated."\t".$order->get_billing_company()."\r\n";
+            $item->get_quantity()."\t".$priceNoPdv."\t".$priceFormated."\t".$order->get_billing_company()."\t".$order->get_meta('_billing_pib')."\r\n";
     }
     $order->update_meta_data('jitexExportCreated', 1);
     $order->save();

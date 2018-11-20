@@ -14,7 +14,7 @@ class Cli
         $products_ids = wc_get_products(array(
             'limit' => $limit,
             'return' => 'ids',
-            'paged' => 1
+            'paged' => 2
         ));
 
         foreach ($products_ids as $product_id) {

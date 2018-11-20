@@ -21,6 +21,22 @@
             'https://connect.facebook.net/en_US/fbevents.js');
         fbq('init', '264258047766442');
         fbq('track', 'PageView');
+        window.addEventListener('load', function () {
+            FBEvents();
+        });
+
+        function FBEvents() {
+            <?php if (isset($_POST['add_to_cart'])): ?>
+            fbq('track', 'AddToCart');
+            <?php endif; ?>
+            var doc = document.getElementsByClassName('woocommerce-order-overview');
+            var price = doc.item(0).getElementsByClassName('woocommerce-Price-amount').item(0).textContent;
+            price = price.split('din')[0];
+            price = price.replace(',', '.');
+            <?php if (get_query_var('order-received')): ?>
+            fbq('track', 'Purchase', {value: price, currency: 'RSD'});
+            <?php endif; ?>
+        }
     </script>
     <noscript>
         <img height="1" width="1" src="https://www.facebook.com/tr?id=264258047766442&ev=PageView&noscript=1"/>
