@@ -39,7 +39,8 @@ require(__DIR__ . '/inc/ExternalBannerWidget/ExternalBannerWidget.php');
 
 
 add_filter('woocommerce_currency_symbol', 'change_existing_currency_symbol', 10, 2);
-function change_existing_currency_symbol($currency_symbol, $currency) {
+function change_existing_currency_symbol($currency_symbol, $currency)
+{
     $currency_symbol = 'din.';
 
     return $currency_symbol;
@@ -52,7 +53,8 @@ add_filter('upload_dir', 'upload_dir_filter');
  * @param $uploads
  * @return mixed
  */
-function upload_dir_filter($uploads) {
+function upload_dir_filter($uploads)
+{
     //$day = date('d');
     $day = date('d/i');
     $uploads['path'] .= '/' . $day;
@@ -66,7 +68,8 @@ function upload_dir_filter($uploads) {
  *
  * @param array $args
  */
-function woocommerce_breadcrumb($args = array()) {
+function woocommerce_breadcrumb($args = array())
+{
     $args = wp_parse_args($args, apply_filters('woocommerce_breadcrumb_defaults', array(
         'delimiter' => '&nbsp;&#47;&nbsp;',
         'wrap_before' => '<nav class="woocommerce-breadcrumb" ' . (is_single() ? 'itemprop="breadcrumb"' : '') . '>',
@@ -90,7 +93,8 @@ function woocommerce_breadcrumb($args = array()) {
  *
  * @return array
  */
-function gf_print_styles() {
+function gf_print_styles()
+{
     $result = [];
     $result['scripts'] = [];
     $result['styles'] = [];
@@ -114,7 +118,8 @@ function gf_print_styles() {
  *
  * @param WP_Query $sortedProducts
  */
-function gf_custom_search_output(WP_Query $sortedProducts) {
+function gf_custom_search_output(WP_Query $sortedProducts)
+{
     if ($sortedProducts->have_posts()):
 //        global $sw;
         wc_setup_loop();
@@ -133,7 +138,8 @@ function gf_custom_search_output(WP_Query $sortedProducts) {
     endif;
 }
 
-function parseAttributes() {
+function parseAttributes()
+{
     $redis = new GF_Cache();
     $atributes = unserialize($redis->redis->get('attributes-collection'));
     if ($atributes === false) {
@@ -338,7 +344,8 @@ function iconic_remove_password_strength()
 
 
 add_action('woocommerce_save_account_details_errors', 'wooc_validate_custom_field', 10, 2);
-function wooc_validate_custom_field($args, $user) {
+function wooc_validate_custom_field($args, $user)
+{
     $user_id = $user->ID;
     $user_pass_hash = get_user_by('id', $user_id)->user_pass;
     if (isset($_POST['password_current']) && !empty($_POST['password_current'])) {
@@ -352,7 +359,8 @@ function wooc_validate_custom_field($args, $user) {
 }
 
 add_action('woocommerce_before_account_navigation', 'gf_my_account_shop_button', 1);
-function gf_my_account_shop_button() {
+function gf_my_account_shop_button()
+{
     global $wp;
     $request = explode('/', $wp->request);
     $page = end($request);
@@ -406,14 +414,16 @@ function gf_cart_refresh_update_qty()
 }
 
 add_filter('woocommerce_account_menu_items', 'gf_remove_my_account_links');
-function gf_remove_my_account_links($menu_links) {
+function gf_remove_my_account_links($menu_links)
+{
     unset($menu_links['dashboard']); // Addresses
 
     return $menu_links;
 }
 
 add_filter('post_date_column_time', 'gf_custom_post_date_column_time', 10, 2);
-function gf_custom_post_date_column_time($h_time, $post) {
+function gf_custom_post_date_column_time($h_time, $post)
+{
 
     $h_time = get_the_time(__('d/m/Y', 'woocommerce'), $post);
 
@@ -421,7 +431,8 @@ function gf_custom_post_date_column_time($h_time, $post) {
 }
 
 add_action('woocommerce_cart_collaterals', 'gf_cart_page_extra_buttons');
-function gf_cart_page_extra_buttons() {
+function gf_cart_page_extra_buttons()
+{
     if (!is_user_logged_in()) {
         echo '<a class="gf-cart-extra-buttons d-block p-3 mb-3" href="/moj-nalog">REGISTRUJ SE</a>
               <a class="gf-cart-extra-buttons d-block p-3" href="/placanje">NASTAVI KUPOVINU BEZ REGISTRACIJE</a>';
@@ -430,7 +441,8 @@ function gf_cart_page_extra_buttons() {
 
 //admin order list - date column
 add_action('manage_posts_custom_column', 'gf_date_clmn');
-function gf_date_clmn($column_name) {
+function gf_date_clmn($column_name)
+{
     global $post;
     if ($column_name == 'order_date') {
         $t_time = get_the_time(__('d/m/Y H:i', 'woocommerce'), $post);
@@ -449,7 +461,8 @@ function gf_date_clmn($column_name) {
 //}
 
 add_filter('manage_edit-shop_order_columns', 'gf_custom_column_ordering_for_admin_list_order');
-function gf_custom_column_ordering_for_admin_list_order($product_columns) {
+function gf_custom_column_ordering_for_admin_list_order($product_columns)
+{
     return array(
         'cb' => '<input type="checkbox" />', // checkbox for bulk actions
         'order_number' => 'Narudžbina',
@@ -464,7 +477,8 @@ function gf_custom_column_ordering_for_admin_list_order($product_columns) {
 }
 
 add_action('manage_shop_order_posts_custom_column', 'gf_get_order_payment_method_column');
-function gf_get_order_payment_method_column($colname) {
+function gf_get_order_payment_method_column($colname)
+{
     global $the_order; // the global order object
 
     if ($colname == 'payment_method_column') {
@@ -494,15 +508,16 @@ function gf_get_order_payment_method_column($colname) {
         echo '&nbsp;';
         echo '<a class="button" href="/back-ajax/?action=printPreorder&id=' . $the_order->get_id() . '" title="Print predracuna" target="_blank">Predracun</a>';
         echo '&nbsp;';
-        echo '<a class="button nssOrderJitexExport" '.$jitexDoneStyle.' href="/back-ajax/?action=exportJitexOrder&id=' . $the_order->get_id() . '" title="Export za Jitex" target="_blank">Export</a>';
+        echo '<a class="button nssOrderJitexExport" ' . $jitexDoneStyle . ' href="/back-ajax/?action=exportJitexOrder&id=' . $the_order->get_id() . '" title="Export za Jitex" target="_blank">Export</a>';
         echo '&nbsp;';
-        echo '<a class="button nssOrderAdresnica" '.$adresnicaDoneStyle.' href="/back-ajax/?action=adresnica&id=' . $the_order->get_id() . '" title="Kreiraj adresnicu" target="_blank">Adresnica</a>';
+        echo '<a class="button nssOrderAdresnica" ' . $adresnicaDoneStyle . ' href="/back-ajax/?action=adresnica&id=' . $the_order->get_id() . '" title="Kreiraj adresnicu" target="_blank">Adresnica</a>';
 //        echo $the_order->get_meta('gf_order_created_method');
     }
 }
 
 add_action('woocommerce_admin_order_data_after_order_details', 'gf_admin_phone_order_field');
-function gf_admin_phone_order_field($order) {
+function gf_admin_phone_order_field($order)
+{
     $checked = true;
     if ($order->get_meta('gf_order_created_method') == 'WWW') {
         $checked = false;
@@ -516,7 +531,8 @@ function gf_admin_phone_order_field($order) {
 }
 
 add_action('save_post', 'redirect_page');
-function redirect_page() {
+function redirect_page()
+{
     switch (get_post_type()) {
         case "shop_order":
             $url = admin_url() . 'edit.php?post_type=shop_order';
@@ -527,7 +543,8 @@ function redirect_page() {
 }
 
 add_filter('woocommerce_catalog_orderby', 'wc_customize_product_sorting');
-function wc_customize_product_sorting($sorting_options) {
+function wc_customize_product_sorting($sorting_options)
+{
     $sorting_options = array(
         'menu_order' => __('Sorting', 'woocommerce'),
         'popularity' => __('Sort by popularity', 'woocommerce'),
@@ -541,7 +558,8 @@ function wc_customize_product_sorting($sorting_options) {
 }
 
 add_action('woocommerce_before_order_itemmeta', 'addItemStatusToOrderItemList', 10, 3);
-function addItemStatusToOrderItemList($itemId, $item, $c) {
+function addItemStatusToOrderItemList($itemId, $item, $c)
+{
     /* @var WC_Order_Item_Product $item */
     if (isset($_GET['post']) && $_GET['post'] && get_class($item) === WC_Order_Item_Product::class) {
         global $wpdb;
@@ -614,78 +632,83 @@ function addItemStatusToOrderItemList($itemId, $item, $c) {
 }
 
 // prevent bug with members plugin
-add_filter('members_check_parent_post_permission', function() {return false;});
+add_filter('members_check_parent_post_permission', function () {
+    return false;
+});
 
 
 // ADDING A CUSTOM COLUMN TITLE TO ADMIN PRODUCTS LIST
-add_filter( 'manage_edit-product_columns', 'gf_supplier_product_list_column',11);
+add_filter('manage_edit-product_columns', 'gf_supplier_product_list_column', 11);
 function gf_supplier_product_list_column($columns)
 {
     //add columns
-    $columns['supplier'] = __( 'Dobavljač','woocommerce'); // title
+    $columns['supplier'] = __('Dobavljač', 'woocommerce'); // title
     return $columns;
 }
 
 // ADDING THE DATA FOR EACH PRODUCTS BY COLUMN (EXAMPLE)
-add_action( 'manage_product_posts_custom_column' , 'gf_supplier_product_list_column_content', 10, 2 );
-function gf_supplier_product_list_column_content( $column, $product_id )
+add_action('manage_product_posts_custom_column', 'gf_supplier_product_list_column_content', 10, 2);
+function gf_supplier_product_list_column_content($column, $product_id)
 {
     global $post;
 
 
     $supplier_id = get_post_meta($product_id, 'supplier', true);
     $supplier_name = get_user_by('ID', $supplier_id)->display_name;
-    switch ( $column )
-    {
+    switch ($column) {
         case 'supplier' :
             echo $supplier_name; // display the data
             break;
     }
 }
 
-add_filter( 'woocommerce_checkout_fields' , 'gf_remove_apartment_checkout_fields' );
-function gf_remove_apartment_checkout_fields( $fields ) {
+add_filter('woocommerce_checkout_fields', 'gf_remove_apartment_checkout_fields');
+function gf_remove_apartment_checkout_fields($fields)
+{
     unset($fields['billing']['billing_address_2']);
     unset($fields['shipping']['shipping_address_2']);
     return $fields;
 }
 
-add_filter( 'woocommerce_default_address_fields', 'gf_remove_unwanted_address_form_fields' );
-function gf_remove_unwanted_address_form_fields($fields) {
-    unset( $fields ['company'] );
-    unset( $fields ['address_2'] );
+add_filter('woocommerce_default_address_fields', 'gf_remove_unwanted_address_form_fields');
+function gf_remove_unwanted_address_form_fields($fields)
+{
+    unset($fields ['company']);
+    unset($fields ['address_2']);
     return $fields;
 }
 
 
 //add_action('admin_menu', 'gf_external_item_banners_widget_options_create_menu');
-function gf_external_item_banners_widget_options_create_menu() {
+function gf_external_item_banners_widget_options_create_menu()
+{
     global $wpdb;
     $widget = new \GF\ExternalBannerWidget\ExternalBannerWidget($wpdb);
     //create new top-level menu
-    add_menu_page('Carousel za partnerske sajtove', 'Carousel za partnere', 'administrator', 'external_item_banners_widget', function() use ($widget) {
+    add_menu_page('Carousel za partnerske sajtove', 'Carousel za partnere', 'administrator', 'external_item_banners_widget', function () use ($widget) {
         $widget->admin();
     }, null, 666);
 
     //call register settings function
-    add_action('admin_init', function() use ($widget) {
+    add_action('admin_init', function () use ($widget) {
         $widget->register_widget_options();
     });
 }
 
 
-function gf_get_order_dates(){
-    $query = new WC_Order_Query( array(
+function gf_get_order_dates()
+{
+    $query = new WC_Order_Query(array(
         'limit' => -1,
         'return' => 'ids'
-    ) );
+    ));
     $order_ids = $query->get_orders();
 
     $same_date = '';
     $order_dates = [];
-    foreach ($order_ids as $order_id){
+    foreach ($order_ids as $order_id) {
         $date = get_the_time(__('d/m/Y', 'woocommerce'), $order_id);
-        if($date !== $same_date){
+        if ($date !== $same_date) {
             $order_dates[] = $date;
             $same_date = $date;
         }
@@ -694,26 +717,29 @@ function gf_get_order_dates(){
 
     return $order_dates;
 }
-add_filter('query_vars', 'gf_order_date_register_query_vars' );
-function gf_order_date_register_query_vars( $qvars ){
+
+add_filter('query_vars', 'gf_order_date_register_query_vars');
+function gf_order_date_register_query_vars($qvars)
+{
     //Add these query variables
     $qvars[] = 'gf_order_date';
     return $qvars;
 }
 
 
-add_action( 'restrict_manage_posts', 'gf_print_order_date_picker_admin_list' );
-function gf_print_order_date_picker_admin_list() {
+add_action('restrict_manage_posts', 'gf_print_order_date_picker_admin_list');
+function gf_print_order_date_picker_admin_list()
+{
 
     global $typenow;
     $order_dates = gf_get_order_dates();
     if ($typenow == 'shop_order') {
         $selected = get_query_var('gf_order_date');
         $output = "<select name='gf_order_date' class='postform'>";
-        $output .= '<option '.selected($selected,0,false).' value="">Date picker</option>';
-        if ( ! empty( $order_dates ) ) {
+        $output .= '<option ' . selected($selected, 0, false) . ' value="">Date picker</option>';
+        if (!empty($order_dates)) {
             foreach ($order_dates as $order_date):
-                $output .= "<option value='{$order_date}' ".selected($selected,$order_date,false).'>'.$order_date.'</option>';
+                $output .= "<option value='{$order_date}' " . selected($selected, $order_date, false) . '>' . $order_date . '</option>';
             endforeach;
         }
         $output .= "</select>";
@@ -722,18 +748,18 @@ function gf_print_order_date_picker_admin_list() {
 
 }
 
-add_action( 'pre_get_posts', 'gf_order_date_apply_filter' );
-function gf_order_date_apply_filter( $query ) {
+add_action('pre_get_posts', 'gf_order_date_apply_filter');
+function gf_order_date_apply_filter($query)
+{
 
     $order_date_str = $query->get('gf_order_date');
     $exploded_date = explode('/', $order_date_str);
-    if( !empty($order_date_str) ){
+    if (!empty($order_date_str)) {
 
         $meta_query = $query->get('meta_query');
 
-        if( empty($meta_query) )
+        if (empty($meta_query))
             $meta_query = array();
-
 
 
         $meta_query[] = array(
@@ -743,11 +769,66 @@ function gf_order_date_apply_filter( $query ) {
             'type' => 'DATE'
         );
 //        $query->set('meta_query',$meta_query);
-        $query->set( 'day', $exploded_date[0]);
-        $query->set( 'monthnum', $exploded_date[1]);
-        $query->set( 'year', $exploded_date[2]);
+        $query->set('day', $exploded_date[0]);
+        $query->set('monthnum', $exploded_date[1]);
+        $query->set('year', $exploded_date[2]);
 
 //        var_dump($query);
     }
 }
 
+add_filter('bulk_actions-edit-product', 'register_gf_product_list_bulk_action');
+
+function register_gf_product_list_bulk_action($bulk_actions)
+{
+//    var_dump($_GET);
+    if (isset($_GET['post_type']) && $_GET['post_type'] == 'product' && isset($_GET['filter_action']) && isset($_GET['product_cat'])) {
+        $bulk_actions['remove_product_from_sliders'] = 'Ukloni iz kategorije: ' . $_GET['product_cat'];
+    }
+
+    return $bulk_actions;
+}
+
+add_filter('handle_bulk_actions-edit-product', 'gf_product_list_bulk_action_handler', 10, 3);
+
+function gf_product_list_bulk_action_handler($redirect_to, $doaction, $post_ids)
+{
+    if ($doaction !== 'remove_product_from_sliders') {
+        return $redirect_to;
+    }
+    $category_slug = $_GET['product_cat'];
+    foreach ($post_ids as $post_id) {
+        wp_remove_object_terms($post_id, $category_slug, 'product_cat');
+    }
+    $redirect_to = add_query_arg('bulk_remove_product_from_sliders', count($post_ids), $redirect_to);
+    return $redirect_to;
+}
+
+//admin product list filter by supplier
+add_filter('woocommerce_product_filters', 'gf_admin_product_list_supplier_filter', 10, 1);
+function gf_admin_product_list_supplier_filter($output)
+{
+    $suppliers = get_users(array('role' => 'supplier'));
+    $html = '<select name="product_supplier_filter">';
+    $html .= '<option value="">Filtriraj po dobavljaču </option>';
+    foreach ($suppliers as $supplier) {
+        $html .= '<option value="' . $supplier->ID . '">' . $supplier->display_name . '</option>';
+    }
+    $html .= '</select>';
+
+    echo $html;
+}
+
+add_filter('parse_query', 'wpa104537_featured_products_admin_filter_query');
+function wpa104537_featured_products_admin_filter_query($query)
+{
+    global $typenow, $wp_query;
+
+    if ($typenow == 'product') {
+        if (!empty($_GET['product_supplier_filter'])) {
+            $query->query_vars['meta_key'] = 'supplier';
+            $query->query_vars['meta_value'] = $_GET['product_supplier_filter'];
+        }
+    }
+}
+//admin product list filter by supplier END
