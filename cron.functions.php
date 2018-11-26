@@ -158,7 +158,7 @@ function passAllUsers() {
 
 function passAllProducts() {
     $cli = new \GF\Cli();
-    $cli->saleItems();
+    $cli->fixItems();
 }
 
 function createElasticIndex() {
