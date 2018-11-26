@@ -63,26 +63,20 @@ if (is_singular('product')) {
     
     if ($r->have_posts()) { ?>
 
-
         <div class="related products">
             <h2><?php _e('Slični proizvodi', 'woocommerce'); ?></h2>
 
             <?php woocommerce_product_loop_start();
             while ($r->have_posts()) : $r->the_post();
-
                 global $product;
 
                 wc_get_template_part('content', 'product');
 
-
             endwhile; // end of the loop.
 
             woocommerce_product_loop_end(); ?>
-
         </div>
-
         <?php
-
         wp_reset_query();
     };
 }
