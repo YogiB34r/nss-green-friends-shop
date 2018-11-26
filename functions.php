@@ -808,7 +808,7 @@ function gf_product_list_bulk_action_handler($redirect_to, $doaction, $post_ids)
 add_filter('woocommerce_product_filters', 'gf_admin_product_list_supplier_filter', 10, 1);
 function gf_admin_product_list_supplier_filter($output)
 {
-    $suppliers = get_users(array('role' => 'supplier'));
+    $suppliers = get_users(array('role' => 'supplier', 'orderby' => 'display_name', 'order' => 'ASC'));
     $html = '<select name="product_supplier_filter">';
     $html .= '<option value="">Filtriraj po dobavljaču </option>';
     foreach ($suppliers as $supplier) {
