@@ -177,29 +177,11 @@ function gf_mobile_search_form()
 
 add_shortcode('gf-best-selling-products', 'gf_display_best_selling_products');
 function gf_display_best_selling_products(){
-    $args = array(
-        'post_type' => 'product',
-        'post_status' => 'publish',
-        'posts_per_page' => '3',
-//        'meta_query' => array(
-//            array(
-//                'key' => '_stock_status',
-//                'value' => 'instock',
-//                'compare' => '=',
-//            )
-//        ),
-        'meta_key' => 'total_sales',
-        'orderby' => 'meta_value_num',
-        'order' => 'DESC',
-    );
-
-    echo 'najprodavaniji';
-
     include_once(WC()->plugin_path().'/includes/admin/reports/class-wc-admin-report.php');
     $wc_report = new WC_Admin_Report();
 //    $wc_report->start_date = strtotime('20/10/2018');
 
-    $filter_range = true;
+//    $filter_range = true;
     $data = $wc_report->get_order_report_data( array(
         'data' => array(
             '_qty' => array(
@@ -229,35 +211,36 @@ function gf_display_best_selling_products(){
         'group_by'     => 'product_id',
         'order_by'     => 'quantity DESC',
         'query_type' => 'get_results',
-        'limit' => 3,
-//        'order_status' => array( 'completed', 'processing', 'finalizovano','u-pripremi-placeno','naruceno',
-//            'spremno-za-slanje', 'spremno-za-pakovanje', 'poslato', 'isporuceno'),
+        'limit' => 20,
+        'order_status' => array( 'completed', 'processing', 'finalizovano','u-pripremi-placeno','naruceno',
+            'spremno-za-slanje', 'spremno-za-pakovanje', 'poslato', 'isporuceno'),
     ) );
 
-//    print_r($data);
-//    return;
+    $ids = [];
     foreach ($data as $datum):
-//        $sortedProducts->the_post();
-        $product = wc_get_product($datum->product_id);
-//        var_dump($datum);
-//        var_dump($datum->product_id);
-//        var_dump($product);
-//        die();
-        require(__DIR__ . "/../woocommerce/content-product.php");
-//            do_action('woocommerce_shop_loop');
-//            $sw->start('wc_get_template_part');
-//        wc_get_template_part('content', 'product');
-//            $sw->stop('wc_get_template_part');
+        $ids[] = $datum->product_id;
+//        $product = wc_get_product($datum->product_id);
+//        require(__DIR__ . "/../woocommerce/content-product.php");
     endforeach;
 
-    return;
+    $args = array(
+        'post_type' => 'product',
+        'orderby' => 'post__in',
+        'post__in' => $ids,
+        'posts_per_page' => 3,
+        'meta_query' => [[
+            'key' => '_stock_status',
+            'value' => 'outofstock',
+            'compare' => 'NOT IN'
+        ]],
+        'suppress_filters' => true,
+        'no_found_rows' => true
+    );
 
-    echo WC_Shortcodes::best_selling_products([
-        'limit'        => '3',
-        'columns'      => '1'
-    ]);
-
-    return;
+//    echo WC_Shortcodes::best_selling_products([
+//        'limit'        => '3',
+//        'columns'      => '1'
+//    ]);
 
 $query = new WP_Query($args);
 echo '<h2>Najprodavaniji proizvodi</h2>';

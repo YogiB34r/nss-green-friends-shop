@@ -93,25 +93,25 @@ function woocommerce_breadcrumb($args = array())
  *
  * @return array
  */
-function gf_print_styles()
-{
-    $result = [];
-    $result['scripts'] = [];
-    $result['styles'] = [];
-
-    // Print all loaded Scripts
-    global $wp_scripts;
-    foreach ($wp_scripts->queue as $script) :
-        $result['scripts'][] = $wp_scripts->registered[$script]->src . ";";
-    endforeach;
-    //Print all loaded Styles
-    global $wp_styles;
-    foreach ($wp_styles->queue as $style) :
-        $result['styles'][] = $wp_styles->registered[$style]->src . ";";
-    endforeach;
-
-    return $result;
-}
+//function gf_print_styles()
+//{
+//    $result = [];
+//    $result['scripts'] = [];
+//    $result['styles'] = [];
+//
+//    // Print all loaded Scripts
+//    global $wp_scripts;
+//    foreach ($wp_scripts->queue as $script) :
+//        $result['scripts'][] = $wp_scripts->registered[$script]->src . ";";
+//    endforeach;
+//    //Print all loaded Styles
+//    global $wp_styles;
+//    foreach ($wp_styles->queue as $style) :
+//        $result['styles'][] = $wp_styles->registered[$style]->src . "?v=7e853;";
+//    endforeach;
+//
+//    return $result;
+//}
 
 /**
  * Custom loop that works with wp query
@@ -624,7 +624,6 @@ function gf_get_order_dates() {
             $order_dates[] = $date;
             $same_date = $date;
         }
-
     }
 
     return $order_dates;

@@ -36,9 +36,9 @@ class Indexer
     {
         global $wpdb;
 
-        $perPage = 500;
+        $perPage = 400;
 
-        for ($i = 0; $i < 50; $i++) {
+        for ($i = 0; $i < 60; $i++) {
 //        for ($i = 0; $i < 4; $i++) {
             $offset = $i * $perPage;
             $sql = "SELECT ID FROM wp_posts WHERE post_type = 'product' LIMIT {$offset}, {$perPage};";
@@ -167,7 +167,7 @@ class Indexer
             'salePrice' => (string) $salePrice,
             'inputPrice' => $product->get_meta('input_price'),
             'stockStatus' => (int) $product->is_in_stock(),
-            'status' => (int) $product->is_visible(),
+            'status' => ($product->get_status() == 'publish'),
             'viewCount' => 0,
             'rating' => 0,
             'sku' => $product->get_sku(),
@@ -183,7 +183,7 @@ class Indexer
                 'date' => strtotime($product->get_date_created()),
                 'viewCount' => $viewCount,
                 'stock' => (int) $product->is_in_stock(),
-                'published' => (int) $product->is_visible(),
+                'published' => ($product->get_status() == 'publish'),
                 'default' => static::calculateOrderingRating($product),
             ]
         ];
