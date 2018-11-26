@@ -47,27 +47,30 @@ class Cli
 //        for ($i = 1; $i < $pages; $i++) {
 //        for ($i = $start; $i < $end; $i++) {
             $products_ids = wc_get_products(array(
-                'limit' => $limit,
+                'limit' => 2000,
                 'meta_key' => 'supplier',
-                'meta_value' => 319,
+                'meta_value' => 252,
                 'return' => 'ids',
                 'paged' => 1
             ));
 
+        foreach ($products_ids as $product_id) {
+            $product = wc_get_product($product_id);
+//            var_dump($product->get_name());
+//            $product->update_meta_data('supplier', 203);
+            $product->set_status('pending');
+            $product->save();
+        }
+        echo 'found ' . count($products_ids) . ' items';
+die();
             $fields = [];
             foreach ($products_ids as $product_id) {
-//                if (in_array($product_id, [399196, 434830])) {
-//                    continue;
-//                }
                 $product = wc_get_product($product_id);
                 $total++;
 
                 $data = $this->fetchItemData($product->get_sku(), $product->get_name(), $product->get_meta('supplier'));
 //                $user = get_users(array('meta_key' => 'vendorid', 'meta_value' => $data->vendorId));
                 if (!$data) {
-                    if (in_array($product->get_id(), [451028])) {
-                        continue;
-                    }
                     $updated[] = $product->get_id();
                     echo 'item not found remotely : ';
                     var_dump($product->get_name());
@@ -81,18 +84,8 @@ class Cli
                 }
                 $user = get_users(array('meta_key' => 'description', 'meta_value' => $data->vendorEmail));
                 if (!$user) {
-                    echo 'not found by email, retry';
+                    echo 'vendor not found by email, retry';
                     die();
-                    $user1 = get_users(array('meta_key' => 'description', 'meta_value' => trim($data->vendorEmail)));
-
-                    if (!$user1[0]) {
-                        $user1 = get_user_by('description', $data->vendorEmail);
-                        var_dump($data->vendorEmail);
-                        var_dump($user1);
-                        echo 'vendor not found : ';
-                        var_dump($data);
-                        die();
-                    }
 
                     // trouble ahead
                     if ((int) $product->get_meta('supplier') !== $user1[0]->ID) {
@@ -112,7 +105,7 @@ class Cli
                         //update by old vendor
                         echo 'update by vendor email to id : ' . $user[0]->ID;
                         var_dump($product->get_name());
-//                        die();
+                        die();
 //                        if ($user[0]->ID !== 252) {
 //                            echo 'wrong vendor ?';
 //                            var_dump($product->get_name());

@@ -29,12 +29,17 @@
             <?php if (isset($_POST['add_to_cart'])): ?>
             fbq('track', 'AddToCart');
             <?php endif; ?>
-            var doc = document.getElementsByClassName('woocommerce-order-overview');
-            var price = doc.item(0).getElementsByClassName('woocommerce-Price-amount').item(0).textContent;
-            price = price.split('din')[0];
-            price = price.replace(',', '.');
+            <?php if (get_query_var('pagename') === 'placanje' && !get_query_var('order-received')): ?>
+            fbq('track', 'InitiateCheckout');
+            <?php endif; ?>
             <?php if (get_query_var('order-received')): ?>
-            fbq('track', 'Purchase', {value: price, currency: 'RSD'});
+            var doc = document.getElementsByClassName('woocommerce-order-overview');
+            if (doc.length) {
+                var price = doc.item(0).getElementsByClassName('woocommerce-Price-amount').item(0).textContent;
+                price = price.split('din')[0];
+                price = price.replace(',', '.');
+                fbq('track', 'Purchase', {value: price, currency: 'RSD'});
+            }
             <?php endif; ?>
         }
     </script>

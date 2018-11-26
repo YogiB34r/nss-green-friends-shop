@@ -276,7 +276,7 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products)
         if ($i === 0) {
             $classes .= " first ";
         }
-//        var_dump($product->get);
+
         $classes .= " product type-product status-publish has-post-thumbnail shipping-taxable purchasable  ";
         $html .= '<li class="product-type-' . $product->getType() . $classes . '">';
         $html .= '<a href=" ' . $product->dto['permalink'] . ' " title=" ' . $product->getName() . ' ">';
