@@ -30,9 +30,12 @@ function custom_admin_order_totals_after_tax($orderid)
     if (isset(array_keys($order->get_shipping_methods())[0])) {
         $order->remove_item(array_keys($order->get_shipping_methods())[0]);
         $order->set_shipping_total(0);
+        $order->save();
     }
 
-    if ($price > 0 && $order->get_shipping_total() == 0) {
+    if (array_search('free_shipping', \GuzzleHttp\Psr7\parse_query(urldecode($_POST['items'])))) {
+
+    } elseif ($price > 0 && $order->get_shipping_total() == 0) {
         $shipping = new WC_Order_Item_Shipping();
         $shipping->set_total($price);
         $order->add_item($shipping);
@@ -40,5 +43,3 @@ function custom_admin_order_totals_after_tax($orderid)
         $order->save();
     }
 }
-
-?>

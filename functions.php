@@ -531,8 +531,7 @@ function gf_admin_phone_order_field($order)
 }
 
 add_action('save_post', 'redirect_page');
-function redirect_page()
-{
+function redirect_page() {
     switch (get_post_type()) {
         case "shop_order":
             $url = admin_url() . 'edit.php?post_type=shop_order';
@@ -543,8 +542,7 @@ function redirect_page()
 }
 
 add_filter('woocommerce_catalog_orderby', 'wc_customize_product_sorting');
-function wc_customize_product_sorting($sorting_options)
-{
+function wc_customize_product_sorting($sorting_options) {
     $sorting_options = array(
         'menu_order' => __('Sorting', 'woocommerce'),
         'popularity' => __('Sort by popularity', 'woocommerce'),
@@ -558,8 +556,7 @@ function wc_customize_product_sorting($sorting_options)
 }
 
 add_action('woocommerce_before_order_itemmeta', 'addItemStatusToOrderItemList', 10, 3);
-function addItemStatusToOrderItemList($itemId, $item, $c)
-{
+function addItemStatusToOrderItemList($itemId, $item, $c) {
     /* @var WC_Order_Item_Product $item */
     if (isset($_GET['post']) && $_GET['post'] && get_class($item) === WC_Order_Item_Product::class) {
         global $wpdb;
@@ -575,11 +572,9 @@ add_filter('members_check_parent_post_permission', function () {
     return false;
 });
 
-
 // ADDING A CUSTOM COLUMN TITLE TO ADMIN PRODUCTS LIST
 add_filter('manage_edit-product_columns', 'gf_supplier_product_list_column', 11);
-function gf_supplier_product_list_column($columns)
-{
+function gf_supplier_product_list_column($columns) {
     //add columns
     $columns['supplier'] = __('Dobavljač', 'woocommerce'); // title
     return $columns;
@@ -587,36 +582,16 @@ function gf_supplier_product_list_column($columns)
 
 // ADDING THE DATA FOR EACH PRODUCTS BY COLUMN (EXAMPLE)
 add_action('manage_product_posts_custom_column', 'gf_supplier_product_list_column_content', 10, 2);
-function gf_supplier_product_list_column_content($column, $product_id)
-{
+function gf_supplier_product_list_column_content($column, $product_id) {
     global $post;
 
-
     $supplier_id = get_post_meta($product_id, 'supplier', true);
-    $supplier_name = get_user_by('ID', $supplier_id)->display_name;
     switch ($column) {
         case 'supplier' :
-            echo $supplier_name; // display the data
+            echo get_user_by('ID', $supplier_id)->display_name;
             break;
     }
 }
-
-add_filter('woocommerce_checkout_fields', 'gf_remove_apartment_checkout_fields');
-function gf_remove_apartment_checkout_fields($fields)
-{
-    unset($fields['billing']['billing_address_2']);
-    unset($fields['shipping']['shipping_address_2']);
-    return $fields;
-}
-
-add_filter('woocommerce_default_address_fields', 'gf_remove_unwanted_address_form_fields');
-function gf_remove_unwanted_address_form_fields($fields)
-{
-    unset($fields ['company']);
-    unset($fields ['address_2']);
-    return $fields;
-}
-
 
 //add_action('admin_menu', 'gf_external_item_banners_widget_options_create_menu');
 function gf_external_item_banners_widget_options_create_menu()
@@ -634,9 +609,7 @@ function gf_external_item_banners_widget_options_create_menu()
     });
 }
 
-
-function gf_get_order_dates()
-{
+function gf_get_order_dates() {
     $query = new WC_Order_Query(array(
         'limit' => -1,
         'return' => 'ids'
@@ -658,18 +631,13 @@ function gf_get_order_dates()
 }
 
 add_filter('query_vars', 'gf_order_date_register_query_vars');
-function gf_order_date_register_query_vars($qvars)
-{
-    //Add these query variables
+function gf_order_date_register_query_vars($qvars) {
     $qvars[] = 'gf_order_date';
     return $qvars;
 }
 
-
 add_action('restrict_manage_posts', 'gf_print_order_date_picker_admin_list');
-function gf_print_order_date_picker_admin_list()
-{
-
+function gf_print_order_date_picker_admin_list() {
     global $typenow;
     $order_dates = gf_get_order_dates();
     if ($typenow == 'shop_order') {
@@ -684,19 +652,15 @@ function gf_print_order_date_picker_admin_list()
         $output .= "</select>";
         echo $output;
     }
-
 }
 
 add_action('pre_get_posts', 'gf_order_date_apply_filter');
-function gf_order_date_apply_filter($query)
-{
+function gf_order_date_apply_filter($query) {
 
     $order_date_str = $query->get('gf_order_date');
     $exploded_date = explode('/', $order_date_str);
     if (!empty($order_date_str)) {
-
         $meta_query = $query->get('meta_query');
-
         if (empty($meta_query))
             $meta_query = array();
 
@@ -712,15 +676,11 @@ function gf_order_date_apply_filter($query)
         $query->set('monthnum', $exploded_date[1]);
         $query->set('year', $exploded_date[2]);
 
-//        var_dump($query);
     }
 }
 
 add_filter('bulk_actions-edit-product', 'register_gf_product_list_bulk_action');
-
-function register_gf_product_list_bulk_action($bulk_actions)
-{
-//    var_dump($_GET);
+function register_gf_product_list_bulk_action($bulk_actions) {
     if (isset($_GET['post_type']) && $_GET['post_type'] == 'product' && isset($_GET['filter_action']) && isset($_GET['product_cat'])) {
         $bulk_actions['remove_product_from_sliders'] = 'Ukloni iz kategorije: ' . $_GET['product_cat'];
     }
@@ -729,9 +689,7 @@ function register_gf_product_list_bulk_action($bulk_actions)
 }
 
 add_filter('handle_bulk_actions-edit-product', 'gf_product_list_bulk_action_handler', 10, 3);
-
-function gf_product_list_bulk_action_handler($redirect_to, $doaction, $post_ids)
-{
+function gf_product_list_bulk_action_handler($redirect_to, $doaction, $post_ids) {
     if ($doaction !== 'remove_product_from_sliders') {
         return $redirect_to;
     }
@@ -745,8 +703,7 @@ function gf_product_list_bulk_action_handler($redirect_to, $doaction, $post_ids)
 
 //admin product list filter by supplier
 add_filter('woocommerce_product_filters', 'gf_admin_product_list_supplier_filter', 10, 1);
-function gf_admin_product_list_supplier_filter($output)
-{
+function gf_admin_product_list_supplier_filter($output) {
     $suppliers = get_users(array('role' => 'supplier'));
     $html = '<select name="product_supplier_filter">';
     $html .= '<option value="">Filtriraj po dobavljaču </option>';
@@ -757,17 +714,13 @@ function gf_admin_product_list_supplier_filter($output)
 
     echo $html;
 }
-
-add_filter('parse_query', 'wpa104537_featured_products_admin_filter_query');
-function wpa104537_featured_products_admin_filter_query($query)
-{
+add_filter('parse_query', 'gf_featured_products_admin_filter_query');
+function gf_featured_products_admin_filter_query($query) {
     global $typenow, $wp_query;
 
-    if ($typenow == 'product') {
-        if (!empty($_GET['product_supplier_filter'])) {
-            $query->query_vars['meta_key'] = 'supplier';
-            $query->query_vars['meta_value'] = $_GET['product_supplier_filter'];
-        }
+    if ($typenow == 'product' && !empty($_GET['product_supplier_filter'])) {
+        $query->query_vars['meta_key'] = 'supplier';
+        $query->query_vars['meta_value'] = $_GET['product_supplier_filter'];
     }
 }
 //admin product list filter by supplier END

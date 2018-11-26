@@ -32,7 +32,7 @@ $status = 'NEMA NA STANJU !';
         jQuery('.saveOrderItemStatus').click(function (e) {
             e.preventDefault();
             var data = {
-                backOrderId: <?=$result[0]->backOrderId?>,
+                backOrderId: '<?=$result[0]->backOrderId?>',
                 itemId: <?=$item->get_product_id()?>,
                 orderId: <?=$_GET['post']?>,
                 status: jQuery('.orderItemStatusWrapper select').val()

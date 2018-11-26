@@ -136,6 +136,7 @@
     </table>
     <table class="gf-print-bill-table">
         <?php
+        /* @var \WC_Order_Item $item */
         foreach ($order->get_items() as $item) {
             $product = wc_get_product($item->get_product()->get_id());
             if ($product->get_parent_id()) {
@@ -143,8 +144,11 @@
             }
             /* @var \WC_Product $product */
             $modifier = (float) '1' .'.'. (int) number_format($product->get_meta('pdv'));
-            $priceNoPdv = (int) $product->get_price() / $modifier;
-            $pdvInDin = $product->get_price() - $priceNoPdv;
+//            $priceNoPdv = (int) $product->get_price() / $modifier;
+//            $pdvInDin = $product->get_price() - $priceNoPdv;
+            $itemPrice = (int) $item->get_total() / $item->get_quantity();
+            $priceNoPdv = $itemPrice / $modifier;
+            $pdvInDin = $itemPrice - $priceNoPdv;
 
             $shippingNoPdv = number_format($order->get_shipping_total() / 1.2);
             $shippingPdvInDin = $order->get_shipping_total() - $shippingNoPdv;
@@ -156,7 +160,7 @@
                 <td width="15%"><?=number_format($priceNoPdv, 2)?></td>
                 <td width="14%"><?=$product->get_meta('pdv')?> %</td>
                 <td width="14%"><?=number_format($pdvInDin, 2)?></td>
-                <td style="text-align: right"><?=number_format($product->get_price(), 2)?> din </td>
+                <td style="text-align: right"><?=number_format($itemPrice, 2)?> din </td>
             </tr>
         <?php } ?>
         <tr>
