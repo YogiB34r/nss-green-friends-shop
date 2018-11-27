@@ -309,5 +309,8 @@ jQuery(document).ready(function ($) {
     //         }
     //     });
     // })
+
+    //test
+    jQuery('select').select2();
 });
 
