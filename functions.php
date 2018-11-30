@@ -724,6 +724,8 @@ function gf_admin_product_list_supplier_filter($output)
     $html .= '</select>';
 
     echo $html;
+
+    return $output;
 }
 add_filter('parse_query', 'gf_featured_products_admin_filter_query');
 function gf_featured_products_admin_filter_query($query) {
