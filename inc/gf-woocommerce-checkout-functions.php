@@ -23,6 +23,14 @@ function gf_woocommerce_billing_field_pib($fields) {
         'class' => array('gf-billing-field-pib'),
         'priority' => 20
     );
+    $fields['billing']['billing_company'] = array(
+        'label' => __('Ime firme', 'woocommerce'),
+        'required' => false,
+        'clear' => true, //
+        'type' => 'text',
+        'class' => array('gf-billing-field-company'),
+        'priority' => 20
+    );
 
     return $fields;
 }
@@ -36,7 +44,7 @@ function gf_order_fields($fields) {
         "billing_company",
         "billing_pib",
         "billing_address_1",
-        "billing_address_2",
+//        "billing_address_2",
         "billing_city",
         "billing_postcode",
         "billing_country",
@@ -214,7 +222,7 @@ add_filter( 'woocommerce_checkout_fields', 'gf_change_city_field_to_dropdown' );
  */
 function gf_change_city_field_to_dropdown( $fields ) {
     global $wpdb;
-    $sql = "SELECT * FROM wp_nss_city";
+    $sql = "SELECT * FROM wp_nss_city ORDER BY gname ASC";
     $result = $wpdb->get_results($sql);
     $cities = [];
     foreach ($result as $city){
@@ -224,9 +232,19 @@ function gf_change_city_field_to_dropdown( $fields ) {
     $city_args = wp_parse_args( array(
         'type' => 'select',
         'options' => $cities,
+        'input_class' => array(
+            'wc-enhanced-select',
+        )
     ), $fields['shipping']['shipping_city'] );
     $fields['shipping']['shipping_city'] = $city_args;
     $fields['billing']['billing_city'] = $city_args; // Also change for billing field
+
+    wc_enqueue_js( "
+	jQuery( ':input.wc-enhanced-select' ).filter( ':not(.enhanced)' ).each( function() {
+		var select2_args = { minimumResultsForSearch: 5 };
+		jQuery( this ).select2( select2_args ).addClass( 'enhanced' );
+	});" );
+
     return $fields;
 }
 
@@ -259,6 +277,21 @@ function gf_processing_notification($order_id, $checkout = null) {
 add_filter('woocommerce_valid_order_statuses_for_payment', 'appendValidPaymentStatuses');
 function appendValidPaymentStatuses($statuses) {
     array_push($statuses, 'u-obradi');
+    array_push($statuses, 'pending');
 
     return $statuses;
+}
+
+add_filter('woocommerce_checkout_fields', 'gf_remove_apartment_checkout_fields');
+function gf_remove_apartment_checkout_fields($fields) {
+    unset($fields['billing']['billing_address_2']);
+    unset($fields['shipping']['shipping_address_2']);
+    return $fields;
+}
+
+add_filter('woocommerce_default_address_fields', 'gf_remove_unwanted_address_form_fields');
+function gf_remove_unwanted_address_form_fields($fields) {
+    unset($fields ['company']);
+    unset($fields ['address_2']);
+    return $fields;
 }

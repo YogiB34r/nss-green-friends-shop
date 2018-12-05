@@ -1,64 +1,60 @@
 <?php
-$categories = get_terms([
-    'taxonomy' => get_queried_object()->taxonomy,
-    'parent' => get_queried_object_id(),
-    'hide_empty' => true
-]);
-if (count($categories) != 0) {
+$ordered_categories_ids = get_option('filter_fields_order');
+
+$second_lvl_cats = [];
+$third_lvl_cats = [];
+foreach ($ordered_categories_ids as $category_id) {
+    $ordered_cat_term = get_term($category_id['term_id'], 'product_cat');
+    if ($ordered_cat_term->parent !== 0) {
+        if ($ordered_cat_term->parent == get_queried_object_id()) {
+            $second_lvl_cats[] = $ordered_cat_term;
+        } else {
+            $third_lvl_cats[] = $ordered_cat_term;
+        }
+    }
+}
+
+if (count($second_lvl_cats) != 0) {
     echo '<div id="gf-expander-id" class="row gf-category-expander">';
 
     $i = 0;
     $second_lvl_cat_ids = [];
-    foreach ($categories as $category) {
+    foreach ($second_lvl_cats as $second_lvl_cat) {
         $i++;
-        $child_args = array(
-            'taxonomy' => 'product_cat',
-            'parent' => $category->term_id
-        );
-        $second_lvl_cat_ids[] = $category->term_id;
-        $child_cats = get_terms($child_args);
+
+        $second_lvl_cat_ids[] = $second_lvl_cat->term_id;
 
         if ($i <= count($second_lvl_cat_ids)) {
             echo '<div class="col-sm-6 col-xs-6 col-md-3 gf-expander-module-first-line">';
-            echo '<h2><a class="gf-expander-first-line-parent" href="' . get_term_link($category) . '">' . $category->name .'</a></h2>';
+            echo '<h2><a class="gf-expander-first-line-parent" href="' . get_term_link($second_lvl_cat) . '">' . $second_lvl_cat->name . '</a></h2>';
             echo '<ul class="gf-expander__subcategory-list">';
-            foreach ($child_cats as $child_cat) {
-                echo '<li>
-                     <h2><a class="gf-category-expander__col__subcategory gf-module-first-href" href="' . get_term_link($child_cat) . '">' . $child_cat->name . '</a></h2>
-                  </li>';
+            foreach ($third_lvl_cats as $third_lvl_cat) {
+                if ($third_lvl_cat->parent == $second_lvl_cat->term_id):
+                    echo '<li>
+                            <h2><a class="gf-category-expander__col__subcategory gf-module-first-href" href="' . get_term_link($third_lvl_cat) . '">' . $third_lvl_cat->name . '</a></h2>
+                           </li>';
+                endif;
             }
+
             echo '</ul>
               </div>';
             continue;
         }
         echo '<div class="col-sm-6 col-xs-6 col-md-3 gf-category-expander__col">';
-        echo '<h2><a class="gf-category-expander__col__category" href="' . get_term_link($category) . '">' . $category->name.'</a></h2>';
+        echo '<h2><a class="gf-category-expander__col__category" href="' . get_term_link($second_lvl_cat) . '">' . $second_lvl_cat->name . '</a></h2>';
         echo '<ul class="gf-expander__subcategory-list">';
-        foreach ($child_cats as $child_cat) {
+        foreach ($third_lvl_cats as $third_lvl_cat) {
+            if ($third_lvl_cat->parent == $second_lvl_cat->term_id):
             echo '<li>
-                     <h2><a class="gf-category-expander__col__subcategory" href="' . get_term_link($child_cat) . '">' . $child_cat->name . '</a></h2>
+                     <h2><a class="gf-category-expander__col__subcategory" href="' . get_term_link($third_lvl_cat) . '">' . $third_lvl_cat->name . '</a></h2>
                   </li>';
+            endif;
         }
         echo '</ul>
               </div>';
     }
-//    $args = array(
-//        'taxonomy' => 'product_cat',
-//        'childless' => 1,
-//    );
-//    $childless_cats = get_terms($args);
-//    $childless_cats_ids = [];
-//    foreach ($childless_cats as $cat) {
-//        $childless_cats_ids[] = $cat->term_id;
-//    }
-//    $result = false;
-//    foreach ($second_lvl_cat_ids as $second_lvl_cat_id) {
-//        if (!in_array($second_lvl_cat_id, $childless_cats_ids)) {
-//            $result = true;
-//            break;
-//        }
-//    }
-    if (!empty($child_cats)) {
+
+    if (!empty($third_lvl_cats)) {
         echo '<div class="gf-category-expander__footer"><span class="fas fa-angle-down"></span></div>';
     } else {
         echo '<div class="gf-category-expander__footer"></div>';

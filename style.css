@@ -708,7 +708,7 @@ h1.product_title.entry-title {
 .woocommerce-page ul.products.grid li {
     display: flex;
     flex-flow: column;
-    height: 315px;
+    /*height: 315px;*/
     position: relative;
 }
 
@@ -1761,6 +1761,13 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title {
     .gf-footer-images li img {
         max-height: 40px !important;
     }
+    ul.grid .saved-sale{
+        font-size: 0.8rem;
+    }
+    .gf-expander-module-first-line{
+        padding: 0px 10px;
+    }
+    
 }
 
 @media only screen and (min-width: 1200px) {
@@ -3319,11 +3326,6 @@ p.woocommerce-thankyou-order-received {
 
 .gf-category-expander__col {
     display: none;
-}
-
-.gf-expander-module-first-line {
-    padding: 10px;
-
 }
 
 .gf-expander-module-first-line .gf-expander-first-line-parent {

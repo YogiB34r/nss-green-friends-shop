@@ -56,7 +56,7 @@
         <div style="float: left;">
             <h3>Model i poziv na broj(odobrenje)</h3>
             <div style="border:1px solid;text-align: center;display: inline-block">
-                <p style="min-height: 5px;min-width: 80px">97</p>
+                <p style="min-height: 5px;min-width: 80px"></p>
             </div>
             <div style="border:1px solid;text-align: center;display: inline-block;margin-left: 0px">
                 <p style="min-height: 5px;min-width: 220px"><?= $order->get_order_number()?></p>

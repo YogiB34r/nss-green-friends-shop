@@ -21,11 +21,40 @@
             'https://connect.facebook.net/en_US/fbevents.js');
         fbq('init', '264258047766442');
         fbq('track', 'PageView');
+        window.addEventListener('load', function () {
+            FBEvents();
+        });
+
+        function FBEvents() {
+            <?php if (isset($_POST['add_to_cart'])): ?>
+            fbq('track', 'AddToCart');
+            <?php endif; ?>
+            <?php if (get_query_var('pagename') === 'placanje' && !get_query_var('order-received')): ?>
+            fbq('track', 'InitiateCheckout');
+            <?php endif; ?>
+            <?php if (get_query_var('order-received')): ?>
+            var doc = document.getElementsByClassName('woocommerce-order-overview');
+            if (doc.length) {
+                var price = doc.item(0).getElementsByClassName('woocommerce-Price-amount').item(0).textContent;
+                price = price.split('din')[0];
+                price = price.replace(',', '.');
+                fbq('track', 'Purchase', {value: price, currency: 'RSD'});
+            }
+            <?php endif; ?>
+        }
     </script>
     <noscript>
         <img height="1" width="1" src="https://www.facebook.com/tr?id=264258047766442&ev=PageView&noscript=1"/>
     </noscript>
     <!-- End Facebook Pixel Code -->
+    <script>
+        if (window.location.pathname === '/' && window.location.host.search('nonstopshop.rs')) {
+            window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+            ga('create', 'UA-108239528-1', { 'cookieDomain': 'nonstopshop.rs' } );
+            // Plugins
+            ga('send', 'pageview');
+        }
+    </script>
 </head>
 
 <body <?php body_class(); ?>>

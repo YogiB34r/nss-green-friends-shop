@@ -1,0 +1,27 @@
+<div class="wrap">
+    <h3>Product list</h3>
+    <table class="widefat" cellspacing="0">
+        <th>Item ID</th>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Sale price</th>
+        <th>Regular price</th>
+        <th>Category url</th>
+        <th>Action</th>
+
+        <?php foreach ($data as $item): ?>
+            <tr>
+                <td><?= $item->itemId ?></td>
+                <td><?= $item->title ?></td>
+                <td><?= $item->description ?></td>
+                <td><?= $item->salePrice ?></td>
+                <td><?= $item->regularPrice ?></td>
+                <td><?= $item->categoryUrl ?></td>
+                <td>
+                    <a href="admin.php?page=external_item_banners_widget&action=update&id=<?=$item->externalBannersWidgetId?>" class="button button-secondary" value="Edit">Edit</a>
+                    <a href="admin.php?page=external_item_banners_widget&action=delete&id=<?=$item->externalBannersWidgetId?>" class="button button-secondary" value="Delete">Delete</a>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    </table>
+</div>

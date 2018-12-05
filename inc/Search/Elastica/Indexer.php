@@ -35,9 +35,9 @@ class Indexer
     {
         global $wpdb;
 
-        $perPage = 200;
+        $perPage = 500;
 
-        for ($i = 0; $i < 100; $i++) {
+        for ($i = 0; $i < 50; $i++) {
 //        for ($i = 0; $i < 4; $i++) {
             $offset = $i * $perPage;
             $sql = "SELECT ID FROM wp_posts WHERE post_type = 'product' LIMIT {$offset}, {$perPage};";
@@ -115,7 +115,8 @@ class Indexer
         }
         // @TODO solve better. when no sku detected, use post id.
         if ($product->get_sku() == "") {
-            $product->set_sku($product->get_id());
+            echo $product->get_name();
+            $product->set_sku(md5($product->get_id() . $product->get_name()));
         }
 
         $thumbnail = '<img src="' . wc_placeholder_img_src() . '" alt="Placeholder" width="200px" height="200px" />';
@@ -194,9 +195,9 @@ class Indexer
      */
     private function calculateOrderingRating(\WC_Product $product)
     {
-        $ponder = 10;
-        if ($product->is_on_sale()) {
-            $ponder = 100;
+        $ponder = 1000;
+        if ($product->get_date_on_sale_to()) {
+            $ponder = 1000000;
         }
         if (!$product->is_in_stock()) {
             $ponder = 1;

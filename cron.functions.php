@@ -13,34 +13,41 @@ include(__DIR__ . "/inc/Search/Factory/ProductSetupFactory.php");
 include(__DIR__ . "/inc/Search/Factory/TermSetupFactory.php");
 
 if (defined('WP_CLI') && WP_CLI) {
-    // add cli commands
+    ini_set('max_execution_time', 1200);
+    ini_set('display_errors', 1);
+    error_reporting(E_ALL);
+
+
+    // elastic operations
     \WP_CLI::add_command('createElasticIndex', 'createElasticIndex');
     \WP_CLI::add_command('syncElasticIndex', 'syncElasticIndex');
 
+    //debug
     \WP_CLI::add_command('passAllProducts', 'passAllProducts');
     \WP_CLI::add_command('passAllUsers', 'passAllUsers');
 
     \WP_CLI::add_command('createXmlExport', 'getItemExport');
 
-    $factory = new \Nss\Feed\FeedFactory();
-
     //feed processing
-    $supplierId = 666;
-    \WP_CLI::add_command('feed', $factory(), $supplierId);
-//    \WP_CLI::add_command('parseFeed', 'resetQueue', $supplierId);
-//    \WP_CLI::add_command('parseFeed', 'importItems', $supplierId);
+    $factory = new \Nss\Feed\FeedFactory();
+    $feed = $factory();
+    \WP_CLI::add_command('feed', $feed);
 
-//    \WP_CLI::add_command('fixItemVendor', 'fixItemVendor');
+    \WP_CLI::add_command('mis', 'mis');
 }
 
-ini_set('max_execution_time', 1200);
-//ini_set('display_errors', 1);
-//error_reporting(E_ALL);
-
-function fixItemVendor() {
-    $cli = new \GF\Cli();
-    $cli->fixItems();
+function mis() {
+    $arg = array('orderby' => 'date', 'posts_per_page' => '200', 'page' => 6);
+    $orders = WC_get_orders($arg);
+    foreach ($orders as $order) {
+        if (!in_array($order->get_status(), ['stornirano', 'cancelled', 'refunded', 'stornirano-pn'])) {
+            if (get_class($order) === WC_Order::class) {
+                $misOrder = new NSS_MIS_Order($order);
+            }
+        }
+    }
 }
+
 
 function getItemExport() {
     global $wpdb;
@@ -132,18 +139,6 @@ function createXml(DOMDocument $xmlDoc, WC_Product $item, $root) {
     return $root;
 }
 
-
-
-
-
-function gf_get_products_without_image() {
-    global $wpdb;
-    $sql = "SELECT ID FROM wp_posts WHERE ID NOT IN (select post_id from wp_postmeta WHERE meta_key='_thumbnail_id') AND post_type='product'";
-    $result = $wpdb->get_results($sql);
-
-    return $result;
-}
-
 function passAllUsers() {
     global $wpdb;
     $args = array(
@@ -152,37 +147,18 @@ function passAllUsers() {
         'order'   => 'ASC'
     );
     /* @var WP_User $user */
-    foreach (get_users($args) as $user) {
-        $userMeta = get_user_meta($user->ID);
-        $sql = "SELECT gfax FROM gvendor WHERE  gvendorid = {$user->vendorid}";
-        $result = $wpdb->get_results($sql);
-        update_user_meta($user->ID, 'description', $result[0]->gfax);
-        wp_update_user( array( 'ID' => $user->ID, 'display_name' => $userMeta['vendor_name'][0] ) );
-    }
+//    foreach (get_users($args) as $user) {
+//        $userMeta = get_user_meta($user->ID);
+//        $sql = "SELECT gfax FROM gvendor WHERE  gvendorid = {$user->vendorid}";
+//        $result = $wpdb->get_results($sql);
+//        update_user_meta($user->ID, 'description', $result[0]->gfax);
+//        wp_update_user( array( 'ID' => $user->ID, 'display_name' => $userMeta['vendor_name'][0] ) );
+//    }
 }
 
 function passAllProducts() {
-    $pages = 21;
-    $limit = 1000;
-
-    global $wpdb;
-
-//    for ($i = 1; $i < $pages; $i++) {
-        $products_ids = wc_get_products(array(
-//            'limit' => $limit,
-            'limit' => 2000,
-            'return' => 'ids',
-            'status' => 'pending',
-//            'paged' => $i
-        ));
-
-        foreach ($products_ids as $product_id) {
-            $product = wc_get_product($product_id);
-            $product->set_status('publish');
-            $product->save();
-        }
-        echo 'done';
-//    }
+    $cli = new \GF\Cli();
+    $cli->fixItems();
 }
 
 function createElasticIndex() {
@@ -213,8 +189,9 @@ function syncToElastic($id) {
 //        && $product->get_sku() != '') {
 
         if ($product->get_sku() == "") {
-            $product->set_sku($product->get_id());
-            $product->save();
+//            return;
+            $product->set_sku(md5($product->get_id() . $product->get_name()));
+//            $product->save();
         }
         $productConfig = new \GF\Search\Elastica\Config\Product();
         $elasticaClientFactory = new \GF\Search\Factory\ElasticClientFactory();

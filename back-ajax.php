@@ -61,6 +61,12 @@ if (isset($_GET['action'])) {
 
             break;
 
+        case 'adminSearch':
+            ini_set('memory_limit', '1500M');
+            ini_set('max_execution_time', '300');
+            createJitexItemExport();
+
+            break;
     }
 }
 
@@ -95,9 +101,9 @@ function createJitexItemExport() {
                         if (!in_array($itemIdSize, $passedIds)) {
                             $passedIds[] = $itemIdSize;
                             $csv .= iconv('utf-8','windows-1250',  $itemIdSize."\t".
-                                    trim(mb_strtoupper($product->get_name() . ' ' . $variation, 'UTF-8'))."\t".
-                                    str_replace('.',',',$product->get_meta('pdv'))."\t".str_replace('.', ',', round($product->get_price() * 100 / (double) $taxcalc, 2))."\t".
-                                    str_replace('.', ',', round($product->get_price(), 2)))."\r\n";
+                            trim(mb_strtoupper($product->get_name() . ' ' . $variation, 'UTF-8'))."\t".
+                            str_replace('.',',',$product->get_meta('pdv'))."\t".str_replace('.', ',', round($product->get_price() * 100 / (double) $taxcalc, 2))."\t".
+                            str_replace('.', ',', round($product->get_price(), 2)))."\r\n";
 //                                var_dump($product->get_sku() . $variation);
                         }
                     }
@@ -109,7 +115,7 @@ function createJitexItemExport() {
     header("Cache-Control: public");
     header("Content-Description: File Transfer");
     header('Content-type: text/plain');
-    header("Content-Disposition: attachment; filename=".date('d-m-Y H:i:s').'.txt');
+    header("Content-Disposition: attachment; filename=".date('d-m-Y H:i:s').'.txt"');
     header('Content-Transfer-Encoding: binary');
 
     echo $csv;
@@ -131,19 +137,14 @@ function createAdresnica($orderId) {
     $html2pdf->output($name, 'D');
 }
 
-function exportJitexOrder(
-    WC_Order $order,
-    $test,
-    $tes12,
-    $test123
-) {
+function exportJitexOrder(WC_Order $order) {
     $string = '';
+    /* @var \WC_Order_Item_Product $item */
     foreach ($order->get_items() as $item) {
         $p = wc_get_product($item->get_product()->get_id());
-
         $variation = '';
         if (get_class($p) === WC_Product_Variation::class) {
-            foreach (array_values($p->get_variation_attributes())[0] as $value) {
+            foreach ($p->get_variation_attributes() as $value) {
                 if (strstr($item->get_name(), $value)) {
                     $variation = $value;
                 }
@@ -155,18 +156,18 @@ function exportJitexOrder(
         }
         $name = $order->get_billing_first_name() .' '. $order->get_billing_last_name();
         if ($order->get_meta('_billing_pib') != '') {
-            $name = $order->get_billing_company() .' '. $order->get_meta('_billing_pib');
+            $name = $order->get_billing_company();
         }
-
         $variantId = $p->get_sku() . $variation;
-        $variantName = $item->get_name();
+        $variantName = str_replace('-', '', $item->get_name());
         $date = $order->get_date_created()->format('d.m.Y');
+        $itemPrice = (int) $item->get_total() / $item->get_quantity();
         $modifier = (float) '1' .'.'. (int) number_format($p->get_meta('pdv'));
-        $priceNoPdv = number_format((int) $p->get_price() / $modifier, 2, ',', '.');
-        $priceFormated =number_format($p->get_price(), 2, ',', '.');
+        $priceNoPdv = number_format($itemPrice / $modifier, 2, ',', '.');
+        $priceFormated = number_format($itemPrice, 2, ',', '.');
         $string .= $name."\t".$order->get_billing_address_1()."\t".$order->get_billing_postcode()."\t".$order->get_billing_city()."\t"."Srbija"."\t".
         $order->get_billing_phone()."\t".$order->get_order_number()."\t".$date."\t".$order->get_payment_method_title()."\t".$variantId."\t".$variantName."\t".
-            $item->get_quantity()."\t".$priceNoPdv."\t".$priceFormated."\t".$order->get_billing_company()."\r\n";
+            $item->get_quantity()."\t".$priceNoPdv."\t".$priceFormated."\t".$order->get_billing_company()."\t".$order->get_meta('_billing_pib')."\r\n";
     }
     $order->update_meta_data('jitexExportCreated', 1);
     $order->save();

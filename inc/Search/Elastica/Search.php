@@ -177,45 +177,58 @@ class Search
      */
     private function setSorting(Query $mainQuery, $boolQuery, $order)
     {
+
+
         switch ($order) {
             case 'popularity':
-                $mainQuery->setSort(['order_data.viewCount' => 'desc']);
+                $mainQuery->addSort(['order_data.viewCount' => 'desc']);
 
                 break;
 
             //@TODO add sync for ratings
             case 'rating':
-                $mainQuery->setSort(['order_data.rating' => 'desc']);
+                $mainQuery->addSort(['order_data.rating' => 'desc']);
 
                 break;
 
             case 'date':
                 $functionQuery = new \Elastica\Query\FunctionScore();
-                $scoreFunction = new \Elastica\Script\Script('_score * doc["order_data.default"].value');
+                $scoreFunction = new \Elastica\Script\Script('doc["order_data.date"].value * doc["order_data.default"].value');
                 $functionQuery->addScriptScoreFunction($scoreFunction);
                 $functionQuery->setQuery($boolQuery);
-                $mainQuery->setQuery($functionQuery);
                 $mainQuery->setSort(['_score' => 'desc']);
-//        $functionQuery->setScoreMode('sum');
-//        $functionQuery->setBoostMode('replace');
+                $mainQuery->setQuery($functionQuery);
 
                 break;
 
             case 'price-desc':
-                $mainQuery->setSort(['order_data.price' => 'desc']);
+                $functionQuery = new \Elastica\Query\FunctionScore();
+                $scoreFunction = new \Elastica\Script\Script('doc["order_data.price"].value * doc["order_data.default"].value');
+                $functionQuery->addScriptScoreFunction($scoreFunction);
+                $functionQuery->setQuery($boolQuery);
+                $mainQuery->setSort(['_score' => 'desc']);
+                $mainQuery->setQuery($functionQuery);
 
                 break;
 
             case 'price':
-                $mainQuery->setSort(['order_data.price' => 'asc']);
+//                $mainQuery->addSort(['order_data.price' => 'asc']);
+                $functionQuery = new \Elastica\Query\FunctionScore();
+                $scoreFunction = new \Elastica\Script\Script('(10000000 - doc["order_data.price"].value) * doc["order_data.default"].value');
+                $functionQuery->addScriptScoreFunction($scoreFunction);
+                $functionQuery->setQuery($boolQuery);
+                $mainQuery->setSort(['_score' => 'desc']);
+                $mainQuery->setQuery($functionQuery);
 
                 break;
 
             default:
-                $mainQuery->setSort(['order_data.default' => 'desc']);
+                $mainQuery->addSort(['order_data.default' => 'desc']);
 
                 break;
         }
+
+
 
         return $mainQuery;
     }
@@ -242,8 +255,9 @@ class Search
     private function performSearch(BoolQuery $boolQuery, $limit, $page, $order)
     {
         $mainQuery = new Query();
-        $mainQuery->setQuery($boolQuery);
+//        $mainQuery->setQuery($boolQuery);
         $mainQuery = $this->setSorting($mainQuery, $boolQuery, $order);
+        $mainQuery->setTrackScores(true);
 
         $categoryAggregation = new \Elastica\Aggregation\Terms('category');
         $categoryAggregation->setField('category.id');

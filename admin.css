@@ -144,3 +144,12 @@ GF SORTABLE CATEGORIES
 .gf-backorders-filters p{
     float: none;
 }
+
+
+.external-item-banners-widget-Form input, .external-item-banners-widget-Form textarea{
+    display: block;
+}
+
+.externalItemBannersWidget-table td{
+    vertical-align: middle;
+}

@@ -278,5 +278,39 @@ jQuery(document).ready(function ($) {
             jQuery('#order_status').val(status).trigger('change');
         }
     });
+
+    // jQuery('body').on('ready', '.wc-product-search', function() {
+    // jQuery('.wc-product-search').on('ready', function() {
+    //     console.log('search');
+    //     jQuery('.wc-product-search').select2({
+    //         ajax: {
+    //             url: '/back-ajax/?action=adminSearch&query=' + jQuery(this).val()
+    //         }
+    //     });
+    // });
+
+    // jQuery('body').on('keypress', '.select2-search__field', function() {
+    //     console.log('click search');
+    //     jQuery.ajax({
+    //         type: "POST",
+    //         url: '/back-ajax/?action=adminSearch',
+    //         data: {'query': jQuery(this).val()},
+    //         minLength: 0,
+    //         beforeSend: function () {
+    //             jQuery(".gf-search-box").css("background", "#fafafa url(/wp-content/themes/nss-green-friends-shop/assets/images/LoaderIcon.gif)no-repeat center");
+    //         },
+    //         success: function (response) {
+    //             jQuery(".gf-search-box").css("background", "none");
+    //             jQuery(".search-box").css("background", "#eee");
+    //             if (response != '') {
+    //                 jQuery(".suggesstion-box").html(response);
+    //                 jQuery(".suggesstion-box").fadeIn(200);
+    //             }
+    //         }
+    //     });
+    // })
+
+    //test
+    jQuery('select').select2();
 });
 
