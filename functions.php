@@ -703,10 +703,21 @@ function gf_product_list_bulk_action_handler($redirect_to, $doaction, $post_ids)
     return $redirect_to;
 }
 
+//add_action('wp_enqueue_scripts', function(){
+//    wp_enqueue_style( 'select2_css', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css' );
+//    wp_register_script( 'select2_js', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js', array('jquery'), '4.0.3', true );
+//    wp_enqueue_script('select2_js');
+//});
 //admin product list filter by supplier
 add_filter('woocommerce_product_filters', 'gf_admin_product_list_supplier_filter', 10, 1);
-function gf_admin_product_list_supplier_filter($output) {
-    $suppliers = get_users(array('role' => 'supplier'));
+function gf_admin_product_list_supplier_filter($output)
+{
+    $args = array(
+        'role' => 'supplier',
+        'orderby' => 'display_name',
+        'order' => 'ASC'
+    );
+    $suppliers = get_users($args);
     $html = '<select name="product_supplier_filter">';
     $html .= '<option value="">Filtriraj po dobavljaču </option>';
     foreach ($suppliers as $supplier) {
@@ -715,6 +726,8 @@ function gf_admin_product_list_supplier_filter($output) {
     $html .= '</select>';
 
     echo $html;
+
+    return $output;
 }
 add_filter('parse_query', 'gf_featured_products_admin_filter_query');
 function gf_featured_products_admin_filter_query($query) {
