@@ -586,11 +586,14 @@ function gf_supplier_product_list_column_content($column, $product_id) {
     global $post;
 
     $supplier_id = get_post_meta($product_id, 'supplier', true);
-    switch ($column) {
-        case 'supplier' :
-            echo get_user_by('ID', $supplier_id)->display_name;
-            break;
+    if ($supplier_id) {
+        switch ($column) {
+            case 'supplier' :
+                echo get_user_by('ID', $supplier_id)->display_name;
+                break;
+        }
     }
+
 }
 
 //add_action('admin_menu', 'gf_external_item_banners_widget_options_create_menu');

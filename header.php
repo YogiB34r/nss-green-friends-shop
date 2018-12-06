@@ -55,9 +55,43 @@
             ga('send', 'pageview');
         }
     </script>
+    <?php global $wp; ?>
+    <?php if($wp->request === ''): ?>
+    <script async src="https://www.google-analytics.com/analytics.js"></script>
+    <!-- WooCommerce Google Analytics Integration -->
+    <script type='text/javascript'>
+        var gaProperty = 'UA-108239528-1';
+        var disableStr = 'ga-disable-' + gaProperty;
+        if ( document.cookie.indexOf( disableStr + '=true' ) > -1 ) {
+            window[disableStr] = true;
+        }
+        function gaOptout() {
+            document.cookie = disableStr + '=true; expires=Thu, 31 Dec 2099 23:59:59 UTC; path=/';
+            window[disableStr] = true;
+        }
+    </script>
+    <script type='text/javascript'>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga( 'create', 'UA-108239528-1', 'auto' );ga( 'set', 'anonymizeIp', true );
+        ga( 'set', 'dimension1', 'no' );
+        ga( 'require', 'ec' );</script>
+    <!-- /WooCommerce Google Analytics Integration -->
+    <?php endif; ?>
 </head>
 
 <body <?php body_class(); ?>>
+<!-- (C)2000-2014 Gemius SA - gemiusAudience / nonstopshop.rs / Ceo sajt -->
+<script type="text/javascript">
+    <!--//--><![CDATA[//><!--
+    var pp_gemius_identifier = 'nXdATXugR4Rheccjvn98r6bSfcBg4KM5o9bukzwvLDL.k7';
+    // lines below shouldn't be edited
+    function gemius_pending(i) { window[i] = window[i] || function() {var x = window[i+'_pdata'] = window[i+'_pdata'] || []; x[x.length]=arguments;};};
+    gemius_pending('gemius_hit'); gemius_pending('gemius_event'); gemius_pending('pp_gemius_hit'); gemius_pending('pp_gemius_event');
+    (function(d,t) {try {var gt=d.createElement(t),s=d.getElementsByTagName(t)[0],l='http'+((location.protocol=='https:')?'s':''); gt.setAttribute('async','async');
+        gt.setAttribute('defer','defer'); gt.src=l+'://gars.hit.gemius.pl/xgemius.js'; s.parentNode.insertBefore(gt,s);} catch (e) {}})(document,'script');
+    //--><!]]>
+</script>
 <div id="page" class="hfeed site">
     <header id="masthead" class="site-header" role="banner">
         <div class="container-fluid container--navigation">

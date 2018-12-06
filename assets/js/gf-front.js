@@ -88,7 +88,10 @@ jQuery(document).ready(function () {
     });
 
     jQuery('#my-search-icon-toggle').click(function () {
-        jQuery('.mobile-search').toggle('slow');
+        jQuery('.mobile-search').toggle('slow', function() {
+            console.log('aaaa');
+            jQuery('.search-field').trigger('focus');
+        });
 
     });
 

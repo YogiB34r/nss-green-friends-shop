@@ -149,7 +149,6 @@ class Indexer
             $viewCount = $gfProduct->viewCount;
         }
 
-
         $data = [
             'postId' => $product->get_id(),
             'category' => $cats,
@@ -167,7 +166,7 @@ class Indexer
             'salePrice' => (string) $salePrice,
             'inputPrice' => $product->get_meta('input_price'),
             'stockStatus' => (int) $product->is_in_stock(),
-            'status' => ($product->get_status() == 'publish'),
+            'status' => (int) ($product->get_status() == 'publish'),
             'viewCount' => 0,
             'rating' => 0,
             'sku' => $product->get_sku(),
@@ -183,7 +182,7 @@ class Indexer
                 'date' => strtotime($product->get_date_created()),
                 'viewCount' => $viewCount,
                 'stock' => (int) $product->is_in_stock(),
-                'published' => ($product->get_status() == 'publish'),
+                'published' => (int) ($product->get_status() == 'publish'),
                 'default' => static::calculateOrderingRating($product),
             ]
         ];

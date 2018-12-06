@@ -7,37 +7,135 @@ class Cli
     public function saleItems()
     {
 //        $pages = 21;
-        $limit = 5000;
+        $limit = 4000;
 
         $total = 0;
         $updated = [];
         $products_ids = wc_get_products(array(
             'limit' => $limit,
             'return' => 'ids',
-            'paged' => 2
+            'paged' => 6
         ));
+
+        $httpClient = new \GuzzleHttp\Client();
 
         foreach ($products_ids as $product_id) {
             $product = wc_get_product($product_id);
-            if ($product->is_on_sale()) {
-                $total++;
-                $product->set_date_on_sale_from('11/2/18');
-                $product->set_date_on_sale_to('12/1/18');
-                $product->save();
+            if ($product->get_date_on_sale_to())  {
+                if ($product->get_date_on_sale_to()->format('d/m/y') === '30/12/18') {
+                    continue;
+                }
+                if ($product->get_date_on_sale_to()->format('d/m/y') === '30/12/19') {
+                    continue;
+                }
+                //local  env bug skip
+                if ($product->get_date_on_sale_to()->format('d/m/y') === '14/11/19') {
+                    continue;
+                }
+                if ($product->get_date_on_sale_to()->format('d/m/y') === '14/01/19') {
+                    continue;
+                }
+                if ($product->get_date_on_sale_to()->format('d/m/y') === '29/11/19') {
+                    continue;
+                }
+                if ($product->get_date_on_sale_to()->format('d/m/y') === '30/11/18') {
+                    $product->set_date_on_sale_from('12/1/18');
+                    $product->set_date_on_sale_to('1/15/19');
+                    $product->save();
+                    continue;
+                }
+
+                var_dump($product_id);
+                var_dump(get_permalink($product_id));
+                var_dump($product->get_date_on_sale_to());
+                die();
             }
+
+            if ($product->is_on_sale()) {
+                if (!$product->get_date_on_sale_from()) {
+                    continue;
+                }
+                var_dump($product_id);
+                var_dump(get_permalink($product_id));
+                var_dump($product->get_price());
+                var_dump($product->get_sale_price());
+                var_dump($product->get_regular_price());
+                die();
+            }
+
+            $url = str_replace('https://nonstopshop.rs', 'https://nss-devel.ha.rs', get_permalink($product_id));
+//            $url = str_replace('http://nss.local', 'https://nss-devel.ha.rs', $url);
+
+//            $url = str_replace('https://nss-devel.ha.rs', 'https://nonstopshop.rs', get_permalink($product_id));
+            try {
+                $response = $httpClient->send(new \GuzzleHttp\Psr7\Request('get', $url));
+            } catch (\Exception $e) {
+                if ($e->getCode() == 404) {
+                    continue;
+                }
+            }
+
+            $dom = new \DOMDocument();
+            @$dom->loadHTML($response->getBody()->getContents());
+            $finder = new \DomXPath($dom);
+            $classname = "woocommerce-Price-amount amount";
+            $nodes = $finder->query("//*[contains(concat(' ', normalize-space(@class), ' '), ' $classname ')]");
+            $backupPrice = str_replace('din.', '', $nodes->item(0)->nodeValue);
+            $backupPrice = str_replace(',', '', $backupPrice);
+            $testPrice = $product->get_price();
+
+            if ($backupPrice == $testPrice) {
+                continue;
+            }
+
+            if ($testPrice > $backupPrice) {
+                $product->set_regular_price($testPrice);
+                $product->set_price($backupPrice);
+                $product->set_sale_price($backupPrice);
+                $product->set_date_on_sale_from('12/1/18');
+                $product->set_date_on_sale_to('1/15/19');
+                $product->save();
+                $total++;
+                continue;
+            }
+
+            if (!$product->is_in_stock()) {
+                continue;
+            }
+
+            if ($testPrice === "") {
+                $product->set_price($backupPrice);
+                $product->save();
+                continue;
+            }
+
+            var_dump($product_id);
+            var_dump(get_permalink($product_id));
+            var_dump($backupPrice);
+            var_dump($testPrice);
+            die();
+
+
+//            if ($product->is_on_sale()) {
+//                $total++;
+//                $product->set_date_on_sale_from('11/2/18');
+//                $product->set_date_on_sale_to('12/1/18');
+//                $product->save();
+//            }
         }
-        echo $total;
+        echo 'saved ' . $total . PHP_EOL;
+        echo 'done';
     }
 
 
     public function fixItems()
     {
 //        $pages = 21;
-        $limit = 500;
+//        $limit = 500;
 
 //        $increment = 1;
-        $start = 70;
-        $end = $start + 80;
+//        $start = 70;
+//        $end = $start + 80;
 
 
         $diff = [];
@@ -47,7 +145,7 @@ class Cli
 //        for ($i = 1; $i < $pages; $i++) {
 //        for ($i = $start; $i < $end; $i++) {
             $products_ids = wc_get_products(array(
-                'limit' => 2000,
+                'limit' => 22000,
                 'meta_key' => 'supplier',
                 'meta_value' => 252,
                 'return' => 'ids',
@@ -55,9 +153,15 @@ class Cli
             ));
 
         foreach ($products_ids as $product_id) {
+//            $sku = get_post_meta($product_id, '_sku')[0];
+//            if ($sku !== '') {
+//                echo get_post_meta($product_id, '_sku')[0] . ',';
+//            }
+
             $product = wc_get_product($product_id);
-//            var_dump($product->get_name());
-//            $product->update_meta_data('supplier', 203);
+//            $vendorcode = md5($product->get_meta('vendor_code') . $product->get_name());
+//            $product->update_meta_data('vendorcode', $vendorcode);
+//            $product->set_meta_data('vendorcode', $vendorcode);
             $product->set_status('pending');
             $product->save();
         }

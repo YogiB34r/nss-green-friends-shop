@@ -27,19 +27,61 @@ function custom_admin_order_totals_after_tax($orderid)
         $newWeight = $totalWeight - 50;
         $price = 500 + ($newWeight * 10);
     }
-    if (isset(array_keys($order->get_shipping_methods())[0])) {
+//    if (isset(array_keys($order->get_shipping_methods())[0])) {
+//        $order->remove_item(array_keys($order->get_shipping_methods())[0]);
+//        $order->set_shipping_total(0);
+//        $order->save();
+//    }
+
+    if (isset($_POST['items']) && array_search('free_shipping', \GuzzleHttp\Psr7\parse_query(urldecode($_POST['items'])))) {
         $order->remove_item(array_keys($order->get_shipping_methods())[0]);
+        $shipping = new WC_Order_Item_Shipping();
+        $shipping->set_name('Besplatna dostava');
+        $shipping->set_total(0);
+        $order->add_item($shipping);
         $order->set_shipping_total(0);
         $order->save();
     }
 
-    if (array_search('free_shipping', \GuzzleHttp\Psr7\parse_query(urldecode($_POST['items'])))) {
-
-    } elseif ($price > 0 && $order->get_shipping_total() == 0) {
-        $shipping = new WC_Order_Item_Shipping();
-        $shipping->set_total($price);
-        $order->add_item($shipping);
-        $order->set_shipping_total($price);
+    if ($price > 0 && $order->get_shipping_total() == 0) {
+        if($order->get_shipping_method() !== 'Besplatna dostava') {
+            $shipping = new WC_Order_Item_Shipping();
+            $shipping->set_total($price);
+            $order->add_item($shipping);
+            $order->set_shipping_total($price);
+            $order->save();
+        }
+    }
+    if (isset($_POST['action']) && $_POST['action'] === 'woocommerce_remove_order_item') {
+        $order->remove_item(array_keys($order->get_shipping_methods())[0]);
         $order->save();
     }
+
 }
+
+
+
+//$freeShipping = false;
+//if (isset($_POST['items']) && array_search('free_shipping', \GuzzleHttp\Psr7\parse_query(urldecode($_POST['items'])))) {
+//    $freeShipping = true;
+//    $order->remove_item(array_keys($order->get_shipping_methods())[0]);
+//    $order->set_shipping_total(0);
+//    $order->save();
+//}
+//
+////    var_dump($price);
+////    var_dump($freeShipping);
+////    var_dump($_POST['action']);
+//
+//if ((isset($_POST['action']) && $_POST['action'] == 'woocommerce_calc_line_taxes') && $price > 0 && !$freeShipping) {
+//    $order->remove_item(array_keys($order->get_shipping_methods())[0]);
+//    $order->set_shipping_total(0);
+//    $order->save();
+//
+//    $shipping = new WC_Order_Item_Shipping();
+//    $shipping->set_total($price);
+//    $order->add_item($shipping);
+//    $order->set_shipping_total($price);
+//    $order->save();
+//    echo 'saved';
+//}

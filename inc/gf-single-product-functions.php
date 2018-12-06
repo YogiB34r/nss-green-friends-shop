@@ -200,3 +200,13 @@ function check_if_product_have_sale_dates_and_print_sticker()
                 </span>';
     }
 }
+
+add_action('woocommerce_after_add_to_cart_form', 'gf_add_ordering_phone_number');
+function gf_add_ordering_phone_number() {
+    echo '<p class="phone_ordering_label">Naručite telefonom</p>';
+    echo '<p class="phone_ordering_text"><a href="tel:+381113334681">011/3334-681</a></p>
+            <p class="phone_ordering_text"><a href="tel:+381113334773">011/3334-773</a></p>
+            <p class="phone_ordering_note">radnim danima od 8-17 subotom od 10-16</p>';
+
+//    return
+}

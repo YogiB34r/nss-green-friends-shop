@@ -3,7 +3,6 @@
 
 
 //ini_set('display_errors', 1);
-
 global $wpdb;
 
 //$sw = new \Symfony\Component\Stopwatch\Stopwatch();

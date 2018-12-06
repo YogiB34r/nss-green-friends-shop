@@ -37,12 +37,40 @@ if (defined('WP_CLI') && WP_CLI) {
 }
 
 function mis() {
-    $arg = array('orderby' => 'date', 'posts_per_page' => '200', 'page' => 6);
+
+//    $item = wc_get_product(438026);
+//    new NSS_MIS_Item($item);
+//    die();
+
+    $arg = array(
+        'orderby' => 'date',
+        'posts_per_page' => '500',
+        'page' => 1,
+    );
     $orders = WC_get_orders($arg);
     foreach ($orders as $order) {
-        if (!in_array($order->get_status(), ['stornirano', 'cancelled', 'refunded', 'stornirano-pn'])) {
+        if (!in_array($order->get_status(), ['stornirano', 'cancelled', 'refunded', 'processing'])) {
             if (get_class($order) === WC_Order::class) {
-                $misOrder = new NSS_MIS_Order($order);
+
+                if ($order->get_meta('synced') !== '') {
+//                    var_dump($order->get_status());
+                } else {
+//                    var_dump($order->get_id());
+//                    var_dump($order->get_meta('synced'));
+//                    $order->add_meta_data('synced', 1);
+//                    $order->save_meta_data();
+//                    var_dump($order->get_meta('synced'));
+
+//                    die();
+                    $misOrder = new NSS_MIS_Order($order);
+                    var_dump($order->get_meta('synced'));
+                }
+            } else if (get_class($order) === WC_Order_Refund::class) {
+                continue;
+            } else {
+                var_dump($order);
+                var_dump('problem ?');
+                die();
             }
         }
     }
@@ -158,6 +186,7 @@ function passAllUsers() {
 
 function passAllProducts() {
     $cli = new \GF\Cli();
+//    $cli->saleItems();
     $cli->fixItems();
 }
 
