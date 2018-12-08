@@ -311,6 +311,6 @@ jQuery(document).ready(function ($) {
     // })
 
     //test
-    jQuery('select').select2();
+    // jQuery('select').select2();
 });
 
