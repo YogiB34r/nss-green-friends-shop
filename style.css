@@ -3569,3 +3569,6 @@ button[name='update_cart'] {
         color: #f45411;
     }
 }
+.woocommerce form .form-row .select2-container{
+    width: 100% !important;
+}

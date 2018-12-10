@@ -739,3 +739,27 @@ function gf_featured_products_admin_filter_query($query) {
     }
 }
 //admin product list filter by supplier END
+
+function insert_ciies_into_db(){
+    $file = file(__DIR__ . '/gradovi.txt');
+    $city = [];
+    $zip = [];
+    $i = 0;
+    foreach ($file as $line){
+        if($i % 2 == 0){
+            $city_and_zip_array[] = trim($line);
+        }else{
+            $zip[] = trim($line);
+        }
+
+        $i++;
+    }
+    $city_and_zip = array_combine ( $city_and_zip_array , $zip );
+    global $wpdb;
+    $i = 1;
+    foreach ($city_and_zip as $city => $zip){
+        $sql = "INSERT INTO `wp_nss_city` (`gid`, `gname`, `gzip`) VALUES ($i, '{$city}', $zip)";
+        $insert = $wpdb->query($sql);
+        $i++;
+    }
+}
