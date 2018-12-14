@@ -119,3 +119,17 @@ if (isset($_POST['query'])) {
     echo $html;
     exit();
 }
+
+
+//checkout city ajax
+if(isset($_POST)){
+//    var_dump($_POST);
+    $city = $_POST;
+    foreach ($city as $key => $value){
+        $clean_city = trim($key);
+//        var_dump($clean_city);
+        $sql = "SELECT gzip FROM wp_nss_city WHERE gname LIKE '{$clean_city}'";
+        $zip = $wpdb->get_results($sql)[0]->gzip;
+        echo $zip;
+    }
+}

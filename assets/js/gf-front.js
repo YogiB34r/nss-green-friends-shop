@@ -470,4 +470,40 @@ jQuery(document).ready(function ($) {
         $('.s-radio-btn-1').removeClass("color-orange");
     });
 
+
+//    checkout city ajax
+    $('#billing_city').change(function () {
+        var city = $('#billing_city').val();
+        console.log("changed");
+        console.log(city);
+        $.ajax({
+            type:"POST",
+            url : "/gf-ajax/",
+            data : city,
+            // async: false,
+            success : function(response) {
+                $('#billing_postcode').val(response);
+            },
+            error: function() {
+                console.log('AJAX error - city select');
+            }
+        });
+    });
+    $('#shipping_city').change(function () {
+        var city = $('#shipping_city').val();
+        console.log("changed");
+        console.log(city);
+        $.ajax({
+            type:"POST",
+            url : "/gf-ajax/",
+            data : city,
+            // async: false,
+            success : function(response) {
+                $('#shipping_postcode').val(response);
+            },
+            error: function() {
+                console.log('AJAX error - city select');
+            }
+        });
+    });
 });
