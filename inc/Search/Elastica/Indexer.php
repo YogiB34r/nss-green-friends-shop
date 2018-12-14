@@ -203,7 +203,7 @@ class Indexer
             $ponder = 1;
         }
 
-        return $ponder;
+        return $ponder * $product->get_menu_order();
     }
 
     /**

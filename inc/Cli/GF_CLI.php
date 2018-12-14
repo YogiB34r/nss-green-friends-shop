@@ -147,7 +147,7 @@ class Cli
             $products_ids = wc_get_products(array(
                 'limit' => 22000,
                 'meta_key' => 'supplier',
-                'meta_value' => 252,
+                'meta_value' => 123,
                 'return' => 'ids',
                 'paged' => 1
             ));
@@ -162,8 +162,18 @@ class Cli
 //            $vendorcode = md5($product->get_meta('vendor_code') . $product->get_name());
 //            $product->update_meta_data('vendorcode', $vendorcode);
 //            $product->set_meta_data('vendorcode', $vendorcode);
-            $product->set_status('pending');
-            $product->save();
+//            $product->set_status('pending');
+//            $product->save();
+//            if ($product->get_sale_price() == 0 || $product->get_regular_price() == 0) {
+            if ($product->get_sale_price() == 0) {
+                var_dump($product->get_sale_price());
+                $product->set_sale_price('');
+                $product->set_date_on_sale_to(null);
+                $product->set_date_on_sale_from(null);
+                $product->save();
+                var_dump($product->get_id());
+//                die();
+            }
         }
         echo 'found ' . count($products_ids) . ' items';
 die();

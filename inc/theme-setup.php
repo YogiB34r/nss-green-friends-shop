@@ -111,11 +111,9 @@ function gf_theme_and_plugins_frontend_scripts_and_styles()
     wp_enqueue_script('photoswipe', plugins_url() . '/woocommerce/assets/js/photoswipe/jquery.photoswipe.min.js');
     wp_enqueue_script('photoswipe-ui-default', plugins_url() . '/woocommerce/assets/js/photoswipe/jquery.photoswipe-ui-default.min.js');
     wp_enqueue_script('wc-single-product', plugins_url() . '/woocommerce/assets/js/frontend/single-product.min.js', ['photoswipe']);
-//    wp_enqueue_script('cookie-notice-front', plugins_url('/cookie-notice/js/front.js'), array('jquery', 'cookie', 'gf-front-js'));
 
     wp_enqueue_style('bootstrap 4.1', 'https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css');
     wp_enqueue_style('woocommerce-layout');
-//    wp_enqueue_style('woocommerce-smallscreen');
     wp_enqueue_style('woocommerce-general');
     wp_enqueue_style('gf-style-reset', get_stylesheet_directory_uri() . '/assets/css/reset.css');
     wp_enqueue_style('gf-style', get_stylesheet_directory_uri() . '/style.css', ['woocommerce-layout'], '7e853');

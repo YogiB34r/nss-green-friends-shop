@@ -154,7 +154,7 @@
             $shippingPdvInDin = $order->get_shipping_total() - $shippingNoPdv;
             ?>
             <tr>
-                <td width="30%" style="text-align: left">(<?=$product->get_sku()?>) <?=$product->get_name()?></td>
+                <td width="30%" style="text-align: left">(<?=$product->get_sku()?>) <?=$item->get_name()?></td>
 <!--                <td width="30%" style="text-align: left"><?=$product->get_name()?></td> -->
                 <td width="7%"><?=$item->get_quantity()?></td>
                 <td width="15%"><?=number_format($priceNoPdv, 2)?></td>

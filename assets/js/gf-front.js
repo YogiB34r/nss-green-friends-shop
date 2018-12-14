@@ -89,7 +89,6 @@ jQuery(document).ready(function () {
 
     jQuery('#my-search-icon-toggle').click(function () {
         jQuery('.mobile-search').toggle('slow', function() {
-            console.log('aaaa');
             jQuery('.search-field').trigger('focus');
         });
 
@@ -419,17 +418,6 @@ jQuery(document).ready(function ($) {
             });
         });
     }
-
-    // initiate checkout page event
-    if (window.location.pathname.search('placanje')) {
-        fbq('track', 'InitiateCheckout');
-    }
-
-    // initiate checkout completed page event
-    if (window.location.pathname.search('placanje')) {
-        fbq('track', 'Purchase', {value: jQuery('.woocommerce-order-overview__total .woocommerce-Price-amount').text().split('din.')[0], currency: 'RSD'});
-    }
-
 });
 jQuery(document).ready(function ($) {
     $('#ship-to-different-address-checkbox').click(); //@TODO kad se sredi css treba izbrisati

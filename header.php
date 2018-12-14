@@ -21,6 +21,7 @@
             'https://connect.facebook.net/en_US/fbevents.js');
         fbq('init', '264258047766442');
         fbq('track', 'PageView');
+
         window.addEventListener('load', function () {
             FBEvents();
         });
@@ -42,11 +43,12 @@
             }
             <?php endif; ?>
         }
-    </script>
+     </script>
     <noscript>
         <img height="1" width="1" src="https://www.facebook.com/tr?id=264258047766442&ev=PageView&noscript=1"/>
     </noscript>
     <!-- End Facebook Pixel Code -->
+
     <script>
         if (window.location.pathname === '/' && window.location.host.search('nonstopshop.rs')) {
             window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
@@ -57,8 +59,14 @@
     </script>
     <?php global $wp; ?>
     <?php if($wp->request === ''): ?>
-    <script async src="https://www.google-analytics.com/analytics.js"></script>
     <!-- WooCommerce Google Analytics Integration -->
+    <script type='text/javascript'>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga( 'create', 'UA-108239528-1', 'auto' );ga( 'set', 'anonymizeIp', true );
+        ga( 'set', 'dimension1', 'no' );
+        ga( 'require', 'ec' );
+    </script>
     <script type='text/javascript'>
         var gaProperty = 'UA-108239528-1';
         var disableStr = 'ga-disable-' + gaProperty;
@@ -70,12 +78,6 @@
             window[disableStr] = true;
         }
     </script>
-    <script type='text/javascript'>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga( 'create', 'UA-108239528-1', 'auto' );ga( 'set', 'anonymizeIp', true );
-        ga( 'set', 'dimension1', 'no' );
-        ga( 'require', 'ec' );</script>
     <!-- /WooCommerce Google Analytics Integration -->
     <?php endif; ?>
 </head>
