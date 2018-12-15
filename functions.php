@@ -123,17 +123,17 @@ function gf_custom_search_output(WP_Query $sortedProducts)
     if ($sortedProducts->have_posts()):
 //        global $sw;
         wc_setup_loop();
-        woocommerce_product_loop_start();
-        while ($sortedProducts->have_posts()) :
+    woocommerce_product_loop_start();
+    while ($sortedProducts->have_posts()) :
             $sortedProducts->the_post();
 //            do_action('woocommerce_shop_loop');
 //            $sw->start('wc_get_template_part');
-            wc_get_template_part('content', 'product');
+    wc_get_template_part('content', 'product');
 //            $sw->stop('wc_get_template_part');
-        endwhile;
+    endwhile;
 //        $sw->start('loop_end');
-        wp_reset_postdata();
-        woocommerce_product_loop_end();
+    wp_reset_postdata();
+    woocommerce_product_loop_end();
 //        $sw->stop('loop_end');
     endif;
 }
@@ -352,8 +352,9 @@ function wooc_validate_custom_field($args, $user)
         $current_pass = $_POST['password_current'];
         $passowrd_check = wp_check_password($current_pass, $user_pass_hash, $user_id);
         if (isset($_POST['password_1']) && $passowrd_check == 'true') {
-            if (strlen($_POST['password_1']) < 5)
+            if (strlen($_POST['password_1']) < 5) {
                 $args->add('error', __('Lozinka mora sadržati minimum 5 karaktera!', 'woocommerce'), '');
+            }
         }
     }
 }
@@ -424,7 +425,6 @@ function gf_remove_my_account_links($menu_links)
 add_filter('post_date_column_time', 'gf_custom_post_date_column_time', 10, 2);
 function gf_custom_post_date_column_time($h_time, $post)
 {
-
     $h_time = get_the_time(__('d/m/Y', 'woocommerce'), $post);
 
     return $h_time;
@@ -531,7 +531,8 @@ function gf_admin_phone_order_field($order)
 }
 
 add_action('save_post', 'redirect_page');
-function redirect_page() {
+function redirect_page()
+{
     switch (get_post_type()) {
         case "shop_order":
             $url = admin_url() . 'edit.php?post_type=shop_order';
@@ -542,7 +543,8 @@ function redirect_page() {
 }
 
 add_filter('woocommerce_catalog_orderby', 'wc_customize_product_sorting');
-function wc_customize_product_sorting($sorting_options) {
+function wc_customize_product_sorting($sorting_options)
+{
     $sorting_options = array(
         'menu_order' => __('Sorting', 'woocommerce'),
         'popularity' => __('Sort by popularity', 'woocommerce'),
@@ -556,14 +558,15 @@ function wc_customize_product_sorting($sorting_options) {
 }
 
 add_action('woocommerce_before_order_itemmeta', 'addItemStatusToOrderItemList', 10, 3);
-function addItemStatusToOrderItemList($itemId, $item, $c) {
+function addItemStatusToOrderItemList($itemId, $item, $c)
+{
     /* @var WC_Order_Item_Product $item */
     if (isset($_GET['post']) && $_GET['post'] && get_class($item) === WC_Order_Item_Product::class) {
         global $wpdb;
 
         $sql = "SELECT * FROM wp_nss_backorderItems WHERE orderId = {$_GET['post']} AND itemId = {$item->get_product_id()}";
         $result = $wpdb->get_results($sql);
-        require ("templates/admin/order/product-status.phtml");
+        require("templates/admin/order/product-status.phtml");
     }
 }
 
@@ -574,7 +577,8 @@ add_filter('members_check_parent_post_permission', function () {
 
 // ADDING A CUSTOM COLUMN TITLE TO ADMIN PRODUCTS LIST
 add_filter('manage_edit-product_columns', 'gf_supplier_product_list_column', 11);
-function gf_supplier_product_list_column($columns) {
+function gf_supplier_product_list_column($columns)
+{
     //add columns
     $columns['supplier'] = __('Dobavljač', 'woocommerce'); // title
     return $columns;
@@ -582,12 +586,13 @@ function gf_supplier_product_list_column($columns) {
 
 // ADDING THE DATA FOR EACH PRODUCTS BY COLUMN (EXAMPLE)
 add_action('manage_product_posts_custom_column', 'gf_supplier_product_list_column_content', 10, 2);
-function gf_supplier_product_list_column_content($column, $product_id) {
+function gf_supplier_product_list_column_content($column, $product_id)
+{
     global $post;
 
     $supplier_id = get_post_meta($product_id, 'supplier', true);
     switch ($column) {
-        case 'supplier' :
+        case 'supplier':
             echo get_user_by('ID', $supplier_id)->display_name;
             break;
     }
@@ -609,7 +614,8 @@ function gf_external_item_banners_widget_options_create_menu()
     });
 }
 
-function gf_get_order_dates() {
+function gf_get_order_dates()
+{
     $query = new WC_Order_Query(array(
         'limit' => -1,
         'return' => 'ids'
@@ -624,20 +630,21 @@ function gf_get_order_dates() {
             $order_dates[] = $date;
             $same_date = $date;
         }
-
     }
 
     return $order_dates;
 }
 
 add_filter('query_vars', 'gf_order_date_register_query_vars');
-function gf_order_date_register_query_vars($qvars) {
+function gf_order_date_register_query_vars($qvars)
+{
     $qvars[] = 'gf_order_date';
     return $qvars;
 }
 
 add_action('restrict_manage_posts', 'gf_print_order_date_picker_admin_list');
-function gf_print_order_date_picker_admin_list() {
+function gf_print_order_date_picker_admin_list()
+{
     global $typenow;
     $order_dates = gf_get_order_dates();
     if ($typenow == 'shop_order') {
@@ -655,14 +662,15 @@ function gf_print_order_date_picker_admin_list() {
 }
 
 add_action('pre_get_posts', 'gf_order_date_apply_filter');
-function gf_order_date_apply_filter($query) {
-
+function gf_order_date_apply_filter($query)
+{
     $order_date_str = $query->get('gf_order_date');
     $exploded_date = explode('/', $order_date_str);
     if (!empty($order_date_str)) {
         $meta_query = $query->get('meta_query');
-        if (empty($meta_query))
+        if (empty($meta_query)) {
             $meta_query = array();
+        }
 
 
         $meta_query[] = array(
@@ -675,12 +683,12 @@ function gf_order_date_apply_filter($query) {
         $query->set('day', $exploded_date[0]);
         $query->set('monthnum', $exploded_date[1]);
         $query->set('year', $exploded_date[2]);
-
     }
 }
 
 add_filter('bulk_actions-edit-product', 'register_gf_product_list_bulk_action');
-function register_gf_product_list_bulk_action($bulk_actions) {
+function register_gf_product_list_bulk_action($bulk_actions)
+{
     if (isset($_GET['post_type']) && $_GET['post_type'] == 'product' && isset($_GET['filter_action']) && isset($_GET['product_cat'])) {
         $bulk_actions['remove_product_from_sliders'] = 'Ukloni iz kategorije: ' . $_GET['product_cat'];
     }
@@ -689,7 +697,8 @@ function register_gf_product_list_bulk_action($bulk_actions) {
 }
 
 add_filter('handle_bulk_actions-edit-product', 'gf_product_list_bulk_action_handler', 10, 3);
-function gf_product_list_bulk_action_handler($redirect_to, $doaction, $post_ids) {
+function gf_product_list_bulk_action_handler($redirect_to, $doaction, $post_ids)
+{
     if ($doaction !== 'remove_product_from_sliders') {
         return $redirect_to;
     }
@@ -728,7 +737,8 @@ function gf_admin_product_list_supplier_filter($output)
     return $output;
 }
 add_filter('parse_query', 'gf_featured_products_admin_filter_query');
-function gf_featured_products_admin_filter_query($query) {
+function gf_featured_products_admin_filter_query($query)
+{
     global $typenow, $wp_query;
 
     if ($typenow == 'product' && !empty($_GET['product_supplier_filter'])) {
@@ -737,3 +747,38 @@ function gf_featured_products_admin_filter_query($query) {
     }
 }
 //admin product list filter by supplier END
+
+// Make custom  order reports
+
+add_filter('woocommerce_admin_reports', 'gf_custom_woocommerce_admin_reports', 10, 1);
+function gf_custom_woocommerce_admin_reports($reports)
+{
+    $sales_by_product_custom = array(
+        'sales_by_product_custom' => array(
+            'title' => 'Custom Sales by Product',
+            'description' => '',
+            'hide_title' => true,
+            'callback' => 'sales_by_product_custom_callback'
+        ),
+    );
+
+    $sales_by_status_custom = array(
+        'sales_by_status_custom' => array(
+            'title' => 'Customs Sales by Status',
+            'description' => '',
+            'hide_title' => true,
+            'callback' => 'sales_by_status_custom_callback'
+        ),
+    );
+
+    $reports['orders']['reports'] = array_merge($reports['orders']['reports'], $sales_by_product_custom);
+    $reports['orders']['reports'] = array_merge($reports['orders']['reports'], $sales_by_status_custom);
+
+    require(__DIR__ . '/templates/admin/report/gf-custom-sales-by-product.php');
+
+    require(__DIR__ . '/templates/admin/report/gf-custom-sales-by-status.php');
+
+
+
+    return $reports;
+}
