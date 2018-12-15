@@ -28,8 +28,7 @@ class Gf_Custom_Sales_By_Status extends WC_Admin_Report
      *
      * @var array
      */
-    public $show_status = array();
-
+    public $show_status;
     /**
      * Item sales.
      *
@@ -76,18 +75,6 @@ class Gf_Custom_Sales_By_Status extends WC_Admin_Report
         $legend = array();
         $index  = 0;
 
-        // var_dump($this->order_items);
-        // die();
-        // var_dump($this->show_status);
-
-
-        // var_dump($this->order_items);
-
-
-
-
-
-
         foreach ($this->show_status as $status) {
             foreach ($this->order_items as $item) {
                 if ($status === $item->post_status) {
@@ -95,9 +82,6 @@ class Gf_Custom_Sales_By_Status extends WC_Admin_Report
                 }
             }
             $product_ids = array_unique($productOrderStatusIds);
-
-            // var_dump($product_ids);
-            // die();
 
             foreach ($product_ids as $id) {
                 if (isset($this->item_sales[ $id ])) {
@@ -182,9 +166,6 @@ class Gf_Custom_Sales_By_Status extends WC_Admin_Report
             $this->item_sales_and_times = array();
 
             $this->order_items = $order_items;
-
-            // var_dump($order_items);
-            // die();
 
             if (is_array($order_items)) {
                 foreach ($order_items as $order_item) {

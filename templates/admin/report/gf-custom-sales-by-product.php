@@ -12,9 +12,7 @@ if (!class_exists('WC_Report_Sales_By_Product')) {
 function sales_by_product_custom_callback()
 {
     $customReport = new Gf_Custom_Sales_By_Product();
-    // $here = 'this is here';
-    // var_dump($here);
-    // die();
+
     $customReport->output_report();
 }
 
@@ -69,7 +67,7 @@ class Gf_Custom_Sales_By_Product extends WC_Report_Sales_By_Product
             <table cellspacing="0">
                 <?php
 
-                $defaultData = array(
+                $defaultTopSellersData = array(
                         'data'         => array(
                             '_product_id' => array(
                                 'type'            => 'order_item_meta',
@@ -93,19 +91,17 @@ class Gf_Custom_Sales_By_Product extends WC_Report_Sales_By_Product
 
 
         if (isset($_GET['best_selling_products']) && $_GET['best_selling_products'] !== 0) {
-            foreach ($defaultData as $key => $value) {
+            foreach ($defaultTopSellersData as $key => $value) {
                 if ($key === 'limit') {
-                    $defaultData[$key] = (int) $_GET['best_selling_products'];
+                    $defaultTopSellersData[$key] = (int) $_GET['best_selling_products'];
                 }
             }
         }
 
 
 
-        $top_sellers = $this->get_order_report_data($defaultData);
+        $top_sellers = $this->get_order_report_data($defaultTopSellersData);
 
-        // var_dump($top_sellers);
-        // die();
         if ($top_sellers) {
             // @codingStandardsIgnoreStart
             foreach ($top_sellers as $product) {
@@ -125,9 +121,9 @@ class Gf_Custom_Sales_By_Product extends WC_Report_Sales_By_Product
         <div class="section">
             <table cellspacing="0">
                 <?php
-                $top_freebies = $this->get_order_report_data(
-                    array(
-                        'data'         => array(
+
+                $defaultTopFreebiesData = array(
+                        'data' => array(
                             '_product_id' => array(
                                 'type'            => 'order_item_meta',
                                 'order_item_type' => 'line_item',
@@ -153,9 +149,18 @@ class Gf_Custom_Sales_By_Product extends WC_Report_Sales_By_Product
                         'group_by'     => 'product_id',
                         'limit'        => 30,
                         'query_type'   => 'get_results',
-                        'filter_range' => true,
-                    )
-                );
+                        'filter_range' => true,);
+
+
+        if (isset($_GET['best_selling_products']) && $_GET['best_selling_products'] !== 0) {
+            foreach ($defaultTopFreebiesData as $key => $value) {
+                if ($key === 'limit') {
+                    $defaultTopFreebiesData[$key] = (int) $_GET['best_selling_products'];
+                }
+            }
+        }
+
+        $top_freebies = $this->get_order_report_data($defaultTopFreebiesData);
 
         if ($top_freebies) {
             // @codingStandardsIgnoreStart
@@ -176,9 +181,9 @@ class Gf_Custom_Sales_By_Product extends WC_Report_Sales_By_Product
         <div class="section">
             <table cellspacing="0">
                 <?php
-                $top_earners = $this->get_order_report_data(
-                    array(
-                        'data'         => array(
+
+                $defaultToEarnersData = array(
+                        'data'=> array(
                             '_product_id' => array(
                                 'type'            => 'order_item_meta',
                                 'order_item_type' => 'line_item',
@@ -197,8 +202,17 @@ class Gf_Custom_Sales_By_Product extends WC_Report_Sales_By_Product
                         'limit'        => 30,
                         'query_type'   => 'get_results',
                         'filter_range' => true,
-                    )
                 );
+
+        if (isset($_GET['best_selling_products']) && $_GET['best_selling_products'] !== 0) {
+            foreach ($defaultToEarnersData as $key => $value) {
+                if ($key === 'limit') {
+                    $defaultToEarnersData[$key] = (int) $_GET['best_selling_products'];
+                }
+            }
+        }
+
+        $top_earners = $this->get_order_report_data($defaultToEarnersData);
 
         if ($top_earners) {
             // @codingStandardsIgnoreStart
