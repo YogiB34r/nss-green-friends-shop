@@ -115,8 +115,13 @@ if (get_query_var('term') !== '') {
             echo '</div>';
 
             woocommerce_product_loop_start();
+
+
             if (get_class($sortedProducts) === \Elastica\ResultSet::class) {
-                gf_custom_shop_loop($sortedProducts);
+
+                ajax_infinite_scroll();
+//                gf_custom_shop_loop($sortedProducts);
+
             } else {
                 gf_custom_search_output($sortedProducts);
             }
