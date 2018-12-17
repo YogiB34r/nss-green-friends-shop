@@ -205,3 +205,29 @@ function bbloomer_unset_gateway_by_category( $available_gateways ) {
     if ( $unset == true ) unset( $available_gateways['cod'] );
     return $available_gateways;
 }
+
+add_action('wp_footer', 'gf_cart_refresh_update_qty');
+function gf_cart_refresh_update_qty()
+{
+    if (is_cart()) {
+        ?>
+        <script type="text/javascript">
+            jQuery('div.woocommerce').on('click', 'input.qty', function () {
+                jQuery("[name='update_cart']").trigger("click");
+            });
+            jQuery('div.woocommerce').on('change', 'input.qty', function () {
+                jQuery("[name='update_cart']").trigger("click");
+            });
+        </script>
+        <?php
+    }
+}
+
+add_action('woocommerce_cart_collaterals', 'gf_cart_page_extra_buttons');
+function gf_cart_page_extra_buttons()
+{
+    if (!is_user_logged_in()) {
+        echo '<a class="gf-cart-extra-buttons d-block p-3 mb-3" href="/moj-nalog">REGISTRUJ SE</a>
+              <a class="gf-cart-extra-buttons d-block p-3" href="/placanje">NASTAVI KUPOVINU BEZ REGISTRACIJE</a>';
+    }
+}

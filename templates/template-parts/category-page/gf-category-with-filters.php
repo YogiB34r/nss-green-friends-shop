@@ -119,7 +119,7 @@ if (get_query_var('term') !== '') {
 
             if (get_class($sortedProducts) === \Elastica\ResultSet::class) {
 
-                ajax_infinite_scroll();
+                ajax_infinite_scroll($sortedProducts);
 //                gf_custom_shop_loop($sortedProducts);
 
             } else {
