@@ -430,21 +430,7 @@ add_filter('members_check_parent_post_permission', function () {
 
 
 
-//add_action('admin_menu', 'gf_external_item_banners_widget_options_create_menu');
-function gf_external_item_banners_widget_options_create_menu()
-{
-    global $wpdb;
-    $widget = new \GF\ExternalBannerWidget\ExternalBannerWidget($wpdb);
-    //create new top-level menu
-    add_menu_page('Carousel za partnerske sajtove', 'Carousel za partnere', 'administrator', 'external_item_banners_widget', function () use ($widget) {
-        $widget->admin();
-    }, null, 666);
 
-    //call register settings function
-    add_action('admin_init', function () use ($widget) {
-        $widget->register_widget_options();
-    });
-}
 
 
 
