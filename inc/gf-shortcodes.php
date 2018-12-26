@@ -106,6 +106,10 @@ add_shortcode('gf-mobile-nav-menu', 'gf_mobile_nav_menu_shortcode');
 function gf_mobile_nav_menu_shortcode()
 {
 //    if (wp_is_mobile()) {
+    global $woocommerce;
+    $cartUrl = wc_get_cart_url();
+    $cartCount = sprintf(_n('%d', '%d', $woocommerce->cart->cart_contents_count, 'woothemes'), $woocommerce->cart->cart_contents_count);
+    echo '<div class="gf-cart-icon-mobile"><a href="'.$cartUrl.'"><i class="fas fa-shopping-cart"></i><span class="shopping-cart__count">'.$cartCount.'</span></a></div>';
     echo '<div class="gf-search-icon" id="my-search-icon-toggle"><i class="fas fa-search " id="my-fancy-search"></i></div>';
     echo '<div class="gf-user-account-menu"><i class="fas fa-user" id="my-fancy-user"></i></div>';
 
