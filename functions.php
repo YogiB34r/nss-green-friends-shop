@@ -556,3 +556,4 @@ function ajax_script_load_more_backup($args)
 //add_shortcode('ajax_posts', 'script_load_more');
 
 //********* infinite scroll END *********
+
