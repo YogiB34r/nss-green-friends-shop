@@ -20,6 +20,8 @@ class Search
      */
     private $resultSet;
 
+    private $categoryId;
+
     /**
      * @TODO add logger
      *
@@ -31,10 +33,12 @@ class Search
         $this->client = $elasticaClient;
         $this->search = new \Elastica\Search($elasticaClient);
         $this->search->addIndex('product')->addType('product');
+        $this->categoryId = null;
     }
 
     public function category($categoryId, $keywords = null, $limit = 0, $currentPage = 1, $order = '')
     {
+        $this->categoryId = $categoryId;
         $boolQuery = new BoolQuery();
         $q = new Term();
         $q->setParam('status', 1);
@@ -175,10 +179,8 @@ class Search
      * @param $order
      * @return \Elastica\Query
      */
-    private function setSorting(Query $mainQuery, $boolQuery, $order)
+    private function setSorting(Query $mainQuery, BoolQuery $boolQuery, $order)
     {
-
-
         switch ($order) {
             case 'popularity':
                 $mainQuery->addSort(['order_data.viewCount' => 'desc']);
@@ -192,8 +194,15 @@ class Search
                 break;
 
             case 'date':
+                //jelke hack
+                if ($this->categoryId === 2441) {
+                    $scriptCode = 'doc["order_data.rating"].value';
+                } else {
+                    $scriptCode = 'doc["order_data.date"].value * doc["order_data.default"].value';
+                }
                 $functionQuery = new \Elastica\Query\FunctionScore();
-                $scoreFunction = new \Elastica\Script\Script('doc["order_data.date"].value * doc["order_data.default"].value');
+//                $scoreFunction = new \Elastica\Script\Script('doc["order_data.date"].value * doc["order_data.default"].value');
+                $scoreFunction = new \Elastica\Script\Script($scriptCode);
                 $functionQuery->addScriptScoreFunction($scoreFunction);
                 $functionQuery->setQuery($boolQuery);
                 $mainQuery->setSort(['_score' => 'desc']);

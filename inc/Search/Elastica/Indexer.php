@@ -38,15 +38,31 @@ class Indexer
 
         $perPage = 400;
 
-        for ($i = 0; $i < 60; $i++) {
-//        for ($i = 0; $i < 4; $i++) {
+//        for ($i = 0; $i < 60; $i++) {
+        for ($i = 0; $i < 2; $i++) {
             $offset = $i * $perPage;
+
+            $args = array(
+                'post_type'             => 'product',
+                'posts_per_page'        => '400',
+                'tax_query'             => array(
+                    array(
+                        'taxonomy'      => 'product_cat',
+                        'field' => 'term_id',
+                        'terms'         => 2441,
+                        'operator'      => 'IN'
+                    )
+                )
+            );
+            $result = new \WP_Query($args);
+            $products = $result->get_posts();
+
             $sql = "SELECT ID FROM wp_posts WHERE post_type = 'product' LIMIT {$offset}, {$perPage};";
-            $result = $wpdb->get_results($sql);
-            $wpdb->flush();
-            if (count($result) > 0) {
+//            $products = $wpdb->get_results($sql);
+//            $wpdb->flush();
+            if (count($products) > 0) {
                 $documents = [];
-                foreach ($result as $value) {
+                foreach ($products as $value) {
                     $product = wc_get_product($value->ID);
                     if (!$product) {
                         var_dump($product);
@@ -116,7 +132,6 @@ class Indexer
         }
         // @TODO solve better. when no sku detected, use post id.
         if ($product->get_sku() == "") {
-            echo $product->get_name();
             $product->set_sku(md5($product->get_id() . $product->get_name()));
         }
 
@@ -148,6 +163,10 @@ class Indexer
             $gfProduct = $wpdb->get_results($sql)[0];
             $viewCount = $gfProduct->viewCount;
         }
+        $rating = $product->get_meta('rating');
+        if (in_array(2441, $product->get_category_ids())) {
+            $rating = self::calculateOrderingRatingJelke($product);
+        }
 
         $data = [
             'postId' => $product->get_id(),
@@ -178,12 +197,12 @@ class Indexer
             ],
             'order_data' => [
                 'price' => (int) $price,
-                'rating' => $product->get_meta('rating'),
+                'rating' => $rating,
                 'date' => strtotime($product->get_date_created()),
                 'viewCount' => $viewCount,
                 'stock' => (int) $product->is_in_stock(),
                 'published' => (int) ($product->get_status() == 'publish'),
-                'default' => static::calculateOrderingRating($product),
+                'default' => self::calculateOrderingRating($product),
             ]
         ];
         return new \Elastica\Document($product->get_id(), $data);
@@ -193,17 +212,35 @@ class Indexer
      * @param \WC_Product $product
      * @return int
      */
-    private function calculateOrderingRating(\WC_Product $product)
+    private function calculateOrderingRatingJelke(\WC_Product $product)
     {
-        $ponder = 1000;
-        if ($product->get_date_on_sale_to()) {
-            $ponder = 1000000;
+        if ($product->get_menu_order() == 0) {
+            return 1;
         }
         if (!$product->is_in_stock()) {
-            $ponder = 1;
+            return 99999 - $product->get_menu_order();
+        }
+        return 999999 - $product->get_menu_order();
+    }
+
+    /**
+     * @param \WC_Product $product
+     * @return int
+     */
+    private function calculateOrderingRating(\WC_Product $product)
+    {
+        $ponder = 1;
+        if ($product->is_on_sale()) {
+            $ponder = 100;
+        }
+        if ($product->get_date_on_sale_to()) {
+            $ponder = 10000;
+        }
+        if (!$product->is_in_stock()) {
+            $ponder = 0;
         }
 
-        return $ponder * $product->get_menu_order();
+        return $ponder;
     }
 
     /**

@@ -38,12 +38,12 @@ if (isset($_GET['action'])) {
 
             break;
 
-        case 'dailyExpressCsv': // wc-spz-slanje
-            $arg = array('orderby' => 'date', 'status' => ['spz-pakovanje', 'spz-slanje'], 'posts_per_page' => '500');
-            $orders = WC_get_orders($arg);
-            createDailyExport($orders);
-
-            break;
+//        case 'dailyExpressCsv': // wc-spz-slanje
+//            $arg = array('orderby' => 'date', 'status' => ['spz-pakovanje', 'spz-slanje'], 'posts_per_page' => '500');
+//            $orders = WC_get_orders($arg);
+//            createDailyExport($orders);
+//
+//            break;
 
         case 'jitexItemExport':
             ini_set('memory_limit', '1500M');
@@ -144,9 +144,12 @@ function exportJitexOrder(WC_Order $order) {
         $variation = '';
         if (get_class($p) === WC_Product_Variation::class) {
             foreach ($p->get_variation_attributes() as $value) {
-                if (strstr($item->get_name(), $value)) {
+//                $cleanName = str_replace('(', '' , $item->get_name());
+//                $cleanName = str_replace(')', '' , $cleanName);
+//                $cleanName = strtolower(str_replace(' ', '-' , $cleanName));
+//                if (strstr($cleanName, $value)) {
                     $variation = $value;
-                }
+//                }
             }
         }
 

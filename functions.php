@@ -253,6 +253,7 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products)
     $i = 0;
     foreach ($products->getResults() as $productData) {
         $productId = $productData->postId;
+        $wcProduct = wc_get_product($productId);
         $product = new \Nss\Feed\Product($productData->getData());
         $saved_price = $product->getRegularPrice() - $product->getSalePrice();
         $price = $product->getRegularPrice();
@@ -311,8 +312,11 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products)
                 . '<span class="woocommerce-Price-currencySymbol">din.</span></span></ins>';
         }
         $html .= '</span>';
-        $html .= '<p class="loop-short-description">' . $product->getShortDescription() . '</p>';
+//        $html .= '<p class="loop-short-description">' . $product->getShortDescription() . '</p>';
+        $html .= '<p class="loop-short-description">' . $wcProduct->get_menu_order() .' - '. $productData->getData()['order_data']['default'] . '</p>';
         $html .= '</li>';
+//        var_dump($productData->getData());
+//        die();
         $i++;
     }
     $html .= '</ul>';
@@ -477,8 +481,7 @@ function gf_custom_column_ordering_for_admin_list_order($product_columns)
 }
 
 add_action('manage_shop_order_posts_custom_column', 'gf_get_order_payment_method_column');
-function gf_get_order_payment_method_column($colname)
-{
+function gf_get_order_payment_method_column($colname) {
     global $the_order; // the global order object
 
     if ($colname == 'payment_method_column') {
@@ -511,6 +514,11 @@ function gf_get_order_payment_method_column($colname)
         echo '<a class="button nssOrderJitexExport" ' . $jitexDoneStyle . ' href="/back-ajax/?action=exportJitexOrder&id=' . $the_order->get_id() . '" title="Export za Jitex" target="_blank">Export</a>';
         echo '&nbsp;';
         echo '<a class="button nssOrderAdresnica" ' . $adresnicaDoneStyle . ' href="/back-ajax/?action=adresnica&id=' . $the_order->get_id() . '" title="Kreiraj adresnicu" target="_blank">Adresnica</a>';
+        if ( $the_order->get_customer_note() ) {
+            echo '&nbsp;';
+            echo '<span class="note-on customer tips" data-tip="' . wc_sanitize_tooltip( $the_order->get_customer_note() ) . '">' . __( 'Note', 'woocommerce' ) . '</span>';
+        }
+
 //        echo $the_order->get_meta('gf_order_created_method');
     }
 }

@@ -43,7 +43,7 @@
             }
             <?php endif; ?>
         }
-     </script>
+    </script>
     <noscript>
         <img height="1" width="1" src="https://www.facebook.com/tr?id=264258047766442&ev=PageView&noscript=1"/>
     </noscript>
@@ -59,26 +59,26 @@
     </script>
     <?php global $wp; ?>
     <?php if($wp->request === ''): ?>
-    <!-- WooCommerce Google Analytics Integration -->
-    <script type='text/javascript'>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga( 'create', 'UA-108239528-1', 'auto' );ga( 'set', 'anonymizeIp', true );
-        ga( 'set', 'dimension1', 'no' );
-        ga( 'require', 'ec' );
-    </script>
-    <script type='text/javascript'>
-        var gaProperty = 'UA-108239528-1';
-        var disableStr = 'ga-disable-' + gaProperty;
-        if ( document.cookie.indexOf( disableStr + '=true' ) > -1 ) {
-            window[disableStr] = true;
-        }
-        function gaOptout() {
-            document.cookie = disableStr + '=true; expires=Thu, 31 Dec 2099 23:59:59 UTC; path=/';
-            window[disableStr] = true;
-        }
-    </script>
-    <!-- /WooCommerce Google Analytics Integration -->
+        <!-- WooCommerce Google Analytics Integration -->
+        <script type='text/javascript'>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+            })(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga( 'create', 'UA-108239528-1', 'auto' );ga( 'set', 'anonymizeIp', true );
+            ga( 'set', 'dimension1', 'no' );
+            ga( 'require', 'ec' );
+        </script>
+        <script type='text/javascript'>
+            var gaProperty = 'UA-108239528-1';
+            var disableStr = 'ga-disable-' + gaProperty;
+            if ( document.cookie.indexOf( disableStr + '=true' ) > -1 ) {
+                window[disableStr] = true;
+            }
+            function gaOptout() {
+                document.cookie = disableStr + '=true; expires=Thu, 31 Dec 2099 23:59:59 UTC; path=/';
+                window[disableStr] = true;
+            }
+        </script>
+        <!-- /WooCommerce Google Analytics Integration -->
     <?php endif; ?>
 </head>
 
