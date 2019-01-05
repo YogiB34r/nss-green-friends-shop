@@ -557,3 +557,11 @@ function ajax_script_load_more_backup($args)
 
 //********* infinite scroll END *********
 
+//remove some fields from billing form
+//ref - https://docs.woothemes.com/document/tutorial-customising-checkout-fields-using-actions-and-filters/
+function wpb_custom_billing_fields( $fields = array() ) {
+    unset($fields['billing_state']);
+
+    return $fields;
+}
+add_filter('woocommerce_billing_fields','wpb_custom_billing_fields');
