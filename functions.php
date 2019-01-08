@@ -253,7 +253,6 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products)
     $i = 0;
     foreach ($products->getResults() as $productData) {
         $productId = $productData->postId;
-        $wcProduct = wc_get_product($productId);
         $product = new \Nss\Feed\Product($productData->getData());
         $saved_price = $product->getRegularPrice() - $product->getSalePrice();
         $price = $product->getRegularPrice();
@@ -312,11 +311,8 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products)
                 . '<span class="woocommerce-Price-currencySymbol">din.</span></span></ins>';
         }
         $html .= '</span>';
-//        $html .= '<p class="loop-short-description">' . $product->getShortDescription() . '</p>';
-        $html .= '<p class="loop-short-description">' . $wcProduct->get_menu_order() .' - '. $productData->getData()['order_data']['default'] . '</p>';
+        $html .= '<p class="loop-short-description">' . $product->getShortDescription() . '</p>';
         $html .= '</li>';
-//        var_dump($productData->getData());
-//        die();
         $i++;
     }
     $html .= '</ul>';
@@ -481,7 +477,8 @@ function gf_custom_column_ordering_for_admin_list_order($product_columns)
 }
 
 add_action('manage_shop_order_posts_custom_column', 'gf_get_order_payment_method_column');
-function gf_get_order_payment_method_column($colname) {
+function gf_get_order_payment_method_column($colname)
+{
     global $the_order; // the global order object
 
     if ($colname == 'payment_method_column') {
@@ -518,8 +515,6 @@ function gf_get_order_payment_method_column($colname) {
             echo '&nbsp;';
             echo '<span class="note-on customer tips" data-tip="' . wc_sanitize_tooltip( $the_order->get_customer_note() ) . '">' . __( 'Note', 'woocommerce' ) . '</span>';
         }
-
-//        echo $the_order->get_meta('gf_order_created_method');
     }
 }
 
@@ -747,27 +742,3 @@ function gf_featured_products_admin_filter_query($query) {
     }
 }
 //admin product list filter by supplier END
-
-function insert_ciies_into_db(){
-    $file = file(__DIR__ . '/gradovi.txt');
-    $city = [];
-    $zip = [];
-    $i = 0;
-    foreach ($file as $line){
-        if($i % 2 == 0){
-            $city_and_zip_array[] = trim($line);
-        }else{
-            $zip[] = trim($line);
-        }
-
-        $i++;
-    }
-    $city_and_zip = array_combine ( $city_and_zip_array , $zip );
-    global $wpdb;
-    $i = 1;
-    foreach ($city_and_zip as $city => $zip){
-        $sql = "INSERT INTO `wp_nss_city` (`gid`, `gname`, `gzip`) VALUES ($i, '{$city}', $zip)";
-        $insert = $wpdb->query($sql);
-        $i++;
-    }
-}

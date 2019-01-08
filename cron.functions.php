@@ -12,14 +12,11 @@ include(__DIR__ . "/inc/Search/Factory/ElasticClientFactory.php");
 include(__DIR__ . "/inc/Search/Factory/ProductSetupFactory.php");
 include(__DIR__ . "/inc/Search/Factory/TermSetupFactory.php");
 
-require (__DIR__ . '/inc/Util/DailyExpressApi.php');
-
 if (defined('WP_CLI') && WP_CLI) {
     ini_set('max_execution_time', 1200);
     ini_set('display_errors', 1);
     error_reporting(E_ALL);
 
-    \WP_CLI::add_command('newsletter', 'newsletter');
 
     // elastic operations
     \WP_CLI::add_command('createElasticIndex', 'createElasticIndex');
@@ -37,45 +34,20 @@ if (defined('WP_CLI') && WP_CLI) {
     \WP_CLI::add_command('feed', $feed);
 
     \WP_CLI::add_command('mis', 'mis');
-
-
-    $api = new \GF\Util\DailyExpressApi();
-    \WP_CLI::add_command('daily', $api->sendAdresnice());
-
-}
-
-function newsletter() {
-    global $wpdb;
-
-    $sql = "SELECT * FROM wp_newsletter WHERE status = 'C' LIMIT 100000, 50000;";
-    $result = $wpdb->get_results($sql);
-    foreach ($result as $item) {
-        if (!filter_var($item->email, FILTER_VALIDATE_EMAIL)) {
-            var_dump("$item->email is unsubscribed, mail is not valid");
-            $sql = "UPDATE wp_newsletter SET status = 'U' WHERE email = '{$item->email}'";
-            if (!$wpdb->query($sql)) {
-                var_dump("failed to update email $item->email");
-            }
-        }
-        $domain = substr($item->email, strrpos($item->email, '@')+1);
-        if (!filter_var($domain, FILTER_VALIDATE_DOMAIN)) {
-            var_dump("$item->email is unsubscribed, domain is not valid");
-            $sql = "UPDATE wp_newsletter SET status = 'U' WHERE email = '{$item->email}'";
-            if (!$wpdb->query($sql)) {
-                var_dump("failed to update email $item->email");
-            }
-        }
-    }
 }
 
 function mis() {
 
-//    $item = get_product_by_sku(440041);
-//    $item = wc_get_product(8286187);
+//    $item = wc_get_product(438026);
 //    new NSS_MIS_Item($item);
+//    die();
 
-//    $order = wc_get_order(457737);
+//    $order = wc_get_order(459144);
 //    new NSS_MIS_Order($order);
+//    die();
+
+//    $user = get_user_by('id', 193943);
+//    new NSS_MIS_User($user);
 //    die();
 
     $arg = array(
