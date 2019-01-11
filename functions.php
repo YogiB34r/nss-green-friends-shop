@@ -411,14 +411,6 @@ function gf_remove_my_account_links($menu_links)
     return $menu_links;
 }
 
-add_action('woocommerce_cart_collaterals', 'gf_cart_page_extra_buttons');
-function gf_cart_page_extra_buttons()
-{
-    if (!is_user_logged_in()) {
-        echo '<a class="gf-cart-extra-buttons d-block p-3 mb-3" href="/moj-nalog">REGISTRUJ SE</a>
-              <a class="gf-cart-extra-buttons d-block p-3" href="/placanje">NASTAVI KUPOVINU BEZ REGISTRACIJE</a>';
-    }
-}
 
 add_filter('woocommerce_catalog_orderby', 'wc_customize_product_sorting');
 function wc_customize_product_sorting($sorting_options)
