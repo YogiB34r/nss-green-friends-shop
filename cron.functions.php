@@ -192,11 +192,14 @@ function passAllUsers() {
 //    }
 }
 
-function passAllProducts() {
+function passAllProducts($args) {
     $cli = new \GF\Cli();
 //    $cli->saleItems();
-    $cli->fixItems();
+//    $cli->fixItems();
+
+    $cli->fixMisPrices($args);
 }
+
 
 function createElasticIndex() {
     $elasticaClient = new \GF\Search\Factory\ElasticClientFactory();

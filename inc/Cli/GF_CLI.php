@@ -4,6 +4,60 @@ namespace GF;
 
 class Cli
 {
+    public function fixMisPrices($args)
+    {
+        $limit = 5000;
+
+        $page = 1;
+        if (isset($args[0])) {
+            $page = $args[0];
+        }
+
+
+        $total = 0;
+        $updated = [];
+        $products_ids = wc_get_products(array(
+            'limit' => $limit,
+            'return' => 'ids',
+            'paged' => $page
+        ));
+        require_once(__DIR__ . "/../../../../plugins/nss-mis/classes/NSS_MIS_Item.php");
+        require_once(__DIR__ . "/../../../../plugins/nss-mis/classes/Pricelist.php");
+        require_once(__DIR__ . "/../../../../plugins/nss-mis/classes/NSS_MIS_Client.php");
+        require_once(__DIR__ . "/../../../../plugins/nss-mis/classes/NSS_Log.php");
+
+
+        $itemId = 0;
+        if (isset($args[0])) {
+            $itemId = $args[0];
+        }
+
+
+        $item = wc_get_product($itemId);
+        echo 'syncing item ' . $item->get_id();
+        new \NSS_MIS_Item($item);
+
+//        $item = wc_get_product($itemId);
+        echo 'syncing item price for ' . $item->get_id();
+        $price = $item->get_sale_price();
+        if ($price == 0) {
+            $price = $item->get_price();
+        }
+        new \NSS\MIS\Pricelist($item->get_sku(), $price);
+        die();
+
+        foreach ($products_ids as $product_id) {
+            $product = wc_get_product($product_id);
+
+            $price = $product->get_sale_price();
+            if ($price == 0) {
+                $price = $product->get_price();
+            }
+
+            new \NSS\MIS\Pricelist($product->get_sku(), $price);
+        }
+    }
+
     public function saleItems()
     {
 //        $pages = 21;
