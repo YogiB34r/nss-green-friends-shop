@@ -59,40 +59,11 @@ function custom_admin_order_totals_after_tax($orderid)
 
 }
 
-
-
-//$freeShipping = false;
-//if (isset($_POST['items']) && array_search('free_shipping', \GuzzleHttp\Psr7\parse_query(urldecode($_POST['items'])))) {
-//    $freeShipping = true;
-//    $order->remove_item(array_keys($order->get_shipping_methods())[0]);
-//    $order->set_shipping_total(0);
-//    $order->save();
-//}
-//
-////    var_dump($price);
-////    var_dump($freeShipping);
-////    var_dump($_POST['action']);
-//
-//if ((isset($_POST['action']) && $_POST['action'] == 'woocommerce_calc_line_taxes') && $price > 0 && !$freeShipping) {
-//    $order->remove_item(array_keys($order->get_shipping_methods())[0]);
-//    $order->set_shipping_total(0);
-//    $order->save();
-//
-//    $shipping = new WC_Order_Item_Shipping();
-//    $shipping->set_total($price);
-//    $order->add_item($shipping);
-//    $order->set_shipping_total($price);
-//    $order->save();
-//    echo 'saved';
-//}
-
-
 //------------------------------------------------------------
 //*********** REMOVED FUNCTIONS FROM functions.php ***********
 //------------------------------------------------------------
 add_filter('post_date_column_time', 'gf_custom_post_date_column_time', 10, 2);
-function gf_custom_post_date_column_time($h_time, $post)
-{
+function gf_custom_post_date_column_time($h_time, $post) {
 
     $h_time = get_the_time(__('d/m/Y', 'woocommerce'), $post);
 
@@ -102,8 +73,7 @@ function gf_custom_post_date_column_time($h_time, $post)
 
 //admin order list - date column
 add_action('manage_posts_custom_column', 'gf_date_clmn');
-function gf_date_clmn($column_name)
-{
+function gf_date_clmn($column_name) {
     global $post;
     if ($column_name == 'order_date') {
         $t_time = get_the_time(__('d/m/Y H:i', 'woocommerce'), $post);
@@ -111,19 +81,8 @@ function gf_date_clmn($column_name)
     }
 }
 
-//***** ORDERS - admin *****
-//add_filter('manage_edit-shop_order_columns', 'gf_order_payment_method_column');
-//function gf_order_payment_method_column($order_columns) {
-//    $order_columns['payment_method_column'] = "Način plaćanja";
-//    $order_columns['order_phone_column'] = "Telefonom / www";
-//    $order_columns['order_shipping_price_column'] = "Dostava";
-//
-//    return $order_columns;
-//}
-
 add_filter('manage_edit-shop_order_columns', 'gf_custom_column_ordering_for_admin_list_order');
-function gf_custom_column_ordering_for_admin_list_order($product_columns)
-{
+function gf_custom_column_ordering_for_admin_list_order($product_columns) {
     return array(
         'cb' => '<input type="checkbox" />', // checkbox for bulk actions
         'order_number' => 'Narudžbina',
@@ -138,8 +97,7 @@ function gf_custom_column_ordering_for_admin_list_order($product_columns)
 }
 
 add_action('manage_shop_order_posts_custom_column', 'gf_get_order_payment_method_column');
-function gf_get_order_payment_method_column($colname)
-{
+function gf_get_order_payment_method_column($colname) {
     global $the_order; // the global order object
 
     if ($colname == 'payment_method_column') {
@@ -177,8 +135,7 @@ function gf_get_order_payment_method_column($colname)
 }
 
 add_action('woocommerce_admin_order_data_after_order_details', 'gf_admin_phone_order_field');
-function gf_admin_phone_order_field($order)
-{
+function gf_admin_phone_order_field($order) {
     $checked = true;
     if ($order->get_meta('gf_order_created_method') == 'WWW') {
         $checked = false;
@@ -192,8 +149,7 @@ function gf_admin_phone_order_field($order)
 }
 
 add_action('save_post', 'redirect_page');
-function redirect_page()
-{
+function redirect_page() {
     switch (get_post_type()) {
         case "shop_order":
             $url = admin_url() . 'edit.php?post_type=shop_order';
@@ -213,7 +169,7 @@ function addItemStatusToOrderItemList($itemId, $item, $c)
 
         $sql = "SELECT * FROM wp_nss_backorderItems WHERE orderId = {$_GET['post']} AND itemId = {$item->get_product_id()}";
         $result = $wpdb->get_results($sql);
-        require("templates/admin/order/product-status.phtml");
+        require(__DIR__ . "/../templates/admin/order/product-status.phtml");
     }
 }
 
@@ -223,7 +179,9 @@ add_filter('manage_edit-product_columns', 'gf_supplier_product_list_column', 11)
 function gf_supplier_product_list_column($columns)
 {
     //add columns
+    $columns['stockStatus'] = __('Lager', 'woocommerce'); // title
     $columns['supplier'] = __('Dobavljač', 'woocommerce'); // title
+
     return $columns;
 }
 
@@ -238,6 +196,14 @@ function gf_supplier_product_list_column_content($column, $product_id)
         switch ($column) {
             case 'supplier' :
                 echo get_user_by('ID', $supplier_id)->display_name;
+                break;
+            case 'stockStatus':
+                $product = wc_get_product($product_id);
+                if ($product->is_in_stock()) {
+                    echo 'Na stanju '. $product->get_meta('quantity') .' komada';
+                } else {
+                    echo 'Nema na stanju';
+                }
                 break;
         }
     }
@@ -341,13 +307,6 @@ function gf_product_list_bulk_action_handler($redirect_to, $doaction, $post_ids)
     return $redirect_to;
 }
 
-
-//add_action('wp_enqueue_scripts', function(){
-//    wp_enqueue_style( 'select2_css', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css' );
-//    wp_register_script( 'select2_js', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js', array('jquery'), '4.0.3', true );
-//    wp_enqueue_script('select2_js');
-//});
-
 //admin product list filter by supplier *** START ***
 add_filter('woocommerce_product_filters', 'gf_admin_product_list_supplier_filter', 10, 1);
 function gf_admin_product_list_supplier_filter($output)
@@ -384,7 +343,7 @@ function gf_featured_products_admin_filter_query($query)
 
 
 // EXTERNAL ITEM BANNERS WIDGET OPTIONS
-//add_action('admin_menu', 'gf_external_item_banners_widget_options_create_menu');
+add_action('admin_menu', 'gf_external_item_banners_widget_options_create_menu');
 function gf_external_item_banners_widget_options_create_menu()
 {
     global $wpdb;
