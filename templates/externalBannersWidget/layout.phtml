@@ -4,7 +4,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta content="charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <link rel="stylesheet" href="<?=get_stylesheet_directory_uri()?>/assets/css/flexslider.css?1" type="text/css" media="screen"/>
+    <link rel="stylesheet" href="<?=get_stylesheet_directory_uri()?>/assets/css/flexslider.css?2" type="text/css" media="screen"/>
 </head>
 <body class="loading">
 
@@ -18,24 +18,29 @@
                     </div>
                     <ul class="slides">
                         <?php foreach ($data as $key => $item): ?>
-                            <?php $url = str_replace('nssWidget', $ref, $item->itemUrl); ?>
-                            <?php if ($key > 7) { continue; } ?>
-                            <?php $k = $key + 1; ?>
+                        <?php
+                            $savingsDinars = $item->regularPrice - $item->salePrice;
+                            $savingsPercentage = 0;
+                            if ($savingsDinars) {
+                                $savingsPercentage = number_format($savingsDinars / $item->regularPrice * 100);
+                            }
+                            $itemUrl = $item->itemUrl . '?utm_source='. $source .'&utm_medium=widget';
+                        ?>
                             <li data-thumb="<?=$item->image?>">
-                                <a target="_blank" href="<?=$url . $k?>" title="<?=$item->title?>"><img src="<?=$item->imageSrc?>" alt="<?=$item->title?>" /></a>
-                                <a target="_blank"  href="<?=$url . $k?>" title="<?=$item->title?>"><h2 class="flex-caption-title" style="text-align:center;"><?=$item->title?></h2></a>
+                                <a target="_blank" href="<?=$itemUrl?>" title="<?=$item->title?>"><img src="<?=$item->imageSrc?>" alt="<?=$item->title?>" /></a>
+                                <a target="_blank"  href="<?=$itemUrl?>" title="<?=$item->title?>"><h2 class="flex-caption-title" style="text-align:center;"><?=$item->title?></h2></a>
                                 <!--<p class="flex-caption"></p>-->
-                                <span class="caption-old-price"><?=$item->price?>din</span>
+                                <span class="caption-old-price"><?=$item->regularPrice?>din</span>
                                 <span class="caption-new-price"><?=$item->salePrice?>din</span>
-                                <span class="caption-savings">Ušteda: <?=$item->savingsDinars?>din (<?=$item->savingsPercentage?>%)</span>
-                                <a target="_blank" href="<?=$url . $k?>" class="caption-others">Pogledajte slične proizvode</a>
+                                <span class="caption-savings">Ušteda: <?=$savingsDinars?>din (<?=$savingsPercentage?>%)</span>
+                                <a target="_blank" href="<?=$item->categoryUrl?>" class="caption-others">Pogledajte slične proizvode</a>
                             </li>
                         <?php endforeach; ?>
                     </ul>
                 </div>
                 <div class="master-footer">
-                    <a class="master-footer-title" target="_blank" href="https://www.nonstopshop.rs/cms/sale.php">
-                        Pogledajte TOP 100 proizvoda na akciji ovde
+                    <a class="master-footer-title" target="_blank" href="https://nonstopshop.rs/specijalne-promocije/akcija/">
+                        Pogledajte TOP proizvode na akciji ovde
                     </a>
                 </div>
             </section>
@@ -49,27 +54,29 @@
             </div>
             <ul class="slides">
                 <?php foreach ($data as $key => $item): ?>
-                    <?php $url = str_replace('nssWidget', $ref, $item->itemUrl); ?>
-                    <?php if ($key > 7) { continue; } ?>
-                    <?php $k = $key + 1; ?>
+                    <?php
+                    $savingsDinars = $item->regularPrice - $item->salePrice;
+                    $savingsPercentage = number_format($savingsDinars / $item->regularPrice * 100);
+                    $itemUrl = $item->itemUrl . '?utm_source='. $source .'&utm_medium=widget';
+                    ?>
                     <li>
-                        <a target="_blank"  href="<?=$url . $k?>" title="<?=$item->title?>">
+                        <a target="_blank"  href="<?=$itemUrl?>" title="<?=$item->title?>">
                             <img src="<?=str_replace('small/', '', $item->imageSrc)?>" alt="<?=$item->title?>" width="200" height="150" />
                         </a>
                         <div class="flex-caption">
-                            <a target="_blank"  href="<?=$url . $k?>" title="<?=$item->title?>">
+                            <a target="_blank"  href="<?=$itemUrl?>" title="<?=$item->title?>">
                                 <h3 class="flex-caption-title" style="text-align:center;"><?=$item->title?></h3>
                             </a>
-                            <span class="caption-old-price"><?=$item->price?>din</span>
+                            <span class="caption-old-price"><?=$item->regularPrice?>din</span>
                             <span class="caption-new-price"><?=$item->salePrice?>din</span>
-                            <span class="caption-savings">Ušteda: <?=$item->savingsDinars?>din (<?=$item->savingsPercentage?>%)</span>
+                            <span class="caption-savings">Ušteda: <?=$savingsDinars?>din (<?=$savingsPercentage?>%)</span>
                         </div>
                     </li>
                 <?php endforeach; ?>
             </ul>
         </div>
         <div class="master-footer">
-            <a target="_blank" href="https://www.nonstopshop.rs/cms/sale.php">
+            <a target="_blank" href="https://nonstopshop.rs/specijalne-promocije/akcija/">
                 <h4 class="master-footer-title">Pogledajte TOP 100 proizvoda na akciji ovde</h4>
             </a>
         </div>
@@ -84,10 +91,7 @@
     $(window).load(function () {
         $('.flexslider.vertical').flexslider({
             animation: "slide",
-            // Krece da radi posle tri sekunde, i na svakom slide-u se zadrzava isto toliko
             slideshowSpeed: 3000,
-            // Pauzira se no hover kapiram da je cool fora da kada neko predje  misem da se on zaustavi jer je
-            // verovatno zainteresovan za to preko cega je presao misem :)
             pauseOnHover: true,
             controlNav: "thumbnails",
             start: function (slider) {

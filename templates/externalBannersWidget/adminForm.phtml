@@ -1,33 +1,69 @@
 <div class="wrap">
-    <h2>External item banners widget options</h2>
+    <?php if (!$product): ?>
+    <h3>Dodaj novi proizvod u carousel widget</h3>
+    <?php else : ?>
+    <h3>Izmeni proizvod: <?=$product->title?></h3>
+    <?php endif; ?>
 
-    <h3>NonStopShop insert article</h3>
+    <table>
+        <tr>
+            <td>
+                <form action="" method="post" class="external-item-banners-widget-Form" id="externalItemBannersWidgetForm">
+                    <label for="sku">SKU : </label>
+                    <input id="sku" name="sku" type="text" class="regular-text skuSearch" required value="<?php
+                    if ($product) { echo $product->sku; }
+                    ?>" />
 
-    <form action="" method="post" class="external-item-banners-widget-Form" id="externalItemBannersWidgetForm">
-        <label for="itemId">Article ID (required): </label>
-        <input id="itemId" name="itemId" type="text" value="" class="regular-text" required/>
+                    <label for="title">Naslov: </label>
+                    <input id="title" name="title" type="text" class="regular-text " required value="<?php
+                    if ($product) { echo $product->title; }
+                    ?>" />
 
-        <label for="title">Article title (required): </label>
-        <input id="title" name="title" type="text" value="" class="regular-text " required/>
+                    <label for="description">Opis: </label>
+                    <textarea id="description" name="description" type="text" value="" class="regular-text" rows="5" required><?php
+                    if ($product) { echo $product->description; }
+                    ?></textarea>
 
-        <label for="description">Article description (required): </label>
-        <textarea id="description" name="description" type="text" value="" class="regular-text" rows="5" required></textarea>
+                    <label for="salePrice">Cena: </label>
+                    <input id="salePrice" name="salePrice" type="text" class="regular-text" required value="<?php
+                    if ($product) { echo $product->salePrice; }
+                    ?>" />
 
-        <label for="salePrice">Article sale price:</label>
-        <input id="salePrice" name="salePrice" type="text" value="" class="regular-text"/>
+                    <label for="regularPrice">Stara cena: </label>
+                    <input id="regularPrice" name="regularPrice" type="text" class="regular-text" value="<?php
+                    if ($product) { echo $product->regularPrice; }
+                    ?>" />
 
-        <label for="regularPrice">Article regular price (required):</label>
-        <input id="regularPrice" name="regularPrice" type="text" value="" class="regular-text" required/>
+                    <label for="categoryUrl">URL kategorije: </label>
+                    <input id="categoryUrl" name="categoryUrl" type="text" class="regular-text" required value="<?php
+                    if ($product) { echo $product->categoryUrl; }
+                    ?>" />
 
-        <label for="categoryUrl">Article category URL (required):</label>
-        <input id="categoryUrl" name="categoryUrl" type="text" value="" class="regular-text" required/>
+                    <input id="imageSrc" name="imageSrc" type="hidden" class="regular-text" value="<?php
+                    if ($product) { echo $product->imageSrc; }
+                    ?>" />
+                    <input id="image" name="image" type="hidden" class="regular-text" value="<?php
+                    if ($product) { echo $product->image; }
+                    ?>" />
+                    <input id="itemUrl" name="itemUrl" type="hidden" class="regular-text" value="<?php
+                    if ($product) { echo $product->itemUrl; }
+                    ?>" />
+                    <input id="itemId" name="itemId" type="hidden" class="regular-text" value="<?php
+                    if ($product) { echo $product->itemId; }
+                    ?>" />
 
-        <!--                <label for="itemUrl">Article URL (required):</label>-->
-        <!--                <input id="itemUrl" name="itemUrl" type="text" value="" class="regular-text" required/>-->
+                    <?php if (!$product): ?>
+                        <input type="submit" name="articleCreate" class="button button-primary" value="Kreiraj" />
+                    <?php else : ?>
+                        <input type="submit" name="articleUpdate" class="button button-primary" value="Izmeni" />
+                    <?php endif; ?>
 
-        <input type="submit" name="articleCreate" class="button button-primary" value="Create">
-        <input type="submit" name="articleUpdate" class="button button-primary" value="Update">
-    </form>
-
+                </form>
+            </td>
+            <td>
+                <img src="" width="500" class="externalCarouselItemImage" />
+            </td>
+        </tr>
+    </table>
 
 </div>
