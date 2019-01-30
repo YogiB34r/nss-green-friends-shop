@@ -3,6 +3,25 @@ $ordered_categories_ids = get_option('filter_fields_order');
 
 $second_lvl_cats = [];
 $third_lvl_cats = [];
+$additional_cats = getAdditionalCatsFor(get_queried_object_id());
+
+function getAdditionalCatsFor($catId) {
+    $cats = [];
+    foreach (getAdditionalCatIdsFor($catId) as $categoryId) {
+        $cats[] = get_term($categoryId, 'product_cat');
+    }
+
+    return $cats;
+}
+
+function getAdditionalCatIdsFor($catId) {
+    if ($catId === 1868) {
+        return [1864, 3084];
+    }
+
+    return [];
+}
+
 foreach ($ordered_categories_ids as $category_id) {
     $ordered_cat_term = get_term($category_id['term_id'], 'product_cat');
     if ($ordered_cat_term->parent !== 0) {
@@ -13,6 +32,8 @@ foreach ($ordered_categories_ids as $category_id) {
         }
     }
 }
+
+$second_lvl_cats = array_merge($second_lvl_cats, $additional_cats);
 
 if (count($second_lvl_cats) != 0) {
     echo '<div id="gf-expander-id" class="row gf-category-expander">';

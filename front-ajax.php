@@ -120,16 +120,27 @@ if (isset($_POST['query'])) {
     exit();
 }
 
+if (isset($_POST['action']) && $_POST['action'] == 'refreshCartCount') {
+    echo WC()->cart->get_cart_contents_count();
+    exit();
+}
 
-//checkout city ajax
-if(isset($_POST)){
-//    var_dump($_POST);
-    $city = $_POST;
-    foreach ($city as $key => $value){
-        $clean_city = trim($key);
-//        var_dump($clean_city);
-        $sql = "SELECT gzip FROM wp_nss_city WHERE gname LIKE '{$clean_city}'";
-        $zip = $wpdb->get_results($sql)[0]->gzip;
-        echo $zip;
-    }
+if (isset($_POST['action']) && $_POST['action'] == 'getZipCode') {
+    $city = $_POST['city'];
+    $sql = "SELECT zip FROM wp_city WHERE name = '{$city}'";
+
+    echo $wpdb->get_var($sql);
+}
+
+if (isset($_POST['action']) && $_POST['action'] == 'ajax_load_more') {
+    $page = addslashes($_POST['page']);
+    $term = addslashes($_POST['term']);
+
+    set_query_var('paged', $page);
+    set_query_var('term', $term);
+
+    $results = gf_get_category_items_from_elastic();
+    gf_custom_shop_loop($results);
+
+    exit();
 }

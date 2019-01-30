@@ -60,12 +60,47 @@ if (isset($_GET['action'])) {
 
             break;
 
-        case 'adminSearch':
-            ini_set('memory_limit', '1500M');
-            ini_set('max_execution_time', '300');
-            createJitexItemExport();
+        case 'findBySku':
+            $item = get_product_by_sku($_GET['sku']);
+            if ($item) {
+                $catUrl = '';
+                foreach ($item->get_category_ids() as $category_id) {
+                    $cat = get_term_by('id', $category_id, 'product_cat');
+                    if ($cat->parent === 0 && (!in_array($category_id, [3142])) ) {
+                        $catUrl = get_term_link($category_id, 'product_cat');
+                    }
+                }
+
+                $salePrice = $item->get_sale_price();
+                $regularPrice = $item->get_regular_price();
+                if (get_class($item) === WC_Product_Variable::class) {
+                    //@TODO check all items when different prices for variations are implemented and used
+                    $variation = wc_get_product($item->get_children()[0]);
+                    $salePrice = $variation->get_sale_price();
+                    $regularPrice = $variation->get_regular_price();
+                }
+
+                echo json_encode([
+                    'sku' => $item->get_sku(),
+                    'id' => $item->get_id(),
+                    'title' => $item->get_title(),
+                    'description' => $item->get_description(),
+                    'itemUrl' => get_permalink($item->get_id()),
+                    'categoryUrl' => $catUrl,
+                    'regularPrice' => $regularPrice,
+                    'salePrice' => $salePrice,
+                    'imageSrc' => get_the_post_thumbnail_url($item->get_id()), // 'shop_catalog' => 200x200
+                    'image' => get_the_post_thumbnail_url($item->get_id(), 'shop_catalog'),
+                ]);
+            }
 
             break;
+//        case 'adminSearch':
+//            ini_set('memory_limit', '1500M');
+//            ini_set('max_execution_time', '300');
+//            createJitexItemExport();
+//
+//            break;
     }
 }
 

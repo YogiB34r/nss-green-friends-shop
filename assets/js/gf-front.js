@@ -1,4 +1,17 @@
-jQuery(document).ready(function () {
+jQuery(document).ready(function ($) {
+    //refresh cart count
+    $.ajax({
+        type:"POST",
+        url : "/gf-ajax/",
+        data : {action:"refreshCartCount"},
+        success : function(response) {
+            $('.shopping-cart__count').html(response);
+        },
+        error: function() {
+            console.log('AJAX error - cannot refresh cart count.');
+        }
+    });
+
     var siteHeader = jQuery('.site-header');
     var siteHeaderHeight = siteHeader.height();
 
@@ -39,33 +52,6 @@ jQuery(document).ready(function () {
 
     jQuery('.gridlist-toggle a').click(function () {
         jQuery('.products .gf-sticker--center').toggleClass('gf-sticker--loop-list');
-    });
-
-    jQuery(document).scroll(function () {
-        // if (jQuery(window).scrollTop() > siteHeaderHeight) {
-        //   jQuery('.gf-header-logo').css({
-        //     'max-width': '102px',
-        //     'top': '0'
-        //   });
-        // } else {
-        //   jQuery('.gf-header-logo').css({
-        //     'max-width': '180px'
-        //   });
-        //   jQuery('body.home .gf-header-logo').css({
-        //     'max-width': '235px'
-        //   });
-        //
-        //   if (jQuery(window).width() > 767) {
-        //     jQuery('.gf-header-logo').css({
-        //       'top': '-42px'
-        //     });
-        //   }
-        //   else {
-        //     jQuery('.gf-header-logo').css({
-        //       'top': '0'
-        //     });
-        //   }
-        // }
     });
 
 
@@ -208,37 +194,6 @@ jQuery(document).ready(function () {
         jQuery('.gf-navblock').slideToggle();
         jQuery('.gf-wrapper-before span').toggleClass('fa-angle-down fa-angle-up');
     });
-
-
-    // jQuery('form.woocommerce-widget-layered-nav-dropdown, .widget_price_filter form').submit(function(e) {
-    //   e.preventDefault();
-    // });
-
-    // jQuery('.price_slider_amount button').click(function () {
-    //   let url = (location.origin).concat(location.pathname);
-    //
-    //   let filterForm = jQuery('.widget_price_filter form');
-    //   let min_price = jQuery('.widget_price_filter input[name="min_price"]').val();
-    //   let max_price = jQuery('.widget_price_filter input[name="max_price"]').val();
-    //   let filter_color= jQuery('.woocommerce-widget-layered-nav-dropdown input[name="filter_color"]').val();
-    //   let filter_size= jQuery('.woocommerce-widget-layered-nav-dropdown input[name="filter_size"]').val();
-    //   let filter_manufacturer = jQuery('.woocommerce-widget-layered-nav-dropdown input[name="filter_manufacturer"]').val();
-    //
-    //   let filterContent = jQuery.extend({}, {
-    //     min_price: min_price,
-    //     max_price: max_price,
-    //     filter_color: filter_color,
-    //     filter_size: filter_size,
-    //     filter_manufacturer: filter_manufacturer
-    //   });
-    //
-    //   jQuery.ajax({
-    //     method: 'GET',
-    //     url: url,
-    //     contentType: 'application/json; charset=utf-8',
-    //     data: filterContent
-    //   });
-    // });
 
     /**
      * Ajax search disabled
@@ -472,78 +427,73 @@ jQuery(document).ready(function ($) {
 
 
 //    checkout city ajax
-    $('#billing_city').change(function () {
-        var city = $('#billing_city').val();
-        console.log("changed");
-        console.log(city);
+    $('#billing_city, #shipping_city').change(function () {
+        var city = $(this).val();
+        var name = $(this).attr('name');
         $.ajax({
             type:"POST",
             url : "/gf-ajax/",
-            data : city,
-            // async: false,
+            data : {
+                city: city,
+                action: 'getZipCode'
+            },
             success : function(response) {
-                $('#billing_postcode').val(response);
+                if (name === 'shipping_city') {
+                    $('#shipping_postcode').val(response);
+                } else {
+                    $('#billing_postcode').val(response);
+                }
             },
             error: function() {
-                console.log('AJAX error - city select');
+                console.log('AJAX error - get zip by city');
             }
         });
     });
-    $('#shipping_city').change(function () {
-        var city = $('#shipping_city').val();
-        console.log("changed");
-        console.log(city);
-        $.ajax({
-            type:"POST",
-            url : "/gf-ajax/",
-            data : city,
-            // async: false,
-            success : function(response) {
-                $('#shipping_postcode').val(response);
-            },
-            error: function() {
-                console.log('AJAX error - city select');
-            }
-        });
-    });
-
-
 
     //*** Infinite scroll ***
-    $(window).scroll(function() {
+    var loading = false;
+    $(window).on('scroll', function() {
         //init
         var that = $('#loadMore');
         var page = $('#loadMore').data('page');
         var newPage = page + 1;
-        var ajaxurl = $('#loadMore').data('url');
-        //check
-        if ($(window).scrollTop() == $(document).height() - $(window).height()) {
+        var targetHeight = $(document).height() - ($(window).height());
 
-            //ajax call
+        // if (that.hasClass('mobile') && $(window).scrollTop() == $(document).height() - $(window).height()) {
+        // if ($(window).scrollTop() === $(document).height() - $(window).height()) {
+        if (!loading && window.scrollY > targetHeight - 100 && window.scrollY < targetHeight + 100) {
+            loading = true;
             $.ajax({
-                url: ajaxurl,
+                url: '/gf-ajax/?query=' + that.data('query'),
                 type: 'post',
                 data: {
                     page: page,
-                    action: 'ajax_script_load_more'
+                    term: that.data('term'),
+                    action: 'ajax_load_more'
                 },
                 error: function(response) {
-                    console.log(response);
+                    loading = false;
+                    // console.log(response);
                 },
                 success: function(response) {
+                    loading = false;
                     //check
                     if (response == 0) {
-                        //check
                         if ($("#no-more").length == 0) {
-                            $('#ajax-content').append('<div id="no-more" class="text-center"><h3>You reached the end of the line!</h3><p>No more posts to load.</p></div>');
+                            $('#ajax-content').append('<div id="no-more" class="text-center"><h3>Stigli ste do kraja!</h3><p>Nema proizvoda za traženi kriterijum.</p></div>');
                         }
                         $('#loadMore').hide();
                     } else {
                         $('#loadMore').data('page', newPage);
                         $('#ajax-content').append(response);
+
+                        window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+                        ga('create', 'UA-108239528-1', { 'cookieDomain': 'nonstopshop.rs' } );
+                        ga('send', 'pageview', location + 'page/' + page);
                     }
                 }
             });
         }
     });
+
 });

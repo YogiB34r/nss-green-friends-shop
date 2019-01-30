@@ -320,7 +320,7 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products)
         $html .= '</li>';
         $i++;
     }
-    $html .= '</ul>';
+//    $html .= '</ul>';
 
     echo $html;
 }
@@ -432,31 +432,6 @@ add_filter('members_check_parent_post_permission', function () {
     return false;
 });
 
-function insert_ciies_into_db()
-{
-    $file = file(__DIR__ . '/gradovi.txt');
-    $city = [];
-    $zip = [];
-    $i = 0;
-    foreach ($file as $line) {
-        if ($i % 2 == 0) {
-            $city_and_zip_array[] = trim($line);
-        } else {
-            $zip[] = trim($line);
-        }
-
-        $i++;
-    }
-    $city_and_zip = array_combine($city_and_zip_array, $zip);
-    global $wpdb;
-    $i = 1;
-    foreach ($city_and_zip as $city => $zip) {
-        $sql = "INSERT INTO `wp_nss_city` (`gid`, `gname`, `gzip`) VALUES ($i, '{$city}', $zip)";
-        $insert = $wpdb->query($sql);
-        $i++;
-    }
-}
-
 
 //@TODO Make it work
 //********* infinite scroll START *********
@@ -471,35 +446,42 @@ add_action('wp_ajax_ajax_script_load_more', 'ajax_script_load_more');
 /*
  * initial posts dispaly
  */
-function ajax_infinite_scroll($args)
-{
-    //initial posts load
-    echo '<div id="ajax-primary" class="content-area">';
-    echo '<div id="ajax-content" class="content-area">';
 
-    ajax_script_load_more($args);
-
-    echo '</div>';
-    echo '<a href="#" id="loadMore"  data-page="1" data-url="' . admin_url("admin-ajax.php") . '" ></a>';
-    echo '</div>';
-}
+//function ajax_infinite_scroll($args)
+//{
+//    //initial posts load
+//    echo '<div id="ajax-primary" class="content-area">';
+//    echo '<div id="ajax-content" class="content-area">';
+//
+//    ajax_script_load_more($args);
+//
+//    $mobile = 'desktop';
+//    if (wp_is_mobile()) {
+//        $mobile = 'mobile';
+//    }
+//
+//    echo '</div>';
+//    echo '<a href="#" id="loadMore" class="'.$mobile.'" data-page="1" data-url="' . admin_url("admin-ajax.php") . '" ></a>';
+//    echo '</div>';
+//}
 
 /*
  * load more script call back
  */
-function ajax_script_load_more($args)
-{
-    $ajax = false;
-    //check ajax call or not
-    if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-        $ajax = true;
-    }
-
-    gf_custom_shop_loop($args);
-
-    //check ajax call
-    if ($ajax) die();
-}
+//function ajax_script_load_more($args)
+//{
+//    $ajax = false;
+//    //check ajax call or not
+//    if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+//        $ajax = true;
+//    }
+//    var_dump($args);
+//
+//    gf_custom_shop_loop($args);
+//
+//    //check ajax call
+//    if ($ajax) die();
+//}
 
 function ajax_script_load_more_backup($args)
 {

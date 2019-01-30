@@ -222,11 +222,12 @@ add_filter( 'woocommerce_checkout_fields', 'gf_change_city_field_to_dropdown' );
  */
 function gf_change_city_field_to_dropdown( $fields ) {
     global $wpdb;
-    $sql = "SELECT * FROM wp_nss_city ORDER BY gname ASC";
+//    $sql = "SELECT * FROM wp_nss_city GROUP BY name ORDER BY gname ASC";
+    $sql = "SELECT distinct(name) FROM wp_city ORDER BY name ASC";
     $result = $wpdb->get_results($sql);
     $cities = [];
     foreach ($result as $city){
-        $cities[$city->gname] = $city->gname;
+        $cities[$city->name] = $city->name;
     }
     
     $city_args = wp_parse_args( array(

@@ -6,13 +6,14 @@ class Cli
 {
     public function fixMisPrices($args)
     {
-        $limit = 5000;
-
+        $limit = 1000;
         $page = 1;
         if (isset($args[0])) {
             $page = $args[0];
         }
-
+        if (isset($args[1])) {
+            $limit = $args[1];
+        }
 
         $total = 0;
         $updated = [];
@@ -26,101 +27,85 @@ class Cli
         require_once(__DIR__ . "/../../../../plugins/nss-mis/classes/NSS_MIS_Client.php");
         require_once(__DIR__ . "/../../../../plugins/nss-mis/classes/NSS_Log.php");
 
+//        $itemId = 0;
 
-        $itemId = 0;
-        if (isset($args[0])) {
-            $itemId = $args[0];
-        }
-
-
-        $item = wc_get_product($itemId);
-        echo 'syncing item ' . $item->get_id();
-        new \NSS_MIS_Item($item);
-
-//        $item = wc_get_product($itemId);
-        echo 'syncing item price for ' . $item->get_id();
-        $price = $item->get_sale_price();
-        if ($price == 0) {
-            $price = $item->get_price();
-        }
-        new \NSS\MIS\Pricelist($item->get_sku(), $price);
-        die();
-
-        foreach ($products_ids as $product_id) {
-            $product = wc_get_product($product_id);
-
-            $price = $product->get_sale_price();
-            if ($price == 0) {
-                $price = $product->get_price();
+        $failedIds = [];
+        foreach ($products_ids as $itemId) {
+            if (isset($args[2])) {
+                $itemId = $args[2];
             }
 
-            new \NSS\MIS\Pricelist($product->get_sku(), $price);
+            $item = wc_get_product($itemId);
+            echo 'syncing item ' . $item->get_id();
+            $syncItem = new \NSS_MIS_Item($item);
+            if ($syncItem->getSync() !== true) {
+                $failedIds['sync'] = $syncItem->getSync();
+                continue;
+            }
+
+            echo 'syncing item price for ' . $item->get_id();
+            if (get_class($item) === \WC_Product_Variable::class) {
+                foreach ($item->get_children() as $productId) {
+                    $variation = wc_get_product($productId);
+                    $price = $variation->get_sale_price();
+                    if ($price == 0 || $price == "") {
+                        $price = $variation->get_price();
+                    }
+                    $syncPrice = new \NSS\MIS\Pricelist($item->get_sku(), $price);
+                    if ($syncPrice->getStatus() !== true) {
+                        $failedIds['price'] = $syncPrice->getStatus();
+                    }
+                }
+            } else {
+                $price = $item->get_sale_price();
+                if ($price == 0 || $price == "") {
+                    $price = $item->get_price();
+                }
+                $syncPrice = new \NSS\MIS\Pricelist($item->get_sku(), $price);
+                if ($syncPrice->getStatus() !== true) {
+                    $failedIds['price'] = $syncPrice->getStatus();
+                }
+            }
+
+//            $syncPrice = new \NSS\MIS\Pricelist($item->get_sku(), $price);
+
         }
+
+        echo 'failed ids';
+        var_dump($failedIds);
     }
 
-    public function saleItems()
+    public function saleItems($args)
     {
-//        $pages = 21;
-        $limit = 4000;
+        $limit = 1000;
+        $page = 1;
+        if (isset($args[0])) {
+            $page = $args[0];
+        }
+        if (isset($args[1])) {
+            $limit = $args[1];
+        }
 
         $total = 0;
         $updated = [];
         $products_ids = wc_get_products(array(
             'limit' => $limit,
             'return' => 'ids',
-            'paged' => 6
+            'paged' => $page
         ));
 
         $httpClient = new \GuzzleHttp\Client();
 
         foreach ($products_ids as $product_id) {
+            if (isset($args[2])) {
+                $product_id = $args[2];
+            }
+
             $product = wc_get_product($product_id);
-            if ($product->get_date_on_sale_to())  {
-                if ($product->get_date_on_sale_to()->format('d/m/y') === '30/12/18') {
-                    continue;
-                }
-                if ($product->get_date_on_sale_to()->format('d/m/y') === '30/12/19') {
-                    continue;
-                }
-                //local  env bug skip
-                if ($product->get_date_on_sale_to()->format('d/m/y') === '14/11/19') {
-                    continue;
-                }
-                if ($product->get_date_on_sale_to()->format('d/m/y') === '14/01/19') {
-                    continue;
-                }
-                if ($product->get_date_on_sale_to()->format('d/m/y') === '29/11/19') {
-                    continue;
-                }
-                if ($product->get_date_on_sale_to()->format('d/m/y') === '30/11/18') {
-                    $product->set_date_on_sale_from('12/1/18');
-                    $product->set_date_on_sale_to('1/15/19');
-                    $product->save();
-                    continue;
-                }
-
-                var_dump($product_id);
-                var_dump(get_permalink($product_id));
-                var_dump($product->get_date_on_sale_to());
-                die();
-            }
-
-            if ($product->is_on_sale()) {
-                if (!$product->get_date_on_sale_from()) {
-                    continue;
-                }
-                var_dump($product_id);
-                var_dump(get_permalink($product_id));
-                var_dump($product->get_price());
-                var_dump($product->get_sale_price());
-                var_dump($product->get_regular_price());
-                die();
-            }
 
             $url = str_replace('https://nonstopshop.rs', 'https://nss-devel.ha.rs', get_permalink($product_id));
-//            $url = str_replace('http://nss.local', 'https://nss-devel.ha.rs', $url);
-
 //            $url = str_replace('https://nss-devel.ha.rs', 'https://nonstopshop.rs', get_permalink($product_id));
+
             try {
                 $response = $httpClient->send(new \GuzzleHttp\Psr7\Request('get', $url));
             } catch (\Exception $e) {
@@ -137,18 +122,45 @@ class Cli
             $backupPrice = str_replace('din.', '', $nodes->item(0)->nodeValue);
             $backupPrice = str_replace(',', '', $backupPrice);
             $testPrice = $product->get_price();
+            if (get_class($product) === \WC_Product_Variable::class) {
+                foreach ($product->get_children() as $productId) {
+                    $variation = wc_get_product($productId);
+                    $testPrice = $variation->get_price();
+                }
+            }
+
+//            var_dump($product_id);
+//            var_dump(get_permalink($product_id));
+//            var_dump($product->get_date_on_sale_to());
+//            var_dump($backupPrice);
+//            var_dump($testPrice);
+//            die();
 
             if ($backupPrice == $testPrice) {
                 continue;
             }
 
             if ($testPrice > $backupPrice) {
-                $product->set_regular_price($testPrice);
-                $product->set_price($backupPrice);
-                $product->set_sale_price($backupPrice);
-                $product->set_date_on_sale_from('12/1/18');
-                $product->set_date_on_sale_to('1/15/19');
-                $product->save();
+                if (get_class($product) === \WC_Product_Variable::class) {
+                    foreach ($product->get_children() as $productId) {
+                        $variation = wc_get_product($productId);
+                        $variation->set_regular_price($testPrice);
+                        $variation->set_price($backupPrice);
+                        $variation->set_sale_price($backupPrice);
+                        $variation->set_date_on_sale_from(strtotime('01/01/2019'));  // m/d/Y
+                        $variation->set_date_on_sale_to(strtotime('03/01/2019'));
+                        $variation->save();
+                    }
+                } else {
+                    $product->set_regular_price($testPrice);
+                    $product->set_price($backupPrice);
+                    $product->set_sale_price($backupPrice);
+                    $product->set_date_on_sale_from(strtotime('01/01/2019'));  // m/d/Y
+                    $product->set_date_on_sale_to(strtotime('03/01/2019'));
+                    $product->save();
+                }
+
+                var_dump(get_permalink($product_id));
                 $total++;
                 continue;
             }
@@ -158,26 +170,29 @@ class Cli
             }
 
             if ($testPrice === "") {
+                var_dump('no test price ');
+                var_dump($product_id);
+//                var_dump(get_permalink($product_id));
+                var_dump($product->get_date_on_sale_to());
+                var_dump($backupPrice);
+                var_dump($testPrice);
+                die();
                 $product->set_price($backupPrice);
                 $product->save();
                 continue;
             }
 
-            var_dump($product_id);
-            var_dump(get_permalink($product_id));
-            var_dump($backupPrice);
-            var_dump($testPrice);
-            die();
-
-
-//            if ($product->is_on_sale()) {
-//                $total++;
-//                $product->set_date_on_sale_from('11/2/18');
-//                $product->set_date_on_sale_to('12/1/18');
-//                $product->save();
-//            }
+//            var_dump($product_id);
+//            var_dump(get_permalink($product_id));
+//            var_dump($product->get_date_on_sale_to());
+//            var_dump($backupPrice);
+//            var_dump($testPrice);
+//            die();
         }
+
         echo 'saved ' . $total . PHP_EOL;
+        echo 'from' . count($products_ids) . PHP_EOL;
+
         echo 'done';
     }
 
@@ -199,9 +214,9 @@ class Cli
 //        for ($i = 1; $i < 22; $i++) {
 //        for ($i = $start; $i < $end; $i++) {
             $products_ids = wc_get_products(array(
-                'limit' => 900,
+                'limit' => 2000,
                 'meta_key' => 'supplier',
-                'meta_value' => 123,
+                'meta_value' => 198,
 //                'compare' => 'IN',
                 'return' => 'ids',
                 'paged' => 1
@@ -214,7 +229,7 @@ class Cli
 //            }
 
                 $product = wc_get_product($product_id);
-                $product->set_status('pending');
+                $product->update_meta_data('pdv', 20);
                 $product->save();
 //                var_dump($product->get_id());
 //                var_dump($product->get_name());

@@ -3,6 +3,7 @@
 // @TODO move this to class
 
 include(__DIR__ . "/inc/Cli/GF_CLI.php");
+include(__DIR__ . "/inc/Util/DailyExpressApi.php");
 include(__DIR__ . "/inc/Search/Elastica/Indexer.php");
 include(__DIR__ . "/inc/Search/Elastica/Config/ConfigInterface.php");
 include(__DIR__ . "/inc/Search/Elastica/Config/Product.php");
@@ -34,6 +35,13 @@ if (defined('WP_CLI') && WP_CLI) {
     \WP_CLI::add_command('feed', $feed);
 
     \WP_CLI::add_command('mis', 'mis');
+
+    \WP_CLI::add_command('daily', 'daily');
+}
+
+function daily() {
+    $api = new \GF\Util\DailyExpressApi();
+    $api->sendAdresnice();
 }
 
 function mis() {
@@ -194,10 +202,12 @@ function passAllUsers() {
 
 function passAllProducts($args) {
     $cli = new \GF\Cli();
-//    $cli->saleItems();
-//    $cli->fixItems();
 
-    $cli->fixMisPrices($args);
+//    $cli->saleItems($args);
+
+    $cli->fixItems();
+
+//    $cli->fixMisPrices($args);
 }
 
 

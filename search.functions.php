@@ -139,7 +139,8 @@ function gf_get_category_items_from_elastic()
         'host' => ES_HOST,
         'port' => 9200
     );
-    $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
+//    $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
+    $per_page = 24;
     $currentPage = (get_query_var('paged')) ? get_query_var('paged') : 1;
     // @TODO calculate proper page when per page param is changed
     if (isset($_POST['ppp'])) {

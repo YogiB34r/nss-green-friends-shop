@@ -116,15 +116,28 @@ if (get_query_var('term') !== '') {
 
             woocommerce_product_loop_start();
 
+            echo '<div id="ajax-primary" class="content-area">';
+            echo '<div id="ajax-content" class="content-area">';
 
             if (get_class($sortedProducts) === \Elastica\ResultSet::class) {
-
-                ajax_infinite_scroll($sortedProducts);
-//                gf_custom_shop_loop($sortedProducts);
-
+                gf_custom_shop_loop($sortedProducts);
             } else {
                 gf_custom_search_output($sortedProducts);
             }
+
+            $mobile = 'desktop';
+            if (wp_is_mobile()) {
+                $mobile = 'mobile';
+            }
+            $ppp = 12;
+            if (isset($_POST["ppp"])) {
+                $ppp = $_POST["ppp"];
+            }
+
+            echo '</div>';
+            echo '<a href="#" data-term="'.get_query_var('term').'" data-query="'. $_GET['query'] .'" 
+            data-ppp="' . $ppp .'" id="loadMore" class="'.$mobile.'" data-page="2" data-url="' . admin_url("admin-ajax.php") . '" ></a>';
+            echo '</div>';
 
             woocommerce_product_loop_end();
 
@@ -133,9 +146,12 @@ if (get_query_var('term') !== '') {
              *
              * @hooked woocommerce_pagination - 10
              */
-            echo '<div class="gf-product-controls gf-product-controls--bottom">';
-            do_action('woocommerce_after_shop_loop');
-            echo '</div>';
+            if (!wp_is_mobile()) {
+                echo '<div class="gf-product-controls gf-product-controls--bottom">';
+                do_action('woocommerce_after_shop_loop');
+                echo '</div>';
+            }
+
         } else {
             /**
              * Hook: woocommerce_no_products_found.

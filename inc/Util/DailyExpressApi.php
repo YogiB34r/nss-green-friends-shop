@@ -24,7 +24,7 @@ class DailyExpressApi
 
     public function sendAdresnice()
     {
-        $csv = file_get_contents(ABSPATH . '/wp-content/uploads/adresnice/adresnica-081118.csv');
+        $csv = file_get_contents(ABSPATH . '/wp-content/uploads/adresnice/adresnica-081118test.csv');
         $this->compileAdresniceSoapXml($csv);
         $this->call();
     }
@@ -33,6 +33,7 @@ class DailyExpressApi
     {
         $headers = ['Content-Type' => 'text/xml'];
         $request = $this->httpClient->send(new Request('POST', $this->endpoint, $headers, $this->soapXml));
+        echo $this->soapXml;
 
         var_dump($request->getBody()->getContents());
         die();

@@ -279,6 +279,26 @@ jQuery(document).ready(function ($) {
         }
     });
 
+    // $('.external-item-banners-widget-Form #sku').change(function() {
+    $('#sku').keyup(function() {
+        $.get('/back-ajax/?action=findBySku&sku=' + $(this).val(), function (JSON) {
+            $('#title').val(JSON.title);
+            $('#description').val(JSON.description);
+            if (JSON.salePrice > 0) {
+                $('#salePrice').val(JSON.salePrice);
+                $('#regularPrice').val(JSON.regularPrice);
+            } else {
+                $('#salePrice').val(JSON.regularPrice);
+            }
+            $('#categoryUrl').val(JSON.categoryUrl);
+            $('#itemUrl').val(JSON.itemUrl);
+            $('#itemId').val(JSON.id);
+            $('#imageSrc').val(JSON.imageSrc);
+            $('#image').val(JSON.image);
+            $('.externalCarouselItemImage').attr('src', JSON.imageSrc);
+        }, 'JSON');
+    });
+
     // jQuery('body').on('ready', '.wc-product-search', function() {
     // jQuery('.wc-product-search').on('ready', function() {
     //     console.log('search');

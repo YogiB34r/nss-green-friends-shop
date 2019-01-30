@@ -96,8 +96,8 @@ function gf_cart_shortcode()
        title="<?php _e('Cart View', 'green-friends'); ?>">
         <p class="gf-header-cart__title">
             <i class="fas fa-shopping-cart"></i> <span
-                    class="shopping-cart__count"><?php echo sprintf(_n('%d', '%d', $woocommerce->cart->cart_contents_count, 'woothemes'),
-                    $woocommerce->cart->cart_contents_count); ?></span>Korpa</p>
+                    class="shopping-cart__count"><?php echo sprintf(_n('%d', '%d', WC()->cart->get_cart_contents_count(), 'woothemes'),
+                    WC()->cart->get_cart_contents_count()); ?></span>Korpa</p>
     </a>
     <?php
 }
@@ -108,7 +108,7 @@ function gf_mobile_nav_menu_shortcode()
 //    if (wp_is_mobile()) {
     global $woocommerce;
     $cartUrl = wc_get_cart_url();
-    $cartCount = sprintf(_n('%d', '%d', $woocommerce->cart->cart_contents_count, 'woothemes'), $woocommerce->cart->cart_contents_count);
+    $cartCount = sprintf(_n('%d', '%d', WC()->cart->cart_contents_count, 'woothemes'), WC()->cart->cart_contents_count);
     echo '<div class="gf-cart-icon-mobile"><a href="'.$cartUrl.'"><i class="fas fa-shopping-cart"></i><span class="shopping-cart__count">'.$cartCount.'</span></a></div>';
     echo '<div class="gf-search-icon" id="my-search-icon-toggle"><i class="fas fa-search " id="my-fancy-search"></i></div>';
     echo '<div class="gf-user-account-menu"><i class="fas fa-user" id="my-fancy-user"></i></div>';
@@ -118,7 +118,7 @@ function gf_mobile_nav_menu_shortcode()
     <li class="gf-mobile-menu__link">
         <a class="gf-header-cart" href="<?php echo wc_get_cart_url(); ?>"
            title="<?php _e('Cart View', 'green-friends'); ?>">
-            Korpa(<?php echo sprintf(_n('%d', '%d', $woocommerce->cart->cart_contents_count, 'woothemes'), $woocommerce->cart->cart_contents_count); ?>
+            Korpa(<?php echo sprintf(_n('%d', '%d', WC()->cart->cart_contents_count, 'woothemes'), WC()->cart->cart_contents_count); ?>
             )
         </a>
     </li>
