@@ -35,7 +35,7 @@ function gf_elastic_search_with_data($input, $limit = 0)
         'host' => ES_HOST,
         'port' => 9200
     );
-    $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
+    $per_page = 24;
     $currentPage = (get_query_var('paged')) ? get_query_var('paged') : 1;
     if (isset($_POST['ppp'])) {
         $per_page = ($_POST['ppp'] > 48) ? 48 : $_POST['ppp'];
