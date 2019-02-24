@@ -225,7 +225,7 @@ function gf_change_city_field_to_dropdown( $fields ) {
 //    $sql = "SELECT * FROM wp_nss_city GROUP BY name ORDER BY gname ASC";
     $sql = "SELECT distinct(name) FROM wp_city ORDER BY name ASC";
     $result = $wpdb->get_results($sql);
-    $cities = [];
+    $cities = ['' => ''];
     foreach ($result as $city){
         $cities[$city->name] = $city->name;
     }
