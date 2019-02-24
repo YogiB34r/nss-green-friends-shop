@@ -56,7 +56,10 @@
                 <?php foreach ($data as $key => $item): ?>
                     <?php
                     $savingsDinars = $item->regularPrice - $item->salePrice;
-                    $savingsPercentage = number_format($savingsDinars / $item->regularPrice * 100);
+                    $savingsPercentage = 0;
+                    if ($savingsDinars) {
+                        $savingsPercentage = number_format($savingsDinars / $item->regularPrice * 100);
+                    }
                     $itemUrl = $item->itemUrl . '?utm_source='. $source .'&utm_medium=widget';
                     ?>
                     <li>
