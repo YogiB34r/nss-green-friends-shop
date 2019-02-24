@@ -6,10 +6,10 @@ if (isset($_GET['type']) && $_GET['type'] === 'category') {
     $cats = explode("\n", file_get_contents(__DIR__ . '/old.cats.map.csv'));
     $category = false;
     foreach ($cats as $catDataString) {
+        $catData = str_getcsv($catDataString, ",", '"');
         if ($catData[0] === '') {
             continue;
         }
-        $catData = str_getcsv($catDataString, ",", '"');
 
         if (isset($catData[3])) {
             if (in_array($id, explode(',', $catData[3]))) {
@@ -38,7 +38,12 @@ if (isset($_GET['type']) && $_GET['type'] === 'category') {
     }
 }
 
-$sku = $_GET['id'];
+if (isset($_GET['type']) && $_GET['type'] === 'comment') {
+    $sku = $_GET['itemId'];
+} else {
+    $sku = $_GET['id'];
+}
+
 $wcproduct = get_product_by_sku($sku);
 if (!$wcproduct) {
 //global $wp_query;
