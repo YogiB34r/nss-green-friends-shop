@@ -23,7 +23,7 @@ function gf_check_if_slug_is_in_url_and_product_count()
     return $resault;
 }
 
-//@TODO fix typo here !!
+//@TODO fix typos here !!
 function gf_check_for_second_level_categories() {
     global $wp;
     $resault = '';
@@ -59,7 +59,7 @@ function gf_check_for_second_level_categories() {
 
 add_action('woocommerce_archive_description', 'gf_display_categories_on_archive_page', 15);
 function gf_display_categories_on_archive_page() {
-    if (is_product_category() and !isset($_GET['query'])) {
+    if (is_product_category() && !isset($_GET['query'])) {
         get_template_part('templates/template-parts/category-page/gf-module-for-categories');
     }
     if (isset($_GET['query'])){
