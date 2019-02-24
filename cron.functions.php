@@ -46,11 +46,18 @@ function daily() {
 
 function mis() {
 
-//    $item = wc_get_product(438026);
+//    $item = wc_get_product(408157);  //408157
 //    new NSS_MIS_Item($item);
 //    die();
 
-//    $order = wc_get_order(459144);
+//    $orderIds = [465270, 465314, 465287, 465272, 465264, 465280, 465222, 465273, 465263, 465277, 465238, 465292, 465613];
+//    $orderIds = [466062];
+//    foreach ($orderIds as $orderId) {
+//        $order = wc_get_order($orderId);
+//        new NSS_MIS_Order($order);
+//    }
+//    die();
+//    $order = wc_get_order(465265);
 //    new NSS_MIS_Order($order);
 //    die();
 

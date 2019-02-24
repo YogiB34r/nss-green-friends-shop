@@ -131,32 +131,6 @@ function gf_check_level_of_category($cat_id) {
     }
 }
 
-//function gf_check_level_of_category($cat_id) {
-//    $result = null;
-//    $top_level_ids = [];
-//    $second_level_ids = [];
-//    $third_level_ids = [];
-//    foreach (gf_get_top_level_categories() as $category) {
-//        $top_level_ids[] = $category->term_id;
-//    }
-//    foreach (gf_get_second_level_categories() as $category) {
-//        $second_level_ids[] = $category->term_id;
-//    }
-//    foreach (gf_get_third_level_categories() as $category) {
-//        $third_level_ids[] = $category->term_id;
-//    }
-//    if (in_array($cat_id, $top_level_ids)) {
-//        $result = 1;
-//    }
-//    if (in_array($cat_id, $second_level_ids)) {
-//        $result = 2;
-//    }
-//    if (in_array($cat_id, $third_level_ids)) {
-//        $result = 3;
-//    }
-//    return $result;
-//}
-
 function gf_get_category_children_ids($slug) {
     $cat = get_term_by('slug', $slug, 'product_cat');
     $childrenIds = [];
@@ -252,4 +226,107 @@ function gf_migrate_comments()
     fwrite($userLogFile, implode(',', $emptyUsers));
     fclose($userLogFile);
     echo '<p>Uspešno importovano ' . count($successfulComments) . ' komentara</p>';
+}
+
+
+//function feedCronStarter() {
+//    if (!wp_next_scheduled('feedCronStarter')) {
+//        wp_schedule_event(time(), 'every5minutes', 'feedCronStarter');
+//    }
+//
+//}
+
+
+//if (!wp_next_scheduled('feedCronStarter')) {
+//    wp_schedule_event(time(), 'newsletter', 'feedCronStarter');
+//}
+
+//nss_feed_start([]);
+
+add_action('feedCronStarter', 'nss_feed_start');
+add_action('feedCronFillQueue', 'nss_feed_parse');
+add_action('feedCronProcessQueue', 'nss_feed_process_queue');
+function nss_feed_start() {
+    $activeSuppliers = [
+//        268, // vitapur
+        252, // a sport
+    ];
+
+    foreach (SUPPLIERS as $supplierId => $supplierData) {
+        if (in_array($supplierId, $activeSuppliers)) {
+            wp_schedule_single_event(time(), 'feedCronFillQueue', [$supplierId, $supplierData['name']]);
+        }
+    }
+}
+
+function nss_feed_parse($supplierId, $name) {
+    \NSS_Log::log('nss_feed_parse start');
+//    $supplierId = $args[0];
+//    $name = $args[1];
+    $from = 'mailer@nonstopshop.rs';
+    $headers = [
+        'Content-Type: text/html; charset=UTF-8',
+        "From: NonStopShop <'{$from}'>",
+    ];
+    $to[] = 'djavolak@mail.ru';
+    $subject = 'NSS feed cron report - parse items for: ' . SUPPLIERS[$supplierId]['name'];
+
+    $message = nss_feed_queue($supplierId);
+    wp_schedule_single_event(time(), 'feedCronProcessQueue', [$supplierId]);
+
+    wp_mail($to, $subject, $message, $headers);
+    \NSS_Log::log('nss_feed_parse done');
+}
+
+function nss_feed_process_queue($supplierId) {
+//    \NSS_Log::log('nss_feed_process started');
+    $from = 'mailer@nonstopshop.rs';
+    $headers = [
+        'Content-Type: text/html; charset=UTF-8',
+        "From: NonStopShop <'{$from}'>",
+    ];
+    $to[] = 'djavolak@mail.ru';
+    $subject = 'NSS feed cron report - process queue for: ' . SUPPLIERS[$supplierId]['name'];
+    $message = nss_feed_process($supplierId);
+
+    wp_mail($to, $subject, $message, $headers);
+    \NSS_Log::log('nss_feed_process done');
+}
+
+function nss_feed_process($supplierId) {
+    global $wpdb;
+
+    $httpClient = new \GuzzleHttp\Client(['defaults' => [
+        'verify' => false
+    ]]);
+    $redis = new \Redis();
+    $redis->connect(REDIS_HOST);
+
+//    $key = 'importFeedQueueCreate:' . SUPPLIERS[$args[0]]['name'] .':';
+//    $importer = new \Nss\Feed\Importer($this->redis, $this->wpdb, $this->httpClient, $key);
+
+    $key = 'importFeedQueueUpdate:' . SUPPLIERS[$supplierId]['name'] .':';
+    $importer = new \Nss\Feed\Importer($redis, $wpdb, $httpClient, $key);
+
+    $message = $importer->importItems(0, 1000);
+
+    return $message;
+}
+
+function nss_feed_queue($supplierId) {
+    $httpClient = new \GuzzleHttp\Client(['defaults' => [
+        'verify' => false
+    ]]);
+    $redis = new \Redis();
+    $redis->connect(REDIS_HOST);
+
+    $parser = \Nss\Feed\ParserFactory::make(SUPPLIERS[$supplierId], $httpClient, $redis);;
+    $stats = $parser->processItems();
+
+    $message = 'Parse completed successfully.' . "\r\n";
+    $message .= print_r($stats, true);
+//    $message .= print_r($args, true);
+    $message .= $parser->parseErrors();
+
+    return $message;
 }

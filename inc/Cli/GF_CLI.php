@@ -206,7 +206,6 @@ class Cli
 //        $start = 70;
 //        $end = $start + 80;
 
-
         $diff = [];
         $html = '';
         $total = 0;
@@ -216,6 +215,7 @@ class Cli
             $products_ids = wc_get_products(array(
                 'limit' => 2000,
                 'meta_key' => 'supplier',
+//                'meta_value' => 268,
                 'meta_value' => 198,
 //                'compare' => 'IN',
                 'return' => 'ids',
@@ -223,20 +223,22 @@ class Cli
             ));
 
             foreach ($products_ids as $product_id) {
-//            $sku = get_post_meta($product_id, '_sku')[0];
-//            if ($sku !== '') {
-//                echo get_post_meta($product_id, '_sku')[0] . ',';
-//            }
-
                 $product = wc_get_product($product_id);
-                $product->update_meta_data('pdv', 20);
-                $product->save();
-//                var_dump($product->get_id());
-//                var_dump($product->get_name());
-//                var_dump($product->get_sku());
+//                $product->update_meta_data('quantity', 0);
+//                $product->set_weight(0.5);
+//                $product->set_status('pending');
+//                $product->save();
+
+                if ($product->get_status() === 'pending') {
+                    $product->delete();
+                    $product->save();
+                    $updated[] = $product_id;
+                }
+
             }
 //        }
-        echo 'found ' . count($products_ids) . ' items';
+//        echo 'found ' . count($products_ids) . ' items';
+        echo 'deleted ' . count($updated) . ' items';
 die();
             $fields = [];
             foreach ($products_ids as $product_id) {
