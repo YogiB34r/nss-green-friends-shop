@@ -15,7 +15,7 @@ if (isset($_GET['action'])) {
         case 'printPreorder':
             $printMenu = false;
             $order = wc_get_order($_GET['id']);
-            printPreorder($order);
+            echo printPreorder($order);
 
             break;
 
@@ -60,6 +60,14 @@ if (isset($_GET['action'])) {
 
             break;
 
+        case 'mis':
+            if ($_GET['type'] === 'order') {
+                $order = wc_get_order($_GET{'id'});
+                new NSS_MIS_Order($order);
+            }
+
+            break;
+
         case 'findBySku':
             $item = get_product_by_sku($_GET['sku']);
             if ($item) {
@@ -95,12 +103,70 @@ if (isset($_GET['action'])) {
             }
 
             break;
-//        case 'adminSearch':
-//            ini_set('memory_limit', '1500M');
-//            ini_set('max_execution_time', '300');
-//            createJitexItemExport();
-//
-//            break;
+
+        case 'getAdresnice':
+            $fileName = 'adresnica-' . date('dmy') . '.csv';
+            $adresnicaPath = ABSPATH . '../wp-content/uploads/adresnice/' . $fileName;
+            header('Content-Disposition: attachment; filename="' . $fileName . '"');
+            header("Content-Transfer-Encoding: binary");
+            header('Content-type: text/csv');
+            header('Expires: 0');
+            header('Pragma: no-cache');
+            echo file_get_contents($adresnicaPath);
+
+            break;
+
+        // served it's purpose, if everything ok delete this
+        case 'fixAdresnice':
+            ini_set('max_execution_time', 600);
+            $zipArchive = new ZipArchive();
+            $zipPath = generateUploadsPath() . date('Ymd') .'-adresnice-fix.zip';
+            $open = $zipArchive->open($zipPath, ZipArchive::CREATE);
+            if ($open !== true) {
+                var_dump($open);
+                die('cannot open');
+            }
+
+            $orderIds = [];
+            $sors = file_get_contents(__DIR__ . '/adresnica-200219.csv');
+            foreach (explode("\n", $sors) as $key => $line) {
+                if ($key === 0) {
+                    continue;
+                }
+                $orderNo = explode('|', $line)[0];
+                if (!isset(explode('-', $orderNo)[1])) {
+                    continue;
+                }
+                $orderId = explode('-', $orderNo)[1];
+                if ($orderId === '') {
+                    continue;
+                }
+                $order = wc_get_order($orderId);
+                if (!$order) {
+                    var_dump($orderId);
+                    var_dump($order);
+                    die();
+                }
+
+                $path = createAdresnicaPdf($order);
+                if (file_exists($path) && is_readable($path)) {
+                    $add = $zipArchive->addFile($path, basename($path));
+                } else {
+                    var_dump('there was a problem reading file: ' . $path);
+                    die();
+                }
+                if ($add !== true) {
+                    var_dump('could not add file to archive');
+                }
+            }
+            if ($zipArchive->close() !== true) {
+                var_dump('could not close archive.');
+                die();
+            }
+            $path = str_replace('public_html', '', str_replace(strstr($zipPath, 'public_html', true), '', $zipPath));
+            echo $path;
+
+            break;
     }
 }
 
@@ -157,87 +223,28 @@ function createJitexItemExport() {
 
 function createAdresnica($orderId) {
     $order = wc_get_order($orderId);
-    $html = '';
-    $order->update_status('spz-slanje');
-    $order->update_meta_data('adresnicaCreated', 1);
-    $order->save();
+    $path = createAdresnicaPdf($order);
 
-    require (__DIR__ . '/templates/orders/adresnica.phtml');
+    header("Cache-Control: public");
+    header("Content-Description: File Transfer");
+    header('Content-type: text/plain');
+    header("Content-Disposition: attachment; filename=".basename($path));
+    header('Content-Transfer-Encoding: binary');
 
-//    $html2pdf = new \Spipu\Html2Pdf\Html2Pdf('P', 'A4', 'en', true, 'Windows-1252');
-    $html2pdf = new \Spipu\Html2Pdf\Html2Pdf();
-    $html2pdf->writeHTML($html);
-    $name = 'Adresnica-'.$order->get_order_number().'.pdf';
-    $html2pdf->output($name, 'D');
+    echo file_get_contents($path);
 }
 
 function exportJitexOrder(WC_Order $order) {
-    $string = '';
-    /* @var \WC_Order_Item_Product $item */
-    foreach ($order->get_items() as $item) {
-        $p = wc_get_product($item->get_product()->get_id());
-        $variation = '';
-        if (get_class($p) === WC_Product_Variation::class) {
-            foreach ($p->get_variation_attributes() as $value) {
-//                $cleanName = str_replace('(', '' , $item->get_name());
-//                $cleanName = str_replace(')', '' , $cleanName);
-//                $cleanName = strtolower(str_replace(' ', '-' , $cleanName));
-//                if (strstr($cleanName, $value)) {
-                    $variation = $value;
-//                }
-            }
-        }
-
-        if ($p->get_parent_id()) {
-            $p = wc_get_product($p->get_parent_id());
-        }
-        $name = $order->get_billing_first_name() .' '. $order->get_billing_last_name();
-        if ($order->get_meta('_billing_pib') != '') {
-            $name = $order->get_billing_company();
-        }
-        $variantId = $p->get_sku() . $variation;
-        $variantName = str_replace('-', '', $item->get_name());
-        $date = $order->get_date_created()->format('d.m.Y');
-        $itemPrice = (int) $item->get_total() / $item->get_quantity();
-        $modifier = (float) '1' .'.'. (int) number_format($p->get_meta('pdv'));
-        $priceNoPdv = number_format($itemPrice / $modifier, 2, ',', '.');
-        $priceFormated = number_format($itemPrice, 2, ',', '.');
-        $string .= $name."\t".$order->get_billing_address_1()."\t".$order->get_billing_postcode()."\t".$order->get_billing_city()."\t"."Srbija"."\t".
-        $order->get_billing_phone()."\t".$order->get_order_number()."\t".$date."\t".$order->get_payment_method_title()."\t".$variantId."\t".$variantName."\t".
-            $item->get_quantity()."\t".$priceNoPdv."\t".$priceFormated."\t".$order->get_billing_company()."\t".$order->get_meta('_billing_pib')."\r\n";
-    }
-    $order->update_meta_data('jitexExportCreated', 1);
-    $order->save();
-    $shippingNoPdv = number_format($order->get_shipping_total() / 1.2, 2, ',', '.');
-
-    $string .= $name."\t".$order->get_billing_address_1()."\t".$order->get_billing_postcode()."\t".$order->get_billing_city()."\t"."Srbija"."\t".
-        $order->get_billing_phone()."\t".$order->get_order_number()."\t".$date."\t".$order->get_payment_method_title()."\t9999\tDostava\t1\t".
-        $shippingNoPdv."\t".number_format($order->get_shipping_total(), 2, ',', '.')."\t".$order->get_billing_company();
+    $csvText = parseJitexDataFromOrder($order);
 
     header('Content-Disposition: attachment; filename="' . $order->get_order_number() . '.txt' . '"');
     header("Content-Transfer-Encoding: binary");
     header('Expires: 0');
     header('Pragma: no-cache');
-    print iconv('utf-8','windows-1250',str_replace(array('Ð', 'ð'), array('Đ', 'đ'), $string));
+
+    print iconv('utf-8','windows-1250',str_replace(array('Ð', 'ð'), array('Đ', 'đ'), $csvText));
 }
 
 function printOrder(WC_Order $order) {
     require (__DIR__ . '/templates/orders/printRacun.phtml');
 }
-function printPreorder(WC_Order $order) {
-
-    ob_start();
-    require (__DIR__ . '/templates/orders/printPredracun.phtml');
-    $html = ob_get_clean();
-
-    echo $html;
-
-//    $html2pdf = new \Spipu\Html2Pdf\Html2Pdf();
-//    $html2pdf->writeHTML($html);
-//    $name = 'Racun-'.$order->get_order_number().'.pdf';
-//    $html2pdf->output($name, 'D');
-}
-
-
-
-

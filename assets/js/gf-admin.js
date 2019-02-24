@@ -228,20 +228,25 @@ jQuery(document).ready(function ($) {
         $('.filter-fields-list').sortable({
             handle: "h2",
             axis: 'y',
+            containment: 'parent',
             cursor: 'move',
-            items: 'li'
+            items: '> li'
         });
         $('.parent-cat-children').sortable({
-            handle: "h4",
+            handle: "> h4",
             axis: 'y',
             cursor: 'move',
-            items: 'li'
+            containment: 'parent',
+            // connectWith: '.parent-cat-children',
+            items: 'li.child-cat'
         });
         $('.child-cat-children').sortable({
-            handle: "h5",
+            handle: "> h4",
             axis: 'y',
             cursor: 'move',
-            items: 'li'
+            containment: 'parent',
+            // connectWith: 'ul.child-cat-children',
+            items: 'li.child-child-cat'
         });
     }
 
