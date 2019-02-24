@@ -39,7 +39,9 @@
                 var price = doc.item(0).getElementsByClassName('woocommerce-Price-amount').item(0).textContent;
                 price = price.split('din')[0];
                 price = price.replace(',', '.');
-                fbq('track', 'Purchase', {value: price, currency: 'RSD'});
+                if (price != '') {
+                    fbq('track', 'Purchase', {value: price, currency: 'RSD'});
+                }
             }
             <?php endif; ?>
         }
