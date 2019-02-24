@@ -22,6 +22,7 @@ if ($sexyShopCats){
  */
 $sortedProducts = false;
 $useElastic = true;
+$action = 'category';
 
 /* @TODO make it better ... */
 if (get_query_var('term') !== '') {
@@ -34,6 +35,7 @@ if (get_query_var('term') !== '') {
     if (!isset($_GET['query'])) {
         header('Location: ' . home_url());
     }
+    $action = 'search';
     if ($useElastic) {
         $sortedProducts = gf_elastic_search_with_data($_GET['query']);
     } else {
@@ -129,14 +131,19 @@ if (get_query_var('term') !== '') {
             if (wp_is_mobile()) {
                 $mobile = 'mobile';
             }
-            $ppp = 12;
-            if (isset($_POST["ppp"])) {
-                $ppp = $_POST["ppp"];
+            $ppp = 24;
+//            if (isset($_POST["ppp"])) {
+//                $ppp = $_POST["ppp"];
+//            }
+
+            $searchQuery = '';
+            if (isset($_GET['query'])) {
+                $searchQuery = $_GET['query'];
             }
 
             echo '</div>';
-            echo '<a href="#" data-term="'.get_query_var('term').'" data-query="'. $_GET['query'] .'" 
-            data-ppp="' . $ppp .'" id="loadMore" class="'.$mobile.'" data-page="2" data-url="' . admin_url("admin-ajax.php") . '" ></a>';
+            echo '<a href="#" data-term="'.get_query_var('term').'" data-query="'. $searchQuery .'" data-action="'.$action.'"
+            data-ppp="' . $ppp .'" id="loadMore" class="'.$mobile.'" data-page="1" data-url="' . admin_url("admin-ajax.php") . '" ></a>';
             echo '</div>';
 
             woocommerce_product_loop_end();

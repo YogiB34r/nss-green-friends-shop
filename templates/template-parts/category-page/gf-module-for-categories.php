@@ -15,6 +15,9 @@ function getAdditionalCatsFor($catId) {
 }
 
 function getAdditionalCatIdsFor($catId) {
+    //disabled
+    return [];
+
     if ($catId === 1868) {
         return [1864, 3084];
     }
@@ -22,8 +25,8 @@ function getAdditionalCatIdsFor($catId) {
     return [];
 }
 
-foreach ($ordered_categories_ids as $category_id) {
-    $ordered_cat_term = get_term($category_id['term_id'], 'product_cat');
+foreach ($ordered_categories_ids as $category_id => $catData) {
+    $ordered_cat_term = get_term($category_id, 'product_cat');
     if ($ordered_cat_term->parent !== 0) {
         if ($ordered_cat_term->parent == get_queried_object_id()) {
             $second_lvl_cats[] = $ordered_cat_term;
