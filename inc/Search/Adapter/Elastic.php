@@ -64,4 +64,14 @@ class Elastic implements \GF\Search\AdapterInterface
 
 //        return array_merge($allIds, array_keys($productsOutOfStock));
     }
+
+    public function getAllItems($limit, $page, $order)
+    {
+        $this->search->search('', $limit, $page, $order);
+        $items = $this->search->getResultSet();
+
+        return $items->getResults();
+    }
+
+
 }

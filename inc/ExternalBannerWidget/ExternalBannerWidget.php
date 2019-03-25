@@ -22,6 +22,7 @@ class ExternalBannerWidget
     {
         $key = sprintf('%s-%s-%s', self::CACHE_KEY, $template, $source);
         $html = $this->cache->redis->get($key);
+        $html = false;
         if ($html === false) {
             $get_items_sql = "SELECT * FROM `wp_nss_external_banners_widget`";
             $data = $this->wpdb->get_results($get_items_sql);

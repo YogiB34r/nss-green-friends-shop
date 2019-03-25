@@ -177,10 +177,10 @@ function show_sale_date_from_to_single_product()
 {
     global $product;
 
-    $product_sale_date_from = get_post_meta($product->get_id(), '_sale_price_dates_from', true);
-    $product_sale_date_to = get_post_meta($product->get_id(), '_sale_price_dates_to', true);
+    $product_sale_date_from = strtotime(get_post_meta($product->get_id(), 'sale_sticker_from', true));
+    $product_sale_date_to = strtotime(get_post_meta($product->get_id(), 'sale_sticker_to', true));
 
-    if ($product_sale_date_from !== '' && $product_sale_date_to !== '') {
+    if (($product_sale_date_from && strlen($product_sale_date_from) > 0) && ($product_sale_date_to && strlen($product_sale_date_to) > 0)) {
         echo 'Akcija traje od ' . date('d/m/Y', $product_sale_date_from) . ' do ' . date('d/m/Y', $product_sale_date_to);
     }
 }
@@ -190,8 +190,8 @@ function check_if_product_have_sale_dates_and_print_sticker()
 {
     global $product;
 
-    $product_sale_date_from = get_post_meta($product->get_id(), '_sale_price_dates_from', true);
-    $product_sale_date_to = get_post_meta($product->get_id(), '_sale_price_dates_to', true);
+    $product_sale_date_from = get_post_meta($product->get_id(), 'sale_sticker_from', true);
+    $product_sale_date_to = get_post_meta($product->get_id(), 'sale_sticker_to', true);
 
     if ($product_sale_date_from !== '' && $product_sale_date_to !== '') {
         $sale_sticker_src = get_option('image_select_sale');

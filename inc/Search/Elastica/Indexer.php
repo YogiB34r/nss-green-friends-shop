@@ -230,10 +230,9 @@ class Indexer
     private function calculateOrderingRating(\WC_Product $product)
     {
         $ponder = 1;
-        if ($product->is_on_sale()) {
+        if ($product->get_meta('sale_sticker_active') === 'yes') {
             $ponder = 100;
-        }
-        if ($product->get_date_on_sale_to()) {
+        } else if ($product->get_sale_price() > 0) {
             $ponder = 10000;
         }
         if (!$product->is_in_stock()) {

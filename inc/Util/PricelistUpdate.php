@@ -50,7 +50,7 @@ class PricelistUpdate
                 } else {
                     $product->set_price((int) $itemInfo[2]);
                     $product->set_regular_price((int) $itemInfo[2]);
-
+                    $product->set_sale_price('');
                 }
                 $status = 'publish';
                 if ($itemInfo[4] == 2) {
