@@ -7,7 +7,7 @@ if (have_posts()):
     while (have_posts()) : the_post(); ?>
       <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
         <div class="row">
-          <div class="gf-content-wrapper col-12">
+          <div class="gf-content-wrapper col-lg-9 offset-lg-3 col-md-12">
             <header class="gf-entry-header">
                 <div class="gf-page-header__breadcrumb">
                   <?php woocommerce_breadcrumb(); ?>
