@@ -207,7 +207,21 @@ function gf_supplier_product_list_column_content($column, $product_id)
                 break;
             case 'stockStatus':
                 $product = wc_get_product($product_id);
-                if ($product->is_in_stock()) {
+                $stockStatus = false;
+                if (get_class($product) == WC_Product_Variable::class) {
+                    foreach ($product->get_available_variations() as $available_variation) {
+                        $variation = wc_get_product($available_variation['variation_id']);
+                        if ($variation->is_in_stock()) {
+                            $stockStatus = true;
+                        }
+                    }
+                } else {
+                    if ($product->is_in_stock()) {
+                        $stockStatus = true;
+                    }
+                }
+
+                if ($stockStatus) {
                     echo 'Na stanju '. $product->get_meta('quantity') .' komada';
                 } else {
                     echo 'Nema na stanju';
@@ -516,12 +530,14 @@ function parseJitexDataFromOrder(WC_Order $order) {
 
 function createAdresnicaPdf(WC_Order $order) {
     $name = 'Adresnica-'.$order->get_order_number().'.pdf';
-    $uploadsDir = generateUploadsPath();
-    if (file_exists($uploadsDir . $name)) {
-        return $uploadsDir . $name;
-    }
+//    $uploadsDir = generateUploadsPath();
+//    if (file_exists($uploadsDir . $name)) {
+//        return $uploadsDir . $name;
+//    }
 
-    $order->update_status('spz-slanje');
+    if (in_array($order->get_status(), ['spz-pakovanje'])) {
+        $order->update_status('spz-slanje');
+    }
     $order->update_meta_data('adresnicaCreated', 1);
     $order->save();
 
@@ -562,4 +578,51 @@ function printPreorder(WC_Order $order) {
     $html = ob_get_clean();
 
     return $html;
+}
+
+add_action('woocommerce_product_options_general_product_data', 'addStickerInfoToProductTabs');
+function addStickerInfoToProductTabs() {
+    echo '<div class="options_group">';
+    $isActive = get_post_meta(get_the_ID(), 'sale_sticker_active', false)[0];
+    $class = "";
+    if ($isActive !== 'yes') {
+        $class = "hidden";
+    }
+
+    woocommerce_wp_checkbox( array(
+        'id'      => 'sale_sticker_active',
+        'value'   => get_post_meta(get_the_ID(), 'sale_sticker_active', false)[0],
+        'label'   => 'Sale sticker',
+        'desc_tip' => true,
+        'description' => 'Add a sale sticker to this product.',
+    ) );
+
+    echo '<div class="'. $class .' saleStickerOptionContainer">';
+
+    woocommerce_wp_text_input([
+        'id' => 'sale_sticker_from',
+        'class' => 'datepicker',
+        'value'   => get_post_meta(get_the_ID(), 'sale_sticker_from', false)[0],
+        'label'   => 'Start date',
+//        'desc_tip' => true,
+        'description' => 'Select start date',
+    ]);
+
+    woocommerce_wp_text_input([
+        'id' => 'sale_sticker_to',
+        'class' => 'datepicker',
+        'value'   => get_post_meta(get_the_ID(), 'sale_sticker_to', false)[0],
+        'label'   => 'End date',
+//        'desc_tip' => true,
+        'description' => 'Select end date.',
+    ]);
+        echo '</div>';
+
+    echo '</div>';
+}
+add_action( 'woocommerce_process_product_meta', 'saveStickerInfo', 10, 2 );
+function saveStickerInfo($id, $post) {
+    update_post_meta( $id, 'sale_sticker_from', $_POST['sale_sticker_from'] );
+    update_post_meta( $id, 'sale_sticker_to', $_POST['sale_sticker_to'] );
+    update_post_meta( $id, 'sale_sticker_active', $_POST['sale_sticker_active'] );
 }

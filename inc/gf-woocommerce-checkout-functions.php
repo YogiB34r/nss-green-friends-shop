@@ -250,9 +250,45 @@ function gf_change_city_field_to_dropdown( $fields ) {
 }
 
 
-add_action( 'woocommerce_order_status_changed', 'gf_processing_notification', 10, 1 );
-function gf_processing_notification($order_id, $checkout = null) {
-    $order = wc_get_order( $order_id );
+add_action( 'woocommerce_order_status_changed', 'gf_processing_notification', 10, 3);
+function gf_processing_notification($order_id, $old, $new) {
+    $order = wc_get_order($order_id);
+
+    $targetStatuses = [
+        'naruceno' => 'Naručeno',
+        'u-pripremi-placeno' => 'U pripremi (plaćeno)',
+//        'spz-pakovanje' => 'Spremno za pakovanje',
+        'poslato' => 'Poslato',
+//        'isporuceno' => 'Isporučeno',
+        'finalizovano' => 'Finalizovano',
+        'reklamacija' => 'Reklamacija',
+        'reklamacija-pnns' => 'Reklamacija - proizvod nema na stanju',
+        'stornirano-pn' => 'Stornirano - proizvod nema na stanju',
+//        'stornirano' => 'Stornirano',
+    ];
+
+    if (in_array($new, array_keys($targetStatuses))) {
+        $mailer = WC()->mailer();
+        $recipient = $order->get_billing_email();
+        $from = 'prodaja@nonstopshop.rs';
+        $headers = "Content-Type: text/html\r\n";
+        $headers .= "From: NonStopShop <'{$from}'>\r\n";
+        $headers .= "Reply-to: NonStopShop <'{$from}'>\r\n";
+        $subject = 'Status Vaše narudžbine je promenjen';
+        $template = 'emails/customer-order-status.php';
+        $content = wc_get_template_html($template, [
+            'order' => $order,
+            'status' => $targetStatuses[$order->get_status()],
+            'email_heading' => $subject,
+            'sent_to_admin' => false,
+            'plain_text' => false,
+            'email' => $mailer
+        ]);
+        $mailer->send($recipient, $subject, $content, $headers);
+
+    }
+
+    //@TODO this should not be required anymore
     if (in_array($order->get_status(), ['u-pripremi', 'cekaseuplata']) && $order->get_meta('backOrderUndo') == '') {
         // load the mailer class
         $mailer = WC()->mailer();

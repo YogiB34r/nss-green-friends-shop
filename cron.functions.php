@@ -44,14 +44,14 @@ function daily() {
     $api->sendAdresnice();
 }
 
-function mis() {
+function mis($args) {
 
-//    $item = wc_get_product(408157);  //408157
+//    $item = wc_get_product(404695);
 //    new NSS_MIS_Item($item);
 //    die();
 
 //    $orderIds = [465270, 465314, 465287, 465272, 465264, 465280, 465222, 465273, 465263, 465277, 465238, 465292, 465613];
-//    $orderIds = [466062];
+//    $orderIds = [471528];
 //    foreach ($orderIds as $orderId) {
 //        $order = wc_get_order($orderId);
 //        new NSS_MIS_Order($order);
@@ -71,6 +71,9 @@ function mis() {
         'page' => 1,
     );
     $orders = WC_get_orders($arg);
+    if (isset($args[0])) {
+        $orders = wc_get_order($args[0]);
+    }
     foreach ($orders as $order) {
         if (!in_array($order->get_status(), ['stornirano', 'cancelled', 'refunded', 'processing'])) {
             if (get_class($order) === WC_Order::class) {
@@ -212,7 +215,11 @@ function passAllProducts($args) {
 
 //    $cli->saleItems($args);
 
-    $cli->fixItems();
+//    $cli->migrateSaleItems($args);
+
+//    $cli->listSaleItems();
+
+    $cli->listItems();
 
 //    $cli->fixMisPrices($args);
 }

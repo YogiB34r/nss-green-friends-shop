@@ -335,7 +335,9 @@ jQuery(document).ready(function ($) {
     //     });
     // })
 
-    //test
-    // jQuery('select').select2();
+    $('.datepicker').datepicker();
+    $('#sale_sticker_active').click(function() {
+        $('.saleStickerOptionContainer').toggle();
+    });
 });
 

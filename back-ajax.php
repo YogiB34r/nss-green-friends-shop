@@ -104,6 +104,31 @@ if (isset($_GET['action'])) {
 
             break;
 
+        case 'getPrice':
+            $productId = wc_get_product_id_by_sku($_GET['sku']);
+            $product = wc_get_product($productId);
+
+            $response = [
+                'status' => 404,
+                'price' => 0,
+                'salePrice' => 0,
+                'regularPrice' => 0
+            ];
+
+            if ($product) {
+                $response = [
+                    'status' => 200,
+                    'price' => $product->get_price(),
+                    'salePrice' => $product->get_sale_price(),
+                    'regularPrice' => $product->get_regular_price()
+                ];
+            }
+
+            echo json_encode($response);
+            exit();
+
+            break;
+
         case 'getAdresnice':
             $fileName = 'adresnica-' . date('dmy') . '.csv';
             $adresnicaPath = ABSPATH . '../wp-content/uploads/adresnice/' . $fileName;
@@ -204,7 +229,6 @@ function createJitexItemExport() {
                             trim(mb_strtoupper($product->get_name() . ' ' . $variation, 'UTF-8'))."\t".
                             str_replace('.',',',$product->get_meta('pdv'))."\t".str_replace('.', ',', round($product->get_price() * 100 / (double) $taxcalc, 2))."\t".
                             str_replace('.', ',', round($product->get_price(), 2)))."\r\n";
-//                                var_dump($product->get_sku() . $variation);
                         }
                     }
                 }
@@ -242,7 +266,18 @@ function exportJitexOrder(WC_Order $order) {
     header('Expires: 0');
     header('Pragma: no-cache');
 
-    print iconv('utf-8','windows-1250',str_replace(array('Ð', 'ð'), array('Đ', 'đ'), $csvText));
+//    print iconv('utf-8','windows-1250',str_replace(array('Ð', 'ð'), array('Đ', 'đ'), $csvText));
+    $csvText = fixJitexCharacters($csvText);
+    echo $csvText;
+}
+
+function fixJitexCharacters($str) {
+
+    return str_replace(
+        ['ć', 'Ć', 'č', 'Č', 'š', 'Š', 'đ', 'Đ', 'ž', 'Ž'],
+        ['c', 'C', 'c', 'C', 's', 'S', 'd', 'D', 'z', 'Z'],
+        $str
+    );
 }
 
 function printOrder(WC_Order $order) {
