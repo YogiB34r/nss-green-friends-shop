@@ -6,8 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
     <link rel="profile" href="http://gmpg.org/xfn/11">
     <link rel="pingback" href="<?php bloginfo('pingback_url'); ?>">
-    <title>NonStopShop.rs - online kupovina - uvek dobre cene - onlajn prodavnica - prodaja preko interneta - Srbija -
-        Beograd</title>
+
     <?php wp_head(); ?>
     <!-- Facebook Pixel Code -->
     <script>

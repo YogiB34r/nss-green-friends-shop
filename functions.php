@@ -12,6 +12,7 @@ require(__DIR__ . DIRECTORY_SEPARATOR . "cron.functions.php");
 add_action('after_setup_theme', 'wc_support');
 function wc_support()
 {
+    add_theme_support('title-tag');
     add_theme_support('woocommerce');
     add_theme_support('wc-product-gallery-zoom');
     add_theme_support('wc-product-gallery-lightbox');
