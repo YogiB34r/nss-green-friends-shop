@@ -38,28 +38,28 @@ class Indexer
 
         $perPage = 400;
 
-//        for ($i = 0; $i < 60; $i++) {
-        for ($i = 0; $i < 2; $i++) {
+        for ($i = 0; $i < 60; $i++) {
+//        for ($i = 0; $i < 2; $i++) {
             $offset = $i * $perPage;
 
-            $args = array(
-                'post_type'             => 'product',
-                'posts_per_page'        => '400',
-                'tax_query'             => array(
-                    array(
-                        'taxonomy'      => 'product_cat',
-                        'field' => 'term_id',
-                        'terms'         => 2441,
-                        'operator'      => 'IN'
-                    )
-                )
-            );
-            $result = new \WP_Query($args);
-            $products = $result->get_posts();
+//            $args = array(
+//                'post_type'             => 'product',
+//                'posts_per_page'        => '400',
+//                'tax_query'             => array(
+//                    array(
+//                        'taxonomy'      => 'product_cat',
+//                        'field' => 'term_id',
+//                        'terms'         => 2441,
+//                        'operator'      => 'IN'
+//                    )
+//                )
+//            );
+//            $result = new \WP_Query($args);
+//            $products = $result->get_posts();
 
             $sql = "SELECT ID FROM wp_posts WHERE post_type = 'product' LIMIT {$offset}, {$perPage};";
-//            $products = $wpdb->get_results($sql);
-//            $wpdb->flush();
+            $products = $wpdb->get_results($sql);
+            $wpdb->flush();
             if (count($products) > 0) {
                 $documents = [];
                 foreach ($products as $value) {
@@ -230,10 +230,10 @@ class Indexer
     private function calculateOrderingRating(\WC_Product $product)
     {
         $ponder = 1;
-        if ($product->get_meta('sale_sticker_active') === 'yes') {
-            $ponder = 100;
-        } else if ($product->get_sale_price() > 0) {
+        if ($product->get_meta('sale_sticker_active') === 'yes' && $product->get_meta('sale_sticker_to') > time()) {
             $ponder = 10000;
+        } else if ($product->get_sale_price() > 0) {
+            $ponder = 100;
         }
         if (!$product->is_in_stock()) {
             $ponder = 0;

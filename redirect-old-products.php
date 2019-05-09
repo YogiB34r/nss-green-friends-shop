@@ -24,8 +24,8 @@ if (isset($_GET['type']) && $_GET['type'] === 'category') {
                     $name = trim($catData[2]);
                     $cat = get_term_by('name', $name, 'product_cat');
                     if (!is_object($cat)) {
-                        var_dump('fali kat ?' . $name);
-                        die();
+                        include(get_query_template('404'));
+                        exit;
                     }
                     $url = get_term_link($cat->term_id, 'product_cat');
                 }
@@ -36,6 +36,9 @@ if (isset($_GET['type']) && $_GET['type'] === 'category') {
             }
         }
     }
+    // no match found
+    include(get_query_template('404'));
+    exit;
 }
 
 if (isset($_GET['type']) && $_GET['type'] === 'comment') {
@@ -46,10 +49,6 @@ if (isset($_GET['type']) && $_GET['type'] === 'comment') {
 
 $wcproduct = get_product_by_sku($sku);
 if (!$wcproduct) {
-//global $wp_query;
-//  $wp_query->set_404();
-//  status_header( 404 );
-//  get_template_part( 404 ); exit();
     header("HTTP/1.1 302 Moved Temporary");
     header('Location: '.  home_url());
     exit();

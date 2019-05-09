@@ -18,7 +18,6 @@ if (defined('WP_CLI') && WP_CLI) {
     ini_set('display_errors', 1);
     error_reporting(E_ALL);
 
-
     // elastic operations
     \WP_CLI::add_command('createElasticIndex', 'createElasticIndex');
     \WP_CLI::add_command('syncElasticIndex', 'syncElasticIndex');
@@ -37,6 +36,59 @@ if (defined('WP_CLI') && WP_CLI) {
     \WP_CLI::add_command('mis', 'mis');
 
     \WP_CLI::add_command('daily', 'daily');
+
+    \WP_CLI::add_command('createNalog', 'createNalog');
+
+    \WP_CLI::add_command('testCron', 'testCron');
+}
+
+$factory = new \Nss\Feed\FeedFactory();
+$feed = $factory();
+add_action('parseFeed', [$feed => 'parseFeed']);
+
+
+//add_action('testCron', 'testCron');
+function testCron() {
+    $from = 'mailer@nonstopshop.rs';
+    $headers = [
+        'Content-Type: text/html; charset=UTF-8',
+        "From: NonStopShop <'{$from}'>",
+    ];
+    $to[] = 'djavolak@mail.ru';
+    $subject = 'test cron operation';
+    $message = 'cron started at : '  . date('d-m-Y H:i:s');
+
+    wp_mail($to, $subject, $message, $headers);
+}
+
+add_action('createNalog', 'createNalog');
+function createNalog() {
+    global $wpdb;
+
+    $backorder = new NSS_Backorder($wpdb);
+    $backorder->createBackOrders();
+
+    $sql = "SELECT backOrderId FROM wp_nss_backorder WHERE status <> 4 AND mailSent = 0";
+    foreach ($wpdb->get_results($sql) as $result) {
+        $orders = $backorder->getBackOrders($result->backOrderId);
+        $supplierId = $orders[0]->supplierId;
+        $backorder->sendBackOrderEmail($supplierId, $orders);
+//        if ($backorder->sendBackOrderEmail($supplierId, $orders)) {
+//            echo 'mail sent';
+//        }
+    }
+
+    $from = 'mailer@nonstopshop.rs';
+    $headers = [
+        'Content-Type: text/html; charset=UTF-8',
+        "From: NonStopShop <'{$from}'>",
+    ];
+    $to[] = 'djavolak@mail.ru';
+    $subject = 'Backorders created';
+    $dt = new \DateTime('now', new \DateTimeZone('Europe/Belgrade'));
+    $message = 'cron started at : '  . $dt->format('d/m/Y H:i:s');
+
+    wp_mail($to, $subject, $message, $headers);
 }
 
 function daily() {
@@ -44,21 +96,11 @@ function daily() {
     $api->sendAdresnice();
 }
 
-function mis($args) {
+add_action('syncMis', 'mis');
+function mis() {
 
-//    $item = wc_get_product(404695);
+//    $item = wc_get_product(417359);
 //    new NSS_MIS_Item($item);
-//    die();
-
-//    $orderIds = [465270, 465314, 465287, 465272, 465264, 465280, 465222, 465273, 465263, 465277, 465238, 465292, 465613];
-//    $orderIds = [471528];
-//    foreach ($orderIds as $orderId) {
-//        $order = wc_get_order($orderId);
-//        new NSS_MIS_Order($order);
-//    }
-//    die();
-//    $order = wc_get_order(465265);
-//    new NSS_MIS_Order($order);
 //    die();
 
 //    $user = get_user_by('id', 193943);
@@ -71,9 +113,6 @@ function mis($args) {
         'page' => 1,
     );
     $orders = WC_get_orders($arg);
-    if (isset($args[0])) {
-        $orders = wc_get_order($args[0]);
-    }
     foreach ($orders as $order) {
         if (!in_array($order->get_status(), ['stornirano', 'cancelled', 'refunded', 'processing'])) {
             if (get_class($order) === WC_Order::class) {
@@ -81,13 +120,6 @@ function mis($args) {
                 if ($order->get_meta('synced') !== '') {
 //                    var_dump($order->get_status());
                 } else {
-//                    var_dump($order->get_id());
-//                    var_dump($order->get_meta('synced'));
-//                    $order->add_meta_data('synced', 1);
-//                    $order->save_meta_data();
-//                    var_dump($order->get_meta('synced'));
-
-//                    die();
                     $misOrder = new NSS_MIS_Order($order);
                     var_dump($order->get_meta('synced'));
                 }
@@ -215,13 +247,9 @@ function passAllProducts($args) {
 
 //    $cli->saleItems($args);
 
+    $cli->cleanupIndex();
+
 //    $cli->migrateSaleItems($args);
-
-//    $cli->listSaleItems();
-
-    $cli->listItems();
-
-//    $cli->fixMisPrices($args);
 }
 
 

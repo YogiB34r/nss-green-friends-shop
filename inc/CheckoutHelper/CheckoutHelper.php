@@ -52,6 +52,6 @@ class CheckoutHelper
     protected function set_billing_company($customer)
     {
         $customer->set_billing_company($this->billing_company_name);
-        wc()->session->__unset('$gf_billing_company');
+        wc()->session->__unset('gf_billing_company');
     }
 }

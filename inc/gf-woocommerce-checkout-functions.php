@@ -249,6 +249,63 @@ function gf_change_city_field_to_dropdown( $fields ) {
     return $fields;
 }
 
+add_action('woocommerce_order_status_poslato', 'sendPoslatoNotice');
+function sendPoslatoNotice($orderId) {
+    $order = wc_get_order($orderId);
+    $subject = 'Vaša narudžbina je poslata';
+    $msg = 'Poštovani, <br />
+Vaša pošiljka je upravo poslata. Isporuku možete očekivati sutra, u periodu od 8:00 do 17:00h.<br/> 
+Isporuku vrši kurirska služba D Express, čiji će Vas kurir kontaktirati kako bi Vam uručio pošiljku.';
+    sendOrderStatusUpdateMail($order, $subject, $msg);
+}
+
+add_action('woocommerce_order_status_u-pripremiplaceno', 'sendPaymentNotice');
+function sendPaymentNotice($orderId) {
+    $order = wc_get_order($orderId);
+    $subject = 'Vaša uplata je upravo evidentirana';
+    $msg = 'Poštovani,<br /> 
+Vaša uplata je upravo evidentirana.<br />
+Očekivani rok isporuke je 3-5 radnih dana. Dodatno ćemo Vas obavestiti kad pošaljemo narudžbinu. ';
+    sendOrderStatusUpdateMail($order, $subject, $msg);
+}
+
+
+//(Neki od) Proizvod(a) koji ste naručili nemamo na stanju (u zavisnosti od toga da li je naručen 1 ili više proizvoda)
+
+add_action('woocommerce_order_status_reklamacija-pnns', 'sendReklamacijaNotice');
+function sendReklamacijaNotice($orderId) {
+    $order = wc_get_order($orderId);
+    $subject = 'Proizvod koji ste naručili nemamo na stanju';
+    if (count($order->get_items()) > 1) {
+        $subject = 'Neki od proizvoda koji ste naručili nemamo na stanju';
+    }
+    $msg = 'Poštovani, nažalost, neki od proizvoda iz Vaše narudžbenice trenutno nemamo na stanju.<br />
+Kolege će se potruditi da Vam pronađu odgovarajuću zamenu (ukoliko postoji), a zatim će Vas kontaktirati. <br />
+Hvala na razumevanju.';
+    sendOrderStatusUpdateMail($order, $subject, $msg);
+}
+
+function sendOrderStatusUpdateMail(WC_Order $order, $subject, $msg) {
+    //    var_dump($order->get_billing_email());
+//    die();
+    $mailer = WC()->mailer();
+    $recipient = $order->get_billing_email();
+    $from = 'prodaja@nonstopshop.rs';
+    $headers = "Content-Type: text/html\r\n";
+    $headers .= "From: NonStopShop <'{$from}'>\r\n";
+    $headers .= "Reply-to: NonStopShop <'{$from}'>\r\n";
+    $template = 'emails/customer-order-status.php';
+    $content = wc_get_template_html($template, [
+        'order' => $order,
+        'email_heading' => $subject,
+        'sent_to_admin' => true,
+        'plain_text' => false,
+        'email' => $mailer,
+        'msg' => $msg
+    ]);
+
+    $mailer->send($recipient, $subject, $content, $headers);
+}
 
 add_action( 'woocommerce_order_status_changed', 'gf_processing_notification', 10, 3);
 function gf_processing_notification($order_id, $old, $new) {

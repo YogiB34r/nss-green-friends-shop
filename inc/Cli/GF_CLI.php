@@ -4,6 +4,20 @@ namespace GF;
 
 class Cli
 {
+    public function getCategoryList()
+    {
+        echo 'catId,name,parentCatId,parentCat';
+        foreach (gf_get_categories() as $cat) {
+            $parent = get_term_by('id', $cat->parent, 'product_cat');
+            if ($parent) {
+                echo $cat->term_id .','. $cat->name .','. $cat->parent .','. $parent->name . "\r\n";
+            } else {
+                echo $cat->term_id .','. $cat->name .',0,none' . "\r\n";
+            }
+
+        }
+    }
+
     public function cleanupIndex()
     {
         $limit = 5000;
@@ -46,86 +60,45 @@ class Cli
         }
     }
 
-    public function listSaleItems()
+    public function addSticker()
     {
-        $limit = 5000;
-        $page = 5;
+        $limit = 12000;
+        $page = 2;
         $total = 0;
         $products_ids = wc_get_products(array(
             'limit' => $limit,
             'return' => 'ids',
             'paged' => $page
         ));
-        $items = [];
+
+        $ids = gf_get_category_children_ids('specijalne-promocije');
+
         foreach ($products_ids as $product_id) {
             $product = wc_get_product($product_id);
+            if (!empty(array_intersect($product->get_category_ids(), $ids)) && (int) get_post_meta($product->get_id(), 'sale_sticker_to', true) == 0) {
+                var_dump($product->get_id());
 
-            $vendor = $product->get_meta('supplier');
-            if ($vendor == 268) {
-                continue;
-            }
+                $dt = new \DateTime();
+                $dt->modify('+30 day');
+                update_post_meta($product->get_id(), 'sale_sticker_from', time());
+                update_post_meta($product->get_id(), 'sale_sticker_to', $dt->getTimestamp());
+                update_post_meta($product->get_id(), 'sale_sticker_active', "yes");
+                $product->set_date_on_sale_to('');
+                $product->set_date_on_sale_from('');
 
-            if ($product->get_status() == 'publish' && $product->is_on_sale() || $product->get_sale_price() > 0) {
-                if (get_class($product) === \WC_Product_Variable::class) {
-                    foreach ($product->get_children() as $productId) {
-                        $variation = wc_get_product($productId);
-                        $savingsDinars = $variation->get_regular_price() - $variation->get_sale_price();
-                        $regularPrice = $variation->get_regular_price();
-                        $salePrice = $variation->get_sale_price();
-                    }
-                } else {
-                    $savingsDinars = $product->get_regular_price() - $product->get_sale_price();
-                    $regularPrice = $product->get_regular_price();
-                    $salePrice = $product->get_sale_price();
-                }
-
-                $savingsPercentage = 0;
-//                if ($savingsDinars > 0) {
-                if ($savingsDinars > 1500) {
-                    if ($regularPrice == 0) {
-                        var_dump('price zero');
-                        var_dump($product->get_id());
-                        die();
-                    }
-                    $savingsPercentage = number_format($savingsDinars / $regularPrice * 100);
-                    if ($savingsPercentage > 30) {
-                        $items['30percent'][] = [
-                            'price' => $regularPrice,
-                            'salePrice' => $salePrice,
-                            'id' => $product->get_id(),
-                            'name' => $product->get_name()
-                        ];
-                        continue;
-                    }
-                    if ($savingsPercentage > 20) {
-                        $items['20percent'][] = $product;
-                        continue;
-                    }
-                    if ($savingsPercentage > 10) {
-                        $items['10percent'][] = $product;
-                        continue;
-                    }
-
-                }
+                $total++;
             }
         }
 
-//        foreach ($items['30percent'] as $item) {
-//            echo $item['id'] .','. $item['price'] .','. $item['salePrice'] .','. $item['name'] . PHP_EOL;
-//        }
-
-//        var_dump('total items: ' . count($items['30percent']));
-//        var_dump('30 percent count: ' . count($items['30percent']));
-//        var_dump('20 percent count: ' . count($items['20percent']));
-//        var_dump('10 percent count: ' . count($items['10percent']));
+        echo 'saved ' . $total . PHP_EOL;
+        echo 'from' . count($products_ids) . PHP_EOL;
+        echo 'done';
     }
-
-
 
     public function migrateSaleItems($args)
     {
-        $limit = 100;
-        $page = 1;
+        $limit = 4000;
+        $page = 6;
         if (isset($args[0])) {
             $page = $args[0];
         }
@@ -139,41 +112,111 @@ class Cli
             'return' => 'ids',
             'paged' => $page
         ));
-
 //        $products_ids = [471779];
 
         foreach ($products_ids as $product_id) {
             $product = wc_get_product($product_id);
+            if (in_array($product->get_meta('supplier'), [123, 268, 252, 198])) {
+                continue;
+            }
 
-            if ($product->get_date_on_sale_to() || $product->get_date_on_sale_from()) {
+            if (!$product->is_on_sale()) {
+                $httpClient = new \GuzzleHttp\Client();
+                $url = 'https://nss-devel.ha.rs/back-ajax/?action=getPrice&sku=' . $product->get_sku();
+                try {
+//                $response = $httpClient->send(new \GuzzleHttp\Psr7\Request('get', $url, ['allow_redirects' => true]));
+                    $response = $httpClient->send(new \GuzzleHttp\Psr7\Request('get', $url, ['allow_redirects' => false]));
+                } catch (\Exception $e) {
+                    continue;
+                }
+
+                $res = json_decode($response->getBody()->getContents());
+                if ($res->status == 404) {
+                    continue;
+                }
+                $backupPrice = $res->price;
+
+                $testPrice = $product->get_price();
                 if (get_class($product) === \WC_Product_Variable::class) {
                     foreach ($product->get_children() as $productId) {
                         $variation = wc_get_product($productId);
-                        $variation->set_date_on_sale_from(null);  // m/d/Y
-                        $variation->set_date_on_sale_to(null);
-                        $variation->update_meta_data('sale_sticker_from', '20. February 2019.');
-                        $variation->update_meta_data('sale_sticker_to', '4. March 2019.');
-                        $variation->update_meta_data('sale_sticker_active', 'yes');
-                        $variation->save();
+                        $testPrice = $variation->get_price();
                     }
-                } else {
-                    $product->set_date_on_sale_from(null);  // m/d/Y
-                    $product->set_date_on_sale_to(null);
-                    // @TODO check if to date is already set longer
-                    var_dump($product->get_date_on_sale_to() > '31. March 2019.');
-                    var_dump($product->get_date_on_sale_to() < '31. March 2019.');
-                    var_dump($product->get_date_on_sale_to() == '31. March 2019.');
-                    die();
-                    $product->update_meta_data('sale_sticker_from', '20. February 2019.');
-                    $product->update_meta_data('sale_sticker_to', '31. March 2019.');
-                    $product->update_meta_data('sale_sticker_active', 'yes');
-                    $product->save();
                 }
 
-                $total++;
-                continue;
+                if ($backupPrice == $testPrice) {
+                    continue;
+                }
+
+                if ($testPrice > $backupPrice && $backupPrice > 0) {
+
+                    var_dump('updating price for: ' . get_permalink($product->get_id()));
+                    $total++;
+
+                    if (get_class($product) === \WC_Product_Variable::class) {
+                        foreach ($product->get_children() as $productId) {
+                            $variation = wc_get_product($productId);
+                            $variation->set_regular_price($testPrice);
+                            $variation->set_price($backupPrice);
+                            $variation->set_sale_price($backupPrice);
+                            $variation->save();
+                        }
+                    } else {
+                        $product->set_regular_price($testPrice);
+                        $product->set_price($backupPrice);
+                        $product->set_sale_price($backupPrice);
+                        $product->save();
+                    }
+
+                    continue;
+                }
+
+                if (!$product->is_in_stock()) {
+                    continue;
+                }
+
+                if ($testPrice === "") {
+                    var_dump('no test price ');
+                    var_dump($product->get_id());
+                    var_dump($product->get_date_on_sale_to());
+                    var_dump($backupPrice);
+                    var_dump($testPrice);
+                    die();
+                }
             }
         }
+
+//        foreach ($products_ids as $product_id) {
+//            $product = wc_get_product($product_id);
+//            if ($product->get_date_on_sale_from() || $product->get_date_on_sale_to()) {
+//                if ($product->get_date_on_sale_to()->format('d/m/Y') === '31/03/2019' ||
+//                    $product->get_date_on_sale_to()->format('d/m/Y') === '31/12/2019' ||
+//                    $product->get_date_on_sale_to()->format('d/m/Y') === '30/12/2019' ||
+//                    $product->get_date_on_sale_to()->format('d/m/Y') === '03/04/2019' ||
+//                    $product->get_date_on_sale_to()->format('d/m/Y') === '29/11/2019'
+//                ) {
+//                    $this->migrateToNewAttributes($product);
+//                    $total++;
+//                } elseif ($product->get_date_on_sale_to()->format('d/m/Y') === '30/03/2019') {
+//                    // lost sale price, fetch from devel
+//                    if (!$this->fetchAndUpdateBadPrice($product)) {
+//                        //there was no need to update price
+//                    }
+//                    //we can now update new attributes
+//                    $this->migrateToNewAttributes($product);
+//                    $total++;
+//
+//                } else {
+//                    var_dump('dif date');
+//                    var_dump($product->get_id());
+//                    var_dump($product->get_date_on_sale_from()->format('d/m/Y'));
+//                    var_dump($product->get_date_on_sale_to()->format('d/m/Y'));
+//                    die();
+//                }
+//            } else {
+//                continue;
+//            }
+//        }
 
         echo 'saved ' . $total . PHP_EOL;
         echo 'from' . count($products_ids) . PHP_EOL;
@@ -181,16 +224,24 @@ class Cli
         echo 'done';
     }
 
+    private function migrateToNewAttributes(\WC_Product $product)
+    {
+        var_dump($product->get_id());
+        $dt = new \DateTime();
+        $dt->modify('+30 day');
+        update_post_meta($product->get_id(), 'sale_sticker_from', time());
+        update_post_meta($product->get_id(), 'sale_sticker_to', $dt->getTimestamp());
+        update_post_meta($product->get_id(), 'sale_sticker_active', "yes");
+        $product->set_date_on_sale_to('');
+        $product->set_date_on_sale_from('');
+
+        return ($product->save());
+    }
+
     public function saleItems($args)
     {
-        $limit = 4000;
-        $page = 1;
-        if (isset($args[0])) {
-            $page = $args[0];
-        }
-        if (isset($args[1])) {
-            $limit = $args[1];
-        }
+        $limit = 5000;
+        $page = 5;
 
         $total = 0;
         $bugged = 0;
@@ -200,129 +251,15 @@ class Cli
             'paged' => $page
         ));
 
-        $httpClient = new \GuzzleHttp\Client();
-        $products_ids = [412783];
+
 
         foreach ($products_ids as $product_id) {
-            if (isset($args[2])) {
-                $product_id = $args[2];
-            }
-            if (in_array($product_id, [471923])) {
-                continue;
-            }
-
-            $product = wc_get_product($product_id);
-            if ($product->get_price() === 0 || $product->get_sale_price() === 0) {
-                echo 'wrong price';
-                var_dump($product->get_id());
-                die();
-            }
-
-            if ($product->get_meta('supplier') == 123) {
-                continue;
-            }
-
-//            $url = str_replace('https://nonstopshop.rs', 'https://nss-devel.ha.rs', get_permalink($product_id));
-//            $url = str_replace('https://nss-devel.ha.rs', 'https://nonstopshop.rs', get_permalink($product_id));
-            if ($product->get_sku() == '') {
-                $bugged++;
-                continue;
-            }
-            $url = 'https://nss-devel.ha.rs/back-ajax/?action=getPrice&sku=' . $product->get_sku();
-            try {
-//                $response = $httpClient->send(new \GuzzleHttp\Psr7\Request('get', $url, ['allow_redirects' => true]));
-                $response = $httpClient->send(new \GuzzleHttp\Psr7\Request('get', $url, ['allow_redirects' => false]));
-            } catch (\Exception $e) {
-                if ($e->getCode() == 404) {
-                    continue;
-                }
-            }
-
-            $res = json_decode($response->getBody()->getContents());
-            if ($res->status == 404) {
-                continue;
-            }
-            $backupPrice = $res->price;
-
-//            var_dump($res->salePrice);
-//            var_dump($res->regularPrice);
-
-
-/*            $rule = '/(<ins>)(.*?)(<\/ins>)/';
-            $matches = [];
-            preg_match_all($rule, $response->getBody()->getContents(), $matches);
-            if (!isset($matches[2][0])) {
-                var_dump($matches);
-                var_dump($url);
-                die();
-            }
-            $string = $matches[2][0];
-            $strip = '<span class="woocommerce-Price-amount amount">';
-            $string = str_replace($strip, '', $string);
-            $backupPrice = strstr($string, '<', true);
-            $backupPrice = (int) str_replace(',', '', $backupPrice);
-*/
-//            $dom = new \DOMDocument();
-//            $html = $response->getBody()->getContents();
-//            @$dom->loadHTML($html);
-//            $finder = new \DomXPath($dom);
-//            $classname = "woocommerce-Price-amount amount";
-//            $nodes = $finder->query("//*[contains(concat(' ', normalize-space(@class), ' '), ' $classname ')]");
-//            $backupPrice = str_replace('din.', '', $nodes->item(0)->nodeValue);
-//            $backupPrice = str_replace(',', '', $backupPrice);
-
-            $testPrice = $product->get_price();
-            if (get_class($product) === \WC_Product_Variable::class) {
-                foreach ($product->get_children() as $productId) {
-                    $variation = wc_get_product($productId);
-                    $testPrice = $variation->get_price();
-                }
-            }
-
-            if ($backupPrice == $testPrice) {
-                continue;
-            }
-
-            if ($testPrice > $backupPrice && $backupPrice > 0) {
-                if (get_class($product) === \WC_Product_Variable::class) {
-                    foreach ($product->get_children() as $productId) {
-                        $variation = wc_get_product($productId);
-                        $variation->set_regular_price($testPrice);
-                        $variation->set_price($backupPrice);
-                        $variation->set_sale_price($backupPrice);
-                        $variation->set_date_on_sale_from(strtotime('02/20/2019'));  // m/d/Y
-                        $variation->set_date_on_sale_to(strtotime('03/31/2019'));
-                        $variation->save();
-                    }
-                } else {
-                    $product->set_regular_price($testPrice);
-                    $product->set_price($backupPrice);
-                    $product->set_sale_price($backupPrice);
-                    $product->set_date_on_sale_from(strtotime('02/20/2019'));  // m/d/Y
-                    $product->set_date_on_sale_to(strtotime('03/31/2019'));
-                    $product->save();
-                }
-
-                var_dump(get_permalink($product_id));
+            if (get_post_meta($product_id, 'sale_sticker_active', true)) {
+                $dt = new \DateTime();
+                $dt->modify('+'. rand(40, 65) .' day');
+                update_post_meta($product_id, 'sale_sticker_from', time());
+                update_post_meta($product_id, 'sale_sticker_to', $dt->getTimestamp());
                 $total++;
-                continue;
-            }
-
-            if (!$product->is_in_stock()) {
-                continue;
-            }
-
-            if ($testPrice === "") {
-                var_dump('no test price ');
-                var_dump($product_id);
-//                var_dump(get_permalink($product_id));
-                var_dump($product->get_date_on_sale_to());
-                var_dump($backupPrice);
-                var_dump($testPrice);
-                die();
-                $product->set_price($backupPrice);
-                $product->save();
-                continue;
             }
 
 //            var_dump($product_id);
@@ -333,58 +270,117 @@ class Cli
 //            die();
         }
 
-        echo 'bugged ' . $bugged . PHP_EOL;
+//        echo 'bugged ' . $bugged . PHP_EOL;
         echo 'saved ' . $total . PHP_EOL;
         echo 'from' . count($products_ids) . PHP_EOL;
 
         echo 'done';
     }
 
+    private function fetchAndUpdateBadPrice(\WC_Product $product)
+    {
+        $httpClient = new \GuzzleHttp\Client();
+        $url = 'https://nss-devel.ha.rs/back-ajax/?action=getPrice&sku=' . $product->get_sku();
+        try {
+//                $response = $httpClient->send(new \GuzzleHttp\Psr7\Request('get', $url, ['allow_redirects' => true]));
+            $response = $httpClient->send(new \GuzzleHttp\Psr7\Request('get', $url, ['allow_redirects' => false]));
+        } catch (\Exception $e) {
+            return false;
+        }
+
+        $res = json_decode($response->getBody()->getContents());
+        if ($res->status == 404) {
+            return false;
+        }
+        $backupPrice = $res->price;
+
+        $testPrice = $product->get_price();
+        if (get_class($product) === \WC_Product_Variable::class) {
+            foreach ($product->get_children() as $productId) {
+                $variation = wc_get_product($productId);
+                $testPrice = $variation->get_price();
+            }
+        }
+
+        if ($backupPrice == $testPrice) {
+            return false;
+        }
+
+        if ($testPrice > $backupPrice && $backupPrice > 0) {
+
+            var_dump('updating price for: ' . get_permalink($product->get_id()));
+
+            if (get_class($product) === \WC_Product_Variable::class) {
+                foreach ($product->get_children() as $productId) {
+                    $variation = wc_get_product($productId);
+                    $variation->set_regular_price($testPrice);
+                    $variation->set_price($backupPrice);
+                    $variation->set_sale_price($backupPrice);
+                    $variation->save();
+                }
+            } else {
+                $product->set_regular_price($testPrice);
+                $product->set_price($backupPrice);
+                $product->set_sale_price($backupPrice);
+                $product->save();
+            }
+
+            return true;
+        }
+
+        if (!$product->is_in_stock()) {
+            return false;
+        }
+
+        if ($testPrice === "") {
+            var_dump('no test price ');
+            var_dump($product->get_id());
+            var_dump($product->get_date_on_sale_to());
+            var_dump($backupPrice);
+            var_dump($testPrice);
+            die();
+        }
+    }
+
 
     public function listItems()
     {
-//        $pages = 21;
-//        $limit = 500;
-
-        $diff = [];
-        $html = '';
         $total = 0;
         $updated = [];
-//        for ($i = 1; $i < 22; $i++) {
-//        for ($i = $start; $i < $end; $i++) {
-            $products_ids = wc_get_products(array(
-                'limit' => 4000,
-                'meta_key' => 'supplier',
-                'meta_value' => 252,
+        $products_ids = wc_get_products(array(
+            'limit' => 4000,
+            'meta_key' => 'supplier',
+            'meta_value' => 252,
 //                'meta_value' => 123,
 //                'compare' => 'IN',
-                'return' => 'ids',
-                'paged' => 1
-            ));
+            'return' => 'ids',
+            'paged' => 1
+        ));
+
+        $redis = new \Redis();
+        $redis->connect(REDIS_HOST);
+
+        $xmlIds = unserialize($redis->get('asportkeys'));
 
 //        $products_ids = [412783];
-            foreach ($products_ids as $product_id) {
+        foreach ($products_ids as $product_id) {
+            if (in_array($product_id, $xmlIds)) {
                 $product = wc_get_product($product_id);
-
-//                var_dump($product->get_date_on_sale_to()->format('d/m/Y') > '28/02/2019');
-//                var_dump($product->get_date_on_sale_to()->format('d/m/Y') < '28/02/2019');
-//                die();
-                $product->set_weight(1);
+                $product->set_status('publish');
                 $product->save();
                 $updated[] = $product_id;
+            }
 
 //                if ($product->get_status() === 'pending') {
-//                $product->set_status('pending');
 //                $product->delete();
 //                $product->save();
-
 //                }
+        }
 
-            }
-//        echo 'found ' . count($products_ids) . ' items';
-        echo 'found ' . count($updated) . ' items';
-            var_dump($updated);
-die();
+        echo 'found ' . count($updated) . ' items' . "\r\n";
+        echo 'from' . count($products_ids) . ' items';
+//            var_dump($updated);
+        die();
     }
 
     private function handleImage($images, $postId) {

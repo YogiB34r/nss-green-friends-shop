@@ -45,10 +45,15 @@ if (isset($_GET['action'])) {
 
             break;
 
-        case 'jitexItemExport':
+        case 'createJitexExport':
             ini_set('memory_limit', '1500M');
             ini_set('max_execution_time', '300');
             createJitexItemExport();
+
+            break;
+
+        case 'jitexItemExport':
+            getJitexExport();
 
             break;
 
@@ -141,143 +146,63 @@ if (isset($_GET['action'])) {
 
             break;
 
-        // served it's purpose, if everything ok delete this
-        case 'fixAdresnice':
-            ini_set('max_execution_time', 600);
-            $zipArchive = new ZipArchive();
-            $zipPath = generateUploadsPath() . date('Ymd') .'-adresnice-fix.zip';
-            $open = $zipArchive->open($zipPath, ZipArchive::CREATE);
-            if ($open !== true) {
-                var_dump($open);
-                die('cannot open');
-            }
-
-            $orderIds = [];
-            $sors = file_get_contents(__DIR__ . '/adresnica-200219.csv');
-            foreach (explode("\n", $sors) as $key => $line) {
-                if ($key === 0) {
-                    continue;
-                }
-                $orderNo = explode('|', $line)[0];
-                if (!isset(explode('-', $orderNo)[1])) {
-                    continue;
-                }
-                $orderId = explode('-', $orderNo)[1];
-                if ($orderId === '') {
-                    continue;
-                }
-                $order = wc_get_order($orderId);
-                if (!$order) {
-                    var_dump($orderId);
-                    var_dump($order);
-                    die();
-                }
-
-                $path = createAdresnicaPdf($order);
-                if (file_exists($path) && is_readable($path)) {
-                    $add = $zipArchive->addFile($path, basename($path));
-                } else {
-                    var_dump('there was a problem reading file: ' . $path);
-                    die();
-                }
-                if ($add !== true) {
-                    var_dump('could not add file to archive');
-                }
-            }
-            if ($zipArchive->close() !== true) {
-                var_dump('could not close archive.');
-                die();
-            }
-            $path = str_replace('public_html', '', str_replace(strstr($zipPath, 'public_html', true), '', $zipPath));
-            echo $path;
+        case 'backendProductSearch':
+            backendProductSearch();
 
             break;
     }
 }
 
-function createJitexItemExport() {
-    $csv = '';
-    for ($i=1; $i<15; $i++) {
-        $args = array(
-            'post_type' => 'product',
-            'posts_per_page' => 2000,
-            'page' => $i,
-            'status' => 'publish'
-        );
-        $products = wc_get_products($args);
+function appendItemForBackendSearch(WC_Product $product) {
+    $data = [];
 
-        /* @var $product WC_Product_Simple|WC_Product_Variable */
-        foreach($products as $product) {
-            if($product->get_meta('pdv') >= 10) {
-                $taxcalc = (int) ('1' . $product->get_meta('pdv'));
-            } else {
-                $taxcalc = (int) ('10' . (int) $product->get_meta('pdv'));
-            }
-
-            $csv .= @iconv('utf-8','windows-1250',  $product->get_sku()."\t".trim(mb_strtoupper($product->get_name(), 'UTF-8'))."\t".
-                    str_replace('.', ',', $product->get_meta('pdv'))."\t".str_replace('.', ',', round($product->get_price() * 100 / (double) $taxcalc, 2))."\t".
-                    str_replace('.', ',', round($product->get_price(), 2)))."\r\n";
-
-            if (get_class($product) === WC_Product_Variable::class) {
-                $passedIds = [];
-                foreach ($product->get_available_variations() as $variations) {
-                    foreach ($variations['attributes'] as $variation) {
-                        $itemIdSize = $product->get_sku() . $variation;
-                        if (!in_array($itemIdSize, $passedIds)) {
-                            $passedIds[] = $itemIdSize;
-                            $csv .= iconv('utf-8','windows-1250',  $itemIdSize."\t".
-                            trim(mb_strtoupper($product->get_name() . ' ' . $variation, 'UTF-8'))."\t".
-                            str_replace('.',',',$product->get_meta('pdv'))."\t".str_replace('.', ',', round($product->get_price() * 100 / (double) $taxcalc, 2))."\t".
-                            str_replace('.', ',', round($product->get_price(), 2)))."\r\n";
-                        }
-                    }
-                }
+    if ($product->get_status() == 'publish' && $product->get_stock_status() == 'instock') {
+        $data[] = [
+            'id' => $product->get_id(),
+            'text' => $product->get_name()
+        ];
+        if (get_class($product) == \WC_Product_Variable::class) {
+            foreach ($product->get_available_variations() as $available_variation) {
+                $variation = wc_get_product($available_variation['variation_id']);
+                $data[] = [
+                    'id' => $available_variation['variation_id'],
+                    'text' => $variation->get_name()
+                ];
             }
         }
     }
 
-    header("Cache-Control: public");
-    header("Content-Description: File Transfer");
-    header('Content-type: text/plain');
-    header("Content-Disposition: attachment; filename=".date('d-m-Y H:i:s').'.txt"');
-    header('Content-Transfer-Encoding: binary');
-
-    echo $csv;
+    return $data;
 }
 
-function createAdresnica($orderId) {
-    $order = wc_get_order($orderId);
-    $path = createAdresnicaPdf($order);
+function backendProductSearch() {
+    $data = [];
+    $query = $_GET['query'];
+    $productId = wc_get_product_id_by_sku($query);
+    if ($productId) {
+        $product = wc_get_product($productId);
+        if ($product) {
+            $data = array_merge($data, appendItemForBackendSearch($product));
+        }
+    }
+    $product = wc_get_product($query);
+    if ($product) {
+        $data = array_merge($data, appendItemForBackendSearch($product));
+    }
 
-    header("Cache-Control: public");
-    header("Content-Description: File Transfer");
-    header('Content-type: text/plain');
-    header("Content-Disposition: attachment; filename=".basename($path));
-    header('Content-Transfer-Encoding: binary');
+    $results = gf_elastic_search_with_data($_GET['query']);
+    foreach ($results->getResults() as $result) {
+        $product = wc_get_product($result->getData()['postId']);
+        $data = array_merge($data, appendItemForBackendSearch($product));
+    }
 
-    echo file_get_contents($path);
-}
-
-function exportJitexOrder(WC_Order $order) {
-    $csvText = parseJitexDataFromOrder($order);
-
-    header('Content-Disposition: attachment; filename="' . $order->get_order_number() . '.txt' . '"');
-    header("Content-Transfer-Encoding: binary");
-    header('Expires: 0');
-    header('Pragma: no-cache');
-
-//    print iconv('utf-8','windows-1250',str_replace(array('Ð', 'ð'), array('Đ', 'đ'), $csvText));
-    $csvText = fixJitexCharacters($csvText);
-    echo $csvText;
-}
-
-function fixJitexCharacters($str) {
-
-    return str_replace(
-        ['ć', 'Ć', 'č', 'Č', 'š', 'Š', 'đ', 'Đ', 'ž', 'Ž'],
-        ['c', 'C', 'c', 'C', 's', 'S', 'd', 'D', 'z', 'Z'],
-        $str
-    );
+    echo json_encode([
+        'security' => wp_create_nonce(),
+        'results' => $data,
+        'pagination' => [
+            'more' => false
+        ]
+    ]);
 }
 
 function printOrder(WC_Order $order) {

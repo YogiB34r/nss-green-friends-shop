@@ -24,7 +24,7 @@ class DailyExpressApi
 
     public function sendAdresnice()
     {
-        $csv = file_get_contents(ABSPATH . '/wp-content/uploads/adresnice/adresnica-081118test.csv');
+        $csv = file_get_contents(ABSPATH . '/wp-content/uploads/adresnice/adresnica-081118.csv');
         $this->compileAdresniceSoapXml($csv);
         $this->call();
     }
@@ -33,7 +33,6 @@ class DailyExpressApi
     {
         $headers = ['Content-Type' => 'text/xml'];
         $request = $this->httpClient->send(new Request('POST', $this->endpoint, $headers, $this->soapXml));
-        echo $this->soapXml;
 
         var_dump($request->getBody()->getContents());
         die();
@@ -103,7 +102,7 @@ class DailyExpressApi
                 'gpoid' => $order->get_order_number(),
 
                 'ID nalogodavca' => 'UK17357',
-                'Naziv nalogodavca' => 'Non Stop Shop​ d.o.o.',
+                'Naziv nalogodavca' => 'Non Stop Shop d.o.o.',
                 'Adresa nalogodavca' => 'Žorža Klemansoa 19',
                 'ID naselja nalogodavca' => 11000,
                 'Naziv naselja/mesta nalogodavca' => 'Beograd',
@@ -111,7 +110,7 @@ class DailyExpressApi
                 'Kontakt telefon nalogodavca' => '011/3334773',
 
                 'ID posaljioca' => 'UK17357',
-                'Naziv posaljioca' => 'Non Stop Shop​ d.o.o.',
+                'Naziv posaljioca' => 'Non Stop Shop d.o.o.',
                 'Adresa mesta preuzimanja' => 'Žorža Klemansoa 19',
                 'ID naselja mesta preuzimanja' => 11000,
                 'Naziv naselja/mesta preuzimanja' => 'Beograd',

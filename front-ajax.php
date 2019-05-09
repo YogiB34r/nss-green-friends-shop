@@ -137,31 +137,17 @@ if (isset($_POST['action']) && $_POST['action'] == 'ajax_load_more') {
     $page = addslashes($_POST['page']);
     $term = addslashes($_POST['term']);
     $type = addslashes($_POST['type']);
-    $key = 'pagination-fragment-cache-' . md5($term . $type . $page . $_GET['query']);
 
     set_query_var('paged', $page);
     set_query_var('term', $term);
 
     if ($type === 'category') {
-        $cache = new GF_Cache();
-        $html  = $cache->redis->get($key);
-//        $results = false;
-        if ($html === false) {
-            echo 'not cached';
-            $results = gf_get_category_items_from_elastic();
-            ob_start();
-            gf_custom_shop_loop($results);
-            $html = ob_get_clean();
-            $cache->redis->set($key, $html);
-        } else {
-            echo 'cached';
-        }
-        echo $html;
+        $results = gf_get_category_items_from_elastic();
     } else {
         $results = gf_elastic_search_with_data($_GET['query']);
-        gf_custom_shop_loop($results);
     }
 
+    gf_custom_shop_loop($results);
 
     exit();
 }
