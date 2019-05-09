@@ -451,60 +451,59 @@ jQuery(document).ready(function ($) {
     });
 
     //*** Infinite scroll ***
-    var loading = false;
-    $(window).on('scroll', function() {
-        //init
+    startInfiniteScroll();
+
+    // var targetHeight = $(document).height() - ($(window).height());
+    function startInfiniteScroll() {
         var that = $('#loadMore');
-        var page = parseInt($('#loadMore').data('page'));
-        if (page < 1) {
-            page = 1;
-        }
-        var newPage = page + 1;
-        // var targetHeight = $(document).height() - ($(window).height());
-
         if (that.length > 0) {
-            // if (!loading && window.scrollY > targetHeight - 100 && window.scrollY < targetHeight + 100) {
-            // var top_of_element = that.offset().top;
-            var bottom_of_element = $('#ajax-primary').offset().top + $('#ajax-primary').outerHeight();
-            var bottom_of_screen = $(window).scrollTop() + $(window).height();
+            //init
+            var loading = false;
+            $(window).on('scroll', function() {
+                var page = parseInt($('#loadMore').data('page'));
+                if (page < 1) {
+                    page = 1;
+                }
+                var newPage = page + 1;
 
-            if (!loading && (bottom_of_screen > bottom_of_element - 200)){
-                loading = true;
-                console.log('trigger');
-                $.ajax({
-                    url: '/gf-ajax/?query=' + that.data('query'),
-                    type: 'post',
-                    data: {
-                        page: newPage,
-                        term: that.data('term'),
-                        type: that.data('action'),
-                        action: 'ajax_load_more'
-                    },
-                    error: function(response) {
-                        loading = false;
-                        // console.log(response);
-                    },
-                    success: function(response) {
-                        loading = false;
-                        //check
-                        if (response == '') {
-                            if ($("#no-more").length == 0) {
-                                $('#ajax-content').append('<div id="no-more" class="text-center"><h3>Stigli ste do kraja!</h3><p>Nema proizvoda za traženi kriterijum.</p></div>');
-                                loading = true; // stop further loading
+                // if ($(window).scrollTop() === $(document).height() - $(window).height()) {
+                var windowPos = window.scrollY + $(window).height() * 3/4;
+                if (!loading && windowPos > that.offset().top - 200 && windowPos < that.offset().top + 100) {
+                    loading = true;
+                    $.ajax({
+                        url: '/gf-ajax/?query=' + that.data('query'),
+                        type: 'post',
+                        data: {
+                            page: newPage,
+                            term: that.data('term'),
+                            type: that.data('action'),
+                            action: 'ajax_load_more'
+                        },
+                        error: function(response) {
+                            loading = false;
+                            // console.log(response);
+                        },
+                        success: function(response) {
+                            loading = false;
+                            if (response == 0) {
+                                if ($("#no-more").length == 0) {
+                                    $('#ajax-content').append('<div id="no-more" class="text-center"><h3>Stigli ste do kraja!</h3><p>Nema proizvoda za traženi kriterijum.</p></div>');
+                                }
+                                $('#loadMore').hide();
+                                console.log('the end');
+                            } else {
+                                $('#loadMore').data('page', newPage);
+                                $('#ajax-content').append(response);
+
+                                window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+                                // ga('create', 'UA-108239528-1', { 'cookieDomain': 'nonstopshop.rs' } );
+                                ga('send', 'pageview', location + 'page/' + page);
                             }
-                            $('#loadMore').hide();
-                        } else {
-                            $('#loadMore').data('page', newPage);
-                            $('#ajax-content').append(response);
-
-                            window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-                            ga('create', 'UA-108239528-1', { 'cookieDomain': 'nonstopshop.rs' } );
-                            ga('send', 'pageview', location + 'page/' + page);
                         }
-                    }
-                });
-            }
+                    });
+                }
+            });
         }
-    });
+    }
 
 });

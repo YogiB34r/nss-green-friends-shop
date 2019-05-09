@@ -34,6 +34,7 @@ class PricelistUpdate
     public function updatePricesAndStatuses($fileInfo)
     {
         $notFoundItems = [];
+        $errorItems = [];
         foreach ($this->parseData($fileInfo) as $itemInfo) {
             if ($itemInfo[0]) {
                 $product = get_product_by_sku($itemInfo[0]);
@@ -41,34 +42,77 @@ class PricelistUpdate
                     $notFoundItems[] = $itemInfo;
                     continue;
                 }
-
-                $product->update_meta_data('input_price', $itemInfo[1]);
-                if ($itemInfo[3] > 0) {
-                    $product->set_price((int) $itemInfo[2]);
-                    $product->set_regular_price((int) $itemInfo[3]);
-                    $product->set_sale_price((int) $itemInfo[2]);
-                } else {
-                    $product->set_price((int) $itemInfo[2]);
-                    $product->set_regular_price((int) $itemInfo[2]);
-
-                }
                 $status = 'publish';
+                $stock = 'instock';
                 if ($itemInfo[4] == 2) {
                     $status = 'draft';
                 }
                 if ($itemInfo[4] == 3) {
-                    $product->set_stock_status('outofstock');
-                } else {
-                    $product->set_stock_status('instock');
+                    $stock = 'outofstock';
                 }
-                $product->set_status($status);
-                $product->save();
+
+                if ($itemInfo[3] > 0 && $itemInfo[2] > $itemInfo[3]) {
+                    $errorItems[] = $itemInfo;
+                    continue;
+                }
+                if ($itemInfo[2] <  10 || ($itemInfo[3] > 0 && $itemInfo[3] < 10)) {
+                    $errorItems[] = $itemInfo;
+                    continue;
+                }
+
+                $product->update_meta_data('input_price', $itemInfo[1]);
+                if ($itemInfo[3] > 0) {
+                    $price = (int) $itemInfo[2];
+                    $regularPrice = (int) $itemInfo[3];
+                    $salePrice = (int) $itemInfo[2];
+                } else {
+                    $price = (int) $itemInfo[2];
+                    $regularPrice = (int) $itemInfo[2];
+                    $salePrice = '';
+                }
+
+                if (get_class($product) == \WC_Product_Variable::class) {
+                    foreach ($product->get_available_variations() as $available_variation) {
+                        $variation = wc_get_product($available_variation['variation_id']);
+                        $variation->set_stock_status($stock);
+                        $variation->set_status($status);
+                        $variation->set_regular_price($regularPrice);
+                        $variation->set_price($price);
+                        $variation->set_sale_price($salePrice);
+                        $variation->save();
+                    }
+                } else {
+                    $product->set_price($price);
+                    $product->set_regular_price($regularPrice);
+                    $product->set_sale_price($salePrice);
+
+                    $product->set_stock_status($stock);
+                    $product->set_status($status);
+                    $product->save();
+                }
             }
         }
-        echo 'Proizvodi uspesno izmenjeni.';
-        if (!empty($notFoundItems)) {
-            return $this->parseNotFoundItems($notFoundItems);
+        $html = 'Proizvodi uspesno izmenjeni.';
+        if (!empty($errorItems)) {
+            $html .= $this->parseErrorItems($errorItems);
         }
+        if (!empty($notFoundItems)) {
+            $html .= $this->parseNotFoundItems($notFoundItems);
+        }
+
+        return $html;
+    }
+
+    private function parseErrorItems($items)
+    {
+        $html = '<p>CENA NIJE VALIDNA za sledece kataloske brojeve:</p>';
+        $html .= '<ul>';
+        foreach ($items as $item) {
+            $html .= '<li>'.$item[0].'</li>';
+        }
+        $html .= '</ul>';
+
+        return $html;
     }
 
     private function parseNotFoundItems($items)

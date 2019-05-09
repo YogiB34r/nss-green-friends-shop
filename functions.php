@@ -221,8 +221,8 @@ function gf_ajax_view_count($postId)
     echo 1;
 }
 
-function gf_set_product_categories($product_id, $category_ids)
-{
+/* @todo could be removed ? */
+function gf_set_product_categories($product_id, $category_ids) {
     $product = wc_get_product($product_id);
     $product_categories = $product->get_category_ids();
     $diff = array_diff($category_ids, $product_categories);
@@ -239,8 +239,7 @@ add_filter('request', 'custom_request');
  * @param $query_string
  * @return mixed
  */
-function custom_request($query_string)
-{
+function custom_request($query_string) {
     if (isset($query_string['page'])) {
         if ($query_string['page'] !== '') {
             if (isset($query_string['name'])) {
@@ -252,8 +251,7 @@ function custom_request($query_string)
 }
 
 
-function gf_custom_shop_loop(\Elastica\ResultSet $products)
-{
+function gf_custom_shop_loop(\Elastica\ResultSet $products) {
     $html = '';
 
     $i = 0;
@@ -326,8 +324,7 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products)
     echo $html;
 }
 
-function woocommerce_pagination()
-{
+function woocommerce_pagination() {
     $args = array(
         'total' => wc_get_loop_prop('total_pages'),
         'current' => wc_get_loop_prop('current_page'),
@@ -343,15 +340,13 @@ function woocommerce_pagination()
 }
 
 add_action('wp_print_scripts', 'iconic_remove_password_strength', 10);
-function iconic_remove_password_strength()
-{
+function iconic_remove_password_strength() {
     wp_dequeue_script('wc-password-strength-meter');
 }
 
 
 add_action('woocommerce_save_account_details_errors', 'wooc_validate_custom_field', 10, 2);
-function wooc_validate_custom_field($args, $user)
-{
+function wooc_validate_custom_field($args, $user) {
     $user_id = $user->ID;
     $user_pass_hash = get_user_by('id', $user_id)->user_pass;
     if (isset($_POST['password_current']) && !empty($_POST['password_current'])) {
@@ -365,8 +360,7 @@ function wooc_validate_custom_field($args, $user)
 }
 
 add_action('woocommerce_before_account_navigation', 'gf_my_account_shop_button', 1);
-function gf_my_account_shop_button()
-{
+function gf_my_account_shop_button() {
     global $wp;
     $request = explode('/', $wp->request);
     $page = end($request);
@@ -402,20 +396,15 @@ function gf_my_account_shop_button()
     echo '</div>';
 }
 
-
-
 add_filter('woocommerce_account_menu_items', 'gf_remove_my_account_links');
-function gf_remove_my_account_links($menu_links)
-{
+function gf_remove_my_account_links($menu_links) {
     unset($menu_links['dashboard']); // Addresses
 
     return $menu_links;
 }
 
-
 add_filter('woocommerce_catalog_orderby', 'wc_customize_product_sorting');
-function wc_customize_product_sorting($sorting_options)
-{
+function wc_customize_product_sorting($sorting_options) {
     $sorting_options = array(
         'menu_order' => __('Sorting', 'woocommerce'),
         'popularity' => __('Sort by popularity', 'woocommerce'),
@@ -433,16 +422,11 @@ add_filter('members_check_parent_post_permission', function () {
     return false;
 });
 
-
-//@TODO Make it work
-//********* infinite scroll START *********
-
 /*
  * load more script ajax hooks
  */
 add_action('wp_ajax_nopriv_ajax_script_load_more', 'ajax_script_load_more');
 add_action('wp_ajax_ajax_script_load_more', 'ajax_script_load_more');
-
 
 /*
  * initial posts dispaly
