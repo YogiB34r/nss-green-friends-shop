@@ -1,7 +1,6 @@
 <?php
 add_action('woocommerce_admin_order_totals_after_tax', 'custom_admin_order_totals_after_tax', 10, 1);
-function custom_admin_order_totals_after_tax($orderid)
-{
+function custom_admin_order_totals_after_tax($orderid) {
     $order = wc_get_order($orderid);
     $totalWeight = 0;
     foreach ($order->get_items() as $item_id => $item_data) {
@@ -22,16 +21,11 @@ function custom_admin_order_totals_after_tax($orderid)
     } elseif ($totalWeight > 20 and $totalWeight <= 30) {
         $price = 470;
     } elseif ($totalWeight > 30 and $totalWeight <= 50) {
-        $price = 500;
+        $price = 600;
     } elseif ($totalWeight > 50) {
         $newWeight = $totalWeight - 50;
-        $price = 500 + ($newWeight * 10);
+        $price = 600 + ($newWeight * 10);
     }
-//    if (isset(array_keys($order->get_shipping_methods())[0])) {
-//        $order->remove_item(array_keys($order->get_shipping_methods())[0]);
-//        $order->set_shipping_total(0);
-//        $order->save();
-//    }
 
     if (isset($_POST['items']) && array_search('free_shipping', \GuzzleHttp\Psr7\parse_query(urldecode($_POST['items'])))) {
         $order->remove_item(array_keys($order->get_shipping_methods())[0]);
@@ -43,20 +37,23 @@ function custom_admin_order_totals_after_tax($orderid)
         $order->save();
     }
 
-    if ($price > 0 && $order->get_shipping_total() == 0) {
-        if($order->get_shipping_method() !== 'Besplatna dostava') {
-            $shipping = new WC_Order_Item_Shipping();
-            $shipping->set_total($price);
-            $order->add_item($shipping);
-            $order->set_shipping_total($price);
-            $order->save();
+    if ($price > 0 && $order->get_shipping_method() !== 'Besplatna dostava') {
+        $shipping = new WC_Order_Item_Shipping();
+        $shipping->set_total($price);
+        if ($order->get_shipping_total() != 0) {
+            $order->remove_item(array_keys($order->get_shipping_methods())[0]);
         }
-    }
-    if (isset($_POST['action']) && $_POST['action'] === 'woocommerce_remove_order_item') {
-        $order->remove_item(array_keys($order->get_shipping_methods())[0]);
+        $order->add_item($shipping);
+        $order->set_shipping_total($price);
         $order->save();
     }
-
+    if (isset($_POST['action']) && $_POST['action'] === 'woocommerce_remove_order_item') {
+        if (isset(array_keys($order->get_shipping_methods())[0])) {
+//            $order->remove_item(array_keys($order->get_shipping_methods())[0]);
+//            $order->save();
+//            echo 'removed shipping';
+        }
+    }
 }
 
 //------------------------------------------------------------
@@ -117,6 +114,7 @@ function gf_get_order_payment_method_column($colname) {
     if ($colname == 'customActions') {
         $jitexDoneStyle = '';
         $adresnicaDoneStyle = '';
+        $misDoneStyle = '';
         if ($the_order->get_meta('jitexExportCreated')) {
             $jitexDoneStyle = 'style="color:white;background-color:gray;font-style:italic;"';
         }
@@ -124,7 +122,7 @@ function gf_get_order_payment_method_column($colname) {
             $adresnicaDoneStyle = 'style="color:white;background-color:gray;font-style:italic;"';
         }
         if ($the_order->get_meta('synced')) {
-            $adresnicaDoneStyle = 'style="color:white;background-color:gray;font-style:italic;"';
+            $misDoneStyle = 'style="color:white;background-color:gray;font-style:italic;"';
         }
 //        echo '<a class="button" href="/back-ajax/?action=printOrder&id='. $the_order->get_id() .'" title="Print racuna" target="_blank">Racun</a>';
         echo '&nbsp;';
@@ -133,10 +131,15 @@ function gf_get_order_payment_method_column($colname) {
         echo '<a class="button nssOrderJitexExport" ' . $jitexDoneStyle . ' href="/back-ajax/?action=exportJitexOrder&id=' . $the_order->get_id() . '" title="Export za Jitex" target="_blank">Export</a>';
         echo '&nbsp;';
         echo '<a class="button nssOrderAdresnica" ' . $adresnicaDoneStyle . ' href="/back-ajax/?action=adresnica&id=' . $the_order->get_id() . '" title="Kreiraj adresnicu" target="_blank">Adresnica</a>';
+        $orderNote = $the_order->get_customer_note();
+        if (strlen($orderNote) > 0) {
+            echo '&nbsp;';
+            echo '<a class="button " style="background-color:yellow;" ' . ' href="#" title="'.$orderNote.'"  target="_blank">Napomena</a>';
+        }
         $user = wp_get_current_user();
         if ($user->ID === 1) {
             echo '&nbsp;';
-            echo '<a class="button nssOrderMis" ' . $adresnicaDoneStyle . ' href="/back-ajax/?action=mis&type=order&id=' . $the_order->get_id() . '" title="Sinkuj na mis" target="_blank">Mis</a>';
+            echo '<a class="button nssOrderMis" ' . $misDoneStyle . ' href="/back-ajax/?action=mis&type=order&id=' . $the_order->get_id() . '" title="Sinkuj na mis" target="_blank">Mis</a>';
         }
 //        echo $the_order->get_meta('gf_order_created_method');
     }
@@ -167,10 +170,8 @@ function redirect_page() {
     }
 }
 
-
 add_action('woocommerce_before_order_itemmeta', 'addItemStatusToOrderItemList', 10, 3);
-function addItemStatusToOrderItemList($itemId, $item, $c)
-{
+function addItemStatusToOrderItemList($itemId, $item, $c){
     /* @var WC_Order_Item_Product $item */
     if (isset($_GET['post']) && $_GET['post'] && get_class($item) === WC_Order_Item_Product::class) {
         global $wpdb;
@@ -181,22 +182,17 @@ function addItemStatusToOrderItemList($itemId, $item, $c)
     }
 }
 
-
 // ADDING A CUSTOM COLUMN TITLE TO ADMIN PRODUCTS LIST
 add_filter('manage_edit-product_columns', 'gf_supplier_product_list_column', 11);
-function gf_supplier_product_list_column($columns)
-{
-    //add columns
+function gf_supplier_product_list_column($columns){
     $columns['stockStatus'] = __('Lager', 'woocommerce'); // title
     $columns['supplier'] = __('Dobavljač', 'woocommerce'); // title
 
     return $columns;
 }
 
-// ADDING THE DATA FOR EACH PRODUCTS BY COLUMN (EXAMPLE)
 add_action('manage_product_posts_custom_column', 'gf_supplier_product_list_column_content', 10, 2);
-function gf_supplier_product_list_column_content($column, $product_id)
-{
+function gf_supplier_product_list_column_content($column, $product_id){
     global $post;
 
     $supplier_id = get_post_meta($product_id, 'supplier', true);
@@ -207,7 +203,21 @@ function gf_supplier_product_list_column_content($column, $product_id)
                 break;
             case 'stockStatus':
                 $product = wc_get_product($product_id);
-                if ($product->is_in_stock()) {
+                $stockStatus = false;
+                if (get_class($product) == WC_Product_Variable::class) {
+                    foreach ($product->get_available_variations() as $available_variation) {
+                        $variation = wc_get_product($available_variation['variation_id']);
+                        if ($variation->is_in_stock()) {
+                            $stockStatus = true;
+                        }
+                    }
+                } else {
+                    if ($product->is_in_stock()) {
+                        $stockStatus = true;
+                    }
+                }
+
+                if ($stockStatus) {
                     echo 'Na stanju '. $product->get_meta('quantity') .' komada';
                 } else {
                     echo 'Nema na stanju';
@@ -215,40 +225,30 @@ function gf_supplier_product_list_column_content($column, $product_id)
                 break;
         }
     }
-
 }
 
-function gf_get_order_dates()
-{
-    $query = new WC_Order_Query(array(
-        'limit' => -1,
-        'return' => 'ids'
-    ));
-    $order_ids = $query->get_orders();
+function gf_get_order_dates() {
+    global $wpdb;
 
-    $same_date = '';
-    $order_dates = [];
-    foreach ($order_ids as $order_id) {
-        $date = get_the_time(__('d/m/Y', 'woocommerce'), $order_id);
-        if ($date !== $same_date) {
-            $order_dates[] = $date;
-            $same_date = $date;
-        }
+    $sql = "SELECT distinct DATE(post_date) as postDate FROM wp_posts WHERE post_type = 'shop_order' ORDER BY post_date DESC";
+    $dates = $wpdb->get_results($sql);
+
+    $orderDates = [];
+    foreach ($dates as $date){
+        $orderDates[] = date('d/m/Y', strtotime($date->postDate));
     }
 
-    return $order_dates;
+    return $orderDates;
 }
 
 add_filter('query_vars', 'gf_order_date_register_query_vars');
-function gf_order_date_register_query_vars($qvars)
-{
+function gf_order_date_register_query_vars($qvars){
     $qvars[] = 'gf_order_date';
     return $qvars;
 }
 
 add_action('restrict_manage_posts', 'gf_print_order_date_picker_admin_list');
-function gf_print_order_date_picker_admin_list()
-{
+function gf_print_order_date_picker_admin_list(){
     global $typenow;
     $order_dates = gf_get_order_dates();
     if ($typenow == 'shop_order') {
@@ -266,16 +266,13 @@ function gf_print_order_date_picker_admin_list()
 }
 
 add_action('pre_get_posts', 'gf_order_date_apply_filter');
-function gf_order_date_apply_filter($query)
-{
-
+function gf_order_date_apply_filter($query){
     $order_date_str = $query->get('gf_order_date');
     $exploded_date = explode('/', $order_date_str);
     if (!empty($order_date_str)) {
         $meta_query = $query->get('meta_query');
         if (empty($meta_query))
             $meta_query = array();
-
 
         $meta_query[] = array(
             'key' => 'post_date',
@@ -287,13 +284,11 @@ function gf_order_date_apply_filter($query)
         $query->set('day', $exploded_date[0]);
         $query->set('monthnum', $exploded_date[1]);
         $query->set('year', $exploded_date[2]);
-
     }
 }
 
 add_filter('bulk_actions-edit-product', 'register_gf_product_list_bulk_action');
-function register_gf_product_list_bulk_action($bulk_actions)
-{
+function register_gf_product_list_bulk_action($bulk_actions){
     if (isset($_GET['post_type']) && $_GET['post_type'] == 'product' && isset($_GET['filter_action']) && isset($_GET['product_cat'])) {
         $bulk_actions['remove_product_from_sliders'] = 'Ukloni iz kategorije: ' . $_GET['product_cat'];
     }
@@ -302,8 +297,7 @@ function register_gf_product_list_bulk_action($bulk_actions)
 }
 
 add_filter('handle_bulk_actions-edit-product', 'gf_product_list_bulk_action_handler', 10, 3);
-function gf_product_list_bulk_action_handler($redirect_to, $doaction, $post_ids)
-{
+function gf_product_list_bulk_action_handler($redirect_to, $doaction, $post_ids){
     if ($doaction !== 'remove_product_from_sliders') {
         return $redirect_to;
     }
@@ -317,8 +311,7 @@ function gf_product_list_bulk_action_handler($redirect_to, $doaction, $post_ids)
 
 //admin product list filter by supplier *** START ***
 add_filter('woocommerce_product_filters', 'gf_admin_product_list_supplier_filter', 10, 1);
-function gf_admin_product_list_supplier_filter($output)
-{
+function gf_admin_product_list_supplier_filter($output) {
     $args = array(
         'role' => 'supplier',
         'orderby' => 'display_name',
@@ -338,8 +331,7 @@ function gf_admin_product_list_supplier_filter($output)
 }
 
 add_filter('parse_query', 'gf_featured_products_admin_filter_query');
-function gf_featured_products_admin_filter_query($query)
-{
+function gf_featured_products_admin_filter_query($query) {
     global $typenow, $wp_query;
 
     if ($typenow == 'product' && !empty($_GET['product_supplier_filter'])) {
@@ -349,11 +341,9 @@ function gf_featured_products_admin_filter_query($query)
 }
 //admin product list filter by supplier *** END ***
 
-
 // EXTERNAL ITEM BANNERS WIDGET OPTIONS
 add_action('admin_menu', 'gf_external_item_banners_widget_options_create_menu');
-function gf_external_item_banners_widget_options_create_menu()
-{
+function gf_external_item_banners_widget_options_create_menu() {
     global $wpdb;
     $widget = new \GF\ExternalBannerWidget\ExternalBannerWidget($wpdb);
     //create new top-level menu
@@ -374,7 +364,6 @@ function bulkAdresniceExport($actions) {
 
     return $actions;
 }
-
 
 function generateUploadsPath() {
     return __DIR__ . '/../../../uploads/'. date('Y') .'/'. date('m') .'/'. date('d') . '/';
@@ -403,6 +392,7 @@ function handleBulkAdresniceExport($redirect_to, $action, $orderIds) {
                 }
                 if ($add !== true) {
                     var_dump('could not add file to archive');
+                    die();
                 }
             }
             if ($zipArchive->close() !== true) {
@@ -445,19 +435,15 @@ function handleBulkAdresniceExport($redirect_to, $action, $orderIds) {
             return $redirect_to;
             break;
     }
-
-//    $paths = [];
-
 }
+
 // The results notice from bulk action on orders
 add_action('admin_notices', 'bulkAdresniceAdminNotice');
 function bulkAdresniceAdminNotice() {
-//    if (empty($_REQUEST['adresniceExport']) || empty($_REQUEST['jitexExport'])) return; // Exit
-
     if (!isset($_REQUEST['processed_count'])) {
         return;
     }
-    $count = intval($_REQUEST['processed_count']);
+    $count = (int) $_REQUEST['processed_count'];
 
     if (!empty($_REQUEST['adresniceExport'])) {
         echo '<div id="message" class="updated fade">
@@ -516,12 +502,14 @@ function parseJitexDataFromOrder(WC_Order $order) {
 
 function createAdresnicaPdf(WC_Order $order) {
     $name = 'Adresnica-'.$order->get_order_number().'.pdf';
-    $uploadsDir = generateUploadsPath();
-    if (file_exists($uploadsDir . $name)) {
-        return $uploadsDir . $name;
-    }
+//    $uploadsDir = generateUploadsPath();
+//    if (file_exists($uploadsDir . $name)) {
+//        return $uploadsDir . $name;
+//    }
 
-    $order->update_status('spz-slanje');
+    if (in_array($order->get_status(), ['spz-pakovanje'])) {
+        $order->update_status('spz-slanje');
+    }
     $order->update_meta_data('adresnicaCreated', 1);
     $order->save();
 
@@ -563,3 +551,93 @@ function printPreorder(WC_Order $order) {
 
     return $html;
 }
+
+add_action('woocommerce_product_options_general_product_data', 'addStickerInfoToProductTabs');
+function addStickerInfoToProductTabs() {
+    echo '<div class="options_group">';
+    $isActive = get_post_meta(get_the_ID(), 'sale_sticker_active', true);
+    $class = "";
+    if ($isActive !== 'yes') {
+        $class = "hidden";
+    }
+    woocommerce_wp_checkbox( array(
+        'id'      => 'sale_sticker_active',
+        'value'   => get_post_meta(get_the_ID(), 'sale_sticker_active', true),
+        'label'   => 'Sale sticker',
+        'desc_tip' => true,
+        'description' => 'Add a sale sticker to this product.',
+    ) );
+
+    echo '<div class="'. $class .' saleStickerOptionContainer">';
+
+    $dateFrom = get_post_meta(get_the_ID(), 'sale_sticker_from', true);
+    woocommerce_wp_text_input([
+        'id' => 'sale_sticker_from',
+        'class' => 'datepicker',
+        'value'   => ((int) $dateFrom > 0) ? date('d/m/Y', (int) $dateFrom) : '',
+        'label'   => 'Start date',
+        'description' => 'Select start date',
+    ]);
+
+    $dateTo = get_post_meta(get_the_ID(), 'sale_sticker_to', true);
+    woocommerce_wp_text_input([
+        'id' => 'sale_sticker_to',
+        'class' => 'datepicker',
+        'value'   => ((int) $dateTo > 0) ? date('d/m/Y', (int) $dateTo) : '',
+        'label'   => 'End date',
+        'description' => 'Select end date.',
+    ]);
+        echo '</div>';
+    echo '</div>';
+}
+
+add_action( 'woocommerce_process_product_meta', 'saveStickerInfo', 10, 2 );
+function saveStickerInfo($id, $post) {
+    update_post_meta( $id, 'sale_sticker_from', strtotime($_POST['sale_sticker_from']));
+    update_post_meta( $id, 'sale_sticker_to', strtotime($_POST['sale_sticker_to']));
+    update_post_meta( $id, 'sale_sticker_active', $_POST['sale_sticker_active']);
+}
+
+add_action( 'woocommerce_order_item_add_line_buttons', 'pd_admin_order_items_headers' );
+function pd_admin_order_items_headers(){
+    ?>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+
+    <button type="button" class="button add-order-item-custom">Dodaj proizvod (test)</button>
+
+    <div id="custom-add" class="modal" title="Dodaj proivod" data-order-id="" data-security="">
+        <div class="content">
+            <div class="custom-add-row">
+<!--                <label style="float: left">Select product</label>-->
+                <select class="item-list" style="width: 80%"></select>
+
+                <label>Qty</label>
+                <input type="number" value="1" class="item-qty" style="width: 50px" />
+            </div>
+        </div>
+
+        <button type="button" class="button save-items">Add</button>
+
+        <div style="display: none;" class="custom-add-template">
+            <div class="custom-add-row">
+                <select class="item-list" style="width: 80%"></select>
+
+                <label>Qty</label>
+                <input type="number" value="1" class="item-qty" style="width: 50px" />
+            </div>
+        </div>
+    </div>
+    <?php
+}
+
+/*
+add_action( 'woocommerce_admin_order_item_values', 'pd_admin_order_item_values', 3 );
+function pd_admin_order_item_values( $product, $item, $item_id ) {
+    //Get what you need from $product, $item or $item_id
+    ?>
+    <td class="line_customtitle">
+        <?php //your content here ?>
+    </td>
+    <?php
+}*/

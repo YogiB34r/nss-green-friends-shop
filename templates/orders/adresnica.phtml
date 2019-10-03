@@ -94,8 +94,13 @@ $html .= '</div>
                 } else {
                     $html .= '<p>'.$order->get_shipping_first_name() .' '. $order->get_shipping_last_name().'</p>';
                 }
-                $html .= '<p>'.$order->get_shipping_address_1().'</p>
-                <p>'.$order->get_shipping_postcode() .', '. $order->get_shipping_city() . ', Srbija</p>';
+                $html .= '<p>'.$order->get_shipping_address_1().'</p>';
+
+                if ($order->get_shipping_address_2() != '') {
+                    $html .= '<p>'.$order->get_shipping_address_2().'</p>';
+                }
+
+                $html .= '<p>'.$order->get_shipping_postcode() .', '. $order->get_shipping_city() . ', Srbija</p>';
             else:
                 if ($companyInfo) {
                     $html .= $companyInfo;

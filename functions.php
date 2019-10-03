@@ -321,7 +321,7 @@ function gf_custom_shop_loop(\Elastica\ResultSet $products)
         $html .= '</li>';
         $i++;
     }
-//    $html .= '</ul>';
+    $html .= '</ul>';
 
     echo $html;
 }
@@ -447,42 +447,40 @@ add_action('wp_ajax_ajax_script_load_more', 'ajax_script_load_more');
 /*
  * initial posts dispaly
  */
+function ajax_infinite_scroll($args)
+{
+    //initial posts load
+    echo '<div id="ajax-primary" class="content-area">';
+    echo '<div id="ajax-content" class="content-area">';
 
-//function ajax_infinite_scroll($args)
-//{
-//    //initial posts load
-//    echo '<div id="ajax-primary" class="content-area">';
-//    echo '<div id="ajax-content" class="content-area">';
-//
-//    ajax_script_load_more($args);
-//
-//    $mobile = 'desktop';
-//    if (wp_is_mobile()) {
-//        $mobile = 'mobile';
-//    }
-//
-//    echo '</div>';
-//    echo '<a href="#" id="loadMore" class="'.$mobile.'" data-page="1" data-url="' . admin_url("admin-ajax.php") . '" ></a>';
-//    echo '</div>';
-//}
+    ajax_script_load_more($args);
+
+    $mobile = 'desktop';
+    if (wp_is_mobile()) {
+        $mobile = 'mobile';
+    }
+
+    echo '</div>';
+    echo '<a href="#" id="loadMore" class="'.$mobile.'" data-page="1" data-url="' . admin_url("admin-ajax.php") . '" ></a>';
+    echo '</div>';
+}
 
 /*
  * load more script call back
  */
-//function ajax_script_load_more($args)
-//{
-//    $ajax = false;
-//    //check ajax call or not
-//    if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-//        $ajax = true;
-//    }
-//    var_dump($args);
-//
-//    gf_custom_shop_loop($args);
-//
-//    //check ajax call
-//    if ($ajax) die();
-//}
+function ajax_script_load_more($args)
+{
+    $ajax = false;
+    //check ajax call or not
+    if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+        $ajax = true;
+    }
+
+    gf_custom_shop_loop($args);
+
+    //check ajax call
+    if ($ajax) die();
+}
 
 function ajax_script_load_more_backup($args)
 {

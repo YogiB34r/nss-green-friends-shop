@@ -304,38 +304,75 @@ jQuery(document).ready(function ($) {
         }, 'JSON');
     });
 
-    // jQuery('body').on('ready', '.wc-product-search', function() {
-    // jQuery('.wc-product-search').on('ready', function() {
-    //     console.log('search');
-    //     jQuery('.wc-product-search').select2({
-    //         ajax: {
-    //             url: '/back-ajax/?action=adminSearch&query=' + jQuery(this).val()
-    //         }
-    //     });
-    // });
+    if ($('#sale_sticker_from').length > 0) {
+        $('#sale_sticker_from').datepicker();
+        $('#sale_sticker_to').datepicker();
 
-    // jQuery('body').on('keypress', '.select2-search__field', function() {
-    //     console.log('click search');
-    //     jQuery.ajax({
-    //         type: "POST",
-    //         url: '/back-ajax/?action=adminSearch',
-    //         data: {'query': jQuery(this).val()},
-    //         minLength: 0,
-    //         beforeSend: function () {
-    //             jQuery(".gf-search-box").css("background", "#fafafa url(/wp-content/themes/nss-green-friends-shop/assets/images/LoaderIcon.gif)no-repeat center");
-    //         },
-    //         success: function (response) {
-    //             jQuery(".gf-search-box").css("background", "none");
-    //             jQuery(".search-box").css("background", "#eee");
-    //             if (response != '') {
-    //                 jQuery(".suggesstion-box").html(response);
-    //                 jQuery(".suggesstion-box").fadeIn(200);
-    //             }
-    //         }
-    //     });
-    // })
+        $('#sale_sticker_active').change(function() {
+            if ($(this).prop('checked')) {
+                $('.saleStickerOptionContainer').show();
+            } else {
+                $('.saleStickerOptionContainer').hide();
+            }
+        });
+    }
 
-    //test
-    // jQuery('select').select2();
+    var select2ConfigForCustomAddProductButton = {
+        ajax: {
+            url: '/back-ajax/',
+            dataType: 'json',
+            data: function (params) {
+                return {
+                    query: params.term,
+                    action: 'backendProductSearch'
+                };
+        },
+        placeholder: "Search product"
+    }};
+
+    function createCloneForCustomAddButton() {
+        var cl = $('.custom-add-template .custom-add-row').clone();
+        cl.find('.item-list').select2(select2ConfigForCustomAddProductButton);
+        return cl;
+    }
+
+    $('body').on('change', '.item-list', function () {
+        $('#custom-add .content').append(createCloneForCustomAddButton());
+    });
+
+    $('body').on('click', '.save-items', function () {
+        var items = [];
+        $('#custom-add select').each(function(i, v) {
+            items.push({
+                'id': $(v).val(),
+                'qty': $(v).siblings('.item-qty').val()
+            });
+        });
+        $('.custom-add-row').remove();
+        var data = {
+            'action':'woocommerce_add_order_item',
+            'order_id': $('#post_ID').val(),
+            'security': woocommerce_admin_meta_boxes.order_item_nonce,
+            'data': items
+        };
+        $.post('/wp-admin/admin-ajax.php?_fs_blog_admin=true', data, function(response) {
+            $('.woocommerce_order_items_wrapper').parent().html(response.data.html);
+            $.modal.close();
+            $('.calculate-action').trigger('click');
+        })
+    });
+
+    $('body').on('click', '.add-order-item-custom', function () {
+        $("#custom-add").modal();
+        $(".close-modal").click(function() {
+            $.modal.close();
+            $('#custom-add .content').html('');
+            $('#custom-add .content').html(createCloneForCustomAddButton());
+        });
+
+        $('.content .item-list').select2(select2ConfigForCustomAddProductButton);
+        $('.content .item-list').select2('open');
+    });
+
 });
 

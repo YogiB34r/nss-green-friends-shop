@@ -37,6 +37,78 @@ if (defined('WP_CLI') && WP_CLI) {
     \WP_CLI::add_command('mis', 'mis');
 
     \WP_CLI::add_command('daily', 'daily');
+
+    \WP_CLI::add_command('createNalog', 'createNalog');
+
+    \WP_CLI::add_command('testCron', 'testCron');
+}
+
+/*
+ * @TODO create automatic operations
+ * */
+add_action('parseFeed', 'parseFeed');
+function parseFeed($args) {
+    global $wpdb;
+
+    $httpClient = new \GuzzleHttp\Client(['defaults' => [
+        'verify' => false
+    ]]);
+    $redis = new \Redis();
+    $redis->connect(REDIS_HOST);
+
+    $feed = new \Nss\Feed\Feed($httpClient, $redis, $wpdb);
+    $feed->parseFeed($args);
+}
+
+
+
+//add_action('testCron', 'testCron');
+function testCron() {
+    $from = 'mailer@nonstopshop.rs';
+    $headers = [
+        'Content-Type: text/html; charset=UTF-8',
+        "From: NonStopShop <'{$from}'>",
+    ];
+    $to[] = 'djavolak@mail.ru';
+    $subject = 'test cron operation';
+    $message = 'cron started at : '  . date('d-m-Y H:i:s');
+
+    wp_mail($to, $subject, $message, $headers);
+}
+
+add_action('createNalog', 'createNalog');
+function createNalog() {
+    global $wpdb;
+
+    $dt = new \DateTime('now');
+    if (in_array($dt->format('D'), ['Sun', 'Sat'])) {
+        return;
+    }
+
+    $backorder = new NSS_Backorder($wpdb);
+    $backorder->createBackOrders();
+
+    $sql = "SELECT backOrderId FROM wp_nss_backorder WHERE status <> 4 AND mailSent = 0";
+    foreach ($wpdb->get_results($sql) as $result) {
+        $orders = $backorder->getBackOrders($result->backOrderId);
+        $supplierId = $orders[0]->supplierId;
+        $backorder->sendBackOrderEmail($supplierId, $orders);
+//        if ($backorder->sendBackOrderEmail($supplierId, $orders)) {
+//            echo 'mail sent';
+//        }
+    }
+
+    $from = 'mailer@nonstopshop.rs';
+    $headers = [
+        'Content-Type: text/html; charset=UTF-8',
+        "From: NonStopShop <'{$from}'>",
+    ];
+    $to[] = 'djavolak@mail.ru';
+    $subject = 'Backorders created';
+    $dt = new \DateTime('now', new \DateTimeZone('Europe/Belgrade'));
+    $message = 'cron started at : '  . $dt->format('d/m/Y H:i:s');
+
+    wp_mail($to, $subject, $message, $headers);
 }
 
 function daily() {
@@ -44,24 +116,25 @@ function daily() {
     $api->sendAdresnice();
 }
 
+add_action('syncMis', 'mis');
 function mis() {
 
-//    $item = wc_get_product(408157);  //408157
+//    $item = wc_get_product(381897);
 //    new NSS_MIS_Item($item);
 //    die();
 
 //    $orderIds = [465270, 465314, 465287, 465272, 465264, 465280, 465222, 465273, 465263, 465277, 465238, 465292, 465613];
-//    $orderIds = [466062];
+//    $orderIds = [495971];
 //    foreach ($orderIds as $orderId) {
 //        $order = wc_get_order($orderId);
 //        new NSS_MIS_Order($order);
 //    }
 //    die();
-//    $order = wc_get_order(465265);
+//    $order = wc_get_order(489836);
 //    new NSS_MIS_Order($order);
 //    die();
 
-//    $user = get_user_by('id', 193943);
+//    $user = get_user_by('id', 214853);
 //    new NSS_MIS_User($user);
 //    die();
 
@@ -78,13 +151,7 @@ function mis() {
                 if ($order->get_meta('synced') !== '') {
 //                    var_dump($order->get_status());
                 } else {
-//                    var_dump($order->get_id());
-//                    var_dump($order->get_meta('synced'));
-//                    $order->add_meta_data('synced', 1);
-//                    $order->save_meta_data();
-//                    var_dump($order->get_meta('synced'));
-
-//                    die();
+                    echo $order->get_id();
                     $misOrder = new NSS_MIS_Order($order);
                     var_dump($order->get_meta('synced'));
                 }
@@ -211,10 +278,9 @@ function passAllProducts($args) {
     $cli = new \GF\Cli();
 
 //    $cli->saleItems($args);
+    $cli->listItems();
 
-    $cli->fixItems();
-
-//    $cli->fixMisPrices($args);
+//    $cli->migrateSaleItems($args);
 }
 
 
