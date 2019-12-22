@@ -37,13 +37,13 @@
                                 <div class="gffooter-card-6"></div>
                             </div>
                             <div class="">
-                                <a href="https://www.visa.ca/en_CA/run-your-business/merchant-resources/verified-by-visa.html">
+                                <a rel="nofollow" href="https://www.visa.ca/en_CA/run-your-business/merchant-resources/verified-by-visa.html">
                                     <div class="gffooter-card-1"></div>
                                 </a>
-                                <a href="https://www.mastercard.us/en-us/merchants/safety-security/securecode.html">
+                                <a rel="nofollow" href="https://www.mastercard.us/en-us/merchants/safety-security/securecode.html">
                                     <div class="gffooter-card-2"></div>
                                 </a>
-                                <a href="http://www.bancaintesa.rs/pocetna.1.html">
+                                <a rel="nofollow" href="http://www.bancaintesa.rs/pocetna.1.html">
                                     <div class="gffooter-card-7"></div>
                                 </a>
                             </div>

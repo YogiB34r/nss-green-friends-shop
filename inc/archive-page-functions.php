@@ -25,6 +25,7 @@ function gf_check_if_slug_is_in_url_and_product_count()
 }
 
 //@TODO not used remove
+//@TODO fix typo here !!
 function gf_check_for_second_level_categories() {
     global $wp;
     $resault = '';

@@ -21,10 +21,10 @@ function custom_admin_order_totals_after_tax($orderid) {
     } elseif ($totalWeight > 20 and $totalWeight <= 30) {
         $price = 470;
     } elseif ($totalWeight > 30 and $totalWeight <= 50) {
-        $price = 500;
+        $price = 600;
     } elseif ($totalWeight > 50) {
         $newWeight = $totalWeight - 50;
-        $price = 500 + ($newWeight * 10);
+        $price = 600 + ($newWeight * 10);
     }
 
     if (isset($_POST['items']) && array_search('free_shipping', \GuzzleHttp\Psr7\parse_query(urldecode($_POST['items'])))) {
@@ -62,9 +62,7 @@ function custom_admin_order_totals_after_tax($orderid) {
 add_filter('post_date_column_time', 'gf_custom_post_date_column_time', 10, 2);
 function gf_custom_post_date_column_time($h_time, $post) {
 
-    $h_time = get_the_time(__('d/m/Y', 'woocommerce'), $post);
-
-    return $h_time;
+    return get_the_time(__('d/m/Y', 'woocommerce'), $post);
 }
 
 
@@ -72,7 +70,7 @@ function gf_custom_post_date_column_time($h_time, $post) {
 add_action('manage_posts_custom_column', 'gf_date_clmn');
 function gf_date_clmn($column_name) {
     global $post;
-    if ($column_name == 'order_date') {
+    if ($column_name === 'order_date') {
         $t_time = get_the_time(__('d/m/Y H:i', 'woocommerce'), $post);
         echo $t_time . '<br />';
     }
@@ -97,10 +95,10 @@ add_action('manage_shop_order_posts_custom_column', 'gf_get_order_payment_method
 function gf_get_order_payment_method_column($colname) {
     global $the_order; // the global order object
 
-    if ($colname == 'payment_method_column') {
+    if ($colname === 'payment_method_column') {
         echo $the_order->get_payment_method_title();
     }
-    if ($colname == 'order_phone_column') {
+    if ($colname === 'order_phone_column') {
         $via = 'WWW';
         if ($the_order->get_created_via() == 'admin') {
             $via = 'PHONE';
@@ -108,10 +106,10 @@ function gf_get_order_payment_method_column($colname) {
         echo $via;
 //        echo $the_order->get_meta('gf_order_created_method');
     }
-    if ($colname == 'order_shipping_price_column') {
+    if ($colname === 'order_shipping_price_column') {
         echo $the_order->get_shipping_total() . 'din.';
     }
-    if ($colname == 'customActions') {
+    if ($colname === 'customActions') {
         $jitexDoneStyle = '';
         $adresnicaDoneStyle = '';
         $misDoneStyle = '';
@@ -148,7 +146,7 @@ function gf_get_order_payment_method_column($colname) {
 add_action('woocommerce_admin_order_data_after_order_details', 'gf_admin_phone_order_field');
 function gf_admin_phone_order_field($order) {
     $checked = true;
-    if ($order->get_meta('gf_order_created_method') == 'WWW') {
+    if ($order->get_meta('gf_order_created_method') === 'WWW') {
         $checked = false;
     }
     woocommerce_form_field('gf_phone_order', array(
@@ -227,6 +225,10 @@ function gf_supplier_product_list_column_content($column, $product_id){
     }
 }
 
+/**
+ * @TODO check this out
+ * @return array
+ */
 function gf_get_order_dates() {
     $query = new WC_Order_Query(array(
         'limit' => -1,
@@ -243,8 +245,17 @@ function gf_get_order_dates() {
             $same_date = $date;
         }
     }
+    global $wpdb;
 
-    return $order_dates;
+    $sql = "SELECT distinct DATE(post_date) as postDate FROM wp_posts WHERE post_type = 'shop_order' ORDER BY post_date DESC";
+    $dates = $wpdb->get_results($sql);
+
+    $orderDates = [];
+    foreach ($dates as $date){
+        $orderDates[] = date('d/m/Y', strtotime($date->postDate));
+    }
+
+    return $orderDates;
 }
 
 add_filter('query_vars', 'gf_order_date_register_query_vars');

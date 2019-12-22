@@ -23,7 +23,7 @@
             <h3>Primalac</h3>
             <div style="border:1px solid;">
                 <p>NON STOP SHOP d.o.o</p>
-                <p>Beograd,Žorža Klemansoa 19</p>
+                <p>Beograd, Gvozdićeva 4</p>
             </div>
         </div>
     </div>

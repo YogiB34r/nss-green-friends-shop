@@ -42,10 +42,26 @@ if (defined('WP_CLI') && WP_CLI) {
     \WP_CLI::add_command('testCron', 'testCron');
 }
 
-$factory = new \Nss\Feed\FeedFactory();
-$feed = $factory();
-add_action('parseFeed', [$feed => 'parseFeed']);
+//$factory = new \Nss\Feed\FeedFactory();
+//$feed = $factory();
+//add_action('parseFeed', [$feed => 'parseFeed']);
 
+/*
+ * @TODO create automatic operations
+ * */
+add_action('parseFeed', 'parseFeed');
+function parseFeed($args) {
+    global $wpdb;
+
+    $httpClient = new \GuzzleHttp\Client(['defaults' => [
+        'verify' => false
+    ]]);
+    $redis = new \Redis();
+    $redis->connect(REDIS_HOST);
+
+    $feed = new \Nss\Feed\Feed($httpClient, $redis, $wpdb);
+    $feed->parseFeed($args);
+}
 
 //add_action('testCron', 'testCron');
 function testCron() {
@@ -64,6 +80,11 @@ function testCron() {
 add_action('createNalog', 'createNalog');
 function createNalog() {
     global $wpdb;
+
+    $dt = new \DateTime('now');
+    if (in_array($dt->format('D'), ['Sun', 'Sat'])) {
+        return;
+    }
 
     $backorder = new NSS_Backorder($wpdb);
     $backorder->createBackOrders();
@@ -104,6 +125,22 @@ function mis() {
 //    die();
 
 //    $user = get_user_by('id', 193943);
+//    $item = wc_get_product(381897);
+//    new NSS_MIS_Item($item);
+//    die();
+
+//    $orderIds = [465270, 465314, 465287, 465272, 465264, 465280, 465222, 465273, 465263, 465277, 465238, 465292, 465613];
+//    $orderIds = [495971];
+//    foreach ($orderIds as $orderId) {
+//        $order = wc_get_order($orderId);
+//        new NSS_MIS_Order($order);
+//    }
+//    die();
+//    $order = wc_get_order(489836);
+//    new NSS_MIS_Order($order);
+//    die();
+
+//    $user = get_user_by('id', 214853);
 //    new NSS_MIS_User($user);
 //    die();
 
@@ -120,6 +157,7 @@ function mis() {
                 if ($order->get_meta('synced') !== '') {
 //                    var_dump($order->get_status());
                 } else {
+                    echo $order->get_id();
                     $misOrder = new NSS_MIS_Order($order);
                     var_dump($order->get_meta('synced'));
                 }
@@ -246,6 +284,7 @@ function passAllProducts($args) {
     $cli = new \GF\Cli();
 
 //    $cli->saleItems($args);
+    $cli->listItems();
 
     $cli->cleanupIndex();
 

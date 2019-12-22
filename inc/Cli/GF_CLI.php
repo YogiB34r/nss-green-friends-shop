@@ -342,15 +342,17 @@ class Cli
         }
     }
 
-
     public function listItems()
     {
         $total = 0;
-        $updated = [];
+        $missingImg = 0;
+        $vendor = [];
+        $items = [];
         $products_ids = wc_get_products(array(
-            'limit' => 4000,
-            'meta_key' => 'supplier',
-            'meta_value' => 252,
+            'limit' => 5000,
+            'status' => 'published',
+//            'meta_key' => 'supplier',
+//            'meta_value' => 252,
 //                'meta_value' => 123,
 //                'compare' => 'IN',
             'return' => 'ids',
@@ -359,7 +361,6 @@ class Cli
 
         $redis = new \Redis();
         $redis->connect(REDIS_HOST);
-
         $xmlIds = unserialize($redis->get('asportkeys'));
 
 //        $products_ids = [412783];
@@ -380,7 +381,32 @@ class Cli
         echo 'found ' . count($updated) . ' items' . "\r\n";
         echo 'from' . count($products_ids) . ' items';
 //            var_dump($updated);
-        die();
+
+//        $products_ids = [412783];
+        foreach ($products_ids as $product_id) {
+            $product = wc_get_product($product_id);
+
+            if ($product->is_in_stock() && strlen($product->get_image_id()) === 0) {
+                $sup = $product->get_meta('supplier');
+                if (!array_key_exists($sup, $vendor)) {
+                    $vendor[$sup] = 1;
+                } else {
+                    $vendor[$sup]++;
+                }
+
+                $missingImg++;
+                $items[] = $product_id;
+
+                if ($missingImg > 20) {
+                    var_dump(implode(',', $items));
+                    die();
+                }
+            }
+        }
+
+        echo 'found ' . $missingImg . ' items' . "\r\n";
+        echo 'from' . count($products_ids) . ' items';
+        var_dump(implode(',', $items));
     }
 
     private function handleImage($images, $postId) {

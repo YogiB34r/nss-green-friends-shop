@@ -91,7 +91,7 @@ function woo_new_product_tab_content()
 		Za <strong>naručivanje telefonom</strong>" . __('neophodno je da imate email adresu i da proizvod nije rasprodat:', 'green-fiends') . "
 	</p>
 	<ul class='cartText3'>
-		<li>" . __('Pozovete broj') . " <strong>011/33-34-773 ili 011/33-34-681</strong> (radnim danima od <strong>09-17h</strong>)</li>
+		<li>" . __('Pozovete broj') . " <strong>011/7450-380</strong> (radnim danima od <strong>09-17h</strong>)</li>
 		<li>" . __('Navedete operateru kataloške brojeve proizvoda koje naručujete kao i količinu svakog od njih') . " </li>
 		<li>" . __('Navedete operateru lične podatke i adresu isporuke') . "</li>
 		<li>" . __('Ukoliko kupujete kao pravno lice pripremite podatke firme:') . "<strong>naziv, adresu i PIB broj</strong></li>
@@ -205,8 +205,7 @@ function check_if_product_have_sale_dates_and_print_sticker()
 add_action('woocommerce_after_add_to_cart_form', 'gf_add_ordering_phone_number');
 function gf_add_ordering_phone_number() {
     echo '<p class="phone_ordering_label">Naručite telefonom</p>';
-    echo '<p class="phone_ordering_text"><a href="tel:+381113334681">011/3334-681</a></p>
-            <p class="phone_ordering_text"><a href="tel:+381113334773">011/3334-773</a></p>
+    echo '<p class="phone_ordering_text"><a href="tel:+381117450380">011/7450-380</a></p>
             <p class="phone_ordering_note">radnim danima od 8-17 subotom od 10-16</p>';
 
 //    return
