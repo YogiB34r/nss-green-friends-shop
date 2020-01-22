@@ -61,7 +61,11 @@
                 </form>
             </td>
             <td>
+                <?php if ($product): ?>
+                <img src="<?=$product->image?>" width="500" class="externalCarouselItemImage" />
+                <?php else: ?>
                 <img src="" width="500" class="externalCarouselItemImage" />
+                <?php endif; ?>
             </td>
         </tr>
     </table>

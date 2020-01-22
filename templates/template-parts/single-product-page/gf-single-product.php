@@ -62,7 +62,7 @@ foreach ($product_cats as $product_cat){
             return;
         }
         ?>
-        <div id="product-<?php the_ID(); ?>" <?php wc_product_class('', get_queried_object_id()); ?>>
+        <div id="product-<?php the_ID(); ?>" <?php wc_product_class(); ?>>
 
             <?php
             /**

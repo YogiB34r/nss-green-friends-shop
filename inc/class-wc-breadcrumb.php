@@ -19,7 +19,7 @@ class gf_breadcrumbs extends WC_Breadcrumb
      *
      * @var array
      */
-    protected $crumbs = array();
+    private $crumbs = array();
 
     /**
      * Add a crumb so we don't get lost.
@@ -104,7 +104,7 @@ class gf_breadcrumbs extends WC_Breadcrumb
     /**
      * Prepend the shop page to shop breadcrumbs.
      */
-    protected function prepend_shop_page()
+    private function prepend_shop_page()
     {
         $permalinks = wc_get_permalink_structure();
         $shop_page_id = wc_get_page_id('shop');
@@ -119,7 +119,7 @@ class gf_breadcrumbs extends WC_Breadcrumb
     /**
      * Is home trail..
      */
-    protected function add_crumbs_home()
+    private function add_crumbs_home()
     {
         $this->add_crumb(single_post_title('', false));
     }
@@ -127,7 +127,7 @@ class gf_breadcrumbs extends WC_Breadcrumb
     /**
      * 404 trail.
      */
-    protected function add_crumbs_404()
+    private function add_crumbs_404()
     {
         $this->add_crumb(__('Error 404', 'woocommerce'));
     }
@@ -135,7 +135,7 @@ class gf_breadcrumbs extends WC_Breadcrumb
     /**
      * Attachment trail.
      */
-    protected function add_crumbs_attachment()
+    private function add_crumbs_attachment()
     {
         global $post;
 
@@ -149,7 +149,7 @@ class gf_breadcrumbs extends WC_Breadcrumb
      * @param int $post_id Post ID.
      * @param string $permalink Post permalink.
      */
-    protected function add_crumbs_single($post_id = 0, $permalink = '')
+    private function add_crumbs_single($post_id = 0, $permalink = '')
     {
         if (!$post_id) {
             global $post;
@@ -193,7 +193,7 @@ class gf_breadcrumbs extends WC_Breadcrumb
     /**
      * Page trail.
      */
-    protected function add_crumbs_page()
+    private function add_crumbs_page()
     {
         global $post;
 
@@ -221,7 +221,7 @@ class gf_breadcrumbs extends WC_Breadcrumb
     /**
      * Product category trail.
      */
-    protected function add_crumbs_product_category()
+    private function add_crumbs_product_category()
     {
         $current_term = $GLOBALS['wp_query']->get_queried_object();
 
@@ -233,7 +233,7 @@ class gf_breadcrumbs extends WC_Breadcrumb
     /**
      * Product tag trail.
      */
-    protected function add_crumbs_product_tag()
+    private function add_crumbs_product_tag()
     {
         $current_term = $GLOBALS['wp_query']->get_queried_object();
 
@@ -246,7 +246,7 @@ class gf_breadcrumbs extends WC_Breadcrumb
     /**
      * Shop breadcrumb.
      */
-    protected function add_crumbs_shop()
+    private function add_crumbs_shop()
     {
         if (intval(get_option('page_on_front')) === wc_get_page_id('shop')) {
             return;
@@ -265,7 +265,7 @@ class gf_breadcrumbs extends WC_Breadcrumb
     /**
      * Post type archive trail.
      */
-    protected function add_crumbs_post_type_archive()
+    private function add_crumbs_post_type_archive()
     {
         $post_type = get_post_type_object(get_post_type());
 
@@ -277,7 +277,7 @@ class gf_breadcrumbs extends WC_Breadcrumb
     /**
      * Category trail.
      */
-    protected function add_crumbs_category()
+    private function add_crumbs_category()
     {
         $this_category = get_category($GLOBALS['wp_query']->get_queried_object());
 
@@ -291,7 +291,7 @@ class gf_breadcrumbs extends WC_Breadcrumb
     /**
      * Tag trail.
      */
-    protected function add_crumbs_tag()
+    private function add_crumbs_tag()
     {
         $queried_object = $GLOBALS['wp_query']->get_queried_object();
 
@@ -302,7 +302,7 @@ class gf_breadcrumbs extends WC_Breadcrumb
     /**
      * Add crumbs for date based archives.
      */
-    protected function add_crumbs_date()
+    private function add_crumbs_date()
     {
         if (is_year() || is_month() || is_day()) {
             $this->add_crumb(get_the_time('Y'), get_year_link(get_the_time('Y')));
@@ -318,7 +318,7 @@ class gf_breadcrumbs extends WC_Breadcrumb
     /**
      * Add crumbs for taxonomies
      */
-    protected function add_crumbs_tax()
+    private function add_crumbs_tax()
     {
         $this_term = $GLOBALS['wp_query']->get_queried_object();
         $taxonomy = get_taxonomy($this_term->taxonomy);
@@ -335,7 +335,7 @@ class gf_breadcrumbs extends WC_Breadcrumb
     /**
      * Add a breadcrumb for author archives.
      */
-    protected function add_crumbs_author()
+    private function add_crumbs_author()
     {
         global $author;
 
@@ -351,7 +351,7 @@ class gf_breadcrumbs extends WC_Breadcrumb
      * @param int $term_id Term ID.
      * @param string $taxonomy Taxonomy.
      */
-    protected function term_ancestors($term_id, $taxonomy)
+    private function term_ancestors($term_id, $taxonomy)
     {
         $ancestors = get_ancestors($term_id, $taxonomy);
         $ancestors = array_reverse($ancestors);
@@ -368,7 +368,7 @@ class gf_breadcrumbs extends WC_Breadcrumb
     /**
      * Endpoints.
      */
-    protected function endpoint_trail()
+    private function endpoint_trail()
     {
         $endpoint = is_wc_endpoint_url() ? WC()->query->get_current_endpoint() : '';
         $endpoint_title = $endpoint ? WC()->query->get_endpoint_title($endpoint) : '';
@@ -381,7 +381,7 @@ class gf_breadcrumbs extends WC_Breadcrumb
     /**
      * Add a breadcrumb for search results.
      */
-    protected function search_trail()
+    private function search_trail()
     {
         if (is_search()) {
             /* translators: %s: search term */
@@ -392,7 +392,7 @@ class gf_breadcrumbs extends WC_Breadcrumb
     /**
      * Add a breadcrumb for pagination.
      */
-    protected function paged_trail()
+    private function paged_trail()
     {
         if (get_query_var('paged')) {
             /* translators: %d: page number */

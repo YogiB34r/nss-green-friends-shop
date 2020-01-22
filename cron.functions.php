@@ -119,22 +119,23 @@ function daily() {
 add_action('syncMis', 'mis');
 function mis() {
 
-//    $item = wc_get_product(381897);
+//    $item = wc_get_product(427337);
 //    new NSS_MIS_Item($item);
 //    die();
 
 //    $orderIds = [465270, 465314, 465287, 465272, 465264, 465280, 465222, 465273, 465263, 465277, 465238, 465292, 465613];
-//    $orderIds = [495971];
+//    $orderIds = [503723];
 //    foreach ($orderIds as $orderId) {
 //        $order = wc_get_order($orderId);
 //        new NSS_MIS_Order($order);
 //    }
 //    die();
-//    $order = wc_get_order(489836);
+
+//    $order = wc_get_order(502738);
 //    new NSS_MIS_Order($order);
 //    die();
 
-//    $user = get_user_by('id', 214853);
+//    $user = get_user_by('id', 414522);
 //    new NSS_MIS_User($user);
 //    die();
 
