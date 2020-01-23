@@ -18,6 +18,7 @@ if (defined('WP_CLI') && WP_CLI) {
     ini_set('display_errors', 1);
     error_reporting(E_ALL);
 
+
     // elastic operations
     \WP_CLI::add_command('createElasticIndex', 'createElasticIndex');
     \WP_CLI::add_command('syncElasticIndex', 'syncElasticIndex');
@@ -42,10 +43,6 @@ if (defined('WP_CLI') && WP_CLI) {
     \WP_CLI::add_command('testCron', 'testCron');
 }
 
-//$factory = new \Nss\Feed\FeedFactory();
-//$feed = $factory();
-//add_action('parseFeed', [$feed => 'parseFeed']);
-
 /*
  * @TODO create automatic operations
  * */
@@ -62,6 +59,8 @@ function parseFeed($args) {
     $feed = new \Nss\Feed\Feed($httpClient, $redis, $wpdb);
     $feed->parseFeed($args);
 }
+
+
 
 //add_action('testCron', 'testCron');
 function testCron() {
@@ -120,27 +119,23 @@ function daily() {
 add_action('syncMis', 'mis');
 function mis() {
 
-//    $item = wc_get_product(417359);
-//    new NSS_MIS_Item($item);
-//    die();
-
-//    $user = get_user_by('id', 193943);
-//    $item = wc_get_product(381897);
+//    $item = wc_get_product(427337);
 //    new NSS_MIS_Item($item);
 //    die();
 
 //    $orderIds = [465270, 465314, 465287, 465272, 465264, 465280, 465222, 465273, 465263, 465277, 465238, 465292, 465613];
-//    $orderIds = [495971];
+//    $orderIds = [503723];
 //    foreach ($orderIds as $orderId) {
 //        $order = wc_get_order($orderId);
 //        new NSS_MIS_Order($order);
 //    }
 //    die();
-//    $order = wc_get_order(489836);
+
+//    $order = wc_get_order(502738);
 //    new NSS_MIS_Order($order);
 //    die();
 
-//    $user = get_user_by('id', 214853);
+//    $user = get_user_by('id', 414522);
 //    new NSS_MIS_User($user);
 //    die();
 
@@ -285,8 +280,6 @@ function passAllProducts($args) {
 
 //    $cli->saleItems($args);
     $cli->listItems();
-
-    $cli->cleanupIndex();
 
 //    $cli->migrateSaleItems($args);
 }

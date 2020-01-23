@@ -18,6 +18,14 @@ function wc_support()
     add_theme_support('yoast-seo-breadcrumbs');
 }
 
+//add_action('after_setup_theme', 'require_on_init');
+//function require_on_init()
+//{
+//    foreach (glob(get_stylesheet_directory() . "/inc/*.php") as $file) {
+//        require $file;
+//    }
+//}
+
 //@TODO Custom admin product table
 //require(__DIR__ . '/templates/admin/search-settings.php');
 //require(__DIR__ . '/templates/admin/list-product-search-settings.php');

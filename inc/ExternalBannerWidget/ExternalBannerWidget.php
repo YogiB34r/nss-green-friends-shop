@@ -6,7 +6,7 @@ namespace GF\ExternalBannerWidget;
 
 class ExternalBannerWidget
 {
-    const CACHE_KEY = 'nss#Carousel#Widget';
+    const CACHE_KEY = 'nss#carouselWidget';
 
     private $wpdb;
 
@@ -20,9 +20,14 @@ class ExternalBannerWidget
 
     public function render_html($template = 'vertical', $source = 'blic.rs')
     {
+<<<<<<< HEAD
         $key = sprintf('%s-%s-%s', self::CACHE_KEY, $template, $source);
         $html = $this->cache->redis->get($key);
         $html = false;
+=======
+        $cacheKey = sprintf('%s-%s-%s', self::CACHE_KEY, $template, $source);
+        $html = $this->cache->redis->get($cacheKey);
+>>>>>>> master
         if ($html === false) {
             $get_items_sql = "SELECT * FROM `wp_nss_external_banners_widget`";
             $data = $this->wpdb->get_results($get_items_sql);
@@ -30,7 +35,7 @@ class ExternalBannerWidget
             ob_start();
             require(get_stylesheet_directory() . "/templates/externalBannersWidget/layout.phtml");
             $html = ob_get_clean();
-            $this->cache->redis->set($key, $html);
+            $this->cache->redis->set($cacheKey, $html, 60 * 60 * 3);
         }
         echo $html;
     }
@@ -69,11 +74,31 @@ class ExternalBannerWidget
 
                 break;
 
+            case 'clear_cache':
+                $this->clear_cache();
+
+                break;
+
             default:
                 $this->list();
 
                 break;
         }
+    }
+
+    public function clear_cache()
+    {
+        $cacheKeys = [
+            'nss#carouselWidget-vertical-blic.rs',
+            'nss#carouselWidget-horizontal-blic.rs',
+            'nss#carouselWidget-vertical-zena.rs',
+            'nss#carouselWidget-horizontal-zena.rs',
+        ];
+        foreach ($cacheKeys as $key) {
+            $this->cache->redis->delete($key);
+        }
+        echo 'cache cleared';
+        $this->list();
     }
 
     public function form()
@@ -154,21 +179,27 @@ class ExternalBannerWidget
 
     public function update()
     {
-        $itemId = $_POST['itemId'];
+        global $wpdb;
+
+        $sku = $_POST['sku'];
         $title = $_POST['title'];
         $description = $_POST['description'];
         $salePrice = str_replace(',', '',  $_POST['salePrice']);
         $regularPrice = str_replace(',', '',  $_POST['regularPrice']);
         $categoryUrl = $_POST['categoryUrl'];
-        $product_id = wc_get_product_id_by_sku( $itemId );
+        $product_id = $wpdb->get_var($wpdb->prepare("SELECT post_id FROM $wpdb->postmeta WHERE meta_key='_sku' AND meta_value='%s' LIMIT 1", $sku));
+        if (!$product_id) {
+            var_dump('product not found');
+            die();
+        }
         $itemUrl = get_permalink($product_id);
         $imageSrc = get_the_post_thumbnail_url($product_id, 'shop_catalog');
 
         if (isset($_POST['articleUpdate'])){
             echo $sql_update = "UPDATE wp_nss_external_banners_widget
-            SET itemId = $itemId, title = '{$title}', description = '{$description}', salePrice = '{$salePrice}', 
-            regularPrice = '{$regularPrice}', categoryUrl = '{$categoryUrl}', itemUrl = '{$itemUrl}', imageSrc = '{$imageSrc}'
-            WHERE itemId LIKE $itemId";
+            SET itemId = $product_id, title = '{$title}', description = '{$description}', salePrice = '{$salePrice}', 
+            regularPrice = '{$regularPrice}', categoryUrl = '{$categoryUrl}', itemUrl = '{$itemUrl}', image = '{$imageSrc}'
+            WHERE itemId = $product_id";
             if ($this->wpdb->query($sql_update)) {
                 return true;
             } else {

@@ -18,6 +18,10 @@ if (isset($_GET['type']) && $_GET['type'] === 'category') {
                 if (isset($catData[1])) {
                     $name = trim($catData[1]);
                     $cat = get_term_by('name', $name, 'product_cat');
+                    if (!is_object($cat)) {
+                        include(get_query_template('404'));
+                        exit;
+                    }
                     $url = get_term_link($cat->term_id, 'product_cat');
                 }
                 if (isset($catData[2]) && $catData[2] != '') {

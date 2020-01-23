@@ -98,6 +98,13 @@ class DailyExpressApi
                 }
             }
 
+//            $dailyCode = 'SS'.preg_replace('/2018/', '', str_replace('-', '', $order->get_order_number()), 1);
+            $codeLength = strlen($order->get_order_number());
+            $dailyCode = 'SS' . preg_replace('/2019/', '', str_replace('-', '', $order->get_order_number()), 1);
+            if (strlen($dailyCode) === $codeLength) {
+                $dailyCode = 'SS' . preg_replace('/2020/', '', str_replace('-', '', $dailyCode), 1);
+            }
+
             $csvArray = array(
                 'gpoid' => $order->get_order_number(),
 
@@ -133,7 +140,7 @@ class DailyExpressApi
                 'Masa' => $weight * 1000,
                 'Povratna dokumentacija' => 0,
                 'SMS pošiljaoca' => '',
-                'Paketi' => 'SS'.preg_replace('/2018/', '', str_replace('-', '', $order->get_order_number()), 1), // i.e. 2018 -> '' , 2012 -> ''
+                'Paketi' => $dailyCode, // i.e. 2018 -> '' , 2012 -> ''
                 'Napomena' => '',
                 'Content' => $category,
             );
