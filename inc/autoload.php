@@ -16,6 +16,9 @@ foreach (glob(__DIR__ . "/Search/*.php") as $file) {
 foreach (glob(__DIR__ . "/Util/*.php") as $file) {
     require_once $file;
 }
+foreach (glob(__DIR__ . "/Theme/*.php") as $file) {
+    require_once $file;
+}
 require_once(__DIR__ . '/archive-page-functions.php');
 require_once(__DIR__ . '/class-wc-breadcrumb.php');
 require_once(__DIR__ . '/gf-admin-functions.php');
@@ -25,4 +28,4 @@ require_once(__DIR__ . '/gf-shortcodes.php');
 require_once(__DIR__ . '/gf-single-product-functions.php');
 require_once(__DIR__ . '/gf-woocommerce-checkout-functions.php');
 require_once(__DIR__ . '/theme-setup.php');
-require_once(__DIR__ .'/Woocommerce/WooFunctions.php');
+require_once(__DIR__ . '/Woocommerce/WooFunctions.php');
