@@ -13,6 +13,10 @@ $theme = new \GF\Theme();
 $theme->init();
 
 
+function get_search_category_aggregation() {
+    return $GLOBALS['gf-search']['facets']['category'];
+}
+
 add_filter('upload_dir', 'upload_dir_filter');
 /**
  * Saves uploads into folders organized by day.

@@ -28,10 +28,7 @@ class ThemeSupport
         Theme::afterThemeSetupAction(function () {
             $this->selectiveRefreshingWidgets();
         });
-        Theme::afterThemeSetupAction(function () {
-            $this->wcSupport();
-        });
-
+        $this->wcSupport();
     }
 
     /**

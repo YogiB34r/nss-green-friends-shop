@@ -13,12 +13,13 @@ class Enqueue
         add_action('wp_enqueue_scripts', [$this, 'addScripts']);
         add_action('admin_enqueue_scripts',[$this, 'addAdminStyles']);
         add_action('admin_enqueue_scripts',[$this, 'addAdminScripts']);
+        $this->hardCodedActionsAndHooks();
     }
 
     /**
      * @TODO test this out
      */
-    public function hardCodedActionsAndHooks()
+    private function hardCodedActionsAndHooks()
     {
         add_action('wp_print_scripts', function() {
             wp_dequeue_script('wc-password-strength-meter');
