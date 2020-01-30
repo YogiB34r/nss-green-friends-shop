@@ -10,7 +10,11 @@ $action = 'search';
 if (get_query_var('term') !== '') {
     $action = 'category';
 }
-$sortedProducts = $searchFunctions->getResults(get_query_var('term'), $_GET['query']);
+$query = '';
+if (isset($_GET['query'])) {
+    $query = $_GET['query'];
+}
+$sortedProducts = $searchFunctions->getResults(get_query_var('term'), $query);
 
 $mobile = 'desktop';
 if (wp_is_mobile()) {

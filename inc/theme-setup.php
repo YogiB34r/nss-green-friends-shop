@@ -1,5 +1,4 @@
 <?php
-add_action('after_theme_setup', 'gf_theme_setup');
 
 function remove_stubborn_js() {
     wp_dequeue_script('cookie');
@@ -10,7 +9,7 @@ function remove_stubborn_js() {
 //add_action('wp_print_scripts', 'remove_stubborn_js', 99999);
 
 // @TODO create option from admin to reset assets
-$compileOverrideActive = true;
+$compileOverrideActive = false;
 $userData = get_userdata(get_current_user_id());
 //$userData = false;
 if ($userData && in_array('administrator', $userData->roles)) {
@@ -172,13 +171,4 @@ function merge_all_scripts($compileOverrideActive) {
     wp_enqueue_script('merged-script',  get_stylesheet_directory_uri() . '/../../' . $targetFile, [], $version, true);
 }
 
-function add_async_attribute($tag, $handle) {
-    $scripts_to_defer = array('merged-script');
-    foreach($scripts_to_defer as $defer_script) {
-        if ($defer_script === $handle) {
-            return str_replace(' src', ' async="async" src', $tag);
-        }
-    }
-    return $tag;
-}
-add_filter('script_loader_tag', 'add_async_attribute', 10, 2);
+

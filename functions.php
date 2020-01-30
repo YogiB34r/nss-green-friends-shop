@@ -75,6 +75,22 @@ function ajax_script_load_more($args)
 //********* infinite scroll END *********
 
 
+
+
+function add_async_attribute($tag, $handle) {
+    $scripts_to_defer = array('merged-script');
+    foreach($scripts_to_defer as $defer_script) {
+        if ($defer_script === $handle) {
+            return str_replace(' src', ' async="async" src', $tag);
+        }
+    }
+    return $tag;
+}
+add_filter('script_loader_tag', 'add_async_attribute', 10, 2);
+
+
+
+
 function gf_get_categories($exlcude = array()) {
     $args = array(
         'orderby' => 'name',

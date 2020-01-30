@@ -33,8 +33,10 @@ class Enqueue
     {
         wp_enqueue_style('font-awesome', 'https://use.fontawesome.com/releases/v5.1.1/css/all.css');
         wp_enqueue_style('bootstrap 4.1', 'https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css');
-        wp_enqueue_style('woocommerce-layout');
-        wp_enqueue_style('woocommerce-general');
+// loads anyway
+//        wp_enqueue_style('woocommerce-layout');
+//        wp_enqueue_style('woocommerce-general');
+
         wp_enqueue_style('gf-style-reset', get_stylesheet_directory_uri() . '/assets/css/reset.css');
         wp_enqueue_style('gf-style', get_stylesheet_directory_uri() . '/style.css', ['woocommerce-layout'], '7e853');
         wp_enqueue_style( 'grid-list-layout', plugins_url( '/woocommerce-grid-list-toggle/assets/css/style.css'));
