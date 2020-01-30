@@ -61,8 +61,9 @@ foreach ($product_cats as $product_cat){
             echo get_the_password_form(); // WPCS: XSS ok.
             return;
         }
+        $product = wc_get_product();
         ?>
-        <div id="product-<?php the_ID(); ?>" <?php wc_product_class(); ?>>
+        <div id="product-<?php the_ID(); ?>" <?php wc_product_class('', $product); ?>>
 
             <?php
             /**
