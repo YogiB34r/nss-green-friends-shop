@@ -8,6 +8,8 @@ ini_set('max_execution_time', '40');
 require (__DIR__ . '/inc/autoload.php');
 include(__DIR__ . '/inc/core.functions.php');
 
+$useElastic = true; // get from config
+$searchFunctions = new \Gf\Search\Functions($useElastic);
 
 $theme = new \GF\Theme();
 $theme->init();

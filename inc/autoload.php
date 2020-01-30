@@ -10,6 +10,8 @@ require_once(__DIR__ . '/CheckoutHelper/CheckoutHelper.php');
 require_once(__DIR__ . '/Cli/GF_CLI.php');
 require_once(__DIR__ . '/ExternalBannerWidget/ExternalBannerWidget.php');
 
+require_once(__DIR__ . '/Search/Functions.php');
+
 foreach (glob(__DIR__ . "/Search/*.php") as $file) {
     require_once $file;
 }
