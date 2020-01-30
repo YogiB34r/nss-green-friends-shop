@@ -15,14 +15,17 @@ class WooFunctions
         add_filter('woocommerce_account_menu_items', [$this, 'gf_remove_my_account_links']);
         add_filter('woocommerce_catalog_orderby', [$this, 'wc_customize_product_sorting']);
         add_filter('woocommerce_billing_fields',[$this, 'wpb_custom_billing_fields']);
+
+        //Cod disable
+        add_filter('woocommerce_available_payment_gateways', [$this, 'restrictCod'], 10, 1);//Checks if product has Cod disabled
+        add_action( 'woocommerce_product_options_shipping', [$this,'disableCodCheckbox'] );//Adds cod checkbox
+        add_action( 'woocommerce_process_product_meta', [$this,'saveCodCheckbox'], 10, 2 );//Saves cod checkbox
     }
 
 
     function change_existing_currency_symbol($currency_symbol, $currency)
     {
-        $currency_symbol = 'din.';
-
-        return $currency_symbol;
+        return 'din.';
     }
 
 
@@ -107,4 +110,50 @@ class WooFunctions
         return $fields;
     }
 
+    /**
+     * Checks if disable cod is active for product
+     */
+
+    function restrictCod($available_gateways)
+    {
+        // Not in backend (admin)
+        if( is_admin() )
+            return $available_gateways;
+
+        foreach (WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
+            $product = wc_get_product($cart_item['product_id']);
+            $disableCod = $product->get_meta('disableCod',true);
+
+
+            if ($disableCod === 'yes')
+                unset($available_gateways['cod']); // unset 'cod'
+
+        }
+        return $available_gateways;
+    }
+
+    /**
+     * Adds checkbox to product shipping tab for disabling cod
+     */
+    function disableCodCheckbox ()
+    {
+        echo '<div class="options_group">';
+
+        woocommerce_wp_checkbox( array(
+            'id'      => 'disableCod',
+            'value'   => get_post_meta( get_the_ID(), 'disableCod', true ),
+            'label'   => 'Disable COD',
+            'desc_tip' => true,
+            'description' => 'If checked disables COD payment options when this product is in cart',
+        ) );
+
+        echo '</div>';
+    }
+
+    /**
+     * Saves checkbox for disabling cod
+     */
+    function saveCodCheckbox( $id, $post ){
+        update_post_meta( $id, 'disableCod', $_POST['disableCod'] );
+    }
 }
