@@ -2,17 +2,6 @@
 
 // @TODO move this to class
 
-//include(__DIR__ . "/inc/Cli/GF_CLI.php");
-//include(__DIR__ . "/inc/Util/DailyExpressApi.php");
-//include(__DIR__ . "/inc/Search/Elastica/Indexer.php");
-//include(__DIR__ . "/inc/Search/Elastica/Config/ConfigInterface.php");
-//include(__DIR__ . "/inc/Search/Elastica/Config/Product.php");
-//include(__DIR__ . "/inc/Search/Elastica/Config/Term.php");
-//include(__DIR__ . "/inc/Search/Elastica/Setup.php");
-//include(__DIR__ . "/inc/Search/Factory/ElasticClientFactory.php");
-//include(__DIR__ . "/inc/Search/Factory/ProductSetupFactory.php");
-//include(__DIR__ . "/inc/Search/Factory/TermSetupFactory.php");
-
 if (defined('WP_CLI') && WP_CLI) {
     ini_set('max_execution_time', 1200);
     ini_set('display_errors', 1);

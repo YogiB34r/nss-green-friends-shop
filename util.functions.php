@@ -57,8 +57,6 @@ function gf_array_reccursive_difrence(array $array1, array $array2, array $_ = n
     return $diff;
 }
 
-
-
 function pricelist_import_page() {
     $updater = new \GF\Util\PricelistUpdate();
     if (isset($_FILES['cenovnik'])) {
@@ -233,9 +231,7 @@ function fixJitexCharacters($str) {
 }
 
 
-function get_search_category_aggregation() {
-    return $GLOBALS['gf-search']['facets']['category'];
-}
+
 
 
 add_action('admin_menu', function (){
@@ -255,6 +251,20 @@ function handleAdminSearchSettings() {
 
 }
 
+
+// check this out, not used ?
+function gf_elastic_search($input, $limit = 0)
+{
+    $config = array(
+        'host' => ES_HOST,
+        'port' => 9200
+    );
+    $elasticaSearch = new \GF\Search\Elastica\Search(new \Elastica\Client($config));
+    $search = new \GF\Search\Search(new \GF\Search\Adapter\Elastic($elasticaSearch));
+    $allIds = $search->getItemIdsForSearch($input, $limit);
+
+    return gf_parse_post_ids_for_list($allIds);
+}
 
 
 
