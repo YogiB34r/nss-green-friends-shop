@@ -1,20 +1,32 @@
 <?php
 
-require_once(get_stylesheet_directory() . "/user.functions.php");
-require_once(get_stylesheet_directory() . "/search.functions.php");
-require_once(get_stylesheet_directory() . "/util.functions.php");
-require_once(get_stylesheet_directory() . "/cron.functions.php");
-
+require_once(__DIR__ . "/Util/DailyExpressApi.php");
+require_once(__DIR__ . "/Search/Elastica/Indexer.php");
+require_once(__DIR__ . "/Search/Elastica/Config/ConfigInterface.php");
+require_once(__DIR__ . "/Search/Elastica/Config/Product.php");
+require_once(__DIR__ . "/Search/Elastica/Config/Term.php");
+require_once(__DIR__ . "/Search/Elastica/Setup.php");
+require_once(__DIR__ . "/Search/Elastica/Search.php");
+require_once(__DIR__ . "/Search/Elastica/TermSearch.php");
+require_once(__DIR__ . "/Search/Factory/ElasticClientFactory.php");
+require_once(__DIR__ . "/Search/Factory/ProductSetupFactory.php");
+require_once(__DIR__ . "/Search/Factory/TermSetupFactory.php");
+require_once(__DIR__ . "/Search/Search.php");
+require_once(__DIR__ . "/Search/AdapterInterface.php");
+require_once(__DIR__ . "/Search/Adapter/MySql.php");
+require_once(__DIR__ . "/Search/Adapter/Elastic.php");
+require_once(__DIR__ . "/Search/Functions.php");
 
 require_once(__DIR__ . '/CheckoutHelper/CheckoutHelper.php');
 require_once(__DIR__ . '/Cli/GF_CLI.php');
 require_once(__DIR__ . '/ExternalBannerWidget/ExternalBannerWidget.php');
 
-require_once(__DIR__ . '/Search/Functions.php');
 
-foreach (glob(__DIR__ . "/Search/*.php") as $file) {
-    require_once $file;
-}
+require_once(get_stylesheet_directory() . "/user.functions.php");
+require_once(get_stylesheet_directory() . "/util.functions.php");
+require_once(get_stylesheet_directory() . "/cron.functions.php");
+
+
 foreach (glob(__DIR__ . "/Util/*.php") as $file) {
     require_once $file;
 }

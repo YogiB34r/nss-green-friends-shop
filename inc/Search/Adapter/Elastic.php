@@ -43,6 +43,7 @@ class Elastic implements \GF\Search\AdapterInterface
      * @param string $input
      * @param int $limit
      * @param int $currentPage
+     *
      * @return \Elastica\ResultSet
      */
     public function getItemsForCategory($category, $input = null, $limit = 0, $currentPage = 1)

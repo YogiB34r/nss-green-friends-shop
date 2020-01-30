@@ -1,4 +1,34 @@
 <?php
+defined('ABSPATH') || exit;
+
+global $searchFunctions;
+
+/**
+ * Has to be called on top in order to properly set all required filters
+ */
+$sortedProducts = false;
+$useElastic = true;
+$action = 'search';
+if (get_query_var('term') !== '') {
+    $action = 'category';
+}
+$sortedProducts = $searchFunctions->getResults(get_query_var('term'), $_GET['query']);
+
+$mobile = 'desktop';
+if (wp_is_mobile()) {
+    $mobile = 'mobile';
+}
+$ppp = 24;
+//            if (isset($_POST["ppp"])) {
+//                $ppp = $_POST["ppp"];
+//            }
+
+$searchQuery = '';
+if (isset($_GET['query'])) {
+    $searchQuery = $_GET['query'];
+}
+
+// todo move somewhere
 $queriedObjectId = get_queried_object_id();
 $sexyShopCats = gf_get_category_children_ids('sexy-shop');
 if ($sexyShopCats){
@@ -16,17 +46,6 @@ if ($sexyShopCats){
         </script>
     <?php endif;
 }
-
-/**
- * Has to be called on top in order to properly set all required filters
- */
-$sortedProducts = false;
-$useElastic = true;
-$action = 'search';
-if (get_query_var('term') !== '') {
-    $action = 'category';
-}
-$sortedProducts = $searchFunctions->getResults();
 ?>
 <div class="row">
     <div class="col-3 list-unstyled gf-sidebar">
@@ -40,24 +59,6 @@ $sortedProducts = $searchFunctions->getResults();
     </div>
     <div class="gf-content-wrapper col-md-9 col-sm-12">
         <?php
-        /**
-         * The Template for displaying product archives, including the main shop page which is a post type archive
-         *
-         * This template can be overridden by copying it to yourtheme/woocommerce/archive-product.php.
-         *
-         * HOWEVER, on occasion WooCommerce will need to update template files and you
-         * (the theme developer) will need to copy the new files to your theme to
-         * maintain compatibility. We try to do this as little as possible, but it does
-         * happen. When this occurs the version of the template file will be bumped and
-         * the readme will list any important changes.
-         *
-         * @see https://docs.woocommerce.com/document/template-structure/
-         * @package WooCommerce/Templates
-         * @version 3.4.0
-         */
-
-        defined('ABSPATH') || exit;
-
         get_header('shop');
 
         /**
@@ -103,8 +104,8 @@ $sortedProducts = $searchFunctions->getResults();
 
             woocommerce_product_loop_start();
 
-            echo '<div id="ajax-primary" class="content-area">';
-            echo '<div id="ajax-content" class="content-area">';
+            echo '<div id="ajax-primary" class="content-area">
+                    <div id="ajax-content" class="content-area">';
 
             if (get_class($sortedProducts) === \Elastica\ResultSet::class) {
                 gf_custom_shop_loop($sortedProducts);
@@ -112,24 +113,9 @@ $sortedProducts = $searchFunctions->getResults();
                 gf_custom_search_output($sortedProducts);
             }
 
-            $mobile = 'desktop';
-            if (wp_is_mobile()) {
-                $mobile = 'mobile';
-            }
-            $ppp = 24;
-//            if (isset($_POST["ppp"])) {
-//                $ppp = $_POST["ppp"];
-//            }
-
-            $searchQuery = '';
-            if (isset($_GET['query'])) {
-                $searchQuery = $_GET['query'];
-            }
-
             echo '</div>';
             echo '<a href="#" data-term="'.get_query_var('term').'" data-query="'. $searchQuery .'" data-action="'.$action.'"
-            data-ppp="' . $ppp .'" id="loadMore" class="'.$mobile.'" data-page="1" data-url="' . admin_url("admin-ajax.php") . '" ></a>';
-            echo '</div>';
+            data-ppp="' . $ppp .'" id="loadMore" class="'.$mobile.'" data-page="1" data-url="' . admin_url("admin-ajax.php") . '" ></a></div>';
 
             woocommerce_product_loop_end();
 
@@ -138,12 +124,11 @@ $sortedProducts = $searchFunctions->getResults();
              *
              * @hooked woocommerce_pagination - 10
              */
-            if (!wp_is_mobile()) {
+            if ($mobile !== 'mobile') {
                 echo '<div class="gf-product-controls gf-product-controls--bottom">';
                 do_action('woocommerce_after_shop_loop');
                 echo '</div>';
             }
-
         } else {
             /**
              * Hook: woocommerce_no_products_found.

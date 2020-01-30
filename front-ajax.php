@@ -134,6 +134,8 @@ if (isset($_POST['action']) && $_POST['action'] == 'getZipCode') {
 }
 
 if (isset($_POST['action']) && $_POST['action'] == 'ajax_load_more') {
+    global $searchFunctions;
+
     $page = addslashes($_POST['page']);
     $term = addslashes($_POST['term']);
     $type = addslashes($_POST['type']);
@@ -141,13 +143,13 @@ if (isset($_POST['action']) && $_POST['action'] == 'ajax_load_more') {
     set_query_var('paged', $page);
     set_query_var('term', $term);
 
-    if ($type === 'category') {
-        $results = gf_get_category_items_from_elastic();
-    } else {
-        $results = gf_elastic_search_with_data($_GET['query']);
-    }
+//    if ($type === 'category') {
+//        $results = gf_get_category_items_from_elastic();
+//    } else {
+//        $results = gf_elastic_search_with_data($_GET['query']);
+//    }
 
-    gf_custom_shop_loop($results);
+    gf_custom_shop_loop($searchFunctions->getResults($term, ''));
 
     exit();
 }

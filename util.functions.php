@@ -144,12 +144,6 @@ function gf_get_category_children_ids($slug) {
     return $childrenIds;
 }
 
-add_action('admin_menu', function (){
-    add_menu_page('Import cenovnika', 'Import cenovnika', 'edit_pages', 'pricelist-import', function() {
-        pricelist_import_page();
-    });
-});
-
 function pricelist_import_page() {
     $updater = new \GF\Util\PricelistUpdate();
     if (isset($_FILES['cenovnik'])) {
@@ -323,6 +317,46 @@ function fixJitexCharacters($str) {
     );
 }
 
+
+function get_search_category_aggregation() {
+    return $GLOBALS['gf-search']['facets']['category'];
+}
+
+
+add_action('admin_menu', function (){
+    add_menu_page('Pretraga', 'Podesavanje pretrage', 'edit_pages',
+        'gf-search-settings', 'handleAdminSearchSettings');
+});
+
+function handleAdminSearchSettings() {
+    $config = array(
+        'host' => ES_HOST,
+        'port' => 9200
+    );
+    $client = new \Elastica\Client($config);
+    $termSearch = new \GF\Search\Elastica\TermSearch($client);
+//    $result = $term->getTerms();
+    require(__DIR__ . "/templates/admin/search-settings.php");
+
+}
+
+
+// check this out, not used ?
+function gf_elastic_search($input, $limit = 0)
+{
+    $config = array(
+        'host' => ES_HOST,
+        'port' => 9200
+    );
+    $elasticaSearch = new \GF\Search\Elastica\Search(new \Elastica\Client($config));
+    $search = new \GF\Search\Search(new \GF\Search\Adapter\Elastic($elasticaSearch));
+    $allIds = $search->getItemIdsForSearch($input, $limit);
+
+    return gf_parse_post_ids_for_list($allIds);
+}
+
+
+
 add_action('feedCronStarter', 'nss_feed_start');
 add_action('feedCronFillQueue', 'nss_feed_parse');
 add_action('feedCronProcessQueue', 'nss_feed_process_queue');
@@ -421,3 +455,4 @@ function nss_feed_queue($supplierId) {
 
     return $message;
 }
+
