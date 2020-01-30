@@ -15,6 +15,19 @@ class Enqueue
         add_action('admin_enqueue_scripts',[$this, 'addAdminScripts']);
     }
 
+    /**
+     * @TODO test this out
+     */
+    public function hardCodedActionsAndHooks()
+    {
+        add_action('wp_print_scripts', function() {
+            wp_dequeue_script('wc-password-strength-meter');
+        }, 10);
+
+        // prevent bug with members plugin
+        add_filter('members_check_parent_post_permission', function () { return false; });
+    }
+
     public function addStyles()
     {
         wp_enqueue_style('font-awesome', 'https://use.fontawesome.com/releases/v5.1.1/css/all.css');

@@ -21,6 +21,7 @@ require_once(__DIR__ . '/CheckoutHelper/CheckoutHelper.php');
 require_once(__DIR__ . '/Cli/GF_CLI.php');
 require_once(__DIR__ . '/ExternalBannerWidget/ExternalBannerWidget.php');
 
+require_once(__DIR__ . '/override.functions.php');
 
 require_once(get_stylesheet_directory() . "/user.functions.php");
 require_once(get_stylesheet_directory() . "/util.functions.php");

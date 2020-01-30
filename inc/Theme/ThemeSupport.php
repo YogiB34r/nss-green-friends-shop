@@ -1,8 +1,6 @@
 <?php
 
-
 namespace GF;
-
 
 class ThemeSupport
 {
@@ -30,8 +28,23 @@ class ThemeSupport
         Theme::afterThemeSetupAction(function () {
             $this->selectiveRefreshingWidgets();
         });
+        Theme::afterThemeSetupAction(function () {
+            $this->wcSupport();
+        });
 
+    }
 
+    /**
+     * Setup wc support
+     */
+    private function wcSupport()
+    {
+        add_theme_support('title-tag');
+        add_theme_support('woocommerce');
+        add_theme_support('wc-product-gallery-zoom');
+        add_theme_support('wc-product-gallery-lightbox');
+        add_theme_support('wc-product-gallery-slider');
+        add_theme_support('yoast-seo-breadcrumbs');
     }
 
     /**

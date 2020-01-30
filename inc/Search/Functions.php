@@ -4,14 +4,35 @@ namespace GF\Search;
 
 class Functions
 {
+    /**
+     * @var bool
+     */
     private $useElastic;
 
+    /**
+     * @var \wpdb
+     */
     private $wpdb;
 
     public function __construct($wpdb, $useElastic)
     {
         $this->wpdb = $wpdb;
         $this->useElastic = $useElastic;
+    }
+
+    public function ajaxViewCount($postId)
+    {
+        $key = 'post-view-count#' . $postId;
+        $cache = new \GF_Cache();
+        $count = (int) $cache->redis->get($key);
+        if ($count == 10) {
+            $this->wpdb->query("UPDATE wp_gf_products SET viewCount = viewCount + {$count} WHERE postId = {$postId}");
+            $cache->redis->set($key, 0);
+        } else {
+            $count++;
+            $cache->redis->set($key, $count);
+        }
+        echo 1;
     }
 
     public function getResults($queryVar, $query)
@@ -23,8 +44,7 @@ class Functions
                 $search = new \GF\Search\Search(new \GF\Search\Adapter\MySql($this->wpdb));
                 $allIds = $search->getItemIdsForCategory(get_query_var('term'));
 
-
-                $sortedProducts = gf_parse_post_ids_for_list($allIds);
+                $sortedProducts = $this->parsePostIdsForList($allIds);
             }
         } else {
             // @TODO
@@ -37,6 +57,47 @@ class Functions
                 $sortedProducts = $this->mysqlSearch($query);
             }
         }
+
+        return $sortedProducts;
+    }
+
+    /**
+     * Parses array of post ids and fetches them via wp query to prepare for loop.
+     *
+     * @param $allIds
+     * @return bool|WP_Query
+     */
+    public function parsePostIdsForList($allIds)
+    {
+        $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
+        if (isset($_POST['ppp'])) {
+            $per_page = ($_POST['ppp'] > 48) ? 48 : $_POST['ppp'];
+        }
+        $currentPage = (get_query_var('paged')) ? get_query_var('paged') : 1;
+
+        $resultCount = count($allIds);
+        if ($resultCount === 0) {
+            return false;
+        }
+        $totalPages = ceil($resultCount / $per_page);
+        if ($currentPage > $totalPages) {
+            $currentPage = $totalPages;
+        }
+        $args = array(
+            'post_type' => 'product',
+            'orderby' => 'post__in',
+            'post__in' => $allIds,
+            'posts_per_page' => $per_page,
+            'paged' => $currentPage,
+            'suppress_filters' => true,
+            'no_found_rows' => true
+        );
+
+        wc_set_loop_prop('total', $resultCount);
+        wc_set_loop_prop('per_page', $per_page);
+        wc_set_loop_prop('current_page', $currentPage);
+        wc_set_loop_prop('total_pages', $totalPages);
+        $sortedProducts = new WP_Query($args);
 
         return $sortedProducts;
     }
@@ -87,7 +148,7 @@ class Functions
         $search = new \GF\Search\Search(new \GF\Search\Adapter\MySql($this->wpdb));
         $allIds = $search->getItemIdsForSearch($input, $limit);
 
-        return gf_parse_post_ids_for_list($allIds);
+        return $this->parsePostIdsForList($allIds);
     }
 
     private function elasticSearch($input, $limit = 0)
@@ -195,5 +256,99 @@ class Functions
         $GLOBALS['gf-search']['facets']['category'] = $cats;
     }
 
+    /**
+     * Custom loop that works with wp query
+     *
+     * @param \WP_Query $sortedProducts
+     */
+    public function customSearchOutput(\WP_Query $sortedProducts)
+    {
+        if ($sortedProducts->have_posts()):
+            wc_setup_loop();
+            woocommerce_product_loop_start();
+            while ($sortedProducts->have_posts()) :
+                $sortedProducts->the_post();
+                wc_get_template_part('content', 'product');
+            endwhile;
+            wp_reset_postdata();
+            woocommerce_product_loop_end();
+        endif;
+    }
 
+    /**
+     * @param \Elastica\ResultSet $products
+     */
+    public function customShopLoop(\Elastica\ResultSet $products)
+    {
+        $html = '';
+
+        $i = 0;
+        foreach ($products->getResults() as $productData) {
+            $productId = $productData->postId;
+            $product = new \Nss\Feed\Product($productData->getData());
+            $saved_price = $product->getRegularPrice() - $product->getSalePrice();
+            $price = $product->getRegularPrice();
+            if ($product->getSalePrice() > 0) {
+                $price = $product->getSalePrice();
+            }
+            $saved_percentage = 0;
+            if ($saved_price > 0 && $product->getSalePrice() > 0) {
+                $saved_percentage = number_format($saved_price * 100 / $product->getRegularPrice(), 2);
+            }
+
+            $classes = '';
+            if ($saved_percentage > 0 && $product->getStockStatus() !== 0) {
+                $classes .= ' sale ';
+            }
+            if ($product->getStockStatus() == 0) {
+                $classes .= ' outofstock ';
+            }
+            // klase koje mozda zatrebaju za <li> 'instock sale shipping-taxable purchasable product-type-simple'
+            $classes .= " instock ";
+            if (!$product->getStockStatus()) {
+                $classes = " outofstock ";
+            }
+            if ($product->getSalePrice() > 0) {
+                $classes .= " sale ";
+            }
+            if ($i === 0) {
+                $classes .= " first ";
+            }
+
+            $classes .= " product type-product status-publish has-post-thumbnail shipping-taxable purchasable  ";
+            $html .= '<li class="product-type-' . $product->getType() . $classes . '">';
+            $html .= '<a href=" ' . $product->dto['permalink'] . ' " title=" ' . $product->getName() . ' ">';
+            $html .= add_stickers_to_products_on_sale($classes, $productId);
+//        woocommerce_show_product_sale_flash('', '', '', $classes);
+//        add_stickers_to_products_new($product);
+            $html .= $product->dto['thumbnail'];
+            ob_start();
+            add_stickers_to_products_soldout($classes);
+            $html .= ob_get_clean();
+//        $html .= add_stickers_to_products_soldout($classes);
+            $html .= '</a>';
+            $html .= '<a href="' . $product->dto['permalink'] . '" title="' . $product->getName() . '">';
+            $html .= '<h3>' . $product->getName() . '</h3>';
+            $html .= '</a>';
+            $html .= '<span class="price">';
+            if ($saved_percentage > 0) {
+                $html .= '<del><span class="woocommerce-Price-amount amount">' . $product->getRegularPrice()
+                    . '<span class="woocommerce-Price-currencySymbol">din.</span></span></del>';
+                $html .= '<ins><span class="woocommerce-Price-amount amount">' . $price .
+                    '<span class="woocommerce-Price-currencySymbol">din.</span></span></ins>';
+                $html .= '<p class="saved-sale">Ušteda: <span class="woocommerce-Price-amount amount">' . $saved_price .
+                    '<span class="woocommerce-Price-currencySymbol">din.</span></span> <em> (' . $saved_percentage . '%)</em></p>';
+            } else {
+                $html .= '<ins><span class="woocommerce-Price-amount amount">' . $product->getRegularPrice()
+                    . '<span class="woocommerce-Price-currencySymbol">din.</span></span></ins>';
+            }
+            $html .= '</span>';
+            $html .= '<p class="loop-short-description">' . $product->getShortDescription() . '</p>';
+            $html .= '</li>';
+            $i++;
+        }
+        $html .= '</ul>';
+
+        echo $html;
+    }
 }

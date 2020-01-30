@@ -57,92 +57,7 @@ function gf_array_reccursive_difrence(array $array1, array $array2, array $_ = n
     return $diff;
 }
 
-function gf_get_categories($exlcude = array()) {
-    $args = array(
-        'orderby' => 'name',
-        'order' => 'asc',
-        'hide_empty' => false,
-        'exclude' => $exlcude,
-    );
-    $product_cats = get_terms('product_cat', $args);
-    return $product_cats;
-}
 
-function gf_get_top_level_categories($exclude = array()) {
-    $top_level_categories = [];
-    foreach (gf_get_categories($exclude) as $category) {
-        if (!$category->parent) {
-            $top_level_categories[] = $category;
-        }
-    }
-    return $top_level_categories;
-}
-
-function gf_get_second_level_categories($parent_id = null) {
-    $categories = gf_get_categories();
-    $top_level_ids = [];
-    $second_level_categories = [];
-    foreach ($categories as $category) {
-        if (!$category->parent) {
-            $top_level_ids[] = $category->term_id;
-        }
-    }
-    foreach ($categories as $category) {
-        if ($parent_id) {
-            if ($category->parent == $parent_id) {
-                $second_level_categories[] = $category;
-            }
-        } elseif (in_array($category->parent, $top_level_ids)) {
-            $second_level_categories[] = $category;
-        }
-    }
-    return $second_level_categories;
-}
-
-function gf_get_third_level_categories($parent_id = null) {
-    $categories = gf_get_categories();
-    $second_level_ids = [];
-    foreach (gf_get_second_level_categories() as $cat) {
-        $second_level_ids[] = $cat->term_id;
-    }
-    $third_level_categories = [];
-    foreach ($categories as $category) {
-        if ($parent_id) {
-            if ($category->parent == $parent_id) {
-                $third_level_categories[] = $category;
-            }
-        } elseif (in_array($category->parent, $second_level_ids)) {
-            $third_level_categories[] = $category;
-        }
-    }
-    return $third_level_categories;
-}
-
-function gf_check_level_of_category($cat_id) {
-    $cat = get_term_by('id', $cat_id, 'product_cat');
-    if ($cat->parent === 0){
-        return 1;
-    } else {
-        if (get_term($cat->parent, 'product_cat')->parent === 0){
-            return 2;
-        } else{
-            return 3;
-        }
-    }
-}
-
-function gf_get_category_children_ids($slug) {
-    $cat = get_term_by('slug', $slug, 'product_cat');
-    $childrenIds = [];
-    if ($cat) {
-        $catChildren = get_term_children($cat->term_id, 'product_cat');
-        $childrenIds[] = $cat->term_id;
-        foreach ($catChildren as $child) {
-            $childrenIds[] = $child;
-        }
-    }
-    return $childrenIds;
-}
 
 function pricelist_import_page() {
     $updater = new \GF\Util\PricelistUpdate();
@@ -340,20 +255,6 @@ function handleAdminSearchSettings() {
 
 }
 
-
-// check this out, not used ?
-function gf_elastic_search($input, $limit = 0)
-{
-    $config = array(
-        'host' => ES_HOST,
-        'port' => 9200
-    );
-    $elasticaSearch = new \GF\Search\Elastica\Search(new \Elastica\Client($config));
-    $search = new \GF\Search\Search(new \GF\Search\Adapter\Elastic($elasticaSearch));
-    $allIds = $search->getItemIdsForSearch($input, $limit);
-
-    return gf_parse_post_ids_for_list($allIds);
-}
 
 
 

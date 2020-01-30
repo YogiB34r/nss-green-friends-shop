@@ -6,8 +6,6 @@ global $searchFunctions;
 /**
  * Has to be called on top in order to properly set all required filters
  */
-$sortedProducts = false;
-$useElastic = true;
 $action = 'search';
 if (get_query_var('term') !== '') {
     $action = 'category';
@@ -108,9 +106,9 @@ if ($sexyShopCats){
                     <div id="ajax-content" class="content-area">';
 
             if (get_class($sortedProducts) === \Elastica\ResultSet::class) {
-                gf_custom_shop_loop($sortedProducts);
+                $searchFunctions->customShopLoop($sortedProducts);
             } else {
-                gf_custom_search_output($sortedProducts);
+                $searchFunctions->customSearchOutput($sortedProducts);
             }
 
             echo '</div>';
