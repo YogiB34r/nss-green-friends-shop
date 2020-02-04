@@ -178,7 +178,6 @@ function gf_get_category_children_ids($slug) {
     return $childrenIds;
 }
 
-add_filter('request', 'customRequestOverride');
 /**
  * Prevent main wp query from returning 404 page on a category page when it thinks there are no more results.
  *
@@ -187,6 +186,8 @@ add_filter('request', 'customRequestOverride');
  */
 function customRequestOverride($query_string)
 {
+//    var_dump($query_string);
+//    die();
     if (isset($query_string['page']) && $query_string['page'] !== '' && isset($query_string['name'])) {
         unset($query_string['name']);
     }

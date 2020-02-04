@@ -1,61 +1,115 @@
 <?php
 
-/**
- * @TODO Some of these must be refactored and optimized
- */
 
+function filterOutJunkCats(\WP_Term $term) {
+    $cat1 = get_term_by('slug', 'specijalne-promocije', 'product_cat');
+    $cat2 = get_term_by('slug', 'uncategorized', 'product_cat');
 
-function gf_insert_in_array_by_index($array, $index, $val) {
-    $size = count($array); //because I am going to use this more than one time
-    if (!is_int($index) || $index < 0 || $index > $size) {
-        return -1;
-    } else {
-        $temp = array_slice($array, 0, $index);
-        $temp[] = $val;
-        return array_merge($temp, array_slice($array, $index, $size));
+    if ($term->term_id === $cat1->term_id || $term->term_id === $cat2->term_id ||
+        $term->parent === $cat1->term_id || $term->parent === $cat2->term_id) {
+        return false;
     }
+    return $term;
 }
 
-//Testira razliku array-a order sensitive
-function gf_array_reccursive_difrence(array $array1, array $array2, array $_ = null) {
-    $diff = [];
-    $args = array_slice(func_get_args(), 1);
-    foreach ($array1 as $key => $value) {
-        foreach ($args as $item) {
-            if (is_array($item)) {
-                if (array_key_exists($key, $item)) {
-                    if (is_array($value) && is_array($item[$key])) {
-                        $tmpDiff = gf_array_reccursive_difrence($value, $item[$key]);
-
-                        if (!empty($tmpDiff)) {
-                            foreach ($tmpDiff as $tmpKey => $tmpValue) {
-                                if (isset($item[$key][$tmpKey])) {
-                                    if (is_array($value[$tmpKey]) && is_array($item[$key][$tmpKey])) {
-                                        $newDiff = array_diff($value[$tmpKey], $item[$key][$tmpKey]);
-                                    } else if ($value[$tmpKey] !== $item[$key][$tmpKey]) {
-                                        $newDiff = $value[$tmpKey];
-                                    }
-
-                                    if (isset($newDiff)) {
-                                        $diff[$key][$tmpKey] = $newDiff;
-                                    }
-                                } else {
-                                    $diff[$key][$tmpKey] = $tmpDiff;
-                                }
-                            }
-                        }
-                    } else if ($value !== $item[$key]) {
-                        $diff[$key] = $value;
-
-                    }
-                } else {
-                    $diff[$key] = $value;
-                }
-            }
+function getProductUrl($post, $permalink, $absolute = true) {
+    $cats = [];
+    foreach (wp_get_post_terms($post->ID, 'product_cat') as $term) {
+        $cat = filterOutJunkCats($term);
+        if ($cat) {
+            $cats[] = $cat;
         }
     }
-    return $diff;
+    if ($absolute) {
+        return home_url() . '/'. $cats[count($cats)-1]->slug .'/'. basename($permalink) .'/';
+    }
+
+    return $cats[count($cats)-1]->slug .'/'. basename($permalink) .'/';
 }
+
+
+add_filter('parse_request', 'customRequestOverride');
+/**
+ * Enables custom URL structure to work for single product: /last-category/product-slug
+ *
+ * @param WP $wp
+ */
+function customRequestOverride(WP $wp) {
+    $params = explode('/', $wp->query_vars['pagename']);
+    if (count($params) === 2) {
+        $pageName = $params[1];
+
+        /* @var WP_Post $p */
+        $p = get_page_by_path($pageName, OBJECT, 'product');
+        if ($p) {
+            $wp->query_vars = [
+                'post_type' => 'product',
+                'product' => $pageName,
+                'name' => $pageName
+            ];
+        }
+    }
+}
+
+add_filter( 'post_type_link', 'custom_post_link', PHP_INT_MAX, 2);
+function custom_post_link( $permalink, $post ) {
+    if ($post->post_type === 'product') {
+        return getProductUrl($post, $permalink);
+    }
+
+    return $permalink;
+}
+
+add_filter('term_link', 'term_link_filter', 10, 3);
+function term_link_filter( $url, $term, $taxonomy ) {
+    if ($taxonomy === 'product_cat') {
+        $url = '/' . buildTermPath($term);
+    }
+
+    return $url;
+}
+
+function rewriteRules($rules) {
+    $terms = get_categories(array(
+        'taxonomy' => 'product_cat',
+        'hide_empty' => false,
+    ));
+
+    foreach ($terms as $term) {
+        $slug = buildTermPath($term);
+//        add_rewrite_rule("{$slug}/?\$", 'index.php?product_cat=' . $term->slug, 'top');
+        $customRules["{$slug}/?\$"] = 'index.php?product_cat=' . $term->slug;
+    }
+
+    return $customRules + $rules;
+}
+add_action('rewrite_rules_array', 'rewriteRules');
+
+// @TODO check if this triggers upon new category creation, will the new url work ?
+function flushRules() {
+    flush_rewrite_rules();
+}
+//add_action('init', 'flushRules');
+
+
+
+
+function buildTermPath($term) {
+    $slug = urldecode($term->slug);
+    $ancestors = get_ancestors($term->term_id, 'product_cat');
+    foreach ($ancestors as $ancestor) {
+        $ancestor_object = get_term($ancestor, 'product_cat');
+        if (gf_check_level_of_category($term->term_id) === 3) {
+            if (!$ancestor_object->parent){
+                $slug = urldecode($ancestor_object->slug) . '/' . $slug;
+            }
+        } else {
+            $slug = urldecode($ancestor_object->slug) . '/' . $slug;
+        }
+    }
+    return $slug;
+}
+
 
 function pricelist_import_page() {
     $updater = new \GF\Util\PricelistUpdate();
@@ -249,21 +303,6 @@ function handleAdminSearchSettings() {
 //    $result = $term->getTerms();
     require(__DIR__ . "/templates/admin/search-settings.php");
 
-}
-
-
-// check this out, not used ?
-function gf_elastic_search($input, $limit = 0)
-{
-    $config = array(
-        'host' => ES_HOST,
-        'port' => 9200
-    );
-    $elasticaSearch = new \GF\Search\Elastica\Search(new \Elastica\Client($config));
-    $search = new \GF\Search\Search(new \GF\Search\Adapter\Elastic($elasticaSearch));
-    $allIds = $search->getItemIdsForSearch($input, $limit);
-
-    return gf_parse_post_ids_for_list($allIds);
 }
 
 

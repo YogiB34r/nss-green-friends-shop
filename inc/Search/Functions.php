@@ -65,7 +65,7 @@ class Functions
      * Parses array of post ids and fetches them via wp query to prepare for loop.
      *
      * @param $allIds
-     * @return bool|WP_Query
+     * @return bool|\WP_Query
      */
     public function parsePostIdsForList($allIds)
     {
@@ -97,7 +97,7 @@ class Functions
         wc_set_loop_prop('per_page', $per_page);
         wc_set_loop_prop('current_page', $currentPage);
         wc_set_loop_prop('total_pages', $totalPages);
-        $sortedProducts = new WP_Query($args);
+        $sortedProducts = new \WP_Query($args);
 
         return $sortedProducts;
     }
