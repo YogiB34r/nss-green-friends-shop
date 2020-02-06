@@ -21,9 +21,6 @@ class AdminMenu
                 'administrator', 'external_item_banners_widget', function () use ($widget) {
                 $widget->admin();
             }, 20);
-//            add_menu_page('Carousel za partnerske sajtove', 'Carousel za partnere', 'administrator', 'external_item_banners_widget', function () use ($widget) {
-//                $widget->admin();
-//            }, null, 666);
         });
 
         add_action('admin_menu', function (){
