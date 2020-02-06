@@ -29,12 +29,12 @@ if (isset($_GET['action'])) {
         case 'exportJitexOrder':
             $printMenu = false;
             $order = wc_get_order($_GET['id']);
-            exportJitexOrder($order);
+            \Gf\Util\Jitex::exportJitexOrder($order);
 
             break;
 
         case 'adresnica':
-            createAdresnica($_GET['id']);
+            \Gf\Util\Adresnica::createAdresnica($_GET['id']);
 
             break;
 
@@ -45,15 +45,8 @@ if (isset($_GET['action'])) {
 
             break;
 
-        case 'createJitexExport':
-            ini_set('memory_limit', '1500M');
-            ini_set('max_execution_time', '300');
-            createJitexItemExport();
-
-            break;
-
         case 'jitexItemExport':
-            getJitexExport();
+            \Gf\Util\Jitex::getJitexExport();
 
             break;
 

@@ -16,7 +16,8 @@ class CategoryFunctions
         return $term;
     }
 
-    public static function getProductUrl($post, $permalink, $absolute = true) {
+    public static function getProductUrl($post, $permalink, $absolute = true)
+    {
         $cats = [];
         foreach (wp_get_post_terms($post->ID, 'product_cat') as $term) {
             $cat = static::filterOutJunkCats($term);
@@ -48,7 +49,8 @@ class CategoryFunctions
         return $slug;
     }
 
-    public static function gf_check_level_of_category($cat_id) {
+    public static function gf_check_level_of_category($cat_id)
+    {
         $cat = get_term_by('id', $cat_id, 'product_cat');
         if ($cat->parent === 0){
             return 1;
@@ -71,5 +73,27 @@ class CategoryFunctions
             }
         }
         return $childrenIds;
+    }
+
+    public static function gf_get_top_level_categories($exclude = array())
+    {
+        $top_level_categories = [];
+        foreach (static::gf_get_categories($exclude) as $category) {
+            if (!$category->parent) {
+                $top_level_categories[] = $category;
+            }
+        }
+        return $top_level_categories;
+    }
+
+    public static function gf_get_categories($exclude = array())
+    {
+        $args = array(
+            'orderby' => 'name',
+            'order' => 'asc',
+            'hide_empty' => false,
+            'exclude' => $exclude,
+        );
+        return get_terms('product_cat', $args);
     }
 }

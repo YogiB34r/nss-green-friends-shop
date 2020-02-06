@@ -15,6 +15,11 @@ $theme->init();
 $urlUtils = new \Gf\Util\Url();
 $urlUtils->init();
 
+$adminMenu = new \Gf\Util\AdminMenu();
+$adminMenu->init();
+
+
+
 
 function get_search_category_aggregation() {
     return $GLOBALS['gf-search']['facets']['category'];
@@ -79,7 +84,7 @@ function ajax_script_load_more($args)
 
 
 
-
+add_filter('script_loader_tag', 'add_async_attribute', 10, 2);
 function add_async_attribute($tag, $handle) {
     $scripts_to_defer = array('merged-script');
     foreach($scripts_to_defer as $defer_script) {
@@ -89,71 +94,8 @@ function add_async_attribute($tag, $handle) {
     }
     return $tag;
 }
-add_filter('script_loader_tag', 'add_async_attribute', 10, 2);
 
 
-
-
-function gf_get_categories($exlcude = array()) {
-    $args = array(
-        'orderby' => 'name',
-        'order' => 'asc',
-        'hide_empty' => false,
-        'exclude' => $exlcude,
-    );
-    $product_cats = get_terms('product_cat', $args);
-    return $product_cats;
-}
-
-function gf_get_top_level_categories($exclude = array()) {
-    $top_level_categories = [];
-    foreach (gf_get_categories($exclude) as $category) {
-        if (!$category->parent) {
-            $top_level_categories[] = $category;
-        }
-    }
-    return $top_level_categories;
-}
-
-function gf_get_second_level_categories($parent_id = null) {
-    $categories = gf_get_categories();
-    $top_level_ids = [];
-    $second_level_categories = [];
-    foreach ($categories as $category) {
-        if (!$category->parent) {
-            $top_level_ids[] = $category->term_id;
-        }
-    }
-    foreach ($categories as $category) {
-        if ($parent_id) {
-            if ($category->parent == $parent_id) {
-                $second_level_categories[] = $category;
-            }
-        } elseif (in_array($category->parent, $top_level_ids)) {
-            $second_level_categories[] = $category;
-        }
-    }
-    return $second_level_categories;
-}
-
-function gf_get_third_level_categories($parent_id = null) {
-    $categories = gf_get_categories();
-    $second_level_ids = [];
-    foreach (gf_get_second_level_categories() as $cat) {
-        $second_level_ids[] = $cat->term_id;
-    }
-    $third_level_categories = [];
-    foreach ($categories as $category) {
-        if ($parent_id) {
-            if ($category->parent == $parent_id) {
-                $third_level_categories[] = $category;
-            }
-        } elseif (in_array($category->parent, $second_level_ids)) {
-            $third_level_categories[] = $category;
-        }
-    }
-    return $third_level_categories;
-}
 
 
 add_filter('request', 'customRewriteFix');
@@ -313,4 +255,66 @@ function get_product_by_sku( $sku ) {
     }
 
     return null;
+}
+
+
+//Migrate comments from old site
+function gf_migrate_comments()
+{
+    $rows = array_map('str_getcsv', file(__DIR__ . '/reviews.csv'));
+    $header = array_shift($rows);
+    $csv = array();
+    foreach ($rows as $row) {
+        $csv[] = array_combine($header, $row);
+    }
+    $successfulComments = [];
+    $emptySkus = [];
+    $emptyUsers = [];
+    foreach ($csv as $comment) {
+        $postId = wc_get_product_id_by_sku($comment['sku']);
+        if (!$postId) {
+            $emptySkus[] = $comment['sku'];
+            continue;
+        }
+        $user = get_user_by('email', $comment['Email']);
+        if (!$user) {
+            $emptyUsers[] = $comment['Email'];
+            continue;
+        }
+        $commentAuthor = $user->get('display_name');
+        $commentAuthorEmail = $user->get('user_email');
+        $commentAuthorUrl = $user->get('user_url');
+        $commentContent = $comment['comment'];
+        $userId = $user->get('ID');
+        $commentDate = $comment['date'];
+
+
+        $data = array(
+            'comment_post_ID' => $postId,
+            'comment_author' => $commentAuthor,
+            'comment_author_email' => $commentAuthorEmail,
+            'comment_author_url' => $commentAuthorUrl,
+            'comment_content' => $commentContent,
+            'comment_date' => $commentDate,
+            'comment_date_gmt' => $commentDate,
+            'comment_approved' => 1,
+            'user_id' => $userId,
+        );
+        $comment_id = wp_insert_comment($data);
+        $successfulComments[] = $comment_id;
+        update_comment_meta($comment_id, 'migrated', '1');
+    } //foreach comments
+
+    $skuLogFile = fopen(LOG_PATH . '/skuLog.csv', 'w');
+    fwrite($skuLogFile, implode(',', $emptySkus));
+    fclose($skuLogFile);
+
+    $userLogFile = fopen(LOG_PATH . '/usersLog.csv', 'w');
+    fwrite($userLogFile, implode(',', $emptyUsers));
+    fclose($userLogFile);
+    echo '<p>Uspešno importovano ' . count($successfulComments) . ' komentara</p>';
+}
+
+function generateUploadsPath() {
+    return WP_CONTENT_DIR . '/uploads/'. date('Y') .'/'. date('m') .'/'. date('d') . '/';
 }
