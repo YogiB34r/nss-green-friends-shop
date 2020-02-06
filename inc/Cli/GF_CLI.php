@@ -71,7 +71,7 @@ class Cli
             'paged' => $page
         ));
 
-        $ids = gf_get_category_children_ids('specijalne-promocije');
+        $ids = \Gf\Util\CategoryFunctions::gf_get_category_children_ids('specijalne-promocije');
 
         foreach ($products_ids as $product_id) {
             $product = wc_get_product($product_id);

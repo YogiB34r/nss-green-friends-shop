@@ -1,5 +1,5 @@
 <?php
-$sexyShopCats = gf_get_category_children_ids('sexy-shop');
+$sexyShopCats = \Gf\Util\CategoryFunctions::gf_get_category_children_ids('sexy-shop');
 $product_cats = wc_get_product(get_queried_object_id())->get_category_ids();
 $result = false;
 foreach ($product_cats as $product_cat){
