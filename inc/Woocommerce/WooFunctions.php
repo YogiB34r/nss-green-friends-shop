@@ -4,22 +4,25 @@ class WooFunctions
 {
     public function __construct()
     {
-       $this->run();
+        $this->run();
     }
 
     private function run()
     {
         add_filter('woocommerce_currency_symbol', [$this, 'change_existing_currency_symbol'], 10, 2);
         add_action('woocommerce_save_account_details_errors', [$this, 'wooc_validate_custom_field'], 10, 2);
-        add_action('woocommerce_before_account_navigation', [$this,'gf_my_account_shop_button'], 1);
+        add_action('woocommerce_before_account_navigation', [$this, 'gf_my_account_shop_button'], 1);
         add_filter('woocommerce_account_menu_items', [$this, 'gf_remove_my_account_links']);
         add_filter('woocommerce_catalog_orderby', [$this, 'wc_customize_product_sorting']);
-        add_filter('woocommerce_billing_fields',[$this, 'wpb_custom_billing_fields']);
+        add_filter('woocommerce_billing_fields', [$this, 'wpb_custom_billing_fields']);
 
         //Cod disable
         add_filter('woocommerce_available_payment_gateways', [$this, 'restrictCod'], 10, 1);//Checks if product has Cod disabled
-        add_action( 'woocommerce_product_options_shipping', [$this,'disableCodCheckbox'] );//Adds cod checkbox
-        add_action( 'woocommerce_process_product_meta', [$this,'saveCodCheckbox'], 10, 2 );//Saves cod checkbox
+        add_action('woocommerce_product_options_shipping', [$this, 'disableCodCheckbox']);//Adds cod checkbox
+        add_action('woocommerce_process_product_meta', [$this, 'saveCodCheckbox'], 10, 2);//Saves cod checkbox
+
+        //Generate sku
+        add_action('save_post', [$this, 'validateSku'], 10, 2);
     }
 
 
@@ -104,7 +107,8 @@ class WooFunctions
         return $sorting_options;
     }
 
-    function wpb_custom_billing_fields( $fields = array() ) {
+    function wpb_custom_billing_fields($fields = array())
+    {
         unset($fields['billing_state']);
 
         return $fields;
@@ -117,12 +121,12 @@ class WooFunctions
     function restrictCod($available_gateways)
     {
         // Not in backend (admin)
-        if( is_admin() )
+        if (is_admin())
             return $available_gateways;
 
-        foreach (WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
+        foreach (WC()->cart->get_cart() as $cart_item_key => $cart_item) {
             $product = wc_get_product($cart_item['product_id']);
-            $disableCod = $product->get_meta('disableCod',true);
+            $disableCod = $product->get_meta('disableCod', true);
 
 
             if ($disableCod === 'yes')
@@ -135,17 +139,17 @@ class WooFunctions
     /**
      * Adds checkbox to product shipping tab for disabling cod
      */
-    function disableCodCheckbox ()
+    function disableCodCheckbox()
     {
         echo '<div class="options_group">';
 
-        woocommerce_wp_checkbox( array(
-            'id'      => 'disableCod',
-            'value'   => get_post_meta( get_the_ID(), 'disableCod', true ),
-            'label'   => 'Disable COD',
+        woocommerce_wp_checkbox(array(
+            'id' => 'disableCod',
+            'value' => get_post_meta(get_the_ID(), 'disableCod', true),
+            'label' => 'Disable COD',
             'desc_tip' => true,
             'description' => 'If checked disables COD payment options when this product is in cart',
-        ) );
+        ));
 
         echo '</div>';
     }
@@ -153,7 +157,69 @@ class WooFunctions
     /**
      * Saves checkbox for disabling cod
      */
-    function saveCodCheckbox( $id, $post ){
-        update_post_meta( $id, 'disableCod', $_POST['disableCod'] );
+    function saveCodCheckbox($id, $post)
+    {
+        update_post_meta($id, 'disableCod', $_POST['disableCod']);
+    }
+
+    public function validateSku($id, $post)
+    {
+            if ($_POST['_sku'] === "") {
+                $this->autoGenerateSku();
+            } else {
+                $productDb = wc_get_product_id_by_sku($_POST['_sku']);
+                if ($productDb === $_POST['post_ID']){
+                    $product = wc_get_product($_POST['post_ID']);
+                    $skuOld = wc_get_product($productDb)->get_sku();
+                    $skuNew = $product->get_sku();
+                    if ($skuOld === $skuNew){
+                        return;
+                    } else {
+                        $this->preventDuplicateSku();
+                    }
+                }
+            }
+
+    }
+
+    private function autoGenerateSku ()
+    {
+        $exit = false;
+        $i = 0;
+        while ($exit === false) {
+            if ($i > 0) {
+                $counter = $i;
+            } else {
+                $counter = '';
+            }
+
+            if (strlen(wc_get_product_id_by_sku($_POST['post_ID'] . $counter) === 0)) {
+                $_POST['_sku'] = $_POST['post_ID'];
+                $exit = true;
+            } else {
+                $_POST['_sku'] = $_POST['post_ID'] . $i;
+                $i++;
+            }
+        }
+    }
+
+    private function preventDuplicateSku()
+    {
+        $exit = false;
+        $i = 0;
+        while ($exit === false) {
+            if ($i > 0) {
+                $counter = $i;
+            } else {
+                $counter = '';
+            }
+
+            if (strlen(wc_get_product_id_by_sku($_POST['_sku'] . $counter) === 0)) {
+                $exit = true;
+            } else {
+                $_POST['_sku'] = $_POST['_sku'] . $i;
+                $i++;
+            }
+        }
     }
 }
