@@ -123,7 +123,7 @@ class MySql implements \GF\Search\AdapterInterface
             $priceCondition = " AND priceOrder >= {$minPrice} AND priceOrder <= {$maxPrice} ";
         }
         $excludeCategories = " 1=1 ";
-        foreach (gf_get_category_children_ids('sexy-shop') as $catId) {
+        foreach (\Gf\Util\CategoryFunctions::gf_get_category_children_ids('sexy-shop') as $catId) {
             $excludeCategories .= " AND categoryIds NOT LIKE '%{$catId}%' ";
         }
 
@@ -208,8 +208,8 @@ class MySql implements \GF\Search\AdapterInterface
         }
 
         $excludeCategories = " 1=1 ";
-        if (!in_array($cat->term_id, gf_get_category_children_ids('sexy-shop'))) {
-            foreach (gf_get_category_children_ids('sexy-shop') as $catId) {
+        if (!in_array($cat->term_id, \Gf\Util\CategoryFunctions::gf_get_category_children_ids('sexy-shop'))) {
+            foreach (\Gf\Util\CategoryFunctions::gf_get_category_children_ids('sexy-shop') as $catId) {
                 $excludeCategories .= " AND categoryIds NOT LIKE '%{$catId}%' ";
             }
         }

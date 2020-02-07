@@ -1,14 +1,8 @@
 <?php
 /**
-<<<<<<< HEAD
- * Customer processing order email
- *
- * This template can be overridden by copying it to yourtheme/woocommerce/emails/customer-processing-order.php.
-=======
  * Customer on-hold order email
  *
  * This template can be overridden by copying it to yourtheme/woocommerce/emails/customer-on-hold-order.php.
->>>>>>> master
  *
  * HOWEVER, on occasion WooCommerce will need to update template files and you
  * (the theme developer) will need to copy the new files to your theme to
@@ -16,16 +10,6 @@
  * happen. When this occurs the version of the template file will be bumped and
  * the readme will list any important changes.
  *
-<<<<<<< HEAD
- * @see 	    https://docs.woocommerce.com/document/template-structure/
- * @author 		WooThemes
- * @package 	WooCommerce/Templates/Emails
- * @version     2.5.0
- */
-
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-=======
  * @see        https://docs.woocommerce.com/document/template-structure/
  * @author        WooThemes
  * @package    WooCommerce/Templates/Emails
@@ -34,23 +18,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 if (!defined('ABSPATH')) {
     exit;
->>>>>>> master
 }
 
 /**
  * @hooked WC_Emails::email_header() Output the email header
  */
-<<<<<<< HEAD
-do_action( 'woocommerce_email_header', $email_heading, $email ); ?>
-
-<p>Status Vaše narudžbine je promenjen na <?=$status?>.</p>
-
-<?php
-/**
- * @hooked WC_Emails::email_footer() Output the email footer
- */
-do_action( 'woocommerce_email_footer', $email );
-=======
 do_action('woocommerce_email_header', $email_heading, $email); ?>
 
 <p><?php echo $msg; ?></p>
@@ -82,4 +54,3 @@ do_action('woocommerce_email_header', $email_heading, $email); ?>
  * @hooked WC_Emails::email_footer() Output the email footer
  */
 do_action('woocommerce_email_footer', $email);
->>>>>>> master
