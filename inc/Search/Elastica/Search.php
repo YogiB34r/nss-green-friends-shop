@@ -117,7 +117,7 @@ class Search
         $boolQuery->addShould($q);
 
         // exclude sex shop categories
-        foreach (gf_get_category_children_ids('sexy-shop') as $catId) {
+        foreach (\Gf\Util\CategoryFunctions::gf_get_category_children_ids('sexy-shop') as $catId) {
             $q = new Term();
             $q->setTerm('category.id', $catId);
             $boolQuery->addMustNot($q);

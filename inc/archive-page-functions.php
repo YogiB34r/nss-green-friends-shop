@@ -1,4 +1,5 @@
 <?php
+//@TODO not used remove
 function gf_check_if_slug_is_in_url_and_product_count()
 {
     global $wp;
@@ -23,6 +24,7 @@ function gf_check_if_slug_is_in_url_and_product_count()
     return $resault;
 }
 
+//@TODO not used remove
 //@TODO fix typo here !!
 function gf_check_for_second_level_categories() {
     global $wp;
@@ -100,11 +102,10 @@ function woocommerce_result_count() {
 }
 
 
-remove_action('woocommerce_archive_description', 'woocommerce_taxonomy_archive_description', 10);
-remove_action('woocommerce_archive_description', 'woocommerce_product_archive_description', 10);
+remove_action('woocommerce_archive_description', 'woocommerce_taxonomy_archive_description');
+remove_action('woocommerce_archive_description', 'woocommerce_product_archive_description');
 add_action('woocommerce_archive_description', 'gf_archive_description', 10);
-function gf_archive_description()
-{
+function gf_archive_description() {
     global $wp_query;
     $cat_id = $wp_query->get_queried_object_id();
     $cat_desc = term_description($cat_id, 'product_cat');

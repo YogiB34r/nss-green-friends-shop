@@ -109,7 +109,7 @@ class DailyExpressApi
                 'gpoid' => $order->get_order_number(),
 
                 'ID nalogodavca' => 'UK17357',
-                'Naziv nalogodavca' => 'Non Stop Shop​ d.o.o.',
+                'Naziv nalogodavca' => 'Non Stop Shop d.o.o.',
                 'Adresa nalogodavca' => 'Gvozdićeva 4',
                 'ID naselja nalogodavca' => 11000,
                 'Naziv naselja/mesta nalogodavca' => 'Beograd',
@@ -117,7 +117,7 @@ class DailyExpressApi
                 'Kontakt telefon nalogodavca' => '011/7450-380',
 
                 'ID posaljioca' => 'UK17357',
-                'Naziv posaljioca' => 'Non Stop Shop​ d.o.o.',
+                'Naziv posaljioca' => 'Non Stop Shop d.o.o.',
                 'Adresa mesta preuzimanja' => 'Gvozdićeva 4',
                 'ID naselja mesta preuzimanja' => 11000,
                 'Naziv naselja/mesta preuzimanja' => 'Beograd',

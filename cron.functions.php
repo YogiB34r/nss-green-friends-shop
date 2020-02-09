@@ -2,17 +2,6 @@
 
 // @TODO move this to class
 
-include(__DIR__ . "/inc/Cli/GF_CLI.php");
-include(__DIR__ . "/inc/Util/DailyExpressApi.php");
-include(__DIR__ . "/inc/Search/Elastica/Indexer.php");
-include(__DIR__ . "/inc/Search/Elastica/Config/ConfigInterface.php");
-include(__DIR__ . "/inc/Search/Elastica/Config/Product.php");
-include(__DIR__ . "/inc/Search/Elastica/Config/Term.php");
-include(__DIR__ . "/inc/Search/Elastica/Setup.php");
-include(__DIR__ . "/inc/Search/Factory/ElasticClientFactory.php");
-include(__DIR__ . "/inc/Search/Factory/ProductSetupFactory.php");
-include(__DIR__ . "/inc/Search/Factory/TermSetupFactory.php");
-
 if (defined('WP_CLI') && WP_CLI) {
     ini_set('max_execution_time', 1200);
     ini_set('display_errors', 1);
@@ -167,6 +156,53 @@ function mis() {
     }
 }
 
+add_action('createJitexItemExport', 'createJitexItemExport');
+function createJitexItemExport()
+{
+    $csv = '';
+    for ($i = 1; $i < 15; $i++) {
+        $args = array(
+            'post_type' => 'product',
+            'posts_per_page' => 2000,
+            'page' => $i,
+            'status' => 'publish'
+        );
+        $products = wc_get_products($args);
+
+        /* @var $product WC_Product_Simple|WC_Product_Variable */
+        foreach ($products as $product) {
+            if ($product->get_meta('pdv') >= 10) {
+                $taxcalc = (int)('1' . $product->get_meta('pdv'));
+            } else {
+                $taxcalc = (int)('10' . (int)$product->get_meta('pdv'));
+            }
+
+            $csv .= @iconv('utf-8', 'windows-1250', $product->get_sku() . "\t" . trim(mb_strtoupper($product->get_name(), 'UTF-8')) . "\t" .
+                    str_replace('.', ',', $product->get_meta('pdv')) . "\t" . str_replace('.', ',', round($product->get_price() * 100 / (double)$taxcalc, 2)) . "\t" .
+                    str_replace('.', ',', round($product->get_price(), 2))) . "\r\n";
+
+            if (get_class($product) === WC_Product_Variable::class) {
+                $passedIds = [];
+                foreach ($product->get_available_variations() as $variations) {
+                    foreach ($variations['attributes'] as $variation) {
+                        $itemIdSize = $product->get_sku() . $variation;
+                        if (!in_array($itemIdSize, $passedIds)) {
+                            $passedIds[] = $itemIdSize;
+                            $csv .= iconv('utf-8', 'windows-1250', $itemIdSize . "\t" .
+                                    trim(mb_strtoupper($product->get_name() . ' ' . $variation, 'UTF-8')) . "\t" .
+                                    str_replace('.', ',', $product->get_meta('pdv')) . "\t" . str_replace('.', ',', round($product->get_price() * 100 / (double)$taxcalc, 2)) . "\t" .
+                                    str_replace('.', ',', round($product->get_price(), 2))) . "\r\n";
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    $fileName = 'jitexItems.txt';
+    $filePath = __DIR__ . '/../../uploads/feed/' . $fileName;
+    file_put_contents($filePath, $csv);
+}
 
 function getItemExport() {
     global $wpdb;
@@ -323,5 +359,104 @@ function syncToElastic($id) {
         $indexer = new \GF\Search\Elastica\Indexer($productType);
         $indexer->indexProduct($product);
     }
+}
+
+add_action('feedCronStarter', 'nss_feed_start');
+add_action('feedCronFillQueue', 'nss_feed_parse');
+add_action('feedCronProcessQueue', 'nss_feed_process_queue');
+
+//nss_feed_test();
+function nss_feed_test(){
+    $message = nss_feed_queue(123);
+    var_dump($message);
+    $message = nss_feed_process(123);
+    var_dump($message);
+    die();
+}
+
+function nss_feed_start() {
+    $activeSuppliers = [
+//        268, // vitapur
+        252, // a sport
+        123, // tv shop
+    ];
+
+    foreach (SUPPLIERS as $supplierId => $supplierData) {
+        if (in_array($supplierId, $activeSuppliers)) {
+            wp_schedule_single_event(time(), 'feedCronFillQueue', [$supplierId, $supplierData['name']]);
+        }
+    }
+}
+
+function nss_feed_parse($supplierId, $name) {
+    \NSS_Log::log('nss_feed_parse start');
+//    $supplierId = $args[0];
+//    $name = $args[1];
+    $from = 'mailer@nonstopshop.rs';
+    $headers = [
+        'Content-Type: text/html; charset=UTF-8',
+        "From: NonStopShop <'{$from}'>",
+    ];
+    $to[] = 'djavolak@mail.ru';
+    $subject = 'NSS feed cron report - parse items for: ' . SUPPLIERS[$supplierId]['name'];
+
+    $message = nss_feed_queue($supplierId);
+    wp_schedule_single_event(time(), 'feedCronProcessQueue', [$supplierId]);
+
+    wp_mail($to, $subject, $message, $headers);
+    \NSS_Log::log('nss_feed_parse done');
+}
+
+function nss_feed_process_queue($supplierId) {
+//    \NSS_Log::log('nss_feed_process started');
+    $from = 'mailer@nonstopshop.rs';
+    $headers = [
+        'Content-Type: text/html; charset=UTF-8',
+        "From: NonStopShop <'{$from}'>",
+    ];
+    $to[] = 'djavolak@mail.ru';
+    $subject = 'NSS feed cron report - process queue for: ' . SUPPLIERS[$supplierId]['name'];
+    $message = nss_feed_process($supplierId);
+
+    wp_mail($to, $subject, $message, $headers);
+    \NSS_Log::log('nss_feed_process done');
+}
+
+function nss_feed_process($supplierId) {
+    global $wpdb;
+
+    $httpClient = new \GuzzleHttp\Client(['defaults' => [
+        'verify' => false
+    ]]);
+    $redis = new \Redis();
+    $redis->connect(REDIS_HOST);
+
+//    $key = 'importFeedQueueCreate:' . SUPPLIERS[$args[0]]['name'] .':';
+//    $importer = new \Nss\Feed\Importer($this->redis, $this->wpdb, $this->httpClient, $key);
+
+    $key = 'importFeedQueueUpdate:' . SUPPLIERS[$supplierId]['name'] .':';
+    $importer = new \Nss\Feed\Importer($redis, $wpdb, $httpClient, $key);
+
+    $message = $importer->importItems(0, 1000);
+
+    return $message;
+}
+
+function nss_feed_queue($supplierId) {
+    $httpClient = new \GuzzleHttp\Client(['defaults' => [
+        'verify' => false
+    ]]);
+    $redis = new \Redis();
+    $redis->connect(REDIS_HOST);
+
+    $parser = \Nss\Feed\ParserFactory::make(SUPPLIERS[$supplierId], $httpClient, $redis);;
+    $stats = $parser->processItems();
+
+    $message = 'Parse completed successfully.' . "\r\n";
+    $message .= print_r($stats, true);
+//    $message .= print_r($args, true);
+    $message .= $parser->parseErrors();
+
+    return $message;
 }
 

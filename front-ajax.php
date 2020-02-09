@@ -1,7 +1,7 @@
 <?php
 /* Template Name: custom ajax */
 
-global $wpdb;
+global $wpdb, $searchFunctions;
 
 $config = array(
     'host' => ES_HOST,
@@ -9,29 +9,7 @@ $config = array(
 );
 
 if (isset($_GET['viewCount'])) {
-    gf_ajax_view_count((int) $_GET['postId']);
-    exit();
-}
-
-if (isset($_GET['import'])) {
-//    require (__DIR__ . '/../../plugins/nss-feed-import/classes/Importer.php');
-    if(!function_exists('wp_get_current_user')) {
-        require_once(ABSPATH . 'wp-admin/includes/image.php');
-        require_once(ABSPATH . 'wp-admin/includes/media.php');
-        require_once(ABSPATH . 'wp-admin/includes/file.php');
-    }
-
-    $perPage = 100;
-    $offset = $_POST['page'] * $perPage;
-    $supplierId = 666;
-    $supplierId = 308;
-    $stats = gf_start_import($wpdb, $supplierId, $offset, $perPage);
-    if ($stats['keyRemoveCount'] === 0 && $stats['importCount'] === 0) {
-        //nothing to do
-        echo 0;
-    } else {
-        echo 1;
-    }
+    $searchFunctions->ajaxViewCount((int) $_GET['postId']);
     exit();
 }
 
@@ -134,20 +112,20 @@ if (isset($_POST['action']) && $_POST['action'] == 'getZipCode') {
 }
 
 if (isset($_POST['action']) && $_POST['action'] == 'ajax_load_more') {
+    global $searchFunctions;
+
     $page = addslashes($_POST['page']);
     $term = addslashes($_POST['term']);
-    $type = addslashes($_POST['type']);
-
+//    $type = addslashes($_POST['type']);
     set_query_var('paged', $page);
     set_query_var('term', $term);
 
-    if ($type === 'category') {
-        $results = gf_get_category_items_from_elastic();
+    $sortedProducts = $searchFunctions->getResults($term, '');
+    if (get_class($sortedProducts) === \Elastica\ResultSet::class) {
+        $searchFunctions->customShopLoop($sortedProducts);
     } else {
-        $results = gf_elastic_search_with_data($_GET['query']);
+        $searchFunctions->customSearchOutput($sortedProducts);
     }
-
-    gf_custom_shop_loop($results);
 
     exit();
 }

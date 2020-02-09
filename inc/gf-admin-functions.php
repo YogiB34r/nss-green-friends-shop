@@ -62,9 +62,7 @@ function custom_admin_order_totals_after_tax($orderid) {
 add_filter('post_date_column_time', 'gf_custom_post_date_column_time', 10, 2);
 function gf_custom_post_date_column_time($h_time, $post) {
 
-    $h_time = get_the_time(__('d/m/Y', 'woocommerce'), $post);
-
-    return $h_time;
+    return get_the_time(__('d/m/Y', 'woocommerce'), $post);
 }
 
 
@@ -72,7 +70,7 @@ function gf_custom_post_date_column_time($h_time, $post) {
 add_action('manage_posts_custom_column', 'gf_date_clmn');
 function gf_date_clmn($column_name) {
     global $post;
-    if ($column_name == 'order_date') {
+    if ($column_name === 'order_date') {
         $t_time = get_the_time(__('d/m/Y H:i', 'woocommerce'), $post);
         echo $t_time . '<br />';
     }
@@ -97,10 +95,10 @@ add_action('manage_shop_order_posts_custom_column', 'gf_get_order_payment_method
 function gf_get_order_payment_method_column($colname) {
     global $the_order; // the global order object
 
-    if ($colname == 'payment_method_column') {
+    if ($colname === 'payment_method_column') {
         echo $the_order->get_payment_method_title();
     }
-    if ($colname == 'order_phone_column') {
+    if ($colname === 'order_phone_column') {
         $via = 'WWW';
         if ($the_order->get_created_via() == 'admin') {
             $via = 'PHONE';
@@ -108,10 +106,10 @@ function gf_get_order_payment_method_column($colname) {
         echo $via;
 //        echo $the_order->get_meta('gf_order_created_method');
     }
-    if ($colname == 'order_shipping_price_column') {
+    if ($colname === 'order_shipping_price_column') {
         echo $the_order->get_shipping_total() . 'din.';
     }
-    if ($colname == 'customActions') {
+    if ($colname === 'customActions') {
         $jitexDoneStyle = '';
         $adresnicaDoneStyle = '';
         $misDoneStyle = '';
@@ -148,7 +146,7 @@ function gf_get_order_payment_method_column($colname) {
 add_action('woocommerce_admin_order_data_after_order_details', 'gf_admin_phone_order_field');
 function gf_admin_phone_order_field($order) {
     $checked = true;
-    if ($order->get_meta('gf_order_created_method') == 'WWW') {
+    if ($order->get_meta('gf_order_created_method') === 'WWW') {
         $checked = false;
     }
     woocommerce_form_field('gf_phone_order', array(
@@ -227,7 +225,25 @@ function gf_supplier_product_list_column_content($column, $product_id){
     }
 }
 
+/**
+ * @return array
+ */
 function gf_get_order_dates() {
+    $query = new WC_Order_Query(array(
+        'limit' => -1,
+        'return' => 'ids'
+    ));
+    $order_ids = $query->get_orders();
+
+    $same_date = '';
+    $order_dates = [];
+    foreach ($order_ids as $order_id) {
+        $date = get_the_time(__('d/m/Y', 'woocommerce'), $order_id);
+        if ($date !== $same_date) {
+            $order_dates[] = $date;
+            $same_date = $date;
+        }
+    }
     global $wpdb;
 
     $sql = "SELECT distinct DATE(post_date) as postDate FROM wp_posts WHERE post_type = 'shop_order' ORDER BY post_date DESC";
@@ -341,21 +357,6 @@ function gf_featured_products_admin_filter_query($query) {
 }
 //admin product list filter by supplier *** END ***
 
-// EXTERNAL ITEM BANNERS WIDGET OPTIONS
-add_action('admin_menu', 'gf_external_item_banners_widget_options_create_menu');
-function gf_external_item_banners_widget_options_create_menu() {
-    global $wpdb;
-    $widget = new \GF\ExternalBannerWidget\ExternalBannerWidget($wpdb);
-    //create new top-level menu
-    add_menu_page('Carousel za partnerske sajtove', 'Carousel za partnere', 'administrator', 'external_item_banners_widget', function () use ($widget) {
-        $widget->admin();
-    }, null, 666);
-
-    //call register settings function
-    add_action('admin_init', function () use ($widget) {
-        $widget->register_widget_options();
-    });
-}
 
 add_filter('bulk_actions-edit-shop_order', 'bulkAdresniceExport', 20, 1);
 function bulkAdresniceExport($actions) {
@@ -363,10 +364,6 @@ function bulkAdresniceExport($actions) {
     $actions['jitexExport'] = __('Jitex Export', 'woocommerce');
 
     return $actions;
-}
-
-function generateUploadsPath() {
-    return __DIR__ . '/../../../uploads/'. date('Y') .'/'. date('m') .'/'. date('d') . '/';
 }
 
 add_filter('handle_bulk_actions-edit-shop_order', 'handleBulkAdresniceExport', 10, 3);
@@ -383,21 +380,18 @@ function handleBulkAdresniceExport($redirect_to, $action, $orderIds) {
 
             foreach ($orderIds as $orderId) {
                 $order = wc_get_order($orderId);
-                $path = createAdresnicaPdf($order);
+                $path = \Gf\Util\Adresnica::createAdresnicaPdf($order);
                 if (file_exists($path) && is_readable($path)) {
                     $add = $zipArchive->addFile($path, basename($path));
                 } else {
-                    var_dump('there was a problem reading file: ' . $path);
-                    die();
+                    throw new \Exception('there was a problem reading file: ' . $path);
                 }
                 if ($add !== true) {
-                    var_dump('could not add file to archive');
-                    die();
+                    throw new \Exception('could not add file to archive');
                 }
             }
             if ($zipArchive->close() !== true) {
-                var_dump('could not close archive.');
-                die();
+                throw new \Exception('could not close archive.');
             }
             $path = str_replace('public_html', '', str_replace(strstr($zipPath, 'public_html', true), '', $zipPath));
 
@@ -414,7 +408,7 @@ function handleBulkAdresniceExport($redirect_to, $action, $orderIds) {
             $open = $zipArchive->open($zipPath, ZipArchive::CREATE);
             foreach ($orderIds as $orderId) {
                 $order = wc_get_order($orderId);
-                $csvText = parseJitexDataFromOrder($order);
+                $csvText = \Gf\Util\Jitex::parseJitexDataFromOrder($order);
                 $add = $zipArchive->addFromString($order->get_order_number() . '.txt', $csvText);
             }
             if ($zipArchive->close() !== true) {
@@ -454,94 +448,9 @@ function bulkAdresniceAdminNotice() {
     if (!empty($_REQUEST['jitexExport'])) {
         echo '<div id="message" class="updated fade">
         <p>' . sprintf('Ukupno %s porudžbina obrađeno za <b>jitex export</b>.', $count) . '</p>
-        <p>Jitex exporte možete preuzeti <a href="'.$_REQUEST['zipPath'].'">ovde</a></p>
+        <p>Jitex export možete preuzeti <a href="'.$_REQUEST['zipPath'].'">ovde</a></p>
         </div>';
     }
-}
-
-function parseJitexDataFromOrder(WC_Order $order) {
-    $string = '';
-    /* @var \WC_Order_Item_Product $item */
-    foreach ($order->get_items() as $item) {
-        $p = wc_get_product($item->get_product()->get_id());
-        $variation = '';
-        if (get_class($p) === WC_Product_Variation::class) {
-            foreach ($p->get_variation_attributes() as $value) {
-                $variation = $value;
-            }
-        }
-
-        if ($p->get_parent_id()) {
-            $p = wc_get_product($p->get_parent_id());
-        }
-        $name = $order->get_billing_first_name() .' '. $order->get_billing_last_name();
-        if ($order->get_meta('_billing_pib') != '') {
-            $name = $order->get_billing_company();
-        }
-        $variantId = $p->get_sku() . $variation;
-        $variantName = str_replace('-', '', $item->get_name());
-        $date = $order->get_date_created()->format('d.m.Y');
-        $itemPrice = (int) $item->get_total() / $item->get_quantity();
-        $modifier = (float) '1' .'.'. (int) number_format($p->get_meta('pdv'));
-        $priceNoPdv = number_format($itemPrice / $modifier, 2, ',', '.');
-        $priceFormated = number_format($itemPrice, 2, ',', '.');
-        $string .= $name."\t".$order->get_billing_address_1()."\t".$order->get_billing_postcode()."\t".$order->get_billing_city()."\t"."Srbija"."\t".
-            $order->get_billing_phone()."\t".$order->get_order_number()."\t".$date."\t".$order->get_payment_method_title()."\t".$variantId."\t".$variantName."\t".
-            $item->get_quantity()."\t".$priceNoPdv."\t".$priceFormated."\t".$order->get_billing_company()."\t".$order->get_meta('_billing_pib')."\r\n";
-    }
-    $order->update_meta_data('jitexExportCreated', 1);
-    $order->save();
-    $shippingNoPdv = number_format($order->get_shipping_total() / 1.2, 2, ',', '.');
-
-    $string .= $name."\t".$order->get_billing_address_1()."\t".$order->get_billing_postcode()."\t".$order->get_billing_city()."\t"."Srbija"."\t".
-        $order->get_billing_phone()."\t".$order->get_order_number()."\t".$date."\t".$order->get_payment_method_title()."\t9999\tDostava\t1\t".
-        $shippingNoPdv."\t".number_format($order->get_shipping_total(), 2, ',', '.')."\t".$order->get_billing_company();
-
-    return $string;
-}
-
-function createAdresnicaPdf(WC_Order $order) {
-    $name = 'Adresnica-'.$order->get_order_number().'.pdf';
-//    $uploadsDir = generateUploadsPath();
-//    if (file_exists($uploadsDir . $name)) {
-//        return $uploadsDir . $name;
-//    }
-
-    if (in_array($order->get_status(), ['spz-pakovanje'])) {
-        $order->update_status('spz-slanje');
-    }
-    $order->update_meta_data('adresnicaCreated', 1);
-    $order->save();
-
-    $html = '';
-    require (__DIR__ . '/../templates/orders/adresnica.phtml');
-
-    //test dir structure
-    $uploadsDir = __DIR__ . '/../../../uploads/'. date('Y');
-    if (!is_dir($uploadsDir)) {
-        mkdir($uploadsDir);
-    }
-    $uploadsDir .= '/'. date('m');
-    if (!is_dir($uploadsDir)) {
-        mkdir($uploadsDir);
-    }
-    $uploadsDir .= '/'. date('d');
-    if (!is_dir($uploadsDir)) {
-        mkdir($uploadsDir);
-    }
-    $uploadsDir .= '/';
-    $filePath = $uploadsDir . $name;
-
-    $dompdf = new \Dompdf\Dompdf();
-    $dompdf->loadHtml($html);
-    $dompdf->render();
-    file_put_contents($filePath, $dompdf->output());
-
-//    $pdf = new \Spipu\Html2Pdf\Html2Pdf();
-//    $pdf->writeHTML($html);
-//    $pdf->output($uploadsDir . $name, 'F');
-
-    return $filePath;
 }
 
 function printPreorder(WC_Order $order) {

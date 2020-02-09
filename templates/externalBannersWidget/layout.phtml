@@ -4,35 +4,42 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta content="charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <link rel="stylesheet" href="<?=get_stylesheet_directory_uri()?>/assets/css/flexslider.css?2" type="text/css" media="screen"/>
+    <link rel="stylesheet" href="<?=get_stylesheet_directory_uri()?>/assets/css/flexslider.css?7" type="text/css" media="screen"/>
 </head>
 <body class="loading">
 
-<?php if ($template === 'vertical'): ?>
+<?php
+if ($template === 'vertical'): ?>
     <div id="container" class="cf">
         <div id="main" role="main">
             <section class="slider">
                 <div class="flexslider vertical">
                     <div class="master-title">
-                        <a target="_blank" href="https://www.nonstopshop.rs">Nonstopshop.rs</a>
+                        <a target="_blank" href="https://www.nonstopshop.rs">NonStopShop.rs</a>
                     </div>
                     <ul class="slides">
                         <?php foreach ($data as $key => $item): ?>
                         <?php
                             $savingsDinars = $item->regularPrice - $item->salePrice;
                             $savingsPercentage = 0;
-                            if ($savingsDinars) {
+                            if ($savingsDinars > 0) {
                                 $savingsPercentage = number_format($savingsDinars / $item->regularPrice * 100);
                             }
                             $itemUrl = $item->itemUrl . '?utm_source='. $source .'&utm_medium=widget';
                         ?>
                             <li data-thumb="<?=$item->image?>">
                                 <a target="_blank" href="<?=$itemUrl?>" title="<?=$item->title?>"><img src="<?=$item->imageSrc?>" alt="<?=$item->title?>" /></a>
-                                <a target="_blank"  href="<?=$itemUrl?>" title="<?=$item->title?>"><h2 class="flex-caption-title" style="text-align:center;"><?=$item->title?></h2></a>
+                                <h2 class="flex-caption-title" style="text-align:center;">
+                                    <a target="_blank" href="<?=$itemUrl?>" title="<?=$item->title?>"><?=$item->title?></a>
+                                </h2>
                                 <!--<p class="flex-caption"></p>-->
+                                <?php if ($savingsDinars > 0): ?>
                                 <span class="caption-old-price"><?=$item->regularPrice?>din</span>
                                 <span class="caption-new-price"><?=$item->salePrice?>din</span>
                                 <span class="caption-savings">Ušteda: <?=$savingsDinars?>din (<?=$savingsPercentage?>%)</span>
+                                <?php else: ?>
+                                    <span class="caption-new-price"><?=$item->salePrice?>din</span>
+                                <?php endif; ?>
                                 <a target="_blank" href="<?=$item->categoryUrl?>" class="caption-others">Pogledajte slične proizvode</a>
                             </li>
                         <?php endforeach; ?>
@@ -40,7 +47,7 @@
                 </div>
                 <div class="master-footer">
                     <a class="master-footer-title" target="_blank" href="https://nonstopshop.rs/specijalne-promocije/akcija/">
-                        Pogledajte TOP proizvode na akciji ovde
+                        Pogledajte top 100 proizvoda na akciji
                     </a>
                 </div>
             </section>
@@ -57,7 +64,7 @@
                     <?php
                     $savingsDinars = $item->regularPrice - $item->salePrice;
                     $savingsPercentage = 0;
-                    if ($savingsDinars) {
+                    if ($savingsDinars > 0) {
                         $savingsPercentage = number_format($savingsDinars / $item->regularPrice * 100);
                     }
                     $itemUrl = $item->itemUrl . '?utm_source='. $source .'&utm_medium=widget';
@@ -67,12 +74,16 @@
                             <img src="<?=str_replace('small/', '', $item->imageSrc)?>" alt="<?=$item->title?>" width="200" height="150" />
                         </a>
                         <div class="flex-caption">
-                            <a target="_blank"  href="<?=$itemUrl?>" title="<?=$item->title?>">
-                                <h3 class="flex-caption-title" style="text-align:center;"><?=$item->title?></h3>
-                            </a>
+                            <h3 class="flex-caption-title" style="text-align:center;">
+                            <a target="_blank"  href="<?=$itemUrl?>" title="<?=$item->title?>"><?=$item->title?></a>
+                            </h3>
+                            <?php if ($savingsDinars > 0): ?>
                             <span class="caption-old-price"><?=$item->regularPrice?>din</span>
                             <span class="caption-new-price"><?=$item->salePrice?>din</span>
                             <span class="caption-savings">Ušteda: <?=$savingsDinars?>din (<?=$savingsPercentage?>%)</span>
+                            <?php else: ?>
+                                <span class="caption-new-price"><?=$item->salePrice?>din</span>
+                            <?php endif; ?>
                         </div>
                     </li>
                 <?php endforeach; ?>
@@ -80,7 +91,7 @@
         </div>
         <div class="master-footer">
             <a target="_blank" href="https://nonstopshop.rs/specijalne-promocije/akcija/">
-                <h4 class="master-footer-title">Pogledajte TOP 100 proizvoda na akciji ovde</h4>
+                <h4 class="master-footer-title">Pogledajte top 100 proizvoda na akciji</h4>
             </a>
         </div>
     </div>
@@ -92,11 +103,14 @@
 <script defer src="<?=get_stylesheet_directory_uri()?>/assets/js/jquery.flexslider-min.js"></script>
 <script type="text/javascript">
     $(window).load(function () {
+        var randomthis = Math.floor((Math.random()* $('.flexslider li').length )+1);
+
         $('.flexslider.vertical').flexslider({
             animation: "slide",
             slideshowSpeed: 3000,
             pauseOnHover: true,
             controlNav: "thumbnails",
+            startAt: randomthis,
             start: function (slider) {
                 $('body').removeClass('loading');
             }
@@ -107,6 +121,7 @@
             controlNav: false,
             slideshowSpeed: 3000,
             animationLoop: true,
+            startAt: randomthis,
             itemWidth: 200,
             itemMargin: 5,
             minItems: 2,

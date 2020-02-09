@@ -164,7 +164,7 @@ class gf_breadcrumbs extends WC_Breadcrumb
                     'woocommerce_breadcrumb_product_terms_args', array(
                         'orderby' => 'parent',
                         'order' => 'DESC',
-                        'exclude' => gf_get_category_children_ids('specijalne-promocije'),
+                        'exclude' => \Gf\Util\CategoryFunctions::gf_get_category_children_ids('specijalne-promocije'),
                     )
                 )
             );

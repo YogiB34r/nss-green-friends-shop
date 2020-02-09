@@ -71,7 +71,7 @@ class MySql implements \GF\Search\AdapterInterface
         $searchCondition = "";
         $customOrdering = "";
         $explodedInput = explode(' ', $input);
-        $attributes = parseAttributes();
+        $attributes = $this->parseAttributes();
         $gradeCount = 0;
         foreach ($explodedInput as $key => $word) {
             if (strlen($word) > 2) {
@@ -123,7 +123,7 @@ class MySql implements \GF\Search\AdapterInterface
             $priceCondition = " AND priceOrder >= {$minPrice} AND priceOrder <= {$maxPrice} ";
         }
         $excludeCategories = " 1=1 ";
-        foreach (gf_get_category_children_ids('sexy-shop') as $catId) {
+        foreach (\Gf\Util\CategoryFunctions::gf_get_category_children_ids('sexy-shop') as $catId) {
             $excludeCategories .= " AND categoryIds NOT LIKE '%{$catId}%' ";
         }
 
@@ -208,8 +208,8 @@ class MySql implements \GF\Search\AdapterInterface
         }
 
         $excludeCategories = " 1=1 ";
-        if (!in_array($cat->term_id, gf_get_category_children_ids('sexy-shop'))) {
-            foreach (gf_get_category_children_ids('sexy-shop') as $catId) {
+        if (!in_array($cat->term_id, \Gf\Util\CategoryFunctions::gf_get_category_children_ids('sexy-shop'))) {
+            foreach (\Gf\Util\CategoryFunctions::gf_get_category_children_ids('sexy-shop') as $catId) {
                 $excludeCategories .= " AND categoryIds NOT LIKE '%{$catId}%' ";
             }
         }
@@ -236,5 +236,23 @@ class MySql implements \GF\Search\AdapterInterface
         $productsOutOfStock = $this->wpdb->get_results($sql, OBJECT_K);
 
         return array_merge($allIds, array_keys($productsOutOfStock));
+    }
+
+    private function parseAttributes()
+    {
+        $redis = new \GF_Cache();
+        $atributes = unserialize($redis->redis->get('attributes-collection'), '');
+        if ($atributes === false) {
+            $atributes = [];
+            foreach (get_terms('pa_boja') as $term) {
+                $atributes[] = $term->name;
+            }
+            foreach (get_terms('pa_velicina') as $term) {
+                $atributes[] = $term->name;
+            }
+            $redis->redis->set('attributes-collection', serialize($atributes));
+        }
+
+        return $atributes;
     }
 }

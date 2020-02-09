@@ -1,5 +1,5 @@
 <?php
-$sexyShopCats = gf_get_category_children_ids('sexy-shop');
+$sexyShopCats = \Gf\Util\CategoryFunctions::gf_get_category_children_ids('sexy-shop');
 $product_cats = wc_get_product(get_queried_object_id())->get_category_ids();
 $result = false;
 foreach ($product_cats as $product_cat){
@@ -61,8 +61,9 @@ foreach ($product_cats as $product_cat){
             echo get_the_password_form(); // WPCS: XSS ok.
             return;
         }
+        $product = wc_get_product();
         ?>
-        <div id="product-<?php the_ID(); ?>" <?php wc_product_class(); ?>>
+        <div id="product-<?php the_ID(); ?>" <?php wc_product_class('', $product); ?>>
 
             <?php
             /**

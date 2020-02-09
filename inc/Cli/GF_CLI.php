@@ -71,7 +71,7 @@ class Cli
             'paged' => $page
         ));
 
-        $ids = gf_get_category_children_ids('specijalne-promocije');
+        $ids = \Gf\Util\CategoryFunctions::gf_get_category_children_ids('specijalne-promocije');
 
         foreach ($products_ids as $product_id) {
             $product = wc_get_product($product_id);
@@ -277,6 +277,71 @@ class Cli
         echo 'done';
     }
 
+    private function fetchAndUpdateBadPrice(\WC_Product $product)
+    {
+        $httpClient = new \GuzzleHttp\Client();
+        $url = 'https://nss-devel.ha.rs/back-ajax/?action=getPrice&sku=' . $product->get_sku();
+        try {
+//                $response = $httpClient->send(new \GuzzleHttp\Psr7\Request('get', $url, ['allow_redirects' => true]));
+            $response = $httpClient->send(new \GuzzleHttp\Psr7\Request('get', $url, ['allow_redirects' => false]));
+        } catch (\Exception $e) {
+            return false;
+        }
+
+        $res = json_decode($response->getBody()->getContents());
+        if ($res->status == 404) {
+            return false;
+        }
+        $backupPrice = $res->price;
+
+        $testPrice = $product->get_price();
+        if (get_class($product) === \WC_Product_Variable::class) {
+            foreach ($product->get_children() as $productId) {
+                $variation = wc_get_product($productId);
+                $testPrice = $variation->get_price();
+            }
+        }
+
+        if ($backupPrice == $testPrice) {
+            return false;
+        }
+
+        if ($testPrice > $backupPrice && $backupPrice > 0) {
+
+            var_dump('updating price for: ' . get_permalink($product->get_id()));
+
+            if (get_class($product) === \WC_Product_Variable::class) {
+                foreach ($product->get_children() as $productId) {
+                    $variation = wc_get_product($productId);
+                    $variation->set_regular_price($testPrice);
+                    $variation->set_price($backupPrice);
+                    $variation->set_sale_price($backupPrice);
+                    $variation->save();
+                }
+            } else {
+                $product->set_regular_price($testPrice);
+                $product->set_price($backupPrice);
+                $product->set_sale_price($backupPrice);
+                $product->save();
+            }
+
+            return true;
+        }
+
+        if (!$product->is_in_stock()) {
+            return false;
+        }
+
+        if ($testPrice === "") {
+            var_dump('no test price ');
+            var_dump($product->get_id());
+            var_dump($product->get_date_on_sale_to());
+            var_dump($backupPrice);
+            var_dump($testPrice);
+            die();
+        }
+    }
+
     public function listItems()
     {
         $total = 0;
@@ -293,6 +358,29 @@ class Cli
             'return' => 'ids',
             'paged' => 1
         ));
+
+        $redis = new \Redis();
+        $redis->connect(REDIS_HOST);
+        $xmlIds = unserialize($redis->get('asportkeys'));
+
+//        $products_ids = [412783];
+        foreach ($products_ids as $product_id) {
+            if (in_array($product_id, $xmlIds)) {
+                $product = wc_get_product($product_id);
+                $product->set_status('publish');
+                $product->save();
+                $updated[] = $product_id;
+            }
+
+//                if ($product->get_status() === 'pending') {
+//                $product->delete();
+//                $product->save();
+//                }
+        }
+
+        echo 'found ' . count($updated) . ' items' . "\r\n";
+        echo 'from' . count($products_ids) . ' items';
+//            var_dump($updated);
 
 //        $products_ids = [412783];
         foreach ($products_ids as $product_id) {
