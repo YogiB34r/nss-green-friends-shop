@@ -309,10 +309,10 @@ jQuery(document).ready(function ($) {
         })
             .slick({
                 infinite: true,
-                // slidesToShow: gfSliderColumnCount,
-                slidesToShow: $(selector).parents('.gf-product-slider').data('sliderItemCount'),
-                // slidesToScroll: gfSliderColumnCount,
-                slidesToScroll: $(selector).parents('.gf-product-slider').data('sliderItemCount'),
+                slidesToShow: gfSliderColumnCount,
+                // slidesToShow: $(selector).parents('.gf-product-slider').data('sliderItemCount'),
+                slidesToScroll: gfSliderColumnCount,
+                // slidesToScroll: $(selector).parents('.gf-product-slider').data('sliderItemCount'),
                 arrows: false,
                 dots: false,
                 lazyLoad: 'ondemand',
