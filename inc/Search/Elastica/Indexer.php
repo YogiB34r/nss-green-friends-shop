@@ -42,22 +42,10 @@ class Indexer
 //        for ($i = 0; $i < 2; $i++) {
             $offset = $i * $perPage;
 
-//            $args = array(
-//                'post_type'             => 'product',
-//                'posts_per_page'        => '400',
-//                'tax_query'             => array(
-//                    array(
-//                        'taxonomy'      => 'product_cat',
-//                        'field' => 'term_id',
-//                        'terms'         => 2441,
-//                        'operator'      => 'IN'
-//                    )
-//                )
-//            );
-//            $result = new \WP_Query($args);
-//            $products = $result->get_posts();
-
             $sql = "SELECT ID FROM wp_posts WHERE post_type = 'product' LIMIT {$offset}, {$perPage};";
+//            $sql = "SELECT ID FROM wp_posts WHERE post_type = 'product'
+// AND ID IN (397944,419590,401317,391140,427106,413564,426681,405142)
+// LIMIT {$offset}, {$perPage};";
             $products = $wpdb->get_results($sql);
             $wpdb->flush();
             if (count($products) > 0) {
@@ -67,10 +55,9 @@ class Indexer
                     if (!$product) {
                         var_dump($product);
                         var_dump('Could not find product for postId : ', $value->ID);
-                        continue;
+                        die();
                     }
-                    // @TODO auto saved empty drafts !?
-                    if ($product->get_name() == "AUTO-DRAFT") {
+                    if ($product->get_name() === "AUTO-DRAFT") {
                         continue;
                     }
                     $documents[] = $this->parseWcProduct($product);
@@ -82,7 +69,7 @@ class Indexer
                     $documents = [];
                     if (!$response->isOk() || $response->hasError()) {
                         var_dump($response->getError());
-//                        die();
+                        die();
                     }
                     echo sprintf('stored %s items.', $response->count());
                     unset($response);
@@ -120,7 +107,9 @@ class Indexer
             ];
         }
         $attributes = [];
+        $regularPrice = $product->get_regular_price();
         if (get_class($product) === \WC_Product_Variable::class) {
+            $regularPrice = $product->get_variation_regular_price();
             foreach ($product->get_available_variations() as $variation) {
                 foreach ($variation['attributes'] as $attribute => $value) {
                     $attributes[] = [
@@ -142,16 +131,16 @@ class Indexer
         }
         $product_link = get_permalink((int) $product->get_id());
         $salePrice = 0;
-        if ($product->is_type('variable')){
-            $regularPrice = $product->get_variation_regular_price();
-        }else{
-            $regularPrice = $product->get_regular_price();
-        }
         $price = $regularPrice;
         if ($product->get_price() !== $regularPrice) {
             $salePrice = $product->get_price();
             $price = $salePrice;
         }
+//        if ($price === 0 || $regularPrice === 0) {
+            var_dump($price);
+            var_dump($regularPrice);
+//            die();
+//        }
         $sql = "SELECT * FROM wp_gf_products WHERE postId = {$product->get_id()}";
         $viewCount = 0;
         if (!isset($wpdb->get_results($sql)[0])) {
@@ -165,7 +154,7 @@ class Indexer
         }
         $rating = $product->get_meta('rating');
         if (in_array(2441, $product->get_category_ids())) {
-            $rating = self::calculateOrderingRatingJelke($product);
+            $rating = $this->calculateOrderingRatingJelke($product);
         }
 
         $data = [

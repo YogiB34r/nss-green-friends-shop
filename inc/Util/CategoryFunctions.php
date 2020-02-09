@@ -25,7 +25,11 @@ class CategoryFunctions
                 $cats[] = $cat;
             }
         }
+        if (count($cats) === 0) {
+            $cats[] = (object) ['slug' => 'uncategorized'];
+        }
         if ($absolute) {
+
             return home_url() . '/'. $cats[count($cats)-1]->slug .'/'. basename($permalink) .'/';
         }
 
