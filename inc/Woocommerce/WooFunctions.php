@@ -164,6 +164,7 @@ class WooFunctions
 
     public function validateSku($id, $post)
     {
+        if (isset($_POST['_sku'])) {
             if ($_POST['_sku'] === "") {
                 $this->autoGenerateSku();
             } else {
@@ -179,7 +180,7 @@ class WooFunctions
                     }
                 }
             }
-
+        }
     }
 
     private function autoGenerateSku ()

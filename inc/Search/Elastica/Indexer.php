@@ -36,22 +36,32 @@ class Indexer
     {
         global $wpdb;
 
-        $perPage = 400;
+        $perPage = 500;
+        $totalItems = 0;
 
         for ($i = 0; $i < 60; $i++) {
-//        for ($i = 0; $i < 2; $i++) {
             $offset = $i * $perPage;
 
-            $sql = "SELECT ID FROM wp_posts WHERE post_type = 'product' LIMIT {$offset}, {$perPage};";
+            $sql = "SELECT ID FROM wp_posts WHERE post_type = 'product' 
+            AND post_status = 'publish'
+LIMIT {$offset}, {$perPage};";
 //            $sql = "SELECT ID FROM wp_posts WHERE post_type = 'product'
 // AND ID IN (397944,419590,401317,391140,427106,413564,426681,405142)
 // LIMIT {$offset}, {$perPage};";
-            $products = $wpdb->get_results($sql);
+//            $products = $wpdb->get_results($sql);
+
+            $products = wc_get_products(array(
+                'category' => array('muska-obuca'), //muska-obuca
+                'posts_per_page' => $perPage, //muska-obuca
+                'page' => $i+1
+            ));
+
             $wpdb->flush();
             if (count($products) > 0) {
                 $documents = [];
                 foreach ($products as $value) {
-                    $product = wc_get_product($value->ID);
+//                    $product = wc_get_product($value->ID);
+                    $product = $value;
                     if (!$product) {
                         var_dump($product);
                         var_dump('Could not find product for postId : ', $value->ID);
@@ -60,26 +70,32 @@ class Indexer
                     if ($product->get_name() === "AUTO-DRAFT") {
                         continue;
                     }
-                    $documents[] = $this->parseWcProduct($product);
+                    if ($product->get_status() !== 'publish') {
+                        //@TODO removing of products....
+//                        $this->elasticaType->deleteDocument($this->parseWcProduct($product));
+                    } else {
+                        $documents[] = $this->parseWcProduct($product);
+                    }
                 }
-                unset($result);
-
                 try {
                     $response = $this->elasticaType->addDocuments($documents);
-                    $documents = [];
                     if (!$response->isOk() || $response->hasError()) {
                         var_dump($response->getError());
                         die();
                     }
-                    echo sprintf('stored %s items.', $response->count());
+                    $totalItems += count($documents);
+                    $documents = [];
+//                    echo sprintf('stored %s items.', $response->count());
                     unset($response);
                     $this->elasticaType->getIndex()->refresh();
                 } catch (\Exception $e) {
                     var_dump($e->getMessage());
                 }
+            } else {
+                break;
             }
         }
-        echo 'sync complete';
+        echo "sync complete. $totalItems items indexed.";
     }
 
     private function parseWcProduct(\WC_Product $product)
@@ -107,9 +123,11 @@ class Indexer
             ];
         }
         $attributes = [];
-        $regularPrice = $product->get_regular_price();
+        $salePrice = $product->get_sale_price();
+        $price = $regularPrice = $product->get_regular_price();
         if (get_class($product) === \WC_Product_Variable::class) {
             $regularPrice = $product->get_variation_regular_price();
+            $salePrice = $product->get_variation_sale_price();
             foreach ($product->get_available_variations() as $variation) {
                 foreach ($variation['attributes'] as $attribute => $value) {
                     $attributes[] = [
@@ -119,6 +137,15 @@ class Indexer
                 }
             }
         }
+        if ($product->get_price() !== 0 && $product->get_price() !== $regularPrice) {
+            $salePrice = $price = $product->get_price();
+        }
+        if ((int) $price === 0) {
+//            $product->set_status('draft');
+//            $product->save();
+        }
+
+
         // @TODO solve better. when no sku detected, use post id.
         if ($product->get_sku() == "") {
             $product->set_sku(md5($product->get_id() . $product->get_name()));
@@ -130,32 +157,19 @@ class Indexer
             ' class="attachment-post-thumbnail size-post-thumbnail wp-post-image"  alt="'.$product->get_title().'"  />';
         }
         $product_link = get_permalink((int) $product->get_id());
-        $salePrice = 0;
-        $price = $regularPrice;
-        if ($product->get_price() !== $regularPrice) {
-            $salePrice = $product->get_price();
-            $price = $salePrice;
-        }
-//        if ($price === 0 || $regularPrice === 0) {
-            var_dump($price);
-            var_dump($regularPrice);
-//            die();
-//        }
         $sql = "SELECT * FROM wp_gf_products WHERE postId = {$product->get_id()}";
         $viewCount = 0;
         if (!isset($wpdb->get_results($sql)[0])) {
             $data = sprintf('%s: %s', date('Y:m:d H:i:s'), 'could not find gf product for ' . $product->get_id());
             $filePath = LOG_PATH . 'debug-cli.log';
             file_put_contents($filePath, $data . PHP_EOL, FILE_APPEND);
-//            throw new \Exception('could not find gf product for ' . $product->get_id());
         } else {
             $gfProduct = $wpdb->get_results($sql)[0];
             $viewCount = $gfProduct->viewCount;
         }
         $rating = $product->get_meta('rating');
-        if (in_array(2441, $product->get_category_ids())) {
-            $rating = $this->calculateOrderingRatingJelke($product);
-        }
+
+        $ordering = $this->calculateOrderingRating($product);
 
         $data = [
             'postId' => $product->get_id(),
@@ -171,10 +185,10 @@ class Indexer
             'permalink' => $product_link,
             'shortDescription' => $product->get_short_description(),
             'regularPrice' => $regularPrice,
-            'salePrice' => (string) $salePrice,
+            'salePrice' => $salePrice,
             'inputPrice' => $product->get_meta('input_price'),
             'stockStatus' => (int) $product->is_in_stock(),
-            'status' => (int) ($product->get_status() == 'publish'),
+            'status' => (int) ($product->get_status() === 'publish'),
             'viewCount' => 0,
             'rating' => 0,
             'sku' => $product->get_sku(),
@@ -185,13 +199,15 @@ class Indexer
                 'full_text_boosted' => static::extractFullTextBoostedFields($product, $attributes, $cats),
             ],
             'order_data' => [
-                'price' => (int) $price,
+                'price' => $price,
+//                'price-asc' => $ordering['price-asc'],
+//                'price-desc' => $ordering['price-desc'],
                 'rating' => $rating,
                 'date' => strtotime($product->get_date_created()),
                 'viewCount' => $viewCount,
                 'stock' => (int) $product->is_in_stock(),
-                'published' => (int) ($product->get_status() == 'publish'),
-                'default' => self::calculateOrderingRating($product),
+                'published' => (int) ($product->get_status() === 'publish'),
+                'default' => $ordering['default'],
             ]
         ];
         return new \Elastica\Document($product->get_id(), $data);
@@ -199,36 +215,46 @@ class Indexer
 
     /**
      * @param \WC_Product $product
-     * @return int
-     */
-    private function calculateOrderingRatingJelke(\WC_Product $product)
-    {
-        if ($product->get_menu_order() == 0) {
-            return 1;
-        }
-        if (!$product->is_in_stock()) {
-            return 99999 - $product->get_menu_order();
-        }
-        return 999999 - $product->get_menu_order();
-    }
-
-    /**
-     * @param \WC_Product $product
-     * @return int
+     * @return array
      */
     private function calculateOrderingRating(\WC_Product $product)
     {
         $ponder = 1;
-        if ($product->get_meta('sale_sticker_active') === 'yes' && $product->get_meta('sale_sticker_to') > time()) {
+        $menuOrder = (int) $product->get_menu_order();
+        if ($product->get_sale_price() > 0 && $product->get_regular_price()) {
             $ponder = 10000;
-        } else if ($product->get_sale_price() > 0) {
-            $ponder = 100;
         }
         if (!$product->is_in_stock()) {
-            $ponder = 0;
+            $ponder = -1;
         }
 
-        return $ponder;
+        /* @var \WC_Product_Variable $product */
+        if (get_class($product) === \WC_Product_Variable::class) {
+            if ($product->get_variation_sale_price() > 0 && $product->get_variation_sale_price() < $product->get_variation_regular_price()) {
+                $ponder = 10000;
+            }
+            $stock = false;
+            foreach ($product->get_available_variations() as $variation) {
+                if ($variation['is_in_stock']) {
+                    $stock = true;
+                }
+            }
+            if (!$stock) {
+                $ponder = -1;
+            }
+        }
+
+        // sort items according to sort order set in admin
+        if ($menuOrder === 0) {
+            $menuOrder = 100000;
+        }
+        $menuOrder = 200000 - $menuOrder;
+
+        return [
+            'default' => $ponder * $menuOrder,
+//            'price-desc' => $priceDescPonder,
+//            'price-asc' => $priceAscPonder
+        ];
     }
 
     /**
