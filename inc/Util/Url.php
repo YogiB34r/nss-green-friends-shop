@@ -19,7 +19,7 @@ class Url
         add_action('rewrite_rules_array', [$this, 'rewriteRules']);
 
 // @TODO check if this triggers upon new category creation, will the new url work ?
-//        add_action('init', 'flushRules');
+        add_action('init', [$this, 'flushRules']);
     }
 
     /**
@@ -38,8 +38,9 @@ class Url
             if ($p) {
                 $wp->query_vars = [
                     'post_type' => 'product',
-                    'product' => $pageName,
-                    'name' => $pageName
+// @TODO test this out
+//                    'product' => $pageName,
+//                    'name' => $pageName
                 ];
             }
         }

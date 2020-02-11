@@ -2,6 +2,8 @@
 
 namespace GF\Search;
 
+use GfPluginsCore\ProductStickers;
+
 class Functions
 {
     /**
@@ -281,7 +283,7 @@ class Functions
     public function customShopLoop(\Elastica\ResultSet $products)
     {
         $html = '';
-
+        $stickers = new ProductStickers();
         $i = 0;
         foreach ($products->getResults() as $productData) {
             $productId = $productData->postId;
@@ -318,12 +320,12 @@ class Functions
             $classes .= " product type-product status-publish has-post-thumbnail shipping-taxable purchasable  ";
             $html .= '<li class="product-type-' . $product->getType() . $classes . '">';
             $html .= '<a href=" ' . $product->dto['permalink'] . ' " title=" ' . $product->getName() . ' ">';
-            $html .= add_stickers_to_products_on_sale($classes, $productId);
+            $html .= $stickers->addStickerToSaleProducts($classes, $productId);
 //        woocommerce_show_product_sale_flash('', '', '', $classes);
 //        add_stickers_to_products_new($product);
             $html .= $product->dto['thumbnail'];
             ob_start();
-            add_stickers_to_products_soldout($classes);
+            $stickers->addStickerForSoldOutProducts($classes);
             $html .= ob_get_clean();
 //        $html .= add_stickers_to_products_soldout($classes);
             $html .= '</a>';
