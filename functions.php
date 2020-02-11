@@ -1,5 +1,7 @@
 <?php
 //ini_set('max_execution_time', '40');
+use GfPluginsCore\ProductStickers;
+
 require (__DIR__ . '/inc/autoload.php');
 global $wpdb;
 
@@ -23,6 +25,8 @@ $urlUtils->init();
 
 $adminMenu = new \Gf\Util\AdminMenu();
 $adminMenu->init();
+
+$stickers = new ProductStickers();
 
 
 function get_search_category_aggregation() {

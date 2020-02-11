@@ -195,7 +195,7 @@ function check_if_product_have_sale_dates_and_print_sticker()
     $sale_sticker_to = get_post_meta($product->get_id(), 'sale_sticker_to', true);
 
     if ($sale_sticker_active === 'yes' && $sale_sticker_to > time()) {
-        $sale_sticker_src = get_option('image_select_sale');
+        $sale_sticker_src = get_option('gf_product_stickers_options')['image_select_sale'];
         echo '<span class="gf-sticker gf-sticker--sale gf-sticker--left">
                 <img src="'.$sale_sticker_src.'" alt="" height="64" width="64">
                 </span>';

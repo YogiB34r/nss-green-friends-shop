@@ -27,21 +27,21 @@ if (empty($product) || !$product->is_visible()) {
 ob_start();
 wc_product_class();
 $classes = ob_get_clean();
+global $stickers;
 ?>
 <li <?=$classes?>>
     <a href="<?php echo get_permalink($product->get_id()) ?>"
        title="<?php echo esc_attr($product->get_title() ? $product->get_title() : $product->get_id()); ?>">
         <?php
 
-        if (function_exists('add_stickers_to_products_on_sale')) {
-
-            echo add_stickers_to_products_on_sale($classes, $product->get_id());
+        if (method_exists($stickers,'addStickerToSaleProducts')) {
+            echo $stickers->addStickerToSaleProducts($classes, $product->get_id());
         }
-        if (function_exists('add_stickers_to_products_new')) {
-            add_stickers_to_products_new($product);
+        if (method_exists($stickers,'addStickersToNewProducts')) {
+            $stickers->addStickersToNewProducts($product);
         }
-        if (function_exists('add_stickers_to_products_soldout')) {
-            add_stickers_to_products_soldout($classes);
+        if (method_exists($stickers,'addStickerForSoldOutProducts')) {
+            $stickers->addStickerToSaleProducts($classes, $product->get_id());
         }
         ?>
         <?php if (has_post_thumbnail($product->get_id())): ?>
