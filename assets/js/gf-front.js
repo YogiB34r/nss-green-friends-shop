@@ -469,9 +469,14 @@ jQuery(document).ready(function ($) {
                 // if ($(window).scrollTop() === $(document).height() - $(window).height()) {
                 var windowPos = window.scrollY + $(window).height() * 3/4;
                 if (!loading && windowPos > that.offset().top - 200 && windowPos < that.offset().top + 100) {
+                    url = '/gf-ajax/?query=' + that.data('query');
+                    if (findGetParameter('orderby') && findGetParameter('orderby') !== '') {
+                        url += '&orderby=' + findGetParameter('orderby');
+                    }
+                    // load filter params as well
                     loading = true;
                     $.ajax({
-                        url: '/gf-ajax/?query=' + that.data('query'),
+                        url: url,
                         type: 'post',
                         data: {
                             page: newPage,
@@ -507,3 +512,17 @@ jQuery(document).ready(function ($) {
     }
 
 });
+
+
+function findGetParameter(parameterName) {
+    var result = null,
+        tmp = [];
+    location.search
+        .substr(1)
+        .split("&")
+        .forEach(function (item) {
+            tmp = item.split("=");
+            if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
+        });
+    return result;
+}
