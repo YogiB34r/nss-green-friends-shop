@@ -72,14 +72,6 @@ class Search
 
     public function search($keywords, $limit = 0, $currentPage = 1, $order = '')
     {
-//        $qb = new \Elastica\QueryBuilder();
-//        $query->setQuery(
-//            $qb->query()->bool()->addMust(
-//                $qb->query()->term(['name' => $keywords])
-//            )->addMust(
-//                $qb->query()->term(['status' => 1])
-//            )
-//        );
         $boolQuery = new BoolQuery();
 
         $q = new Term();
@@ -183,13 +175,15 @@ class Search
     {
         switch ($order) {
             case 'popularity':
-                $mainQuery->addSort(['order_data.viewCount' => 'desc']);
+                $scriptCode = 'doc["order_data.viewCount"].value';
+                $ordering = 'desc';
 
                 break;
 
             //@TODO add sync for ratings
             case 'rating':
-                $mainQuery->addSort(['order_data.rating' => 'desc']);
+                $scriptCode = 'doc["order_data.rating"].value';
+                $ordering = 'desc';
 
                 break;
 

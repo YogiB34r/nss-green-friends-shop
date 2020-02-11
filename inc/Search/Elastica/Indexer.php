@@ -48,20 +48,20 @@ LIMIT {$offset}, {$perPage};";
 //            $sql = "SELECT ID FROM wp_posts WHERE post_type = 'product'
 // AND ID IN (397944,419590,401317,391140,427106,413564,426681,405142)
 // LIMIT {$offset}, {$perPage};";
-//            $products = $wpdb->get_results($sql);
+            $products = $wpdb->get_results($sql);
 
-            $products = wc_get_products(array(
-                'category' => array('muska-obuca'), //muska-obuca
-                'posts_per_page' => $perPage, //muska-obuca
-                'page' => $i+1
-            ));
+//            $products = wc_get_products(array(
+//                'category' => array('muska-obuca'), //muska-obuca
+//                'posts_per_page' => $perPage, //muska-obuca
+//                'page' => $i+1
+//            ));
 
             $wpdb->flush();
             if (count($products) > 0) {
                 $documents = [];
                 foreach ($products as $value) {
-//                    $product = wc_get_product($value->ID);
-                    $product = $value;
+                    $product = wc_get_product($value->ID);
+//                    $product = $value;
                     if (!$product) {
                         var_dump($product);
                         var_dump('Could not find product for postId : ', $value->ID);
