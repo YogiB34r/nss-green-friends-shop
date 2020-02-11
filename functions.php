@@ -29,6 +29,23 @@ $adminMenu->init();
 $stickers = new ProductStickers();
 
 
+
+add_filter('request', 'customRewriteFix');
+/**
+ * Prevent main wp query from returning 404 page on a category page when it thinks there are no more results.
+ *
+ * @param $query_string
+ * @return mixed
+ */
+function customRewriteFix($query_string) {
+    if (isset($query_string['page']) && $query_string['page'] !== '' && isset($query_string['name'])) {
+        unset($query_string['name']);
+    }
+    return $query_string;
+}
+
+
+
 function get_search_category_aggregation() {
     return $GLOBALS['gf-search']['facets']['category'];
 }
@@ -106,19 +123,7 @@ function add_async_attribute($tag, $handle) {
 
 
 
-add_filter('request', 'customRewriteFix');
-/**
- * Prevent main wp query from returning 404 page on a category page when it thinks there are no more results.
- *
- * @param $query_string
- * @return mixed
- */
-function customRewriteFix($query_string) {
-    if (isset($query_string['page']) && $query_string['page'] !== '' && isset($query_string['name'])) {
-        unset($query_string['name']);
-    }
-    return $query_string;
-}
+
 
 
 

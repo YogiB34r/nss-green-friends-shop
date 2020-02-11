@@ -375,17 +375,34 @@ jQuery(document).ready(function ($) {
     }
 });
 jQuery(document).ready(function ($) {
-    $('#ship-to-different-address-checkbox').click(); //@TODO kad se sredi css treba izbrisati
-    $('#billing_company_checkbox').removeAttr('checked').click(function () {
-        $('#billing_pib_field').toggle();
-        $('#billing_company_field').toggle();
-        if ($('#billing_company_checkbox').prop('checked')) {
-            $('#billing_company_field').addClass('validate-required');
-            $('#billing_pib_field').addClass('validate-required');
-            $('p#billing_company_field > label > span').text('*').removeClass('optional').addClass('required');
-            $('p#billing_pib_field > label > span').text('*').removeClass('optional').addClass('required');
-        }
-    });
+
+    if ($('#billing_postcode').length === 1) {
+        //force pib to number
+        $('#billing_postcode').val($('#billing_postcode').val().replace(/\D/g,''));
+        $('#shipping_postcode').val($('#shipping_postcode').val().replace(/\D/g,''));
+        $('#billing_postcode, #shipping_postcode').on('keypress', function(e) {
+            var code = e.keyCode || e.which;
+            if (code < 48 || code > 57) {
+                e.preventDefault();
+            }
+            if (this.value.length >= 6) {
+                e.preventDefault();
+            }
+        });
+
+        $('#ship-to-different-address-checkbox').click(); //@TODO kad se sredi css treba izbrisati
+        $('#billing_company_checkbox').removeAttr('checked').click(function () {
+            $('#billing_pib_field').toggle();
+            $('#billing_company_field').toggle();
+            if ($('#billing_company_checkbox').prop('checked')) {
+                $('#billing_company_field').addClass('validate-required');
+                $('#billing_pib_field').addClass('validate-required');
+                $('p#billing_company_field > label > span').text('*').removeClass('optional').addClass('required');
+                $('p#billing_pib_field > label > span').text('*').removeClass('optional').addClass('required');
+            }
+        });
+    }
+
 });
 
 jQuery('.gf-archive-description-button').click(function () {
@@ -472,6 +489,9 @@ jQuery(document).ready(function ($) {
                     url = '/gf-ajax/?query=' + that.data('query');
                     if (findGetParameter('orderby') && findGetParameter('orderby') !== '') {
                         url += '&orderby=' + findGetParameter('orderby');
+                    }
+                    if (findGetParameter('min_price') && findGetParameter('min_price') !== '') {
+                        url += '&min_price=' + findGetParameter('min_price') + '&max_price=' + findGetParameter('max_price');
                     }
                     // load filter params as well
                     loading = true;
