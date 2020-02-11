@@ -345,12 +345,12 @@ class Cli
     public function listItems()
     {
         $total = 0;
-        $missingImg = 0;
+        $drafted = 0;
         $vendor = [];
         $items = [];
         $products_ids = wc_get_products(array(
             'limit' => 5000,
-            'status' => 'published',
+//            'status' => 'published',
 //            'meta_key' => 'supplier',
 //            'meta_value' => 252,
 //                'meta_value' => 123,
@@ -359,54 +359,28 @@ class Cli
             'paged' => 1
         ));
 
-        $redis = new \Redis();
-        $redis->connect(REDIS_HOST);
-        $xmlIds = unserialize($redis->get('asportkeys'));
-
-//        $products_ids = [412783];
-        foreach ($products_ids as $product_id) {
-            if (in_array($product_id, $xmlIds)) {
-                $product = wc_get_product($product_id);
-                $product->set_status('publish');
-                $product->save();
-                $updated[] = $product_id;
-            }
-
-//                if ($product->get_status() === 'pending') {
-//                $product->delete();
-//                $product->save();
-//                }
-        }
-
-        echo 'found ' . count($updated) . ' items' . "\r\n";
-        echo 'from' . count($products_ids) . ' items';
-//            var_dump($updated);
-
 //        $products_ids = [412783];
         foreach ($products_ids as $product_id) {
             $product = wc_get_product($product_id);
-
-            if ($product->is_in_stock() && strlen($product->get_image_id()) === 0) {
-                $sup = $product->get_meta('supplier');
-                if (!array_key_exists($sup, $vendor)) {
-                    $vendor[$sup] = 1;
-                } else {
-                    $vendor[$sup]++;
-                }
-
-                $missingImg++;
-                $items[] = $product_id;
-
-                if ($missingImg > 20) {
-                    var_dump(implode(',', $items));
-                    die();
-                }
+            $salePrice = $product->get_sale_price();
+            $price = $regularPrice = $product->get_regular_price();
+            if (get_class($product) === \WC_Product_Variable::class) {
+                $price = $regularPrice = $product->get_variation_regular_price();
+                $salePrice = $product->get_variation_sale_price();
             }
+            if ($product->get_price() !== 0 && $product->get_price() !== $regularPrice) {
+                $salePrice = $price = $product->get_price();
+            }
+            if ((int) $price === 0) {
+                $product->set_status('draft');
+                $product->save();
+                $drafted++;
+            }
+            $total++;
         }
 
-        echo 'found ' . $missingImg . ' items' . "\r\n";
-        echo 'from' . count($products_ids) . ' items';
-        var_dump(implode(',', $items));
+        echo 'drafted ' . $drafted . ' items' . "\r\n";
+        echo 'from' . $total . ' items';
     }
 
     private function handleImage($images, $postId) {

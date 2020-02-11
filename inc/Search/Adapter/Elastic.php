@@ -48,7 +48,7 @@ class Elastic implements \GF\Search\AdapterInterface
      */
     public function getItemsForCategory($category, $input = null, $limit = 0, $currentPage = 1)
     {
-        $order = (isset($_GET['orderby'])) ? $_GET['orderby'] : 'date';
+        $order = (isset($_GET['orderby'])) ? $_GET['orderby'] : '';
         $this->search->category($category, $input, $limit, $currentPage, $order);
 
         $resultSet = $this->search->getResultSet();

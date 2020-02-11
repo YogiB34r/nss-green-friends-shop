@@ -329,8 +329,12 @@ class Functions
             $html .= ob_get_clean();
 //        $html .= add_stickers_to_products_soldout($classes);
             $html .= '</a>';
+//            $html .= '<a href="' . $product->dto['permalink'] . '" title="' . $product->getName() . '">';
+//            var_dump($product->dto);
+//            die();
             $html .= '<a href="' . $product->dto['permalink'] . '" title="' . $product->getName() . '">';
-            $html .= '<h3>' . $product->getName() . '</h3>';
+            $html .= '<h3>' . $productData->getScore() .' # '. $product->getName() . '</h3>';
+//            $html .= '<h3>'. $product->getName() .'</h3>';
             $html .= '</a>';
             $html .= '<span class="price">';
             if ($saved_percentage > 0) {

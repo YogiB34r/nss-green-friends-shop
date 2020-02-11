@@ -3,6 +3,12 @@
 require (__DIR__ . '/inc/autoload.php');
 global $wpdb;
 
+if (ES_HOST === '10.223.22.38' || ES_HOST === '10.223.22.39') {
+    define('ENVIRONMENT', 'PRODUCTION');
+} else {
+    define('ENVIRONMENT', 'DEVELOPMENT');
+}
+
 $useElastic = true; // create admin setting
 if (defined('USE_ELASTIC')) {
     $useElastic = USE_ELASTIC;
@@ -17,8 +23,6 @@ $urlUtils->init();
 
 $adminMenu = new \Gf\Util\AdminMenu();
 $adminMenu->init();
-
-
 
 
 function get_search_category_aggregation() {

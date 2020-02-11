@@ -194,50 +194,36 @@ class Search
                 break;
 
             case 'date':
-                //jelke hack
-                if ($this->categoryId === 2441) {
-                    $scriptCode = 'doc["order_data.rating"].value';
-                } else {
-                    $scriptCode = 'doc["order_data.date"].value * doc["order_data.default"].value';
-                }
-                $functionQuery = new \Elastica\Query\FunctionScore();
-//                $scoreFunction = new \Elastica\Script\Script('doc["order_data.date"].value * doc["order_data.default"].value');
-                $scoreFunction = new \Elastica\Script\Script($scriptCode);
-                $functionQuery->addScriptScoreFunction($scoreFunction);
-                $functionQuery->setQuery($boolQuery);
-                $mainQuery->setSort(['_score' => 'desc']);
-                $mainQuery->setQuery($functionQuery);
+                $scriptCode = 'doc["order_data.default"].value';
+                $ordering = 'desc';
 
                 break;
 
             case 'price-desc':
-                $functionQuery = new \Elastica\Query\FunctionScore();
-                $scoreFunction = new \Elastica\Script\Script('doc["order_data.price"].value * doc["order_data.default"].value');
-                $functionQuery->addScriptScoreFunction($scoreFunction);
-                $functionQuery->setQuery($boolQuery);
-                $mainQuery->setSort(['_score' => 'desc']);
-                $mainQuery->setQuery($functionQuery);
+                $scriptCode = 'doc["order_data.price"].value';
+                $ordering = 'desc';
 
                 break;
 
             case 'price':
-//                $mainQuery->addSort(['order_data.price' => 'asc']);
-                $functionQuery = new \Elastica\Query\FunctionScore();
-                $scoreFunction = new \Elastica\Script\Script('(10000000 - doc["order_data.price"].value) * doc["order_data.default"].value');
-                $functionQuery->addScriptScoreFunction($scoreFunction);
-                $functionQuery->setQuery($boolQuery);
-                $mainQuery->setSort(['_score' => 'desc']);
-                $mainQuery->setQuery($functionQuery);
+                $scriptCode = 'doc["order_data.price"].value';
+                $ordering = 'asc';
 
                 break;
 
             default:
-                $mainQuery->addSort(['order_data.default' => 'desc']);
+                $scriptCode = 'doc["order_data.default"].value';
+                $ordering = 'desc';
 
                 break;
         }
 
-
+        $functionQuery = new \Elastica\Query\FunctionScore();
+        $scoreFunction = new \Elastica\Script\Script($scriptCode);
+        $functionQuery->addScriptScoreFunction($scoreFunction);
+        $functionQuery->setQuery($boolQuery);
+        $mainQuery->setSort(['_score' => $ordering]);
+        $mainQuery->setQuery($functionQuery);
 
         return $mainQuery;
     }

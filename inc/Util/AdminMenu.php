@@ -32,18 +32,20 @@ class AdminMenu
         });
 
         add_action('admin_menu', function (){
-            add_submenu_page('nss-panel', 'Podešavanje pretrage', 'Podešavanje pretrage', 'edit_pages','gf-search-settings',
+            add_submenu_page('nss-panel', 'Podešavanje indexera', 'Podešavanje indexera', 'edit_pages','gf-indexer',
                 function() {
                     $config = array(
                         'host' => ES_HOST,
                         'port' => 9200
                     );
                     $client = new \Elastica\Client($config);
-                    $termSearch = new \GF\Search\Elastica\TermSearch($client);
-//    $result = $term->getTerms();
-                    require(get_stylesheet_directory() . "/templates/admin/search-settings.php");
+                    $indexer = new \GF\Search\Indexer\Indexer($client);
+
+                    require(get_stylesheet_directory() . "/templates/admin/indexer-settings.php");
             });
         });
+
+
     }
 
 }

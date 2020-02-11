@@ -2,6 +2,7 @@
 
 //require_once(__DIR__ . "/Util/DailyExpressApi.php");
 require_once(__DIR__ . "/Search/Elastica/Indexer.php");
+require_once(__DIR__ . "/Search/Indexer/Indexer.php");
 require_once(__DIR__ . "/Search/Elastica/Config/ConfigInterface.php");
 require_once(__DIR__ . "/Search/Elastica/Config/Product.php");
 require_once(__DIR__ . "/Search/Elastica/Config/Term.php");
