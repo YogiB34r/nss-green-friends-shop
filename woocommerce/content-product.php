@@ -27,7 +27,7 @@ if (empty($product) || !$product->is_visible()) {
 ob_start();
 wc_product_class();
 $classes = ob_get_clean();
-$stickers = new \GfPluginsCore\ProductStickers();
+global $stickers;
 ?>
 <li <?=$classes?>>
     <a href="<?php echo get_permalink($product->get_id()) ?>"
@@ -41,7 +41,7 @@ $stickers = new \GfPluginsCore\ProductStickers();
             $stickers->addStickersToNewProducts($product);
         }
         if (method_exists($stickers,'addStickerForSoldOutProducts')) {
-            $stickers->addStickerToSaleProducts($classes);
+            $stickers->addStickerToSaleProducts($classes, $product->get_id());
         }
         ?>
         <?php if (has_post_thumbnail($product->get_id())): ?>

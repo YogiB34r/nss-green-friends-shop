@@ -282,8 +282,8 @@ class Functions
      */
     public function customShopLoop(\Elastica\ResultSet $products)
     {
+        global $stickers;
         $html = '';
-        $stickers = new ProductStickers();
         $i = 0;
         foreach ($products->getResults() as $productData) {
             $productId = $productData->postId;
@@ -324,17 +324,13 @@ class Functions
 //        woocommerce_show_product_sale_flash('', '', '', $classes);
 //        add_stickers_to_products_new($product);
             $html .= $product->dto['thumbnail'];
-            ob_start();
-            $stickers->addStickerForSoldOutProducts($classes);
-            $html .= ob_get_clean();
-//        $html .= add_stickers_to_products_soldout($classes);
+            $html .= $stickers->addStickerForSoldOutProducts($classes, $product->dto['stockStatus']);
             $html .= '</a>';
 //            $html .= '<a href="' . $product->dto['permalink'] . '" title="' . $product->getName() . '">';
-//            var_dump($product->dto);
-//            die();
             $html .= '<a href="' . $product->dto['permalink'] . '" title="' . $product->getName() . '">';
-            $html .= '<h3>' . $productData->getScore() .' # '. $product->getName() . '</h3>';
-//            $html .= '<h3>'. $product->getName() .'</h3>';
+//            $html .= '<h3>' . $product->dto['stockStatus'] .' # '. $product->getName() . '</h3>';
+//            $html .= '<h3>' . $productData->getScore() .' # '. $product->getName() . '</h3>';
+            $html .= '<h3>'. $product->getName() .'</h3>';
             $html .= '</a>';
             $html .= '<span class="price">';
             if ($saved_percentage > 0) {

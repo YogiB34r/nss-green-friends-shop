@@ -29,19 +29,21 @@ class Url
      */
     public function customRequestOverride(\WP $wp)
     {
-        $params = explode('/', $wp->query_vars['pagename']);
-        if (count($params) === 2) {
-            $pageName = $params[1];
+        if (isset($wp->query_vars['pagename'])) {
+            $params = explode('/', $wp->query_vars['pagename']);
+            if (count($params) === 2) {
+                $pageName = $params[1];
 
-            /* @var \WP_Post $p */
-            $p = get_page_by_path($pageName, OBJECT, 'product');
-            if ($p) {
-                $wp->query_vars = [
-                    'post_type' => 'product',
+                /* @var \WP_Post $p */
+                $p = get_page_by_path($pageName, OBJECT, 'product');
+                if ($p) {
+                    $wp->query_vars = [
+                        'post_type' => 'product',
 // @TODO test this out. it seems to be required in order for rewrites to work.
-                    'product' => $pageName,
-                    'name' => $pageName
-                ];
+                        'product' => $pageName,
+                        'name' => $pageName
+                    ];
+                }
             }
         }
     }
