@@ -19,7 +19,7 @@ class Url
         add_action('rewrite_rules_array', [$this, 'rewriteRules']);
 
 // @TODO check if this triggers upon new category creation, will the new url work ?
-        add_action('init', [$this, 'flushRules']);
+//        add_action('init', [$this, 'flushRules']);
     }
 
     /**
