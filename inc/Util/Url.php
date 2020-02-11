@@ -38,9 +38,9 @@ class Url
             if ($p) {
                 $wp->query_vars = [
                     'post_type' => 'product',
-// @TODO test this out
-//                    'product' => $pageName,
-//                    'name' => $pageName
+// @TODO test this out. it seems to be required in order for rewrites to work.
+                    'product' => $pageName,
+                    'name' => $pageName
                 ];
             }
         }
