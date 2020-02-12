@@ -21,6 +21,10 @@ class WooFunctions
         add_action('woocommerce_product_options_shipping', [$this, 'disableCodCheckbox']);//Adds cod checkbox
         add_action('woocommerce_process_product_meta', [$this, 'saveCodCheckbox'], 10, 2);//Saves cod checkbox
 
+        //Custom shipping price
+        add_action('woocommerce_product_options_shipping', [$this, 'customShippingPrice']);//Adds cod checkbox
+        add_action('woocommerce_process_product_meta', [$this, 'saveCustomShippingPrice'], 10, 2);//Saves cod checkbox
+
         //Generate sku
         add_action('save_post', [$this, 'validateSku'], 10, 2);
     }
@@ -161,6 +165,33 @@ class WooFunctions
     {
         update_post_meta($id, 'disableCod', $_POST['disableCod']);
     }
+
+    /**
+     * Creates input for custom shipping price in shipping tab on product edit page
+     */
+    function customShippingPrice()
+    {
+        echo '<div class="options_group">';
+
+        woocommerce_wp_text_input(array(
+            'id' => 'customShippingPrice',
+            'value' => get_post_meta(get_the_ID(), 'customShippingPrice', true),
+            'label' => 'Custom shipping price',
+            'desc_tip' => true,
+            'description' => 'This field changes product shipping price',
+        ));
+
+        echo '</div>';
+    }
+
+    /**
+     * Saves custom shipping price value
+     */
+    function saveCustomShippingPrice($id, $post)
+    {
+        update_post_meta($id, 'customShippingPrice', $_POST['customShippingPrice']);
+    }
+
 
     public function validateSku($id, $post)
     {

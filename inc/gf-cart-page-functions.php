@@ -80,25 +80,113 @@ function custom_wc_empty_cart_message()
 }
 
 add_filter('woocommerce_return_to_shop_redirect', 'wc_empty_cart_redirect_url');
-function wc_empty_cart_redirect_url() {
+function wc_empty_cart_redirect_url()
+{
     return get_home_url();
 }
 
 
 //They only way to translate shipping
 add_filter('woocommerce_shipping_package_name', 'gf_translate_shipping', 10, 3);
-function gf_translate_shipping($name, $package) {
+function gf_translate_shipping($name, $package)
+{
 //    return sprintf( _nx( 'Dostava', 'Dostava %d', ( $i + 1 ), 'shipping packages', 'green-friends' ), ( $i + 1 ) );
     return 'Dostava';
 }
 
+//Checks for custom price in product meta
+function getCustomShippingPrice(WC_Product $product)
+{
+    if ($product instanceof WC_Product_Variation) {
+        $product = wc_get_product($product->get_parent_id());
+    }
+
+    $customCost = $product->get_meta('customShippingPrice', true);
+    if (strlen($customCost) > 0) {
+        return $customCost;
+    }
+    return false;
+}
+
+add_action('woocommerce_before_cart', 'customShippingPriceNotice',50);
+
+function customShippingPriceNotice()
+{
+    $cartContents = WC()->cart->get_cart_contents();
+
+    /** @var WC_Product $product */
+    foreach ($cartContents as $cartContent) {
+        $product = $cartContent['data'];
+        if (getCustomShippingPrice($product)) {
+            $html = '<p><b>'.$product->get_name().'</b> ima dodatnu cenu dostave i ona iznozi '. getCustomShippingPrice($product) . get_woocommerce_currency_symbol().'</p>';
+            wc_print_notice($html, 'notice');
+        }
+    }
+}
 
 /**
-  * Display shipping category and price
-  */
-add_filter('woocommerce_package_rates', 'bbloomer_woocommerce_tiered_shipping', 10, 2);
-function bbloomer_woocommerce_tiered_shipping($rates, $package) {
-    if (WC()->cart->cart_contents_weight <= 0.5) {
+ * Display shipping category and price
+ */
+add_filter('woocommerce_package_rates', 'customShippingRates', 10, 2);
+function customShippingRates($rates, $package)
+{
+    $cartWeight = WC()->cart->cart_contents_weight;
+    $cartContents = WC()->cart->get_cart_contents();
+    $customCost = 0;
+
+    /** @var WC_Product $product */
+    foreach ($cartContents as $cartContent) {
+        $product = $cartContent['data'];
+
+        if ($cartContent['quantity'] > 1) {
+            if (getCustomShippingPrice($product)) {
+                for ($i = 1; $i <= $cartContent['quantity']; $i++) {
+                    $customCost += (int)getCustomShippingPrice($product);
+                    $productWeight = (float)$product->get_weight();
+
+                    /*
+                    Remove weight of product with special price from cart weight so items with normal shipping
+                    cost can have valid shipping price based on its weight
+                    */
+                    $cartWeight -= $productWeight;
+                }
+            }
+            continue;
+        }
+
+        if (getCustomShippingPrice($product)) {
+            $customCost += (int)getCustomShippingPrice($product);
+            $productWeight = (float)$product->get_weight();
+
+            /*
+            Remove weight of product with special price from cart weight so items with normal shipping
+            cost can have valid shipping price based on its weight
+            */
+            $cartWeight -= $productWeight;
+        }
+    }
+
+
+    if ($customCost > 0) {
+        /** @var WC_Shipping_Rate $rate */
+        foreach ($rates as $rate) {
+            //If cart weight after deducting special products is 0 or less set all weight based cost to 0
+            if ($cartWeight <= 0) {
+                $rate->set_cost('0');
+            }
+
+            $cost = $rate->get_cost();
+            $newCost = (int)$cost + $customCost;
+            //Add custom product shipping cost to all shipping rates
+            $rate->set_cost($newCost);
+
+            //Remove weight based title if product in cart has custom shipping price
+            $rate->set_label('Dostava');
+        }
+    }
+
+    //Weight based rates
+    if ($cartWeight <= 0.5) {
         if (isset($rates['flat_rate:3']))
             unset(
                 $rates['flat_rate:4'],
@@ -108,7 +196,7 @@ function bbloomer_woocommerce_tiered_shipping($rates, $package) {
                 $rates['flat_rate:8'],
                 $rates['flat_rate:9'],
                 $rates['flat_rate:10']);
-    } elseif (WC()->cart->cart_contents_weight > 0.5 and WC()->cart->cart_contents_weight <= 2) {
+    } elseif ($cartWeight > 0.5 and $cartWeight <= 2) {
         if (isset($rates['flat_rate:4']))
             unset(
                 $rates['flat_rate:3'],
@@ -118,7 +206,7 @@ function bbloomer_woocommerce_tiered_shipping($rates, $package) {
                 $rates['flat_rate:8'],
                 $rates['flat_rate:9'],
                 $rates['flat_rate:10']);
-    } elseif (WC()->cart->cart_contents_weight > 2 and WC()->cart->cart_contents_weight <= 5) {
+    } elseif ($cartWeight > 2 and $cartWeight <= 5) {
         if (isset($rates['flat_rate:5']))
             unset(
                 $rates['flat_rate:3'],
@@ -128,7 +216,7 @@ function bbloomer_woocommerce_tiered_shipping($rates, $package) {
                 $rates['flat_rate:8'],
                 $rates['flat_rate:9'],
                 $rates['flat_rate:10']);
-    } elseif (WC()->cart->cart_contents_weight > 5 and WC()->cart->cart_contents_weight <= 10) {
+    } elseif ($cartWeight > 5 and $cartWeight <= 10) {
         if (isset($rates['flat_rate:6']))
             unset(
                 $rates['flat_rate:3'],
@@ -138,7 +226,7 @@ function bbloomer_woocommerce_tiered_shipping($rates, $package) {
                 $rates['flat_rate:8'],
                 $rates['flat_rate:9'],
                 $rates['flat_rate:10']);
-    } elseif (WC()->cart->cart_contents_weight > 10 and WC()->cart->cart_contents_weight <= 20) {
+    } elseif ($cartWeight > 10 and $cartWeight <= 20) {
         if (isset($rates['flat_rate:7']))
             unset(
                 $rates['flat_rate:3'],
@@ -148,7 +236,7 @@ function bbloomer_woocommerce_tiered_shipping($rates, $package) {
                 $rates['flat_rate:8'],
                 $rates['flat_rate:9'],
                 $rates['flat_rate:10']);
-    } elseif (WC()->cart->cart_contents_weight > 20 and WC()->cart->cart_contents_weight <= 30) {
+    } elseif ($cartWeight > 20 and $cartWeight <= 30) {
         if (isset($rates['flat_rate:8']))
             unset(
                 $rates['flat_rate:3'],
@@ -158,7 +246,7 @@ function bbloomer_woocommerce_tiered_shipping($rates, $package) {
                 $rates['flat_rate:7'],
                 $rates['flat_rate:9'],
                 $rates['flat_rate:10']);
-    } elseif (WC()->cart->cart_contents_weight > 30 and WC()->cart->cart_contents_weight <= 50) {
+    } elseif ($cartWeight > 30 and $cartWeight <= 50) {
         if (isset($rates['flat_rate:9']))
             unset(
                 $rates['flat_rate:3'],
@@ -168,11 +256,11 @@ function bbloomer_woocommerce_tiered_shipping($rates, $package) {
                 $rates['flat_rate:7'],
                 $rates['flat_rate:8'],
                 $rates['flat_rate:10']);
-    } elseif (WC()->cart->cart_contents_weight > 50) {
+    } elseif ($cartWeight > 50) {
         if (isset($rates['flat_rate:10'])) {
-            $cartWeight = WC()->cart->cart_contents_weight;
             $myExtraWeight = $cartWeight - 50;
-            $myNewPrice = 500 + (10 * $myExtraWeight);
+            $flatRate10Cost = $rates['flat_rate:10']->get_cost();
+            $myNewPrice = $flatRate10Cost + (10 * $myExtraWeight);
             $rates['flat_rate:10']->set_cost($myNewPrice);
             unset(
                 $rates['flat_rate:3'],
@@ -188,21 +276,24 @@ function bbloomer_woocommerce_tiered_shipping($rates, $package) {
 }
 
 add_action('woocommerce_before_cart', 'gf_cart_limit_notice');
-function gf_cart_limit_notice(){
+function gf_cart_limit_notice()
+{
     global $woocommerce;
-    if($woocommerce->cart->total > 20000){
+    if ($woocommerce->cart->total > 20000) {
         $message = 'OBAVEŠTENJE: Plaćanje pouzećem nije omogućeno za narudžbine koje iznose preko 20.000 din.';
-        wc_print_notice( $message, 'notice');
+        wc_print_notice($message, 'notice');
     }
 }
-add_filter( 'woocommerce_available_payment_gateways', 'bbloomer_unset_gateway_by_category' );
-function bbloomer_unset_gateway_by_category( $available_gateways ) {
+
+add_filter('woocommerce_available_payment_gateways', 'bbloomer_unset_gateway_by_category');
+function bbloomer_unset_gateway_by_category($available_gateways)
+{
     global $woocommerce;
     $unset = false;
-    if($woocommerce->cart->total > 20000){
+    if ($woocommerce->cart->total > 20000) {
         $unset = true;
     }
-    if ( $unset == true ) unset( $available_gateways['cod'] );
+    if ($unset == true) unset($available_gateways['cod']);
     return $available_gateways;
 }
 
