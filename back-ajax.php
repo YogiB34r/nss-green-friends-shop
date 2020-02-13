@@ -169,6 +169,8 @@ function appendItemForBackendSearch(WC_Product $product) {
 }
 
 function backendProductSearch() {
+    global $searchFunctions;
+
     $data = [];
     $query = $_GET['query'];
     $productId = wc_get_product_id_by_sku($query);
@@ -183,7 +185,7 @@ function backendProductSearch() {
         $data = array_merge($data, appendItemForBackendSearch($product));
     }
 
-    $results = gf_elastic_search_with_data($_GET['query']);
+    $results = $searchFunctions->getResults('', $_GET['query']);
     foreach ($results->getResults() as $result) {
         $product = wc_get_product($result->getData()['postId']);
         $data = array_merge($data, appendItemForBackendSearch($product));
