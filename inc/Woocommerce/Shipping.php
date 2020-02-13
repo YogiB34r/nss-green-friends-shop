@@ -92,8 +92,11 @@ class Shipping
             $title = 'Dostava';
         }
 
-        //Radi samo prvi put kad se zameni i posle samo krene da loopuje
-        if ($order->get_shipping_methods() !== 'Besplatna Dostava' && array_search('free_shipping', \GuzzleHttp\Psr7\parse_query(urldecode($_POST['items'])))) {
+        /*
+         *  Skorz sam zaboravio da imamo i treci slucaj a to je kada nema itema sa custom cenom onda je title shippinga onaj koji ide uz tu tezinu korpe
+         *
+         */
+        if ($order->get_shipping_method() !== 'Besplatna Dostava' && array_search('free_shipping', \GuzzleHttp\Psr7\parse_query(urldecode($_POST['items'])))) {
             $order->remove_order_items('shipping');
             $shipping = new \WC_Order_Item_Shipping();
             $freeShipping = new \WC_Shipping_Free_Shipping();
@@ -104,7 +107,7 @@ class Shipping
             $order->save();
         }
 
-        if ($order->get_shipping_methods() !== 'Dostava' && array_search('flat_rate', \GuzzleHttp\Psr7\parse_query(urldecode($_POST['items'])))) {
+        if ($order->get_shipping_method() !== 'Dostava' && array_search('flat_rate', \GuzzleHttp\Psr7\parse_query(urldecode($_POST['items'])))) {
             $order->remove_order_items('shipping');
             $shipping = new \WC_Order_Item_Shipping();
             $order->add_item($shipping);
