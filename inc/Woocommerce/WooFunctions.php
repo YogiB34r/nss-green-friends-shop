@@ -1,5 +1,5 @@
 <?php
-
+namespace GF\Woocommerce;
 class WooFunctions
 {
     public function __construct()
