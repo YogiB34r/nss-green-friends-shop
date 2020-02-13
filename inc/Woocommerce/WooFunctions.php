@@ -1,4 +1,5 @@
 <?php
+
 namespace GF\Woocommerce;
 class WooFunctions
 {
@@ -22,21 +23,26 @@ class WooFunctions
         add_action('woocommerce_process_product_meta', [$this, 'saveCodCheckbox'], 10, 2);//Saves cod checkbox
 
         //Custom shipping price
-        add_action('woocommerce_product_options_shipping', [$this, 'customShippingPrice']);//Adds cod checkbox
-        add_action('woocommerce_process_product_meta', [$this, 'saveCustomShippingPrice'], 10, 2);//Saves cod checkbox
+        add_action('woocommerce_product_options_shipping', [$this, 'customShippingPrice']);//Adds shipping price input
+        add_action('woocommerce_process_product_meta', [$this, 'saveCustomShippingPrice'], 10, 2);//Saves custom shipping price input
+
+        //Cod disable
+//        add_filter('woocommerce_add_to_cart_validation', [$this, 'soloItemCartCheck']);//Adds cart check for solo item option
+        add_action('woocommerce_product_options_shipping', [$this, 'soloItemCheckbox']);//Adds solo in cart checkbox
+        add_action('woocommerce_process_product_meta', [$this, 'saveSoloItemCheckbox'], 10, 2);//Saves solo in car checkbox
 
         //Generate sku
         add_action('save_post', [$this, 'validateSku'], 10, 2);
     }
 
 
-    function change_existing_currency_symbol($currency_symbol, $currency)
+    public function change_existing_currency_symbol($currency_symbol, $currency)
     {
         return 'din.';
     }
 
 
-    function wooc_validate_custom_field($args, $user)
+    public function wooc_validate_custom_field($args, $user)
     {
         $user_id = $user->ID;
         $user_pass_hash = get_user_by('id', $user_id)->user_pass;
@@ -51,7 +57,7 @@ class WooFunctions
     }
 
 
-    function gf_my_account_shop_button()
+    public function gf_my_account_shop_button()
     {
         global $wp;
         $request = explode('/', $wp->request);
@@ -89,7 +95,7 @@ class WooFunctions
     }
 
 
-    function gf_remove_my_account_links($menu_links)
+    public function gf_remove_my_account_links($menu_links)
     {
         unset($menu_links['dashboard']); // Addresses
 
@@ -97,7 +103,7 @@ class WooFunctions
     }
 
 
-    function wc_customize_product_sorting($sorting_options)
+    public function wc_customize_product_sorting($sorting_options)
     {
         $sorting_options = array(
             'menu_order' => __('Sorting', 'woocommerce'),
@@ -111,7 +117,7 @@ class WooFunctions
         return $sorting_options;
     }
 
-    function wpb_custom_billing_fields($fields = array())
+    public function wpb_custom_billing_fields($fields = array())
     {
         unset($fields['billing_state']);
 
@@ -122,7 +128,7 @@ class WooFunctions
      * Checks if disable cod is active for product
      */
 
-    function restrictCod($available_gateways)
+    public function restrictCod($available_gateways)
     {
         // Not in backend (admin)
         if (is_admin())
@@ -143,7 +149,7 @@ class WooFunctions
     /**
      * Adds checkbox to product shipping tab for disabling cod
      */
-    function disableCodCheckbox()
+    public function disableCodCheckbox()
     {
         echo '<div class="options_group">';
 
@@ -161,7 +167,7 @@ class WooFunctions
     /**
      * Saves checkbox for disabling cod
      */
-    function saveCodCheckbox($id, $post)
+    public function saveCodCheckbox($id, $post)
     {
         update_post_meta($id, 'disableCod', $_POST['disableCod']);
     }
@@ -169,7 +175,7 @@ class WooFunctions
     /**
      * Creates input for custom shipping price in shipping tab on product edit page
      */
-    function customShippingPrice()
+    public function customShippingPrice()
     {
         echo '<div class="options_group">';
 
@@ -187,24 +193,64 @@ class WooFunctions
     /**
      * Saves custom shipping price value
      */
-    function saveCustomShippingPrice($id, $post)
+    public function saveCustomShippingPrice($id, $post)
     {
         update_post_meta($id, 'customShippingPrice', $_POST['customShippingPrice']);
     }
 
 
-    public function validateSku($id, $post)
+    public function soloItemCartCheck($passed, $product_id, $quantity)
+    {
+        if (wc_get_product($_POST['add-to-cart'])->get_meta('soloInCart', true) === 'yes') {
+            if (!empty(WC()->cart->get_cart())) {
+                WC()->cart->empty_cart();
+            }
+        }
+        return $passed;
+    }
+
+    /**
+     * Adds checkbox to product shipping tab for disabling cod
+     */
+    public
+    function soloItemCheckbox()
+    {
+        echo '<div class="options_group">';
+
+        woocommerce_wp_checkbox(array(
+            'id' => 'soloInCart',
+            'value' => get_post_meta(get_the_ID(), 'soloInCart', true),
+            'label' => 'Solo in cart',
+            'desc_tip' => true,
+            'description' => 'If checked this item must be solo in cart',
+        ));
+
+        echo '</div>';
+    }
+
+    /**
+     * Saves checkbox for disabling cod
+     */
+    public
+    function saveSoloItemCheckbox($id, $post)
+    {
+        update_post_meta($id, 'soloInCart', $_POST['soloInCart']);
+    }
+
+
+    public
+    function validateSku($id, $post)
     {
         if (isset($_POST['_sku'])) {
             if ($_POST['_sku'] === "") {
                 $this->autoGenerateSku();
             } else {
                 $productDb = wc_get_product_id_by_sku($_POST['_sku']);
-                if ($productDb === $_POST['post_ID']){
+                if ($productDb === $_POST['post_ID']) {
                     $product = wc_get_product($_POST['post_ID']);
                     $skuOld = wc_get_product($productDb)->get_sku();
                     $skuNew = $product->get_sku();
-                    if ($skuOld === $skuNew){
+                    if ($skuOld === $skuNew) {
                         return;
                     } else {
                         $this->preventDuplicateSku();
@@ -214,7 +260,8 @@ class WooFunctions
         }
     }
 
-    private function autoGenerateSku ()
+    private
+    function autoGenerateSku()
     {
         $exit = false;
         $i = 0;
@@ -235,7 +282,8 @@ class WooFunctions
         }
     }
 
-    private function preventDuplicateSku()
+    private
+    function preventDuplicateSku()
     {
         $exit = false;
         $i = 0;
