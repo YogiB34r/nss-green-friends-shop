@@ -2,8 +2,6 @@
 
 namespace GF\Search;
 
-use GfPluginsCore\ProductStickers;
-
 class Functions
 {
     /**
