@@ -48,7 +48,7 @@ class Shipping
     }
 
 
-    function manualOrdersShippingCalculation($orderid)
+    public function manualOrdersShippingCalculation($orderid)
     {
         $order = wc_get_order($orderid);
         $cartWeight = 0;
@@ -64,7 +64,6 @@ class Shipping
             $rates[$shippingMethod->get_rate_id()] = $shippingMethod;
         }
 
-
         /** @var \WC_Order_Item_Product $item */
         foreach ($order->get_items() as $item) {
             $cartWeight += $item->get_product()->get_weight() * $item->get_quantity();
@@ -76,7 +75,7 @@ class Shipping
         $customCost = $overrides['customShippingCost'];
         $cartWeight = $overrides['cartWeight'];
 
-        $rate = ($this->getWeightBasedShippingRate($rates, $cartWeight));
+        $rate = $this->getWeightBasedShippingRate($rates, $cartWeight);
         $rate = array_values($rate)[0];
 
         /** @var \WC_Shipping_Flat_Rate $rate */
@@ -90,33 +89,52 @@ class Shipping
         if ($customCost > 0) {
             $cost = $cost + $customCost;
             $title = 'Dostava';
+        } else {
+            $title = 'Dostava: '. $title;
+        }
+
+//        var_dump($rate->id);
+//        var_dump($_POST);
+//        die();
+
+//        if (isset($_POST['action']) && $_POST['action'] === 'woocommerce_calc_line_taxes') {
+        if (isset($_POST['items'])) {
+
+            if ($order->get_shipping_method() !== 'Besplatna Dostava' && array_search('free_shipping', \GuzzleHttp\Psr7\parse_query(urldecode($_POST['items'])))) {
+                $order->remove_order_items('shipping');
+                $shipping = new \WC_Order_Item_Shipping();
+                $freeShipping = new \WC_Shipping_Free_Shipping();
+                $shipping->set_props(['method_title' => $freeShipping->title, 'method_id' => $freeShipping->id, 'total' => 0]);
+//                $shipping->set_name('Besplatna Dostava');
+                $order->add_item($shipping);
+                $order->calculate_totals();
+                $order->save();
+//            } else if ($order->get_shipping_method() !== 'Dostava' && array_search('flat_rate', \GuzzleHttp\Psr7\parse_query(urldecode($_POST['items'])))) {
+//                $order->remove_order_items('shipping');
+//                var_dump('second');
+//                $shipping = new \WC_Order_Item_Shipping();
+//                $shipping->set_props(['method_title' => $title, 'method_id' => $rate->id, 'total' => $cost]);
+//                $shipping->apply_changes();
+//                $order->add_item($shipping);
+//                $order->calculate_shipping();
+//                $order->calculate_totals();
+//                $order->save();
+//            } else if ($order->get_shipping_method() == '') {
+            } else {
+                $order->remove_order_items('shipping');
+                $shipping = new \WC_Order_Item_Shipping();
+                $shipping->set_props(['method_title' => $title, 'method_id' => $rate->id, 'total' => $cost]);
+                $shipping->calculate_taxes();
+                $order->add_item($shipping);
+                $order->calculate_totals();
+                $order->save();
+            }
         }
 
         /*
          *  Skorz sam zaboravio da imamo i treci slucaj a to je kada nema itema sa custom cenom onda je title shippinga onaj koji ide uz tu tezinu korpe
          *
          */
-        if ($order->get_shipping_method() !== 'Besplatna Dostava' && array_search('free_shipping', \GuzzleHttp\Psr7\parse_query(urldecode($_POST['items'])))) {
-            $order->remove_order_items('shipping');
-            $shipping = new \WC_Order_Item_Shipping();
-            $freeShipping = new \WC_Shipping_Free_Shipping();
-            $shipping->set_props(['method_title' => $freeShipping->title, 'method_id' => $freeShipping->id, 'total' => 0]);
-            $shipping->set_name('Besplatna Dostava');
-            $order->add_item($shipping);
-            $order->calculate_totals();
-            $order->save();
-        }
-
-        if ($order->get_shipping_method() !== 'Dostava' && array_search('flat_rate', \GuzzleHttp\Psr7\parse_query(urldecode($_POST['items'])))) {
-            $order->remove_order_items('shipping');
-            $shipping = new \WC_Order_Item_Shipping();
-            $order->add_item($shipping);
-            $shipping->set_props(['method_title' => $title, 'method_id' => $rate->id, 'total' => $cost]);
-            $order->add_item($shipping);
-            $order->calculate_totals();
-            $order->save();
-        }
-
 
     }
 
