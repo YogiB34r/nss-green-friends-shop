@@ -3,11 +3,8 @@
 
 namespace GF\Woocommerce;
 
-use WC_Order_Item_Shipping;
-use WC_Product;
-use WC_Product_Variation;
-use WC_Shipping_Free_Shipping;
-use WC_Shipping_Zones;
+
+use Composer\Package\Loader\ValidatingArrayLoader;
 
 class Shipping
 {
@@ -58,7 +55,7 @@ class Shipping
         $i = 0;
 
         //Serbia iz zone id 1
-        $zone = WC_Shipping_Zones::get_zone('1');
+        $zone = \WC_Shipping_Zones::get_zone('1');
         $rates = [];
 
         /** @var \WC_Shipping_Flat_Rate $shippingMethod */
@@ -99,7 +96,7 @@ class Shipping
         }
 
         if (!$shipping) {
-            $shipping = new WC_Order_Item_Shipping();
+            $shipping = new \WC_Order_Item_Shipping();
             $order->add_item($shipping);
             $shipping->set_props(['method_title' => $title, 'method_id' => $rate->id, 'total' => $cost]);
             $order->add_item($shipping);
@@ -108,17 +105,18 @@ class Shipping
         }
 
         if ($shipping->get_name() === 'Shipping') {
-            $freeShipping = new WC_Shipping_Free_Shipping();
+            $freeShipping = new \WC_Shipping_Free_Shipping();
             $shipping->set_props(['method_title' => $freeShipping->title, 'method_id' => $freeShipping->id, 'total' => 0]);
-            try {
-                $shipping->set_name('Besplatna Dostava');
-            } catch (\Exception $e){
-                var_dump($e->getMessage());
-            }
+            $shipping->set_name('Besplatna Dostava');
             $order->calculate_totals();
             $order->save();
         }
-
+        if ($shipping->get_name() !== 'Besplatna Dostava') {
+            $shipping->set_props(['method_title' => $title, 'method_id' => $rate->id, 'total' => $cost]);
+            $order->add_item($shipping);
+            $order->calculate_totals();
+            $order->save();
+        }
     }
 
     /**
@@ -128,7 +126,7 @@ class Shipping
     {
         $cartContents = WC()->cart->get_cart_contents();
 
-        /** @var WC_Product $product */
+        /** @var \WC_Product $product */
         foreach ($cartContents as $cartContent) {
             $product = $cartContent['data'];
             if ($this->getCustomShippingPrice($product)) {
@@ -247,7 +245,7 @@ class Shipping
     {
 
         $customCost = 0;
-        /** @var WC_Product $product */
+        /** @var \WC_Product $product */
         foreach ($cartContents as $cartContent) {
             $product = $cartContent['data'];
 
@@ -306,12 +304,12 @@ class Shipping
 
     /**
      * Checks for custom price in product meta
-     * @param WC_Product $product
+     * @param \WC_Product $product
      * @return bool|string
      */
-    private function getCustomShippingPrice(WC_Product $product)
+    private function getCustomShippingPrice(\WC_Product $product)
     {
-        if ($product instanceof WC_Product_Variation) {
+        if ($product instanceof \WC_Product_Variation) {
             $product = wc_get_product($product->get_parent_id());
         }
 
