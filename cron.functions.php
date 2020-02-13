@@ -69,35 +69,38 @@ add_action('createNalog', 'createNalog');
 function createNalog() {
     global $wpdb;
 
-    $dt = new \DateTime('now');
-    if (in_array($dt->format('D'), ['Sun', 'Sat'])) {
-        return;
+    if (ENVIRONMENT === 'production') {
+
+        $dt = new \DateTime('now');
+        if (in_array($dt->format('D'), ['Sun', 'Sat'])) {
+            return;
+        }
+
+        $backorder = new NSS_Backorder($wpdb);
+        $backorder->createBackOrders();
+
+        $sql = "SELECT backOrderId FROM wp_nss_backorder WHERE status <> 4 AND mailSent = 0";
+        foreach ($wpdb->get_results($sql) as $result) {
+            $orders = $backorder->getBackOrders($result->backOrderId);
+            $supplierId = $orders[0]->supplierId;
+            $backorder->sendBackOrderEmail($supplierId, $orders);
+            //        if ($backorder->sendBackOrderEmail($supplierId, $orders)) {
+            //            echo 'mail sent';
+            //        }
+        }
+
+        $from = 'mailer@nonstopshop.rs';
+        $headers = [
+            'Content-Type: text/html; charset=UTF-8',
+            "From: NonStopShop <'{$from}'>",
+        ];
+        $to[] = 'djavolak@mail.ru';
+        $subject = 'Backorders created';
+        $dt = new \DateTime('now', new \DateTimeZone('Europe/Belgrade'));
+        $message = 'cron started at : ' . $dt->format('d/m/Y H:i:s');
+
+        wp_mail($to, $subject, $message, $headers);
     }
-
-    $backorder = new NSS_Backorder($wpdb);
-    $backorder->createBackOrders();
-
-    $sql = "SELECT backOrderId FROM wp_nss_backorder WHERE status <> 4 AND mailSent = 0";
-    foreach ($wpdb->get_results($sql) as $result) {
-        $orders = $backorder->getBackOrders($result->backOrderId);
-        $supplierId = $orders[0]->supplierId;
-        $backorder->sendBackOrderEmail($supplierId, $orders);
-//        if ($backorder->sendBackOrderEmail($supplierId, $orders)) {
-//            echo 'mail sent';
-//        }
-    }
-
-    $from = 'mailer@nonstopshop.rs';
-    $headers = [
-        'Content-Type: text/html; charset=UTF-8',
-        "From: NonStopShop <'{$from}'>",
-    ];
-    $to[] = 'djavolak@mail.ru';
-    $subject = 'Backorders created';
-    $dt = new \DateTime('now', new \DateTimeZone('Europe/Belgrade'));
-    $message = 'cron started at : '  . $dt->format('d/m/Y H:i:s');
-
-    wp_mail($to, $subject, $message, $headers);
 }
 
 function daily() {
