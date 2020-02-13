@@ -43,3 +43,4 @@ require_once(__DIR__ . '/gf-single-product-functions.php');
 require_once(__DIR__ . '/gf-woocommerce-checkout-functions.php');
 //require_once(__DIR__ . '/theme-setup.php');
 require_once(__DIR__ . '/Woocommerce/WooFunctions.php');
+require_once(__DIR__ . '/Woocommerce/Shipping.php');

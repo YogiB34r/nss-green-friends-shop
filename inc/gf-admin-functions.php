@@ -1,5 +1,8 @@
 <?php
-add_action('woocommerce_admin_order_totals_after_tax', 'custom_admin_order_totals_after_tax', 10, 1);
+//add_action('woocommerce_admin_order_totals_after_tax', 'custom_admin_order_totals_after_tax', 10, 1);
+/**
+ * @deprecated
+ */
 function custom_admin_order_totals_after_tax($orderid) {
     $order = wc_get_order($orderid);
     $totalWeight = 0;
@@ -40,6 +43,7 @@ function custom_admin_order_totals_after_tax($orderid) {
     if ($price > 0 && $order->get_shipping_method() !== 'Besplatna dostava') {
         $shipping = new WC_Order_Item_Shipping();
         $shipping->set_total($price);
+
         if ($order->get_shipping_total() != 0) {
             $order->remove_item(array_keys($order->get_shipping_methods())[0]);
         }

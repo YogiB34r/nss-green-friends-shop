@@ -1,26 +1,27 @@
 <?php
 //ini_set('max_execution_time', '40');
+use Gf\Search\Functions;
+use GF\Theme;
+use Gf\Util\Url;
+use GF\Woocommerce\Shipping;
+use GF\Woocommerce\WooFunctions;
 use GfPluginsCore\ProductStickers;
 
 require (__DIR__ . '/inc/autoload.php');
 global $wpdb;
 
-if (ES_HOST === '10.223.22.38' || ES_HOST === '10.223.22.39') {
-    define('ENVIRONMENT', 'PRODUCTION');
-} else {
-    define('ENVIRONMENT', 'DEVELOPMENT');
-}
-
 $useElastic = true; // create admin setting
 if (defined('USE_ELASTIC')) {
     $useElastic = USE_ELASTIC;
 }
-$searchFunctions = new \Gf\Search\Functions($wpdb, $useElastic);
+$searchFunctions = new Functions($wpdb, $useElastic);
 $wooFunctions = new WooFunctions();
-$theme = new \GF\Theme();
+$wooShipping = new Shipping();
+$wooShipping->init();
+$theme = new Theme();
 $theme->init();
 
-$urlUtils = new \Gf\Util\Url();
+$urlUtils = new Url();
 $urlUtils->init();
 
 $adminMenu = new \Gf\Util\AdminMenu();
