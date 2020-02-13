@@ -19,6 +19,7 @@ class Shipping
 
     public function init()
     {
+        //Customer orders
         add_filter('woocommerce_package_rates', [$this, 'customShippingRatesCustomer'], 10, 2);
         add_action('woocommerce_before_cart', [$this, 'customShippingPriceNotice'], 50);
 
@@ -90,12 +91,21 @@ class Shipping
             $cost = $cost + $customCost;
             $title = 'Dostava';
         }
-        $shipping = null;
-        if (count($order->get_shipping_methods()) > 0) {
-            $shipping = array_values($order->get_shipping_methods())[0];
+
+        //Radi samo prvi put kad se zameni i posle samo krene da loopuje
+        if ($order->get_shipping_methods() !== 'Besplatna Dostava' && array_search('free_shipping', \GuzzleHttp\Psr7\parse_query(urldecode($_POST['items'])))) {
+            $order->remove_order_items('shipping');
+            $shipping = new \WC_Order_Item_Shipping();
+            $freeShipping = new \WC_Shipping_Free_Shipping();
+            $shipping->set_props(['method_title' => $freeShipping->title, 'method_id' => $freeShipping->id, 'total' => 0]);
+            $shipping->set_name('Besplatna Dostava');
+            $order->add_item($shipping);
+            $order->calculate_totals();
+            $order->save();
         }
 
-        if (!$shipping) {
+        if ($order->get_shipping_methods() !== 'Dostava' && array_search('flat_rate', \GuzzleHttp\Psr7\parse_query(urldecode($_POST['items'])))) {
+            $order->remove_order_items('shipping');
             $shipping = new \WC_Order_Item_Shipping();
             $order->add_item($shipping);
             $shipping->set_props(['method_title' => $title, 'method_id' => $rate->id, 'total' => $cost]);
@@ -104,19 +114,7 @@ class Shipping
             $order->save();
         }
 
-        if ($shipping->get_name() === 'Shipping') {
-            $freeShipping = new \WC_Shipping_Free_Shipping();
-            $shipping->set_props(['method_title' => $freeShipping->title, 'method_id' => $freeShipping->id, 'total' => 0]);
-            $shipping->set_name('Besplatna Dostava');
-            $order->calculate_totals();
-            $order->save();
-        }
-        if ($shipping->get_name() !== 'Besplatna Dostava') {
-            $shipping->set_props(['method_title' => $title, 'method_id' => $rate->id, 'total' => $cost]);
-            $order->add_item($shipping);
-            $order->calculate_totals();
-            $order->save();
-        }
+
     }
 
     /**
@@ -319,6 +317,9 @@ class Shipping
         }
         return false;
     }
+
+
+
 
 
 }
