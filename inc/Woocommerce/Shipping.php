@@ -98,10 +98,10 @@ class Shipping
             $activeMethodName = $activeShippingMethod->get_method_id();
         }
 
-        if ($activeMethodName === 'flat_rate') {
-            $case = 0;
-        } else {
+        if ($activeMethodName === 'free_shipping') {
             $case = 1;
+        } else {
+            $case = 0;
         }
 
 
