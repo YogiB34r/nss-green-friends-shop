@@ -99,17 +99,20 @@ class Shipping
         }
 
         if ($activeMethodName === 'flat_rate') {
+            var_dump('1');
             $case = 0;
         } else {
+            var_dump('2');
             $case = 1;
         }
 
-        if (($_POST['action'] === 'woocommerce_save_order_items' || $_POST['action'] === 'woocommerce_calc_line_taxes')
+
+        if (($_POST['action'] === 'woocommerce_save_order_items')
             && array_search('flat_rate', \GuzzleHttp\Psr7\parse_query(urldecode($_POST['items'])))) {
             $case = 0;
         }
 
-        if (($_POST['action'] === 'woocommerce_save_order_items' || $_POST['action'] === 'woocommerce_calc_line_taxes')
+        if (($_POST['action'] === 'woocommerce_save_order_items')
             && array_search('free_shipping', \GuzzleHttp\Psr7\parse_query(urldecode($_POST['items'])))) {
             $case = 1;
         }
