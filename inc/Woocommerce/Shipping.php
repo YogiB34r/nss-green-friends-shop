@@ -105,7 +105,7 @@ class Shipping
                 $shipping = new \WC_Order_Item_Shipping();
                 $freeShipping = new \WC_Shipping_Free_Shipping();
                 $shipping->set_props(['method_title' => $freeShipping->title, 'method_id' => $freeShipping->id, 'total' => 0]);
-//                $shipping->set_name('Besplatna Dostava');
+                $shipping->set_name('Besplatna Dostava');
                 $order->add_item($shipping);
                 $order->calculate_totals();
                 $order->save();

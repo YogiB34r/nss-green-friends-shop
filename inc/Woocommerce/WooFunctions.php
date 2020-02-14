@@ -27,7 +27,7 @@ class WooFunctions
         add_action('woocommerce_process_product_meta', [$this, 'saveCustomShippingPrice'], 10, 2);//Saves custom shipping price input
 
         //Cod disable
-//        add_filter('woocommerce_add_to_cart_validation', [$this, 'soloItemCartCheck']);//Adds cart check for solo item option
+        add_filter('woocommerce_add_to_cart_validation', [$this, 'soloItemCartCheck']);//Adds cart check for solo item option
         add_action('woocommerce_product_options_shipping', [$this, 'soloItemCheckbox']);//Adds solo in cart checkbox
         add_action('woocommerce_process_product_meta', [$this, 'saveSoloItemCheckbox'], 10, 2);//Saves solo in car checkbox
 

@@ -27,7 +27,7 @@ $urlUtils->init();
 $adminMenu = new \Gf\Util\AdminMenu();
 $adminMenu->init();
 
-$stickers = new ProductStickers();
+//$stickers = new ProductStickers();
 
 
 
