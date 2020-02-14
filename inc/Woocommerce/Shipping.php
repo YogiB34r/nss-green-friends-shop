@@ -99,10 +99,8 @@ class Shipping
         }
 
         if ($activeMethodName === 'flat_rate') {
-            var_dump('1');
             $case = 0;
         } else {
-            var_dump('2');
             $case = 1;
         }
 
