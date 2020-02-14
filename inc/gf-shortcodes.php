@@ -5,7 +5,7 @@ function gf_footer_credits_shortcode()
     echo get_bloginfo('name') . ' ' . date('Y');
 }
 
-add_shortcode('gf-my-account-link', 'gf_my_account_link_shortcode');
+add_shortcode('gf_my_account_link', 'gf_my_account_link_shortcode');
 function gf_my_account_link_shortcode()
 {
     $myaccount_page = get_option('woocommerce_myaccount_page_id');

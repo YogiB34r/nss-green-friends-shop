@@ -7,6 +7,10 @@ use GF\Woocommerce\Shipping;
 use GF\Woocommerce\WooFunctions;
 use GfPluginsCore\ProductStickers;
 
+//require (__DIR__ . '/../../plugins/nss-feed-import/classes/Product.php');
+//require (__DIR__ . '/../../plugins/nssPlugins/plugins/ProductStickers.php');
+
+
 require (__DIR__ . '/inc/autoload.php');
 global $wpdb;
 
@@ -27,7 +31,7 @@ $urlUtils->init();
 $adminMenu = new \Gf\Util\AdminMenu();
 $adminMenu->init();
 
-//$stickers = new ProductStickers();
+$stickers = new ProductStickers();
 
 
 

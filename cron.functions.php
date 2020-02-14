@@ -317,8 +317,12 @@ function passAllUsers() {
 function passAllProducts($args) {
     $cli = new \GF\Cli();
 
+
+    flush_rewrite_rules();
+    die();
+
 //    $cli->saleItems($args);
-    $cli->listItems();
+//    $cli->listItems();
 
 //    $cli->migrateSaleItems($args);
 }

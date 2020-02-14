@@ -188,7 +188,7 @@ class Functions
         return $resultSet;
     }
 
-    private function applySearchPageTitle($title) {
+    public function applySearchPageTitle($title) {
         $page_title = sprintf('Rezultati pretrage za: &ldquo;%s&rdquo;', wc_get_loop_prop('query'));
 
         if (wc_get_loop_prop('current_page')) {
@@ -205,7 +205,7 @@ class Functions
      * @param \Elastica\ResultSet $resultSet
      * @return void
      */
-    private function parseCategoryAggregation(\Elastica\ResultSet $resultSet) {
+    public function parseCategoryAggregation(\Elastica\ResultSet $resultSet) {
         $counts = [];
         foreach ($resultSet->getAggregation('category')['buckets'] as $bucket) {
             $counts[$bucket['key']] = $bucket['doc_count'];

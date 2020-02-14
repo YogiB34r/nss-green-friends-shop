@@ -27,7 +27,7 @@ class Url
      *
      * @param \WP $wp
      */
-    public function customRequestOverride(\WP $wp)
+    public static function customRequestOverride(\WP $wp)
     {
         if (isset($wp->query_vars['pagename'])) {
             $params = explode('/', $wp->query_vars['pagename']);
@@ -48,7 +48,7 @@ class Url
         }
     }
 
-    public function custom_post_link( $permalink, $post ) {
+    public static function custom_post_link( $permalink, $post ) {
         if ($post->post_type === 'product') {
             return \Gf\Util\CategoryFunctions::getProductUrl($post, $permalink);
         }
@@ -56,7 +56,7 @@ class Url
         return $permalink;
     }
 
-    public function term_link_filter( $url, $term, $taxonomy ) {
+    public static function term_link_filter( $url, $term, $taxonomy ) {
         if ($taxonomy === 'product_cat') {
             $url = '/' . \Gf\Util\CategoryFunctions::buildTermPath($term);
         }
@@ -64,7 +64,7 @@ class Url
         return $url;
     }
 
-    public function rewriteRules($rules) {
+    public static function rewriteRules($rules) {
         $terms = get_categories(array(
             'taxonomy' => 'product_cat',
             'hide_empty' => false,
@@ -79,7 +79,7 @@ class Url
         return $customRules + $rules;
     }
 
-    public function flushRules() {
+    public static function flushRules() {
         flush_rewrite_rules();
     }
 
