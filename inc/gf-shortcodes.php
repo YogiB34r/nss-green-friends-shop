@@ -113,8 +113,7 @@ function gf_mobile_nav_menu_shortcode()
     echo '<div class="gf-search-icon" id="my-search-icon-toggle"><i class="fas fa-search " id="my-fancy-search"></i></div>';
     echo '<div class="gf-user-account-menu"><i class="fas fa-user" id="my-fancy-user"></i></div>';
 
-    echo '<div class="gf-mobile-menu">';
-    global $woocommerce ?>
+    echo '<div class="gf-mobile-menu">'; ?>
     <li class="gf-mobile-menu__link">
         <a class="gf-header-cart" href="<?php echo wc_get_cart_url(); ?>"
            title="<?php _e('Cart View', 'green-friends'); ?>">

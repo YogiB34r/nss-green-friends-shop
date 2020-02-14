@@ -318,11 +318,14 @@ class Functions
             $classes .= " product type-product status-publish has-post-thumbnail shipping-taxable purchasable  ";
             $html .= '<li class="product-type-' . $product->getType() . $classes . '">';
             $html .= '<a href=" ' . $product->dto['permalink'] . ' " title=" ' . $product->getName() . ' ">';
-            $html .= $stickers->addStickerToSaleProducts($classes, $productId);
+            $html .= $stickers::addStickerToSaleProducts($classes, $productId);
 //        woocommerce_show_product_sale_flash('', '', '', $classes);
+//            ob_start();
+//            $stickers::addStickersToNewProducts(null, $product->getStockStatus(), $product->getPostId());
+//            $html .= ob_get_clean();
 //        add_stickers_to_products_new($product);
             $html .= $product->dto['thumbnail'];
-            $html .= $stickers->addStickerForSoldOutProducts($classes, $product->dto['stockStatus']);
+            $html .= $stickers::addStickerForSoldOutProducts($classes, $product->dto['stockStatus']);
             $html .= '</a>';
 //            $html .= '<a href="' . $product->dto['permalink'] . '" title="' . $product->getName() . '">';
             $html .= '<a href="' . $product->dto['permalink'] . '" title="' . $product->getName() . '">';
