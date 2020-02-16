@@ -34,6 +34,7 @@ if (isset($_GET['action'])) {
             break;
 
         case 'adresnica':
+            ini_set('display_errors', 1);
             \Gf\Util\Adresnica::createAdresnica($_GET['id']);
 
             break;

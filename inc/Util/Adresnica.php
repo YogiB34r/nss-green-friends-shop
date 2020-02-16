@@ -32,10 +32,11 @@ class Adresnica
         $order->save();
 
         $html = '';
-        require (__DIR__ . '/../templates/orders/adresnica.phtml');
+        require (__DIR__ . '/../../templates/orders/adresnica.phtml');
 
         //test dir structure
-        $uploadsDir = __DIR__ . '/../../../uploads/'. date('Y');
+//        $uploadsDir = __DIR__ . '/../../../../uploads/'. date('Y');
+        $uploadsDir = WP_CONTENT_DIR . '/uploads/'. date('Y');
         if (!is_dir($uploadsDir)) {
             mkdir($uploadsDir);
         }
