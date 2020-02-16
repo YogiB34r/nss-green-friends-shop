@@ -7,12 +7,10 @@ use GF\Woocommerce\Shipping;
 use GF\Woocommerce\WooFunctions;
 use GfPluginsCore\ProductStickers;
 
-//require (__DIR__ . '/../../plugins/nss-feed-import/classes/Product.php');
-//require (__DIR__ . '/../../plugins/nssPlugins/plugins/ProductStickers.php');
-
-
 require (__DIR__ . '/inc/autoload.php');
 global $wpdb;
+
+$cache = new \GF_Cache();
 
 $useElastic = true; // create admin setting
 if (defined('USE_ELASTIC')) {
@@ -32,6 +30,8 @@ $adminMenu = new \Gf\Util\AdminMenu();
 $adminMenu->init();
 
 $stickers = new ProductStickers();
+
+$metaCache = new \GF\Util\MetaCache($cache);
 
 
 

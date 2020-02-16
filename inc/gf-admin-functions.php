@@ -104,7 +104,7 @@ function gf_get_order_payment_method_column($colname) {
     }
     if ($colname === 'order_phone_column') {
         $via = 'WWW';
-        if ($the_order->get_created_via() == 'admin') {
+        if ($the_order->get_created_via() === 'admin') {
             $via = 'PHONE';
         }
         echo $via;
@@ -195,18 +195,23 @@ function gf_supplier_product_list_column($columns){
 
 add_action('manage_product_posts_custom_column', 'gf_supplier_product_list_column_content', 10, 2);
 function gf_supplier_product_list_column_content($column, $product_id){
-    global $post;
+    global $metaCache, $product;
 
-    $supplier_id = get_post_meta($product_id, 'supplier', true);
-    if ($supplier_id) {
-        switch ($column) {
-            case 'supplier' :
-                echo get_user_by('ID', $supplier_id)->display_name;
-                break;
-            case 'stockStatus':
-                $product = wc_get_product($product_id);
+//    $supplier_id = get_post_meta($product_id, 'supplier', true);
+
+    switch ($column) {
+        case 'supplier':
+            $supplierId = $metaCache->getMetaFor($product_id, 'product', 'supplier');
+            if ($supplierId) {
+//                echo get_user_by('ID', $supplierId)->display_name;
+                echo $metaCache->getMetaFor($product_id, 'product', 'supplierName', true);
+            }
+            break;
+        case 'stockStatus':
+            $supplierId = $metaCache->getMetaFor($product_id, 'product', 'supplier');
+            if ($supplierId) {
                 $stockStatus = false;
-                if (get_class($product) == WC_Product_Variable::class) {
+                if (get_class($product) === WC_Product_Variable::class) {
                     foreach ($product->get_available_variations() as $available_variation) {
                         $variation = wc_get_product($available_variation['variation_id']);
                         if ($variation->is_in_stock()) {
@@ -220,12 +225,12 @@ function gf_supplier_product_list_column_content($column, $product_id){
                 }
 
                 if ($stockStatus) {
-                    echo 'Na stanju '. $product->get_meta('quantity') .' komada';
+                    echo 'Na stanju ' . $product->get_meta('quantity') . ' komada';
                 } else {
                     echo 'Nema na stanju';
                 }
-                break;
-        }
+            }
+            break;
     }
 }
 
@@ -233,29 +238,21 @@ function gf_supplier_product_list_column_content($column, $product_id){
  * @return array
  */
 function gf_get_order_dates() {
-    $query = new WC_Order_Query(array(
-        'limit' => -1,
-        'return' => 'ids'
-    ));
-    $order_ids = $query->get_orders();
-
-    $same_date = '';
-    $order_dates = [];
-    foreach ($order_ids as $order_id) {
-        $date = get_the_time(__('d/m/Y', 'woocommerce'), $order_id);
-        if ($date !== $same_date) {
-            $order_dates[] = $date;
-            $same_date = $date;
-        }
-    }
     global $wpdb;
 
-    $sql = "SELECT distinct DATE(post_date) as postDate FROM wp_posts WHERE post_type = 'shop_order' ORDER BY post_date DESC";
-    $dates = $wpdb->get_results($sql);
-
-    $orderDates = [];
-    foreach ($dates as $date){
-        $orderDates[] = date('d/m/Y', strtotime($date->postDate));
+    $cache = new \GF_Cache();
+    $key = 'orderDateFilterHtml';
+    $orderDates = $cache->redis->get($key);
+    if ($orderDates === false) {
+        $sql = "SELECT distinct DATE(post_date) as postDate FROM wp_posts WHERE post_type = 'shop_order' ORDER BY post_date DESC";
+        $dates = $wpdb->get_results($sql);
+        $orderDates = [];
+        foreach ($dates as $date){
+            $orderDates[] = date('d/m/Y', strtotime($date->postDate));
+        }
+        $cache->redis->set($key, serialize($orderDates), 60 * 60 * 4); // 4 hours ttl, could be whole day ?
+    } else {
+        $orderDates = unserialize($orderDates);
     }
 
     return $orderDates;
@@ -332,22 +329,25 @@ function gf_product_list_bulk_action_handler($redirect_to, $doaction, $post_ids)
 //admin product list filter by supplier *** START ***
 add_filter('woocommerce_product_filters', 'gf_admin_product_list_supplier_filter', 10, 1);
 function gf_admin_product_list_supplier_filter($output) {
-    $args = array(
-        'role' => 'supplier',
-        'orderby' => 'display_name',
-        'order' => 'ASC'
-    );
-    $suppliers = get_users($args);
-    $html = '<select name="product_supplier_filter">';
-    $html .= '<option value="">Filtriraj po dobavljaču </option>';
-    foreach ($suppliers as $supplier) {
-        $html .= '<option value="' . $supplier->ID . '">' . $supplier->display_name . '</option>';
+    $cache = new \GF_Cache();
+    $key = 'orderSuppliersFilterHtml';
+    $html = $cache->redis->get($key);
+    if ($html === false) {
+        $suppliers = get_users([
+            'role' => 'supplier',
+            'orderby' => 'display_name',
+            'order' => 'ASC'
+        ]);
+        $html = '<select name="product_supplier_filter">';
+        $html .= '<option value="">Filtriraj po dobavljaču </option>';
+        foreach ($suppliers as $supplier) {
+            $html .= '<option value="' . $supplier->ID . '">' . $supplier->display_name . '</option>';
+        }
+        $html .= '</select>';
+        $cache->redis->set($key, $html, 60 * 60);
     }
-    $html .= '</select>';
 
-    echo $html;
-
-    return $output;
+    return $html . $output;
 }
 
 add_filter('parse_query', 'gf_featured_products_admin_filter_query');
@@ -517,26 +517,25 @@ function pd_admin_order_items_headers(){
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
 
-    <button type="button" class="button add-order-item-custom">Dodaj proizvod (test)</button>
+    <button type="button" class="button add-order-item-custom">Dodaj proizvod (novo)</button>
 
     <div id="custom-add" class="modal" title="Dodaj proivod" data-order-id="" data-security="">
         <div class="content">
             <div class="custom-add-row">
-<!--                <label style="float: left">Select product</label>-->
                 <select class="item-list" style="width: 80%"></select>
 
-                <label>Qty</label>
+                <label>kol</label>
                 <input type="number" value="1" class="item-qty" style="width: 50px" />
             </div>
         </div>
 
-        <button type="button" class="button save-items">Add</button>
+        <button type="button" class="button save-items">Dodaj</button>
 
         <div style="display: none;" class="custom-add-template">
             <div class="custom-add-row">
                 <select class="item-list" style="width: 80%"></select>
 
-                <label>Qty</label>
+                <label>kol</label>
                 <input type="number" value="1" class="item-qty" style="width: 50px" />
             </div>
         </div>
