@@ -69,6 +69,37 @@ function gf_custom_post_date_column_time($h_time, $post) {
     return get_the_time(__('d/m/Y', 'woocommerce'), $post);
 }
 
+//add_filter( "views_edit-shop_order" , 'gfCacheStatusCounts', -PHP_INT_MAX);
+function gfCacheStatusCounts($views) {
+    global $current_screen;
+    $cache = new \GF_Cache();
+
+//    var_dump($views);
+//    die();
+
+    switch($current_screen->id) {
+//        case 'edit-post':
+//            $views = wpse_30331_manipulate_views( 'post', $views );
+//            break;
+        case 'edit-shop_order':
+            $key = 'ordersStatusCounts';
+            $cachedViews = $cache->redis->get($key);
+            if ($cachedViews === false) {
+                if (!empty($views)) {
+                    $cache->redis->set($key, serialize($views), 60 * 5);
+                } else {
+                    add_filter( "views_edit-shop_order" , 'gfCacheStatusCounts', 10, 10);
+                }
+            } else {
+                echo 'cached';
+                $views = unserialize($cachedViews);
+                remove_all_filters('views_edit-shop_order');
+            }
+
+            break;
+    }
+    return $views;
+}
 
 //admin order list - date column
 add_action('manage_posts_custom_column', 'gf_date_clmn');
