@@ -41,6 +41,7 @@ require_once(__DIR__ . '/gf-registred-sidebars.php');
 require_once(__DIR__ . '/gf-shortcodes.php');
 require_once(__DIR__ . '/gf-single-product-functions.php');
 require_once(__DIR__ . '/gf-woocommerce-checkout-functions.php');
-//require_once(__DIR__ . '/theme-setup.php');
-require_once(__DIR__ . '/Woocommerce/WooFunctions.php');
-require_once(__DIR__ . '/Woocommerce/Shipping.php');
+
+foreach (glob(__DIR__ . "/Woocommerce/*.php") as $file) {
+    require_once $file;
+}
