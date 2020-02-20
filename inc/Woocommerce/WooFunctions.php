@@ -1,6 +1,9 @@
 <?php
 
 namespace GF\Woocommerce;
+
+use mysql_xdevapi\Exception;
+
 class WooFunctions
 {
     public function __construct()
@@ -26,10 +29,12 @@ class WooFunctions
         add_action('woocommerce_product_options_shipping', [$this, 'customShippingPrice']);//Adds shipping price input
         add_action('woocommerce_process_product_meta', [$this, 'saveCustomShippingPrice'], 10, 2);//Saves custom shipping price input
 
-        //Cod disable
-        add_filter('woocommerce_add_to_cart_validation', [$this, 'soloItemCartCheck']);//Adds cart check for solo item option
+        //Solo in cart
+        add_filter('woocommerce_add_to_cart_validation', [$this, 'soloItemCartCheck'], 1, 5);//Adds cart check for solo item option
         add_action('woocommerce_product_options_shipping', [$this, 'soloItemCheckbox']);//Adds solo in cart checkbox
         add_action('woocommerce_process_product_meta', [$this, 'saveSoloItemCheckbox'], 10, 2);//Saves solo in car checkbox
+
+        add_action('woocommerce_before_single_product', [$this, 'soloItemProductNotice'], 1, 10);
 
         //Generate sku
         add_action('save_post', [$this, 'validateSku'], 10, 2);
@@ -199,14 +204,42 @@ class WooFunctions
     }
 
 
+    /**
+     * Validates solo in cart products
+     * @param $passed
+     * @param $product_id
+     * @param $quantity
+     * @return mixed
+     */
     public function soloItemCartCheck($passed, $product_id, $quantity)
     {
+        $cart = WC()->cart;
         if (wc_get_product($_POST['add-to-cart'])->get_meta('soloInCart', true) === 'yes') {
             if (!empty(WC()->cart->get_cart())) {
-                WC()->cart->empty_cart();
+                $cart->empty_cart();
             }
         }
-        return $passed;
+        foreach ($cart->get_cart() as $cartItemKey => $cartItem){
+            $product = $cartItem['data'];
+            if ($product->get_meta('soloInCart',true) === 'yes'){
+                wc_add_notice('U korpi postoji proizvod koji se naručuje odvojeno','error');
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public function soloItemProductNotice()
+    {
+        global $product;
+        global $singlePage;
+        if ($product->get_meta('soloInCart', true) === 'yes') {
+
+            wc_print_notice('Ovaj proizvod ima posebne uslove dostave i mora se naručivati odvojeno.
+                 Ako ga dodate u korpu, sadržaj korpe će biti obrisan i ostaće samo ovaj proizvod.Hvala na razumevanju', 'notice');
+            ob_start();
+        }
     }
 
     /**
@@ -229,11 +262,14 @@ class WooFunctions
     }
 
     /**
-     * Saves checkbox for disabling cod
+     * Saves checkbox for solo in cart
      */
     public
     function saveSoloItemCheckbox($id, $post)
     {
+        if ($_POST['soloInCart'] === 'yes') {
+            $_POST['_sold_individually'] = 'yes';
+        }
         update_post_meta($id, 'soloInCart', $_POST['soloInCart']);
     }
 
@@ -302,4 +338,5 @@ class WooFunctions
             }
         }
     }
+
 }
