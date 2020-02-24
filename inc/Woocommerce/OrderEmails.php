@@ -1,8 +1,5 @@
 <?php
-
-
 namespace GF\Woocommerce;
-
 
 class OrderEmails
 {
@@ -14,13 +11,12 @@ class OrderEmails
         add_action('woocommerce_order_status_poslato', [$this, 'sendPoslatoNotice']);
     }
 
-
     public function processingNotification($order_id, $old, $new)
     {
         $order = wc_get_order($order_id);
 
         $targetStatuses = [
-            'naruceno' => 'Naručeno',
+//            'naruceno' => 'Naručeno',
 //            'u-pripremi-placeno' => 'U pripremi (plaćeno)',
             'spz-pakovanje' => 'Spremno za pakovanje',
 //            'poslato' => 'Poslato',
