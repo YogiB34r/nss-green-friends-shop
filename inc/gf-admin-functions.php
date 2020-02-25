@@ -550,7 +550,7 @@ function pd_admin_order_items_headers(){
 
     <button type="button" class="button add-order-item-custom">Dodaj proizvod (novo)</button>
 
-    <div id="custom-add" class="modal" title="Dodaj proivod" data-order-id="" data-security="">
+    <div id="custom-add" class="modal" title="Dodaj proizvod" data-order-id="" data-security="">
         <div class="content">
             <div class="custom-add-row">
                 <select class="item-list" style="width: 80%"></select>

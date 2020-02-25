@@ -86,7 +86,7 @@ class OrderEmails
         $order = wc_get_order($orderId);
         $subject = 'Vaša narudžbina je poslata';
         $msg = 'Poštovani, <br />
-                Vaša pošiljka je upravo poslata. Isporuku možete očekivati sutra, u periodu od 8:00 do 17:00h.<br/> 
+                Vaša pošiljka je upravo poslata. Isporuku možete očekivati sutra.<br/> 
                 Isporuku vrši kurirska služba D Express, čiji će Vas kurir kontaktirati kako bi Vam uručio pošiljku.';
         $this->sendOrderStatusUpdateMail($order, $subject, $msg);
     }
