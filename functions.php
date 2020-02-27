@@ -29,7 +29,9 @@ $urlUtils->init();
 $adminMenu = new \Gf\Util\AdminMenu();
 $adminMenu->init();
 
-$stickers = new ProductStickers();
+if (class_exists('GfPluginsCore\ProductStickers')) {
+    $stickers = new ProductStickers();
+}
 
 $metaCache = new \GF\Util\MetaCache($cache);
 
