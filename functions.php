@@ -16,6 +16,11 @@ $useElastic = true; // create admin setting
 if (defined('USE_ELASTIC')) {
     $useElastic = USE_ELASTIC;
 }
+
+if (class_exists('GfPluginsCore\ProductStickers')) {
+    $stickers = new ProductStickers();
+}
+
 $searchFunctions = new Functions($wpdb, $useElastic);
 $wooFunctions = new WooFunctions();
 $wooShipping = new Shipping();
@@ -28,10 +33,6 @@ $urlUtils->init();
 
 $adminMenu = new \Gf\Util\AdminMenu();
 $adminMenu->init();
-
-if (class_exists('GfPluginsCore\ProductStickers')) {
-    $stickers = new ProductStickers();
-}
 
 $metaCache = new \GF\Util\MetaCache($cache);
 

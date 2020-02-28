@@ -165,7 +165,7 @@ class Shipping
         foreach ($cartContents as $cartContent) {
             $product = $cartContent['data'];
             if ($this->getCustomShippingPrice($product)) {
-                $html = '<p><b>' . $product->get_name() . '</b> ima dodatnu cenu dostave i ona iznozi ' . $this->getCustomShippingPrice($product) . get_woocommerce_currency_symbol() . '</p>';
+                $html = '<p><b>' . $product->get_name() . '</b> ima dodatnu cenu dostave i ona iznosi ' . $this->getCustomShippingPrice($product) . get_woocommerce_currency_symbol() . '</p>';
                 wc_print_notice($html, 'notice');
             }
         }

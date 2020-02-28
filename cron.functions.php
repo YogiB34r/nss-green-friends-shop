@@ -4,7 +4,7 @@
 
 if (defined('WP_CLI') && WP_CLI) {
     ini_set('max_execution_time', 1200);
-    ini_set('display_errors', 1);
+//    ini_set('display_errors', 1);
     error_reporting(E_ALL);
 
 
