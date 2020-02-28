@@ -573,14 +573,3 @@ function pd_admin_order_items_headers(){
     </div>
     <?php
 }
-
-/*
-add_action( 'woocommerce_admin_order_item_values', 'pd_admin_order_item_values', 3 );
-function pd_admin_order_item_values( $product, $item, $item_id ) {
-    //Get what you need from $product, $item or $item_id
-    ?>
-    <td class="line_customtitle">
-        <?php //your content here ?>
-    </td>
-    <?php
-}*/
