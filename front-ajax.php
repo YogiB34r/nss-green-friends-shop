@@ -116,11 +116,20 @@ if (isset($_POST['action']) && $_POST['action'] == 'ajax_load_more') {
 
     $page = addslashes($_POST['page']);
     $term = addslashes($_POST['term']);
+    $query = addslashes($_GET['query']);
 //    $type = addslashes($_POST['type']);
     set_query_var('paged', $page);
     set_query_var('term', $term);
 
-    $sortedProducts = $searchFunctions->getResults($term, '');
+//    var_dump($term); die();
+
+//    if ($_POST['type'] === 'search') {
+//        $sortedProducts = $searchFunctions->getCategoryItemsFromElastic();
+//    } else if ($_POST['type'] === 'category') {
+//        $sortedProducts = $searchFunctions->getResults($term, '');
+//    }
+
+    $sortedProducts = $searchFunctions->getResults($term, $query);
     if (get_class($sortedProducts) === \Elastica\ResultSet::class) {
         $searchFunctions->customShopLoop($sortedProducts);
     } else {

@@ -191,10 +191,9 @@ class Functions
     public function applySearchPageTitle($title) {
         $page_title = sprintf('Rezultati pretrage za: &ldquo;%s&rdquo;', wc_get_loop_prop('query'));
 
-        if (wc_get_loop_prop('current_page')) {
-            $page_title .= '&nbsp;' . wc_get_loop_prop('current_page');
-//            sprintf('&nbsp; strana %s', wc_get_loop_prop('current_page'));
-        }
+//        if (wc_get_loop_prop('current_page')) {
+//            $page_title .= '&nbsp;' . wc_get_loop_prop('current_page');
+//        }
 
         return $page_title;
     }
