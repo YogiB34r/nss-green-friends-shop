@@ -180,8 +180,9 @@ function backendProductSearch() {
         if ($product) {
             $data = array_merge($data, appendItemForBackendSearch($product));
         }
+    } else {
+        $product = wc_get_product($query);
     }
-    $product = wc_get_product($query);
     if ($product) {
         $data = array_merge($data, appendItemForBackendSearch($product));
     }

@@ -4,7 +4,7 @@
 
 if (defined('WP_CLI') && WP_CLI) {
     ini_set('max_execution_time', 1200);
-    ini_set('display_errors', 1);
+//    ini_set('display_errors', 1);
     error_reporting(E_ALL);
 
 
@@ -71,7 +71,7 @@ function createNalog() {
 
     if (ENVIRONMENT === 'production') {
 
-        $dt = new \DateTime('now');
+        $dt = new \DateTime('now', new \DateTimeZone('Europe/Belgrade'));
         if (in_array($dt->format('D'), ['Sun', 'Sat'])) {
             return;
         }
@@ -111,7 +111,7 @@ function daily() {
 add_action('syncMis', 'mis');
 function mis() {
 
-//    $item = wc_get_product(427337);
+//    $item = wc_get_product(381572);
 //    new NSS_MIS_Item($item);
 //    die();
 

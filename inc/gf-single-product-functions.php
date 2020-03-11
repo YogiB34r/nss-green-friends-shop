@@ -9,30 +9,22 @@ remove_action('woocommerce_single_product_summary', 'woocommerce_template_single
 remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_meta', 40);
 
 add_action('woocommerce_single_product_summary', 'gf_get_single_product_meta', 9);
-function gf_get_single_product_meta()
-{
+function gf_get_single_product_meta() {
     global $product;
     ?>
     <div class="product_meta">
-
         <?php do_action('woocommerce_product_meta_start'); ?>
-
         <?php if (wc_product_sku_enabled() && ($product->get_sku() || $product->is_type('variable'))) : ?>
-
             <span class="sku_wrapper">Kataloški broj proizvoda:<?php esc_html__('SKU:', 'woocommerce'); ?> <span
                         class="sku"><?php echo ($sku = $product->get_sku()) ? $sku : esc_html__('N/A', 'woocommerce'); ?></span></span>
-
         <?php endif; ?>
-
         <?php do_action('woocommerce_product_meta_end'); ?>
-
     </div>
     <?php
 }
 
 add_filter('woocommerce_get_stock_html', 'my_wc_hide_in_stock_message', 10, 2);
-function my_wc_hide_in_stock_message($html, $product)
-{
+function my_wc_hide_in_stock_message($html, $product) {
     if ($product->is_in_stock()) {
         return '';
     }
@@ -41,20 +33,23 @@ function my_wc_hide_in_stock_message($html, $product)
 }
 
 add_action('woocommerce_single_product_summary', 'gf_display_tax_notice', 11);
-function gf_display_tax_notice()
-{
+function gf_display_tax_notice() {
     echo '<p>' . __('Prikazana cena je sa uračunatim PDV-om.', 'green-fiends') . '</p>';
 }
 
 add_action('woocommerce_single_product_summary', 'gf_display_offer_notice', 12);
-function gf_display_offer_notice()
-{
+function gf_display_offer_notice() {
+    global $product;
     echo '<p>' . __('Ponuda važi dok traju zalihe', 'green-fiends') . '</p>';
+
+    if (current_user_can('administrator')) {
+        $src = wp_get_attachment_image_url($product->get_image_id(), 'full');
+        echo '<br /><a href="'.$src.'" target="_blank">Preuzmi sliku proizvoda (novi tab)</a>';
+    }
 }
 
 add_filter('woocommerce_get_price_html', 'change_displayed_sale_price_html', 10, 2);
-function change_displayed_sale_price_html($price, WC_Product $product)
-{
+function change_displayed_sale_price_html($price, WC_Product $product) {
     // Only on sale products on frontend
     // Get product prices
     if ($product->is_on_sale() && !is_admin()) {

@@ -550,7 +550,7 @@ function pd_admin_order_items_headers(){
 
     <button type="button" class="button add-order-item-custom">Dodaj proizvod (novo)</button>
 
-    <div id="custom-add" class="modal" title="Dodaj proivod" data-order-id="" data-security="">
+    <div id="custom-add" class="modal" title="Dodaj proizvod" data-order-id="" data-security="">
         <div class="content">
             <div class="custom-add-row">
                 <select class="item-list" style="width: 80%"></select>
@@ -573,14 +573,3 @@ function pd_admin_order_items_headers(){
     </div>
     <?php
 }
-
-/*
-add_action( 'woocommerce_admin_order_item_values', 'pd_admin_order_item_values', 3 );
-function pd_admin_order_item_values( $product, $item, $item_id ) {
-    //Get what you need from $product, $item or $item_id
-    ?>
-    <td class="line_customtitle">
-        <?php //your content here ?>
-    </td>
-    <?php
-}*/
