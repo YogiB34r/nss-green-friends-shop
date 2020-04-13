@@ -111,7 +111,7 @@ function daily() {
 add_action('syncMis', 'mis');
 function mis() {
 
-//    $item = wc_get_product(381572);
+//    $item = wc_get_product(385062);
 //    new NSS_MIS_Item($item);
 //    die();
 
@@ -127,7 +127,7 @@ function mis() {
 //    new NSS_MIS_Order($order);
 //    die();
 
-//    $user = get_user_by('id', 414522);
+//    $user = get_user_by('id', 732);
 //    new NSS_MIS_User($user);
 //    die();
 
@@ -299,25 +299,35 @@ function createXml(DOMDocument $xmlDoc, WC_Product $item, $root) {
 
 function passAllUsers() {
     global $wpdb;
-    $args = array(
-        'role'    => 'Supplier',
-        'orderby' => 'user_nicename',
-        'order'   => 'ASC'
-    );
-    /* @var WP_User $user */
-//    foreach (get_users($args) as $user) {
-//        $userMeta = get_user_meta($user->ID);
-//        $sql = "SELECT gfax FROM gvendor WHERE  gvendorid = {$user->vendorid}";
-//        $result = $wpdb->get_results($sql);
-//        update_user_meta($user->ID, 'description', $result[0]->gfax);
-//        wp_update_user( array( 'ID' => $user->ID, 'display_name' => $userMeta['vendor_name'][0] ) );
-//    }
+//    $args = array(
+//        'role'    => 'Customer',
+//        'orderby' => 'user_nicename',
+//        'order'   => 'ASC',
+//        'limit' => 1,
+//        'paged' => 1
+//    );
+
+    $sql = "SELECT user_email FROM wp_users u WHERE u.user_email NOT IN 
+(SELECT email FROM wp_newsletter n) AND u.user_email NOT LIKE '%nonstopshop.rs' AND u.user_email NOT LIKE '!!DISABLED!!%' 
+AND u.user_email <> '' AND user_email NOT LIKE '%telefonska%' LIMIT 30000";
+    $emails = $wpdb->get_results($sql);
+
+    ob_start();
+    foreach ($emails as $email) {
+//        $user = TNP::subscribe(['email' => $email->user_email, 'status' => 'C', 'send_emails' => false]);
+//        if ($user) { // if object, should mean user is subscribed
+//
+//        }
+        echo $email->user_email . PHP_EOL;
+    }
+    $csv = ob_get_clean();
+    file_put_contents('csv', $csv);
 }
 
 function passAllProducts($args) {
     $cli = new \GF\Cli();
 
-    $cli->saleItems($args);
+//    $cli->saleItems($args);
     $cli->listItems();
 
 //    $cli->migrateSaleItems($args);

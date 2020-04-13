@@ -253,9 +253,20 @@ class Shipping
         } elseif ($cartWeight > 50) {
             if (isset($rates['flat_rate:10'])) {
                 $myExtraWeight = $cartWeight - 50;
-                $flatRate10Cost = $rates['flat_rate:10']->get_cost();
+
+                if (isset($rates['flat_rate:10']->instance_settings['cost'])) {
+                    $flatRate10Cost = $rates['flat_rate:10']->instance_settings['cost'];
+                } else {
+                    $flatRate10Cost = $rates['flat_rate:10']->get_cost();
+                }
+
                 $myNewPrice = $flatRate10Cost + (10 * $myExtraWeight);
-                $rates['flat_rate:10']->set_cost($myNewPrice);
+                if (isset($rates['flat_rate:10']->instance_settings['cost'])) {
+                    $rates['flat_rate:10']->instance_settings['cost'] = $myNewPrice;
+                } else {
+                    $rates['flat_rate:10']->set_cost($myNewPrice);
+                }
+
                 unset(
                     $rates['flat_rate:3'],
                     $rates['flat_rate:4'],

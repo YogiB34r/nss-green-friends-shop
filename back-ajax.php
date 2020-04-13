@@ -40,7 +40,7 @@ if (isset($_GET['action'])) {
             break;
 
         case 'dailyExpressCsv': // wc-spz-slanje
-            $arg = array('orderby' => 'date', 'status' => ['spz-pakovanje', 'spz-slanje'], 'posts_per_page' => '500');
+            $arg = array('orderby' => 'date', 'status' => ['spz-pakovanje', 'spz-slanje'], 'posts_per_page' => '1000');
             $orders = WC_get_orders($arg);
             createDailyExport($orders);
 

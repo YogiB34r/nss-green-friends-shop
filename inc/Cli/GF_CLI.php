@@ -348,38 +348,53 @@ class Cli
         $drafted = 0;
         $vendor = [];
         $items = [];
-        $products_ids = wc_get_products(array(
+        $products = wc_get_products(array(
             'limit' => 5000,
 //            'status' => 'published',
-//            'meta_key' => 'supplier',
-//            'meta_value' => 252,
+            'meta_key' => 'supplier',
+            'meta_value' => 119,
 //                'meta_value' => 123,
 //                'compare' => 'IN',
-            'return' => 'ids',
+//            'return' => 'ids',
             'paged' => 1
         ));
 
+        $httpClient = new \GuzzleHttp\Client(['defaults' => [
+            'verify' => false
+        ]]);
+        $redis = new \Redis();
+        $redis->connect(REDIS_HOST);
+        $zomParser = new \Nss\Feed\Parser\Zomimpex($httpClient, $redis);
+//        var_dump($zomParser->getProducts()[0]);
+
+        $newItems = 0;
 //        $products_ids = [412783];
-        foreach ($products_ids as $product_id) {
-            $product = wc_get_product($product_id);
-            $salePrice = $product->get_sale_price();
-            $price = $regularPrice = $product->get_regular_price();
-            if (get_class($product) === \WC_Product_Variable::class) {
-                $price = $regularPrice = $product->get_variation_regular_price();
-                $salePrice = $product->get_variation_sale_price();
+        /* @var \WC_Product $wcProduct */
+        foreach ($zomParser->getProducts() as $xmlData) {
+            $sourceData = $zomParser->parseSource($xmlData);
+
+
+            $found = false;
+            foreach ($products as $wcProduct) {
+                if (strpos($wcProduct->get_name(), $sourceData->dto['sku']) !== false) {
+                    $found = true;
+
+                    $vendorCode = $wcProduct->get_meta('vendor_code', true);
+                    //fix empty and wrong codes
+                    if ($vendorCode === '' || $vendorCode !== $sourceData->dto['sku']) {
+                        $wcProduct->update_meta_data('vendor_code', $sourceData->dto['sku']);
+                        $wcProduct->save();
+                    }
+                }
             }
-            if ($product->get_price() !== 0 && $product->get_price() !== $regularPrice) {
-                $salePrice = $price = $product->get_price();
+            if (!$found) {
+                $newItems++;
             }
-            if ((int) $price === 0) {
-                $product->set_status('draft');
-                $product->save();
-                $drafted++;
-            }
+
             $total++;
         }
 
-        echo 'drafted ' . $drafted . ' items' . "\r\n";
+        echo 'new ' . $newItems . ' items' . "\r\n";
         echo 'from' . $total . ' items';
     }
 

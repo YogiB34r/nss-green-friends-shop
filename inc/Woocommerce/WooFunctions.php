@@ -214,7 +214,8 @@ class WooFunctions
     public function soloItemCartCheck($passed, $product_id, $quantity)
     {
         $cart = WC()->cart;
-        if (wc_get_product($_POST['add-to-cart'])->get_meta('soloInCart', true) === 'yes') {
+        $product = wc_get_product($_POST['add-to-cart']);
+        if ($product && $product->get_meta('soloInCart', true) === 'yes') {
             if (!empty(WC()->cart->get_cart())) {
                 $cart->empty_cart();
             }

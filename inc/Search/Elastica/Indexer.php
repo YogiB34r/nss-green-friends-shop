@@ -148,7 +148,8 @@ LIMIT {$offset}, {$perPage};";
 
         // @TODO solve better. when no sku detected, use post id.
         if ($product->get_sku() == "") {
-            $product->set_sku(md5($product->get_id() . $product->get_name()));
+//            $product->set_sku(md5($product->get_id() . $product->get_name()));
+            $product->set_sku('0' . $product->get_id());
         }
 
         $thumbnail = '<img src="' . wc_placeholder_img_src() . '" alt="Placeholder" width="200px" height="200px" />';
