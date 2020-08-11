@@ -76,8 +76,9 @@ class Pricelist
                 }
 
                 if (get_class($product) == \WC_Product_Variable::class) {
-                    foreach ($product->get_available_variations() as $available_variation) {
-                        $variation = wc_get_product($available_variation['variation_id']);
+                    $product->get_available_variations();
+                    foreach ($product->get_children() as $variationId) {
+                        $variation = wc_get_product($variationId);
                         $variation->set_stock_status($stock);
                         $variation->set_status($status);
                         $variation->set_regular_price($regularPrice);
