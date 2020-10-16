@@ -76,10 +76,10 @@ class Pricelist
                 }
 
                 if (get_class($product) == \WC_Product_Variable::class) {
-                    foreach ($product->get_available_variations() as $available_variation) {
-                        $variation = wc_get_product($available_variation['variation_id']);
+                    wp_update_post(["ID" => $product->get_id(),'post_status' => $status]);
+                    foreach ($product->get_children() as $variationId) {
+                        $variation = wc_get_product($variationId);
                         $variation->set_stock_status($stock);
-                        $variation->set_status($status);
                         $variation->set_regular_price($regularPrice);
                         $variation->set_price($price);
                         $variation->set_sale_price($salePrice);
