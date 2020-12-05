@@ -339,3 +339,11 @@ function gf_migrate_comments()
 function generateUploadsPath() {
     return WP_CONTENT_DIR . '/uploads/'. date('Y') .'/'. date('m') .'/'. date('d') . '/';
 }
+
+add_action( 'rank_math/frontend/description', function( $description ) {
+    if (is_product_category()) {
+//        $description = get_term_meta(get_queried_object_id(), '_aioseop_description', true);
+    }
+
+    return $description;
+});

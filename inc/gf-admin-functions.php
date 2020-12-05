@@ -1,64 +1,4 @@
 <?php
-//add_action('woocommerce_admin_order_totals_after_tax', 'custom_admin_order_totals_after_tax', 10, 1);
-/**
- * @deprecated
- */
-function custom_admin_order_totals_after_tax($orderid) {
-    $order = wc_get_order($orderid);
-    $totalWeight = 0;
-    foreach ($order->get_items() as $item_id => $item_data) {
-        $totalWeight += $item_data->get_product()->get_weight() * $item_data->get_quantity();
-    }
-
-    $price = 0;
-    if ($totalWeight > 0 and $totalWeight <= 0.5) {
-        $price = 175;
-    } elseif ($totalWeight > 0.5 and $totalWeight <= 2) {
-        $price = 200;
-    } elseif ($totalWeight > 2 and $totalWeight <= 5) {
-        $price = 230;
-    } elseif ($totalWeight > 5 and $totalWeight <= 10) {
-        $price = 270;
-    } elseif ($totalWeight > 10 and $totalWeight <= 20) {
-        $price = 360;
-    } elseif ($totalWeight > 20 and $totalWeight <= 30) {
-        $price = 470;
-    } elseif ($totalWeight > 30 and $totalWeight <= 50) {
-        $price = 600;
-    } elseif ($totalWeight > 50) {
-        $newWeight = $totalWeight - 50;
-        $price = 600 + ($newWeight * 10);
-    }
-
-    if (isset($_POST['items']) && array_search('free_shipping', \GuzzleHttp\Psr7\parse_query(urldecode($_POST['items'])))) {
-        $order->remove_item(array_keys($order->get_shipping_methods())[0]);
-        $shipping = new WC_Order_Item_Shipping();
-        $shipping->set_name('Besplatna dostava');
-        $shipping->set_total(0);
-        $order->add_item($shipping);
-        $order->set_shipping_total(0);
-        $order->save();
-    }
-
-    if ($price > 0 && $order->get_shipping_method() !== 'Besplatna dostava') {
-        $shipping = new WC_Order_Item_Shipping();
-        $shipping->set_total($price);
-
-        if ($order->get_shipping_total() != 0) {
-            $order->remove_item(array_keys($order->get_shipping_methods())[0]);
-        }
-        $order->add_item($shipping);
-        $order->set_shipping_total($price);
-        $order->save();
-    }
-    if (isset($_POST['action']) && $_POST['action'] === 'woocommerce_remove_order_item') {
-        if (isset(array_keys($order->get_shipping_methods())[0])) {
-//            $order->remove_item(array_keys($order->get_shipping_methods())[0]);
-//            $order->save();
-//            echo 'removed shipping';
-        }
-    }
-}
 
 //------------------------------------------------------------
 //*********** REMOVED FUNCTIONS FROM functions.php ***********
@@ -179,17 +119,13 @@ function gf_get_order_payment_method_column($colname) {
 }
 
 add_action('woocommerce_admin_order_data_after_order_details', 'gf_admin_phone_order_field');
-function gf_admin_phone_order_field($order) {
-    $checked = true;
-    if ($order->get_meta('gf_order_created_method') === 'WWW') {
-        $checked = false;
+function gf_admin_phone_order_field(WC_Order $order) {
+    $type = 'Telefonska';
+    if ($order->get_created_via() === 'checkout') {
+        $type = 'WWW';
     }
-    woocommerce_form_field('gf_phone_order', array(
-        'type' => 'checkbox',
-        'class' => array('gf-admin-phone-order'),
-        'label' => __('Poručivanje telefonom'),
-        'required' => false,
-    ), $checked);
+    echo '<br />';
+    echo '<p class="form-field form-field-wide">Tip porudžbenice: ' . $type . '</p>';
 }
 
 add_action('save_post', 'redirect_page');
@@ -292,6 +228,7 @@ function gf_get_order_dates() {
 add_filter('query_vars', 'gf_order_date_register_query_vars');
 function gf_order_date_register_query_vars($qvars){
     $qvars[] = 'gf_order_date';
+    $qvars[] = 'gf_created_via';
     return $qvars;
 }
 
@@ -309,6 +246,14 @@ function gf_print_order_date_picker_admin_list(){
             endforeach;
         }
         $output .= "</select>";
+
+//        $selected = get_query_var('gf_created_via');
+//        $output .= "<select name='gf_created_via' class='postform'>";
+//        $output .= '<option>Phone / WWW</option>';
+//        $output .= '<option ' . selected($selected, 'phone', false) . ' value="phone">Phone</option>';
+//        $output .= '<option ' . selected($selected, 'www', false) . ' value="www">WWW</option>';
+//        $output .= "</select>";
+
         echo $output;
     }
 }
@@ -322,12 +267,12 @@ function gf_order_date_apply_filter($query){
         if (empty($meta_query))
             $meta_query = array();
 
-        $meta_query[] = array(
-            'key' => 'post_date',
-            'value' => $order_date_str,
-            'compare' => 'LIKE',
-            'type' => 'DATE'
-        );
+//        $meta_query[] = array(
+//            'key' => 'post_date',
+//            'value' => $order_date_str,
+//            'compare' => 'LIKE',
+//            'type' => 'DATE'
+//        );
 //        $query->set('meta_query',$meta_query);
         $query->set('day', $exploded_date[0]);
         $query->set('monthnum', $exploded_date[1]);
@@ -345,12 +290,34 @@ function register_gf_product_list_bulk_action($bulk_actions){
 }
 
 add_filter('handle_bulk_actions-edit-product', 'gf_product_list_bulk_action_handler', 10, 3);
-function gf_product_list_bulk_action_handler($redirect_to, $doaction, $post_ids){
+function gf_product_list_bulk_action_handler($redirect_to, $doaction, $post_ids)
+{
     if ($doaction !== 'remove_product_from_sliders') {
         return $redirect_to;
     }
     $category_slug = $_GET['product_cat'];
+    $specialPromoId = get_term_by('slug', 'specijalne-promocije','product_cat')->term_id;
+    $taxonomyParentId = wp_get_term_taxonomy_parent_id(get_term_by( 'slug', $category_slug, 'product_cat' ),
+        'product_cat');
+
+
+    /*Specijalne promocije is parent category for slider cats, so if filtered cat is aforementioned cat
+      get all child cats and remove them from product
+     **/
+    if ($category_slug === 'specijalne-promocije'){
+        $category = get_term_by( 'slug', $category_slug, 'product_cat' );
+        $childCats = get_terms(['parent' => $category->term_id, 'taxonomy' => 'product_cat' , 'number' => 50]);
+    }
     foreach ($post_ids as $post_id) {
+        if (count($childCats ) > 0) {
+            foreach ($childCats as $cat){
+                wp_remove_object_terms($post_id, $cat->term_id, 'product_cat');
+            }
+        }
+        //If parent cat is specijalne-promocije, also remove specijalne promocije cat from product
+        if( $taxonomyParentId === $specialPromoId){
+            wp_remove_object_terms($post_id, 'specijalne-promocije', 'product_cat');
+        }
         wp_remove_object_terms($post_id, $category_slug, 'product_cat');
     }
     $redirect_to = add_query_arg('bulk_remove_product_from_sliders', count($post_ids), $redirect_to);

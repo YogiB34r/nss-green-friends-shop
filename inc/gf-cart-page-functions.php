@@ -110,7 +110,7 @@ function bbloomer_unset_gateway_by_category($available_gateways)
 {
     global $woocommerce;
     $unset = false;
-    if ($woocommerce->cart->total > 20000) {
+    if (isset($woocommerce->cart->total) && $woocommerce->cart->total > 20000) {
         $unset = true;
     }
     if ($unset == true) unset($available_gateways['cod']);

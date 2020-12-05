@@ -8,7 +8,42 @@ add_action('woocommerce_before_single_product', 'gf_wc_breadcrumbs_single_produc
 remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_excerpt', 20);
 remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_meta', 40);
 
+add_filter('woocommerce_get_stock_html', 'my_wc_hide_in_stock_message', 10, 2);
+function my_wc_hide_in_stock_message($html, $product) {
+    if ($product->is_in_stock()) {
+        return '';
+    }
+
+    return $html;
+}
+
+add_action('woocommerce_single_product_summary', 'gf_add_vileda_view_pixel');
+function gf_add_vileda_view_pixel() {
+    global $product;
+    if ($product->get_meta('supplier') == 407) {
+        ?>
+        <!--
+            Start of Floodlight Tag: Please do not remove
+            Activity name of this tag: Vileda :: Product Page
+            URL of the webpage where the tag is expected to be placed:
+            This tag must be placed between the <body> and </body> tags, as close as possible to the opening tag.
+            Creation Date: 09/02/2020
+        -->
+        <script type="text/javascript">
+            var axel = Math.random() + "";
+            var a = axel * 10000000000000;
+            document.write('<img src="https://ad.doubleclick.net/ddm/activity/src=10317862;type=invmedia;cat=viled0;dc_lat=;dc_rdid=;tag_for_child_directed_treatment=;tfua=;npa=;gdpr=${GDPR};gdpr_consent=${GDPR_CONSENT_755};ord=' + a + '?" width="1" height="1" alt=""/>');
+        </script>
+        <noscript>
+            <img src="https://ad.doubleclick.net/ddm/activity/src=10317862;type=invmedia;cat=viled0;dc_lat=;dc_rdid=;tag_for_child_directed_treatment=;tfua=;npa=;gdpr=${GDPR};gdpr_consent=${GDPR_CONSENT_755};ord=1?" width="1" height="1" alt=""/>
+        </noscript>
+        <!-- End of Floodlight Tag: Please do not remove -->
+        <?php
+    }
+}
+
 add_action('woocommerce_single_product_summary', 'gf_get_single_product_meta', 9);
+add_action('woocommerce_single_product_summary', 'gf_display_tax_notice', 11);
 function gf_get_single_product_meta() {
     global $product;
     ?>
@@ -22,17 +57,6 @@ function gf_get_single_product_meta() {
     </div>
     <?php
 }
-
-add_filter('woocommerce_get_stock_html', 'my_wc_hide_in_stock_message', 10, 2);
-function my_wc_hide_in_stock_message($html, $product) {
-    if ($product->is_in_stock()) {
-        return '';
-    }
-
-    return $html;
-}
-
-add_action('woocommerce_single_product_summary', 'gf_display_tax_notice', 11);
 function gf_display_tax_notice() {
     echo '<p>' . __('Prikazana cena je sa uračunatim PDV-om.', 'green-fiends') . '</p>';
 }
@@ -83,10 +107,10 @@ function woo_new_product_tab_content()
     echo "
 	<h3 class='reset footerTitle2'>" . __('Naručivanje telefonom', 'green-fiends') . "</h3>
 	<p class='cartText3'>
-		Za <strong>naručivanje telefonom</strong>" . __('neophodno je da imate email adresu i da proizvod nije rasprodat:', 'green-fiends') . "
+		Za <strong>naručivanje telefonom</strong> " . __(' neophodno je da imate email adresu i da proizvod nije rasprodat:', 'green-fiends') . "
 	</p>
 	<ul class='cartText3'>
-		<li>" . __('Pozovete broj') . " <strong>011/7450-380</strong> (radnim danima od <strong>09-17h</strong>)</li>
+		<li>" . __('Pozovete broj') . " <strong>011/7450-380</strong> (radnim danima od <strong>08-17h</strong>)</li>
 		<li>" . __('Navedete operateru kataloške brojeve proizvoda koje naručujete kao i količinu svakog od njih') . " </li>
 		<li>" . __('Navedete operateru lične podatke i adresu isporuke') . "</li>
 		<li>" . __('Ukoliko kupujete kao pravno lice pripremite podatke firme:') . "<strong>naziv, adresu i PIB broj</strong></li>
@@ -201,7 +225,7 @@ add_action('woocommerce_after_add_to_cart_form', 'gf_add_ordering_phone_number')
 function gf_add_ordering_phone_number() {
     echo '<p class="phone_ordering_label">Naručite telefonom</p>';
     echo '<p class="phone_ordering_text"><a href="tel:+381117450380">011/7450-380</a></p>
-            <p class="phone_ordering_note">radnim danima od 8-15 subotom od 9-15</p>';
+            <p class="phone_ordering_note">radnim danima od 8-17 subotom od 10-16</p>';
 
 //    return
 }

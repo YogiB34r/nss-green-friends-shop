@@ -61,7 +61,7 @@ class Url
             $url = '/' . \Gf\Util\CategoryFunctions::buildTermPath($term);
         }
 
-        return $url;
+        return trailingslashit($url);
     }
 
     public static function rewriteRules($rules) {

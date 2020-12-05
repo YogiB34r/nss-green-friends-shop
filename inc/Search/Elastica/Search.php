@@ -129,11 +129,11 @@ class Search
      */
     private function setFilters(BoolQuery $boolQuery)
     {
-        if (isset($_GET{'min_price'})) {
+        if (isset($_GET['min_price'])) {
             $q = new \Elastica\Query\Range();
             $q->addField('order_data.price', [
-                'gte' => (int) $_GET{'min_price'},
-                'lte' => (int) $_GET{'max_price'}
+                'gte' => (int) $_GET['min_price'],
+                'lte' => (int) $_GET['max_price']
             ]);
             $boolQuery->addMust($q);
         }

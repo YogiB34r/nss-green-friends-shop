@@ -18,14 +18,14 @@ class OrderEmails
         $targetStatuses = [
 //            'naruceno' => 'Naručeno',
 //            'u-pripremi-placeno' => 'U pripremi (plaćeno)',
-            'spz-pakovanje' => 'Spremno za pakovanje',
-//            'poslato' => 'Poslato',
-            'isporuceno' => 'Isporučeno',
-            'finalizovano' => 'Finalizovano',
-            'reklamacija' => 'Reklamacija',
-//            'reklamacija-pnns' => 'Reklamacija - proizvod nema na stanju',
+//            'spz-pakovanje' => 'Spremno za pakovanje',
+            'poslato' => 'Poslato',
+//            'isporuceno' => 'Isporučeno',
+//            'finalizovano' => 'Finalizovano',
+//            'reklamacija' => 'Reklamacija',
+            'reklamacija-pnns' => 'Reklamacija - proizvod nema na stanju',
             'stornirano-pn' => 'Stornirano - proizvod nema na stanju',
-            'stornirano' => 'Stornirano',
+//            'stornirano' => 'Stornirano',
         ];
 
         if (in_array($new, array_keys($targetStatuses))) {

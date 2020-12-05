@@ -190,7 +190,9 @@ function backendProductSearch() {
     $results = $searchFunctions->getResults('', $_GET['query']);
     foreach ($results->getResults() as $result) {
         $product = wc_get_product($result->getData()['postId']);
-        $data = array_merge($data, appendItemForBackendSearch($product));
+        if ($product->is_purchasable()) {
+            $data = array_merge($data, appendItemForBackendSearch($product));
+        }
     }
 
     echo json_encode([

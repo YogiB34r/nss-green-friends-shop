@@ -1,22 +1,21 @@
 <?php
 
 // @TODO move this to class
-
 if (defined('WP_CLI') && WP_CLI) {
     ini_set('max_execution_time', 1200);
-//    ini_set('display_errors', 1);
-    error_reporting(E_ALL);
-
 
     // elastic operations
     \WP_CLI::add_command('createElasticIndex', 'createElasticIndex');
     \WP_CLI::add_command('syncElasticIndex', 'syncElasticIndex');
+    \WP_CLI::add_command('removeNonExistentProductsFromIndex', 'removeNonExistentProductsFromIndex');
 
     //debug
     \WP_CLI::add_command('passAllProducts', 'passAllProducts');
     \WP_CLI::add_command('passAllUsers', 'passAllUsers');
-
     \WP_CLI::add_command('createXmlExport', 'getItemExport');
+
+
+    \WP_CLI::add_command('createFromExcell', 'createFromExcell');
 
     //feed processing
     $factory = new \Nss\Feed\FeedFactory();
@@ -28,6 +27,8 @@ if (defined('WP_CLI') && WP_CLI) {
     \WP_CLI::add_command('daily', 'daily');
 
     \WP_CLI::add_command('createNalog', 'createNalog');
+
+    \WP_CLI::add_command('createJitexItemExport', 'createJitexItemExport');
 
     \WP_CLI::add_command('testCron', 'testCron');
 }
@@ -51,7 +52,7 @@ function parseFeed($args) {
 
 
 
-//add_action('testCron', 'testCron');
+add_action('testCron', 'testCron');
 function testCron() {
     $from = 'mailer@nonstopshop.rs';
     $headers = [
@@ -62,7 +63,9 @@ function testCron() {
     $subject = 'test cron operation';
     $message = 'cron started at : '  . date('d-m-Y H:i:s');
 
-    wp_mail($to, $subject, $message, $headers);
+    $send = wp_mail($to, $subject, $message, $headers);
+//    $send = mail($to, $subject, $message);
+    var_dump($send);
 }
 
 add_action('createNalog', 'createNalog');
@@ -110,20 +113,18 @@ function daily() {
 
 add_action('syncMis', 'mis');
 function mis() {
-
-//    $item = wc_get_product(385062);
+//    $item = wc_get_product(553396);  //
 //    new NSS_MIS_Item($item);
 //    die();
 
-//    $orderIds = [465270, 465314, 465287, 465272, 465264, 465280, 465222, 465273, 465263, 465277, 465238, 465292, 465613];
-//    $orderIds = [503723];
+//    $orderIds = [574521];
 //    foreach ($orderIds as $orderId) {
 //        $order = wc_get_order($orderId);
 //        new NSS_MIS_Order($order);
 //    }
 //    die();
 
-//    $order = wc_get_order(502738);
+//    $order = wc_get_order(570514);
 //    new NSS_MIS_Order($order);
 //    die();
 
@@ -131,22 +132,33 @@ function mis() {
 //    new NSS_MIS_User($user);
 //    die();
 
+//    $dtStart = \DateTime::createFromFormat('d/m/Y', '28/4/2020');
+//    $dtEnd = \DateTime::createFromFormat('d/m/Y', '12/5/2020');
+//    $dt = $dtStart->getTimestamp() .'...'. $dtEnd->getTimestamp();
+
     $arg = array(
         'orderby' => 'date',
-        'posts_per_page' => '500',
-        'page' => 1,
+        'posts_per_page' => '300',
+//        'posts_per_page' => -1,
+//        'date_created' => $dt,
+//        'page' => 10,
     );
     $orders = WC_get_orders($arg);
+//    var_dump(count($orders));
+//    die();
     foreach ($orders as $order) {
-        if (!in_array($order->get_status(), ['stornirano', 'cancelled', 'refunded', 'processing'])) {
+        $ignoreStatuses = [
+            'stornirano', 'cancelled', 'refunded', 'processing', 'reklamacija-pnns', 'pending', 'on-hold', 'failed'
+        ];
+        if (!in_array($order->get_status(), $ignoreStatuses)) {
             if (get_class($order) === WC_Order::class) {
-
                 if ($order->get_meta('synced') !== '') {
 //                    var_dump($order->get_status());
                 } else {
-                    echo $order->get_id();
                     $misOrder = new NSS_MIS_Order($order);
-                    var_dump($order->get_meta('synced'));
+                    $order->add_order_note('Synced to MIS at: ' . date('d/m/Y H:i'));
+//                    echo $order->get_id();
+//                    var_dump($order->get_meta('synced'));
                 }
             } else if (get_class($order) === WC_Order_Refund::class) {
                 continue;
@@ -157,6 +169,7 @@ function mis() {
             }
         }
     }
+    echo 'total passed ' . count($orders);
 }
 
 add_action('createJitexItemExport', 'createJitexItemExport');
@@ -174,30 +187,35 @@ function createJitexItemExport()
 
         /* @var $product WC_Product_Simple|WC_Product_Variable */
         foreach ($products as $product) {
-            if ($product->get_meta('pdv') >= 10) {
-                $taxcalc = (int)('1' . $product->get_meta('pdv'));
-            } else {
-                $taxcalc = (int)('10' . (int)$product->get_meta('pdv'));
-            }
+            try {
+                if ($product->get_meta('pdv') >= 10) {
+                    $taxcalc = (int)('1' . $product->get_meta('pdv'));
+                } else {
+                    $taxcalc = (int)('10' . (int)$product->get_meta('pdv'));
+                }
 
-            $csv .= @iconv('utf-8', 'windows-1250', $product->get_sku() . "\t" . trim(mb_strtoupper($product->get_name(), 'UTF-8')) . "\t" .
-                    str_replace('.', ',', $product->get_meta('pdv')) . "\t" . str_replace('.', ',', round($product->get_price() * 100 / (double)$taxcalc, 2)) . "\t" .
-                    str_replace('.', ',', round($product->get_price(), 2))) . "\r\n";
+                $csv .= iconv('utf-8', 'windows-1250//IGNORE', $product->get_sku() . "\t" . trim(mb_strtoupper($product->get_name(), 'UTF-8')) . "\t" .
+                        str_replace('.', ',', $product->get_meta('pdv')) . "\t" . str_replace('.', ',', round($product->get_price() * 100 / (double)$taxcalc, 2)) . "\t" .
+                        str_replace('.', ',', round($product->get_price(), 2))) . "\r\n";
 
-            if (get_class($product) === WC_Product_Variable::class) {
-                $passedIds = [];
-                foreach ($product->get_available_variations() as $variations) {
-                    foreach ($variations['attributes'] as $variation) {
-                        $itemIdSize = $product->get_sku() . $variation;
-                        if (!in_array($itemIdSize, $passedIds)) {
-                            $passedIds[] = $itemIdSize;
-                            $csv .= iconv('utf-8', 'windows-1250', $itemIdSize . "\t" .
-                                    trim(mb_strtoupper($product->get_name() . ' ' . $variation, 'UTF-8')) . "\t" .
-                                    str_replace('.', ',', $product->get_meta('pdv')) . "\t" . str_replace('.', ',', round($product->get_price() * 100 / (double)$taxcalc, 2)) . "\t" .
-                                    str_replace('.', ',', round($product->get_price(), 2))) . "\r\n";
+                if (get_class($product) === WC_Product_Variable::class) {
+                    $passedIds = [];
+                    foreach ($product->get_available_variations() as $variations) {
+                        foreach ($variations['attributes'] as $variation) {
+                            $itemIdSize = $product->get_sku() . $variation;
+                            if (!in_array($itemIdSize, $passedIds)) {
+                                $passedIds[] = $itemIdSize;
+                                $csv .= iconv('utf-8', 'windows-1250//IGNORE', $itemIdSize . "\t" .
+                                        trim(mb_strtoupper($product->get_name() . ' ' . $variation, 'UTF-8')) . "\t" .
+                                        str_replace('.', ',', $product->get_meta('pdv')) . "\t" . str_replace('.', ',', round($product->get_price() * 100 / (double)$taxcalc, 2)) . "\t" .
+                                        str_replace('.', ',', round($product->get_price(), 2))) . "\r\n";
+                            }
                         }
                     }
                 }
+            } catch (\Exception $e) {
+                var_dump($e->getMessage());
+                continue;
             }
         }
     }
@@ -324,6 +342,15 @@ AND u.user_email <> '' AND user_email NOT LIKE '%telefonska%' LIMIT 30000";
     file_put_contents('csv', $csv);
 }
 
+function createFromExcell($args) {
+    $cli = new \GF\Cli();
+
+//    $cli->saleItems($args);
+    $cli->createFromExcell();
+
+//    $cli->migrateSaleItems($args);
+}
+
 function passAllProducts($args) {
     $cli = new \GF\Cli();
 
@@ -333,6 +360,10 @@ function passAllProducts($args) {
 //    $cli->migrateSaleItems($args);
 }
 
+function removeNonExistentProductsFromIndex() {
+    $cli = new \GF\Cli();
+    $cli->removeNonExistentProducts();
+}
 
 function createElasticIndex() {
     $elasticaClient = new \GF\Search\Factory\ElasticClientFactory();

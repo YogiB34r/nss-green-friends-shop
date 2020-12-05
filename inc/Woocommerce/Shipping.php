@@ -4,6 +4,8 @@
 namespace GF\Woocommerce;
 
 
+use Composer\Package\Loader\ValidatingArrayLoader;
+
 class Shipping
 {
 
@@ -90,29 +92,29 @@ class Shipping
         } else {
             $title = 'Dostava: ' . $title;
         }
-        $case = '';
-        if (count($order->get_shipping_methods()) > 0){
-            $activeShippingMethod = array_values($order->get_shipping_methods())[0];
+
+        $activeShippingMethod = array_values($order->get_shipping_methods())[0];
+        if (isset($activeShippingMethod)) {
             $activeMethodName = $activeShippingMethod->get_method_id();
-
-            if ($activeMethodName === 'free_shipping') {
-                $case = 1;
-            } else {
-                $case = 0;
-            }
         }
 
-        if (isset($_POST['action'])){
-            if (($_POST['action'] === 'woocommerce_save_order_items')
-                && array_search('flat_rate', \GuzzleHttp\Psr7\parse_query(urldecode($_POST['items'])))) {
-                $case = 0;
-            }
-
-            if (($_POST['action'] === 'woocommerce_save_order_items')
-                && array_search('free_shipping', \GuzzleHttp\Psr7\parse_query(urldecode($_POST['items'])))) {
-                $case = 1;
-            }
+        if ($activeMethodName === 'free_shipping') {
+            $case = 1;
+        } else {
+            $case = 0;
         }
+
+
+        if (($_POST['action'] === 'woocommerce_save_order_items')
+            && array_search('flat_rate', \GuzzleHttp\Psr7\parse_query(urldecode($_POST['items'])))) {
+            $case = 0;
+        }
+
+        if (($_POST['action'] === 'woocommerce_save_order_items')
+            && array_search('free_shipping', \GuzzleHttp\Psr7\parse_query(urldecode($_POST['items'])))) {
+            $case = 1;
+        }
+
 
         if (isset($_POST['items'])) {
             switch ($case) {
@@ -173,13 +175,13 @@ class Shipping
      * Unset rates based on cart weight
      * @param $rates
      * @param $cartWeight
-     * @return mixed
+     * @return \WC_Shipping_Rate[]
      */
     private
     function getWeightBasedShippingRate($rates, $cartWeight)
     {
         if ($cartWeight <= 0.5) {
-            if (isset($rates['flat_rate:3'])) {
+            if (isset($rates['flat_rate:3']))
                 unset(
                     $rates['flat_rate:4'],
                     $rates['flat_rate:5'],
@@ -188,9 +190,8 @@ class Shipping
                     $rates['flat_rate:8'],
                     $rates['flat_rate:9'],
                     $rates['flat_rate:10']);
-            }
         } elseif ($cartWeight > 0.5 and $cartWeight <= 2) {
-            if (isset($rates['flat_rate:4'])) {
+            if (isset($rates['flat_rate:4']))
                 unset(
                     $rates['flat_rate:3'],
                     $rates['flat_rate:5'],
@@ -199,9 +200,8 @@ class Shipping
                     $rates['flat_rate:8'],
                     $rates['flat_rate:9'],
                     $rates['flat_rate:10']);
-            }
         } elseif ($cartWeight > 2 and $cartWeight <= 5) {
-            if (isset($rates['flat_rate:5'])) {
+            if (isset($rates['flat_rate:5']))
                 unset(
                     $rates['flat_rate:3'],
                     $rates['flat_rate:4'],
@@ -210,9 +210,8 @@ class Shipping
                     $rates['flat_rate:8'],
                     $rates['flat_rate:9'],
                     $rates['flat_rate:10']);
-            }
         } elseif ($cartWeight > 5 and $cartWeight <= 10) {
-            if (isset($rates['flat_rate:6'])) {
+            if (isset($rates['flat_rate:6']))
                 unset(
                     $rates['flat_rate:3'],
                     $rates['flat_rate:4'],
@@ -221,9 +220,8 @@ class Shipping
                     $rates['flat_rate:8'],
                     $rates['flat_rate:9'],
                     $rates['flat_rate:10']);
-            }
         } elseif ($cartWeight > 10 and $cartWeight <= 20) {
-            if (isset($rates['flat_rate:7'])) {
+            if (isset($rates['flat_rate:7']))
                 unset(
                     $rates['flat_rate:3'],
                     $rates['flat_rate:4'],
@@ -232,9 +230,8 @@ class Shipping
                     $rates['flat_rate:8'],
                     $rates['flat_rate:9'],
                     $rates['flat_rate:10']);
-            }
         } elseif ($cartWeight > 20 and $cartWeight <= 30) {
-            if (isset($rates['flat_rate:8'])) {
+            if (isset($rates['flat_rate:8']))
                 unset(
                     $rates['flat_rate:3'],
                     $rates['flat_rate:4'],
@@ -243,9 +240,8 @@ class Shipping
                     $rates['flat_rate:7'],
                     $rates['flat_rate:9'],
                     $rates['flat_rate:10']);
-            }
         } elseif ($cartWeight > 30 and $cartWeight <= 50) {
-            if (isset($rates['flat_rate:9'])) {
+            if (isset($rates['flat_rate:9']))
                 unset(
                     $rates['flat_rate:3'],
                     $rates['flat_rate:4'],
@@ -254,18 +250,20 @@ class Shipping
                     $rates['flat_rate:7'],
                     $rates['flat_rate:8'],
                     $rates['flat_rate:10']);
-            }
         } elseif ($cartWeight > 50) {
             if (isset($rates['flat_rate:10'])) {
                 $myExtraWeight = $cartWeight - 50;
 
-                if ($rates['flat_rate:10'] instanceof \WC_Shipping_Flat_Rate){
+                if (isset($rates['flat_rate:10']->instance_settings['cost'])) {
                     $flatRate10Cost = $rates['flat_rate:10']->instance_settings['cost'];
-                    $myNewPrice = $flatRate10Cost + (10 * $myExtraWeight);
+                } else {
+                    $flatRate10Cost = $rates['flat_rate:10']->get_cost();
+                }
+
+                $myNewPrice = $flatRate10Cost + (10 * $myExtraWeight);
+                if (isset($rates['flat_rate:10']->instance_settings['cost'])) {
                     $rates['flat_rate:10']->instance_settings['cost'] = $myNewPrice;
-                } elseif ($rates['flat_rate:10'] instanceof \WC_Shipping_Rate) {
-                    $flatRate10Cost = (int)$rates['flat_rate:10']->get_cost();
-                    $myNewPrice = $flatRate10Cost + (10 * $myExtraWeight);
+                } else {
                     $rates['flat_rate:10']->set_cost($myNewPrice);
                 }
 

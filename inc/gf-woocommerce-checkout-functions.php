@@ -115,7 +115,7 @@ function custom_field_display_cust_order_meta($order) {
 
 add_filter('woocommerce_order_formatted_billing_address', 'woo_custom_order_formatted_billing_address', 10, 2);
 function woo_custom_order_formatted_billing_address($address, $order) {
-    $address = array(
+    return array(
         'first_name' => $order->get_billing_first_name(),
         'last_name' => $order->get_billing_last_name(),
         'address_1' => $order->get_billing_address_1(),
@@ -124,8 +124,6 @@ function woo_custom_order_formatted_billing_address($address, $order) {
         'postcode' => $order->get_billing_postcode(),
         'priority' => 50
     );
-
-    return $address;
 }
 
 add_action('woocommerce_review_order_before_submit', 'gf_add_newsletter_checkbox_on_checkout');
@@ -140,9 +138,6 @@ function gf_add_newsletter_checkbox_on_checkout($checkout) {
 }
 
 add_action('woocommerce_checkout_update_order_meta', 'my_custom_checkout_field_update_order_meta');
-
-
-
 function my_custom_checkout_field_update_order_meta($order_id) {
     if (isset($_POST['gf_newsletter_checkout']) && $_POST['gf_newsletter_checkout']) update_post_meta($order_id, 'gf_newsletter_checkout', esc_attr($_POST['gf_newsletter_checkout']));
 }
@@ -168,6 +163,34 @@ function gf_newsletter_on_checkout_page($orderid) {
         }
         $order->save();
     }
+
+    $viledaItem = false;
+    /* @var WC_Order_Item_Product $item */
+    foreach ($order->get_items() as $item) {
+        if (in_array($item->get_product()->get_id(), [395290, 432648])) {
+            $viledaItem = true;
+        }
+    }
+    if ($viledaItem) {
+        ?>
+        <!--
+        Start of Floodlight Tag: Please do not remove
+        Activity name of this tag: Vileda :: Thank You
+        URL of the webpage where the tag is expected to be placed:
+        This tag must be placed between the <body> and </body> tags, as close as possible to the opening tag.
+        Creation Date: 09/02/2020
+        -->
+        <script type="text/javascript">
+            var axel = Math.random() + "";
+            var a = axel * 10000000000000;
+            document.write('<img src="https://ad.doubleclick.net/ddm/activity/src=10317862;type=invmedia;cat=viled00;dc_lat=;dc_rdid=;tag_for_child_directed_treatment=;tfua=;npa=;gdpr=${GDPR};gdpr_consent=${GDPR_CONSENT_755};ord=' + a + '?" width="1" height="1" alt=""/>');
+        </script>
+        <noscript>
+            <img src="https://ad.doubleclick.net/ddm/activity/src=10317862;type=invmedia;cat=viled00;dc_lat=;dc_rdid=;tag_for_child_directed_treatment=;tfua=;npa=;gdpr=${GDPR};gdpr_consent=${GDPR_CONSENT_755};ord=1?" width="1" height="1" alt=""/>
+        </noscript>
+        <!-- End of Floodlight Tag: Please do not remove -->
+        <?php
+    }
 }
 
 add_action('woocommerce_before_checkout_shipping_form', 'gf_checkout_shipping_notice');
@@ -182,7 +205,8 @@ function gf_unrequire_wc_state_field($fields) {
     return $fields;
 }
 
-add_action('save_post_shop_order', 'gf_order_created', 666, 3);
+// removed 29.6.2020. should not be needed anymore
+//add_action('save_post_shop_order', 'gf_order_created', 666, 3);
 function gf_order_created($post_id, $post, $update)
 {
     $order = new WC_Order($post_id);
@@ -204,17 +228,17 @@ function gf_order_created($post_id, $post, $update)
     }
 }
 
-add_action('woocommerce_review_order_before_submit', 'gf_add_www_field_on_checkout');
-function gf_add_www_field_on_checkout($checkout) {
-    woocommerce_form_field('gf_www_orders', array(
-        'type' => 'hidden',
-    ), true);
-}
-
-add_action('woocommerce_checkout_update_order_meta', 'gf_custom_checkout_field_update_order_meta_created_method');
-function gf_custom_checkout_field_update_order_meta_created_method($order_id) {
-    if (isset($_POST['gf_www_orders']) && $_POST['gf_www_orders']) update_post_meta($order_id, 'gf_order_created_method', 'WWW');
-}
+//add_action('woocommerce_review_order_before_submit', 'gf_add_www_field_on_checkout');
+//function gf_add_www_field_on_checkout($checkout) {
+//    woocommerce_form_field('gf_www_orders', array(
+//        'type' => 'hidden',
+//    ), true);
+//}
+//
+//add_action('woocommerce_checkout_update_order_meta', 'gf_custom_checkout_field_update_order_meta_created_method');
+//function gf_custom_checkout_field_update_order_meta_created_method($order_id) {
+//    if (isset($_POST['gf_www_orders']) && $_POST['gf_www_orders']) update_post_meta($order_id, 'gf_order_created_method', 'WWW');
+//}
 
 add_filter( 'woocommerce_checkout_fields', 'gf_change_city_field_to_dropdown' );
 /**

@@ -95,10 +95,11 @@ class Search_List_Table extends WP_List_Table
 
         /** Process bulk action */
         $this->process_bulk_action();
+        $keywords = 'knjiga';
+        $perPage = 10;
 
-        $data = $this->parseData();
+        $data = $this->parseData($keywords, $perPage);
         usort($data, array(&$this, 'sort_data'));
-        $perPage = 30;
         $currentPage = $this->get_pagenum();
 
         $this->set_pagination_args(array(
@@ -115,29 +116,37 @@ class Search_List_Table extends WP_List_Table
      *
      * @return array
      */
-    private function parseData()
+    private function parseData($keywords, $perPage)
     {
         $data = [];
+
+
+//        $this->indexer->removeNonExistentProducts();
+
+
+
         /* @var \Elastica\Result $term */
-        foreach ($this->indexer->getResults() as $term) {
-//            $url = '<input type="text" style="display:none;" />';
-//            if ($term->getData()['url'] !== '') {
-//                $url = '<input readonly size="55" class="redirected" type="text" value="' . $term->getData()['url'] . '" />';
-//            }
-//            $url .= '<button style="display: none" data-query="'. $term->getData()['searchQuery'] .'" class="redirect">
-//                    Snimi
-//                </button>';
-            $data[] = array(
-                'id' => $term->getData()['postId'],
-                'name' => $term->getData()['name'],
-                'sku' => $term->getData()['sku'],
-                'regularPrice' => $term->getData()['regularPrice'],
-                'salePrice' => $term->getData()['salePrice'],
-                'sorting' => $term->getData()['order_data'],
-//                'url' => $url,
-                'action' => '<a href="#" class="showRedirect">#</a>'
-            );
-        }
+//        foreach ($this->indexer->getResultsTest($keywords, $perPage) as $term) {
+////            $url = '<input type="text" style="display:none;" />';
+////            if ($term->getData()['url'] !== '') {
+////                $url = '<input readonly size="55" class="redirected" type="text" value="' . $term->getData()['url'] . '" />';
+////            }
+////            $url .= '<button style="display: none" data-query="'. $term->getData()['searchQuery'] .'" class="redirect">
+////                    Snimi
+////                </button>';
+//            $data[] = array(
+//                'id' => $term->getData()['postId'],
+//                'name' => $term->getData()['name'],
+//                'sku' => $term->getData()['sku'],
+//                'status' => $term->getData()['status'],
+//                'stockStatus' => $term->getData()['stockStatus'],
+//                'regularPrice' => $term->getData()['regularPrice'],
+//                'salePrice' => $term->getData()['salePrice'],
+//                'sorting' => $term->getData()['order_data'],
+////                'url' => $url,
+//                'action' => '<a href="#" class="showRedirect">#</a>'
+//            );
+//        }
 
         return $data;
     }
@@ -153,6 +162,8 @@ class Search_List_Table extends WP_List_Table
             'cb' => '<input type="checkbox" />',
             'name' => 'naziv',
             'sku' => 'sku',
+            'status' => 'status',
+            'stockStatus' => 'stockStatus',
             'regularPrice' => 'regularPrice',
             'salePrice' => 'salePrice',
             'sorting' => 'sorting',
@@ -206,6 +217,8 @@ class Search_List_Table extends WP_List_Table
             case 'id':
             case 'sku':
             case 'name':
+            case 'status':
+            case 'stockStatus':
             case 'regularPrice':
             case 'salePrice':
             case 'action':

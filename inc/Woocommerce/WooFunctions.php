@@ -2,8 +2,6 @@
 
 namespace GF\Woocommerce;
 
-use mysql_xdevapi\Exception;
-
 class WooFunctions
 {
     public function __construct()
@@ -274,70 +272,83 @@ class WooFunctions
         update_post_meta($id, 'soloInCart', $_POST['soloInCart']);
     }
 
+    /**
+     * @param $sku
+     *
+     * Fetch product by sku from database and return its id
+     *
+     * @return string|null
+     */
+    public function fetchProductBySku($sku)
+    {
+        global $wpdb;
+        return $wpdb->get_var($wpdb->prepare("SELECT post_id FROM $wpdb->postmeta WHERE 
+                meta_key='_sku' AND meta_value='%s'", $sku));
+    }
 
-    public
-    function validateSku($id, $post)
+    /**
+     * @hook save_post
+     * When post is being created || updated prevent same sku for being saved in database
+     * @param $id
+     * @param $post
+     */
+    public function validateSku($id, $post)
     {
         if (isset($_POST['_sku'])) {
             if ($_POST['_sku'] === "") {
-                $this->autoGenerateSku();
+                $this->preventDuplicateSku($_POST['post_ID']);
             } else {
-                $productDb = wc_get_product_id_by_sku($_POST['_sku']);
-                if ($productDb === $_POST['post_ID']) {
+                if ($this->fetchProductBySku($_POST['_sku']) === $_POST['post_ID']) {
                     $product = wc_get_product($_POST['post_ID']);
-                    $skuOld = wc_get_product($productDb)->get_sku();
-                    $skuNew = $product->get_sku();
+                    $skuOld = $product->get_sku();
+                    $skuNew = $_POST['_sku'];
                     if ($skuOld === $skuNew) {
                         return;
-                    } else {
-                        $this->preventDuplicateSku();
                     }
                 }
+                $this->preventDuplicateSku($_POST['post_ID'], $_POST['_sku']);
             }
         }
     }
 
-    private
-    function autoGenerateSku()
+    /**
+     *
+     * If post is being created and user didn't enter sku post sku is equal its ID.
+     * If post with same sku as post being created || updated is found
+     * concatenate 0, and if still same sku exists increment whole entered number by 1 until no duplicate sku is found
+     *
+     * @param $sku
+     * @param $postId
+     */
+    private function preventDuplicateSku($postId, $sku = null)
     {
-        $exit = false;
+        if ($sku === null) {
+            $sku = $postId;
+        }
+        //cat string to integer so we can add 1 to number each time we hit product with same sku
+        $sku = (int)$sku;
+        $edit = false;
         $i = 0;
-        while ($exit === false) {
-            if ($i > 0) {
-                $counter = $i;
-            } else {
-                $counter = '';
+        $exit = false;
+        while (!$exit) {
+            if ($i === 0) {
+                if (!$this->fetchProductBySku($sku)) {
+                    $exit = true;
+                }
             }
-
-            if (strlen(wc_get_product_id_by_sku($_POST['post_ID'] . $counter) === 0)) {
-                $_POST['_sku'] = $_POST['post_ID'];
+            if (!$this->fetchProductBySku($sku) . $i) {
                 $exit = true;
             } else {
-                $_POST['_sku'] = $_POST['post_ID'] . $i;
-                $i++;
+                //After adding first 0 to sku later on we just increment whole number by 1
+                if ($edit) {
+                    $sku++;
+                    continue;
+                }
+                $sku .= $i++;
+                $edit = true;
             }
         }
-    }
-
-    private
-    function preventDuplicateSku()
-    {
-        $exit = false;
-        $i = 0;
-        while ($exit === false) {
-            if ($i > 0) {
-                $counter = $i;
-            } else {
-                $counter = '';
-            }
-
-            if (strlen(wc_get_product_id_by_sku($_POST['_sku'] . $counter) === 0)) {
-                $exit = true;
-            } else {
-                $_POST['_sku'] = $_POST['_sku'] . $i;
-                $i++;
-            }
-        }
+        return update_post_meta($postId, '_sku', $sku);
     }
 
 }

@@ -50,12 +50,12 @@ if (count($second_lvl_cats) != 0) {
 
         if ($i <= count($second_lvl_cat_ids)) {
             echo '<div class="col-sm-6 col-xs-6 col-md-3 gf-expander-module-first-line">';
-            echo '<h2><a class="gf-expander-first-line-parent" href="' . get_term_link($second_lvl_cat) . '">' . $second_lvl_cat->name . '</a></h2>';
+            echo '<h2><a class="gf-expander-first-line-parent" href="' . user_trailingslashit(get_term_link($second_lvl_cat)) . '">' . $second_lvl_cat->name . '</a></h2>';
             echo '<ul class="gf-expander__subcategory-list">';
             foreach ($third_lvl_cats as $third_lvl_cat) {
                 if ($third_lvl_cat->parent == $second_lvl_cat->term_id):
                     echo '<li>
-                            <h2><a class="gf-category-expander__col__subcategory gf-module-first-href" href="' . get_term_link($third_lvl_cat) . '">' . $third_lvl_cat->name . '</a></h2>
+                            <h2><a class="gf-category-expander__col__subcategory gf-module-first-href" href="' . user_trailingslashit(get_term_link($third_lvl_cat)) . '">' . $third_lvl_cat->name . '</a></h2>
                            </li>';
                 endif;
             }
@@ -65,12 +65,12 @@ if (count($second_lvl_cats) != 0) {
             continue;
         }
         echo '<div class="col-sm-6 col-xs-6 col-md-3 gf-category-expander__col">';
-        echo '<h2><a class="gf-category-expander__col__category" href="' . get_term_link($second_lvl_cat) . '">' . $second_lvl_cat->name . '</a></h2>';
+        echo '<h2><a class="gf-category-expander__col__category" href="' . user_trailingslashit(get_term_link($second_lvl_cat)) . '">' . $second_lvl_cat->name . '</a></h2>';
         echo '<ul class="gf-expander__subcategory-list">';
         foreach ($third_lvl_cats as $third_lvl_cat) {
             if ($third_lvl_cat->parent == $second_lvl_cat->term_id):
             echo '<li>
-                     <h2><a class="gf-category-expander__col__subcategory" href="' . get_term_link($third_lvl_cat) . '">' . $third_lvl_cat->name . '</a></h2>
+                     <h2><a class="gf-category-expander__col__subcategory" href="' . user_trailingslashit(get_term_link($third_lvl_cat)) . '">' . $third_lvl_cat->name . '</a></h2>
                   </li>';
             endif;
         }

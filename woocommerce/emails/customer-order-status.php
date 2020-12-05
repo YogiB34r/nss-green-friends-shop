@@ -27,7 +27,9 @@ do_action('woocommerce_email_header', $email_heading, $email); ?>
 
 <p><?php echo $msg; ?></p>
 
+<?php if (isset($customer_note)) : ?>
 <blockquote><?php echo wpautop( wptexturize( $customer_note ) ) ?></blockquote>
+<?php endif;?>
 
 <?php
 

@@ -285,14 +285,24 @@ class Functions
         foreach ($products->getResults() as $productData) {
             $productId = $productData->postId;
             $product = new \Nss\Feed\Product($productData->getData());
-            $saved_price = $product->getRegularPrice() - $product->getSalePrice();
             $price = $product->getRegularPrice();
-            if ($product->getSalePrice() > 0) {
-                $price = $product->getSalePrice();
-            }
             $saved_percentage = 0;
-            if ($saved_price > 0 && $product->getSalePrice() > 0) {
-                $saved_percentage = number_format($saved_price * 100 / $product->getRegularPrice(), 2);
+            $showSalePrice = false;
+            $dtNow = date('now');
+            if ($productData->getData()['salePriceStart'] !== '' && $dtNow > $productData->getData()['salePriceStart'] && $dtNow < $productData->getData()['salePriceEnd']) {
+                $showSalePrice = true;
+            } elseif ($product->getSalePrice() > 0) {
+                $showSalePrice = true;
+            }
+
+            if ($showSalePrice) {
+                $saved_price = $product->getRegularPrice() - $product->getSalePrice();
+                if ($product->getSalePrice() > 0) {
+                    $price = $product->getSalePrice();
+                }
+                if ($saved_price > 0 && $product->getSalePrice() > 0) {
+                    $saved_percentage = number_format($saved_price * 100 / $product->getRegularPrice(), 2);
+                }
             }
 
             $classes = '';

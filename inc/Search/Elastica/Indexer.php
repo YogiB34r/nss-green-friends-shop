@@ -36,7 +36,7 @@ class Indexer
     {
         global $wpdb;
 
-        $perPage = 500;
+        $perPage = 700;
         $totalItems = 0;
 
         for ($i = 0; $i < 60; $i++) {
@@ -140,15 +140,9 @@ LIMIT {$offset}, {$perPage};";
         if ($product->get_price() !== 0 && $product->get_price() !== $regularPrice) {
             $salePrice = $price = $product->get_price();
         }
-        if ((int) $price === 0) {
-//            $product->set_status('draft');
-//            $product->save();
-        }
-
 
         // @TODO solve better. when no sku detected, use post id.
         if ($product->get_sku() == "") {
-//            $product->set_sku(md5($product->get_id() . $product->get_name()));
             $product->set_sku('0' . $product->get_id());
         }
 
@@ -161,15 +155,15 @@ LIMIT {$offset}, {$perPage};";
         $sql = "SELECT * FROM wp_gf_products WHERE postId = {$product->get_id()}";
         $viewCount = 0;
         if (!isset($wpdb->get_results($sql)[0])) {
+            // @TODO gf product meta..
             $data = sprintf('%s: %s', date('Y:m:d H:i:s'), 'could not find gf product for ' . $product->get_id());
             $filePath = LOG_PATH . 'debug-cli.log';
-            file_put_contents($filePath, $data . PHP_EOL, FILE_APPEND);
+//            file_put_contents($filePath, $data . PHP_EOL, FILE_APPEND);
         } else {
             $gfProduct = $wpdb->get_results($sql)[0];
             $viewCount = $gfProduct->viewCount;
         }
         $rating = $product->get_meta('rating');
-
         $ordering = $this->calculateOrderingRating($product);
 
         $data = [
@@ -187,6 +181,8 @@ LIMIT {$offset}, {$perPage};";
             'shortDescription' => $product->get_short_description(),
             'regularPrice' => $regularPrice,
             'salePrice' => $salePrice,
+            'salePriceStart' => get_post_meta($product->get_id(), '_sale_price_dates_from', true),
+            'salePriceEnd' => get_post_meta($product->get_id(), '_sale_price_dates_to', true),
             'inputPrice' => $product->get_meta('input_price'),
             'stockStatus' => (int) $product->is_in_stock(),
             'status' => (int) ($product->get_status() === 'publish'),
