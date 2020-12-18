@@ -1,0 +1,21 @@
+/*
+Theme Name: nss-green-friends-shop
+Author: Green Friends
+Author URI: http://greenfriends.systems
+Version: 1.0.2
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: nss
+*/
+
+// Base
+@import "scss/mixins";
+@import "scss/base";
+
+// Parts
+@import "templates/header/scss/header";
+@import "templates/footer/scss/footer";
+
+// Responsive
+@import "templates/header/scss/headerMobile";
+@import "templates/footer/scss/footerMobile";

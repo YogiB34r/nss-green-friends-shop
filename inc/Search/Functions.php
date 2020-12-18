@@ -24,7 +24,7 @@ class Functions
     {
         $key = 'post-view-count#' . $postId;
         $cache = new \GF_Cache();
-        $count = (int) $cache->redis->get($key);
+        $count = (int)$cache->redis->get($key);
         if ($count == 10) {
             $this->wpdb->query("UPDATE wp_gf_products SET viewCount = viewCount + {$count} WHERE postId = {$postId}");
             $cache->redis->set($key, 0);
@@ -37,17 +37,22 @@ class Functions
 
     public function getResults($queryVar, $query)
     {
+
         if ($queryVar !== '') {
+
             if ($this->useElastic) {
                 $sortedProducts = $this->getCategoryItemsFromElastic();
             } else {
+
                 $search = new \GF\Search\Search(new \GF\Search\Adapter\MySql($this->wpdb));
                 $allIds = $search->getItemIdsForCategory(get_query_var('term'));
 
                 $sortedProducts = $this->parsePostIdsForList($allIds);
+
             }
         } else {
             // @TODO
+
             if (!isset($query)) {
                 header('Location: ' . home_url());
             }
@@ -188,7 +193,8 @@ class Functions
         return $resultSet;
     }
 
-    public function applySearchPageTitle($title) {
+    public function applySearchPageTitle($title)
+    {
         $page_title = sprintf('Rezultati pretrage za: &ldquo;%s&rdquo;', wc_get_loop_prop('query'));
 
 //        if (wc_get_loop_prop('current_page')) {
@@ -204,7 +210,8 @@ class Functions
      * @param \Elastica\ResultSet $resultSet
      * @return void
      */
-    public function parseCategoryAggregation(\Elastica\ResultSet $resultSet) {
+    public function parseCategoryAggregation(\Elastica\ResultSet $resultSet)
+    {
         $counts = [];
         foreach ($resultSet->getAggregation('category')['buckets'] as $bucket) {
             $counts[$bucket['key']] = $bucket['doc_count'];
@@ -216,7 +223,7 @@ class Functions
         }
 
         $args = array(
-            'taxonomy'     => 'product_cat',
+            'taxonomy' => 'product_cat',
             'include' => array_keys($counts),
             'orderby' => 'include',
             'posts_per_page' => 50,  // ?
@@ -340,7 +347,7 @@ class Functions
             $html .= '<a href="' . $product->dto['permalink'] . '" title="' . $product->getName() . '">';
 //            $html .= '<h3>' . $product->dto['stockStatus'] .' # '. $product->getName() . '</h3>';
 //            $html .= '<h3>' . $productData->getScore() .' # '. $product->getName() . '</h3>';
-            $html .= '<h3>'. $product->getName() .'</h3>';
+            $html .= '<h3>' . $product->getName() . '</h3>';
             $html .= '</a>';
             $html .= '<span class="price">';
             if ($saved_percentage > 0) {

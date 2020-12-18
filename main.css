@@ -1,0 +1,321 @@
+/*
+Theme Name: nss-green-friends-shop
+Author: Green Friends
+Author URI: http://greenfriends.systems
+Version: 1.0.2
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: nss
+*/
+li {
+    list-style: none;
+}
+
+@media only screen and (max-width: 768px) {
+    header .fas {
+        font-size: 18px;
+    }
+}
+
+/*Header start*/
+.nssHeader {
+    position: relative;
+    min-width: 100%;
+    z-index: 2000;
+    background: #fff;
+    box-shadow: 0 0 7px rgba(0, 0, 0, 0.8);
+    overflow: visible;
+}
+
+.nssHeader .nssTopBar {
+    background-color: #1d1d1d;
+    color: white;
+    padding: 14px 0;
+    min-width: 100%;
+}
+
+.nssHeader .nssTopBar a {
+    color: #f45411;
+}
+
+.nssHeader .nssTopBar .nssTopBarMenu {
+    display: flex;
+    justify-content: space-around;
+    padding: 0 0 0 25px;
+    margin-left: 25%;
+}
+
+.nssHeader .nssPrimaryNav {
+    display: flex;
+    justify-content: space-between;
+    height: 70px;
+    width: 1156px;
+    align-items: center;
+    margin: 0 auto;
+}
+
+.nssHeader .nssPrimaryNav .nssLogo {
+    position: relative;
+    z-index: 1000;
+    padding: 0;
+    top: -20px;
+}
+
+.nssHeader .nssPrimaryNav .nssLogo img {
+    max-width: 66%;
+}
+
+.nssHeader .nssPrimaryNav .nssSearch {
+    position: relative;
+    width: 53%;
+    min-height: 1px;
+}
+
+.nssHeader .nssPrimaryNav .nssSearch .nssSearchForm {
+    padding: 35px;
+}
+
+.nssHeader .nssPrimaryNav .nssNavIcons {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    min-width: 196px;
+    margin-left: -35px;
+}
+
+.nssHeader .nssPrimaryNav .nssNavIcons .nssHeaderCart {
+    margin-right: 5%;
+    margin-left: auto;
+}
+
+.nssHeader .nssPrimaryNav .nssNavIcons .nssHeaderCart .nssHeaderCartTitle {
+    font-size: 0.99rem;
+    position: relative;
+}
+
+.nssHeader .nssPrimaryNav .nssNavIcons a {
+    color: #1d1d1d;
+    transition: 0.2s all;
+    font-weight: 600;
+}
+
+.nssHeader .nssPrimaryNav .nssNavIcons a:hover {
+    color: #f45411;
+    text-decoration: none;
+}
+
+.nssHeader .nssSearchSlider {
+    min-width: 100%;
+    display: none;
+}
+
+.nssCartCount {
+    position: absolute;
+    top: -7px;
+    left: 23px;
+    padding: 1px 7px 4px;
+    background: #d4480b;
+    border-radius: 50%;
+    color: #fff;
+}
+
+.fa-shopping-cart {
+    padding: 11px 11px 11px 9px;
+    background: #999;
+    color: #fff;
+    border-radius: 3px;
+    transition: 0.2s all;
+}
+
+#menu-topbar {
+    display: flex;
+}
+
+#menu-topbar :first-child {
+    padding-right: 20px;
+}
+
+.fa-shopping-cart:hover {
+    background: #888;
+}
+
+.fa-user {
+    padding: 11px 0 11px 9px;
+}
+
+/*Header end*/
+/*Footer start*/
+.nssFooter {
+    border-top: solid 1px rgba(204, 204, 204, 0.7);
+    padding-top: 2%;
+}
+
+.nssFooterContainer {
+    width: 1156px;
+    margin: 0 auto;
+    padding-top: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.nssFooterContainer .nssFooterSection {
+    margin-left: 20%;
+}
+
+.nssFooterContainer .nssFooterSection .nssFooterLinks a {
+    margin-right: 1rem;
+    margin-top: 0.5rem;
+}
+
+.nssFooterContainer .nssFooterSection .nssFooterCardsWrapper {
+    margin-top: 1.5rem;
+}
+
+.nssBancaIntesa, .nssMasterSecure, .nssVisaVerified, .nssVisaCard, .nssMasterCard,
+.nssMaestroCard, .nssAmericanExpress {
+    display: inline-block;
+    background: url(/wp-content/themes/nss-green-friends-shop/assets/images/footer-sprites.png) no-repeat;
+    overflow: hidden;
+    text-indent: -9999px;
+    text-align: left;
+}
+
+.nssBancaIntesa {
+    background-position: -2px -0px;
+    width: 267px;
+    height: 40px;
+}
+
+.nssMasterSecure {
+    background-position: -2px -42px;
+    width: 75px;
+    height: 40px;
+}
+
+.nssVisaVerified {
+    background-position: -79px -42px;
+    width: 68px;
+    height: 40px;
+}
+
+.nssVisaCard {
+    background-position: -149px -42px;
+    width: 66px;
+    height: 40px;
+}
+
+.nssMasterCard {
+    background-position: -2px -84px;
+    width: 62px;
+    height: 40px;
+}
+
+.nssMaestroCard {
+    background-position: -66px -84px;
+    width: 62px;
+    height: 40px;
+}
+
+.nssAmericanExpress {
+    background-position: -217px -42px;
+    width: 40px;
+    height: 40px;
+}
+
+/*Footer end*/
+/*Mobile header start*/
+@media only screen and (min-width: 768px) and (max-width: 1023px) {
+    .nssHeader {
+        height: 160px;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .nssHeader {
+        position: fixed;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .nssHeader .nssTopBar {
+        display: none;
+    }
+}
+
+@media only screen and (max-width: 1365px) {
+    .nssHeader .nssPrimaryNav {
+        width: 90%;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .nssHeader .nssPrimaryNav .nssLogo {
+        top: 0;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .nssHeader .nssPrimaryNav .nssSearch {
+        position: absolute;
+        width: 80%;
+    }
+}
+
+@media only screen and (max-width: 350px) {
+    .nssHeader .nssPrimaryNav .nssSearch {
+        width: 90%;
+    }
+}
+
+.nssHeader .nssPrimaryNav .nssCartMobile {
+    margin-right: 20px;
+    position: relative;
+}
+
+.fa-search {
+    margin-right: 20px;
+}
+
+.nssMobileUserMenu {
+    position: absolute;
+    top: 50px;
+    padding: 20px;
+    background-color: #fff;
+    border-top: solid 2px #f45411;
+    border-bottom: solid 2px #f45411;
+    width: 100%;
+    z-index: 1050;
+}
+
+.nssMobileUserLink a {
+    display: block;
+    padding: 10px;
+}
+
+/*Mobile header end*/
+/*Mobile footer start*/
+@media only screen and (max-width: 768px) {
+    .nssFooterContainer {
+        width: 98%;
+        display: block;
+        padding: 0 15px;
+    }
+
+    .nssFooterContainer .nssFooterSection {
+        margin: 0px auto;
+        text-align: center;
+        min-height: 200px;
+    }
+
+    .nssFooterContainer .nssFooterSection .nssMobileFooterLinks {
+        margin-bottom: 0.5rem;
+    }
+
+    .nssFooterContainer .nssFooterSection .nssBancaIntesa {
+        margin-bottom: 20px;
+    }
+}
+
+/*Mobile footer end*/
+
+/*# sourceMappingURL=main.css.map */

@@ -1,0 +1,22 @@
+/*Mobile footer start*/
+.nssFooterContainer{
+  @include largePhonesAndBelow{
+    width: 98%;
+    display: block;
+    padding: 0 15px;
+    .nssFooterSection{
+      margin: 0px auto;
+      text-align: center;
+      min-height: 200px;
+      .nssMobileFooterLinks{
+        margin-bottom: 0.5rem;
+      }
+      .nssBancaIntesa{
+        margin-bottom: 20px;
+      }
+
+    }
+  }
+}
+
+/*Mobile footer end*/

@@ -7,6 +7,9 @@ use GF\Woocommerce\Shipping;
 use GF\Woocommerce\WooFunctions;
 use GfPluginsCore\ProductStickers;
 
+// add theme options
+add_theme_support('custom-logo');
+
 require (__DIR__ . '/inc/autoload.php');
 global $wpdb;
 
@@ -338,6 +341,11 @@ function gf_migrate_comments()
 
 function generateUploadsPath() {
     return WP_CONTENT_DIR . '/uploads/'. date('Y') .'/'. date('m') .'/'. date('d') . '/';
+}
+
+function gcGetTemplate($templateName)
+{
+    include(__DIR__ . '/templates/' . $templateName . '/' . $templateName . '.php');
 }
 
 add_action( 'rank_math/frontend/description', function( $description ) {

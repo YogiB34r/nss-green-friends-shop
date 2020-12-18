@@ -5,7 +5,8 @@ jQuery(document).ready(function ($) {
         url : "/gf-ajax/",
         data : {action:"refreshCartCount"},
         success : function(response) {
-            $('.shopping-cart__count').html(response);
+            $('.nssCartCount').html(response);
+            $('.nssHeaderMobileCart').html('Korpa (' + response + ')');
         },
         error: function() {
             console.log('AJAX error - cannot refresh cart count.');
@@ -73,25 +74,25 @@ jQuery(document).ready(function ($) {
         jQuery(this).toggleClass('fa-plus fa-minus');
     });
 
-    jQuery('#my-search-icon-toggle').click(function () {
-        jQuery('.mobile-search').toggle('slow', function() {
+    jQuery('#nssSearchToggle').click(function () {
+        jQuery('.nssSearchSlider').toggle('slow', function() {
             jQuery('.search-field').trigger('focus');
         });
 
     });
 
-    jQuery('.gf-user-account-menu').click(function () {
-        jQuery('.gf-mobile-menu').slideToggle();
+    jQuery('.nssUserMobile').click(function () {
+        jQuery('.nssMobileUserMenu').slideToggle();
     });
 
-    jQuery('#my-fancy-search').click(function () {
-        if (jQuery('#my-fancy-search').hasClass('fancy-header-icons')) {
-            jQuery('#my-fancy-search').removeClass('fancy-header-icons')
+    jQuery('#nssFancySearch').click(function () {
+        if (jQuery('#nssFancySearch').hasClass('fancy-header-icons')) {
+            jQuery('#nssFancySearch').removeClass('fancy-header-icons')
         } else {
-            jQuery('#my-fancy-search').addClass('fancy-header-icons')
-            if (jQuery('#my-fancy-user').hasClass('fancy-header-icons')) {
-                jQuery('#my-fancy-user').removeClass('fancy-header-icons')
-                jQuery('.gf-mobile-menu').slideToggle();
+            jQuery('#nssFancySearch').addClass('fancy-header-icons')
+            if (jQuery('#nssFancyUser').hasClass('fancy-header-icons')) {
+                jQuery('#nssFancyUser').removeClass('fancy-header-icons')
+                jQuery('.nssMobileUserMenu').slideToggle();
             }
             if (jQuery('#gf-bars-icon-toggle').hasClass('fancy-header-icons')) {
                 jQuery('#gf-bars-icon-toggle').removeClass('fancy-header-icons');
@@ -100,18 +101,18 @@ jQuery(document).ready(function ($) {
         }
 
     });
-    jQuery('#my-fancy-user').click(function () {
-        if (jQuery('#my-fancy-user').hasClass('fancy-header-icons')) {
-            jQuery('#my-fancy-user').removeClass('fancy-header-icons')
+    jQuery('#nssFancyUser').click(function () {
+        if (jQuery('#nssFancyUser').hasClass('fancy-header-icons')) {
+            jQuery('#nssFancyUser').removeClass('fancy-header-icons')
         } else {
-            jQuery('#my-fancy-user').addClass('fancy-header-icons')
+            jQuery('#nssFancyUser').addClass('fancy-header-icons')
             if (jQuery('#gf-bars-icon-toggle').hasClass('fancy-header-icons')) {
                 jQuery('#gf-bars-icon-toggle').removeClass('fancy-header-icons');
                 jQuery('.gf-category-accordion').hide();
             }
-            if (jQuery('#my-fancy-search').hasClass('fancy-header-icons')) {
-                jQuery('#my-fancy-search').removeClass('fancy-header-icons');
-                jQuery('.mobile-search').toggle('slow');
+            if (jQuery('#nssFancySearch').hasClass('fancy-header-icons')) {
+                jQuery('#nssFancySearch').removeClass('fancy-header-icons');
+                jQuery('.nssSearchSlider').toggle('slow');
             }
 
         }
@@ -121,13 +122,13 @@ jQuery(document).ready(function ($) {
             jQuery('#gf-bars-icon-toggle').removeClass('fancy-header-icons')
         } else {
             jQuery('#gf-bars-icon-toggle').addClass('fancy-header-icons')
-            if (jQuery('#my-fancy-user').hasClass('fancy-header-icons')) {
-                jQuery('#my-fancy-user').removeClass('fancy-header-icons');
-                jQuery('.gf-mobile-menu').slideToggle();
+            if (jQuery('#nssFancyUser').hasClass('fancy-header-icons')) {
+                jQuery('#nssFancyUser').removeClass('fancy-header-icons');
+                jQuery('.nssMobileUserMenu').slideToggle();
             }
-            if (jQuery('#my-fancy-search').hasClass('fancy-header-icons')) {
-                jQuery('#my-fancy-search').removeClass('fancy-header-icons');
-                jQuery('.mobile-search').toggle('slow');
+            if (jQuery('#nssFancySearch').hasClass('fancy-header-icons')) {
+                jQuery('#nssFancySearch').removeClass('fancy-header-icons');
+                jQuery('.nssSearchSlider').toggle('slow');
             }
         }
     });

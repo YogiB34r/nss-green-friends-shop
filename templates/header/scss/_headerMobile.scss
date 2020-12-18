@@ -1,0 +1,66 @@
+/*Mobile header start*/
+.nssHeader {
+  @include tabletsPortraitLargePhonesLandscape {
+    height: 160px;
+  }
+
+  @include largePhonesAndBelow {
+    position: fixed;
+  }
+
+  .nssTopBar {
+    @include largePhonesAndBelow {
+      display: none;
+    }
+  }
+
+  .nssPrimaryNav {
+
+    @include tabletsAndBelow {
+      width: 90%;
+    }
+
+    .nssLogo {
+      @include largePhonesAndBelow {
+        top: 0;
+      }
+    }
+
+    .nssSearch {
+      @include largePhonesAndBelow {
+        position: absolute;
+        width: 80%;
+      }
+      @include smallestPhones {
+        width: 90%;
+      }
+    }
+
+    .nssCartMobile{
+      margin-right: 20px;
+      position: relative;
+    }
+
+  }
+
+}
+.fa-search {
+  margin-right: 20px;
+}
+.nssMobileUserMenu {
+  position: absolute;
+  top: 50px;
+  padding: 20px;
+  background-color: #fff;
+  border-top: solid 2px #f45411;
+  border-bottom: solid 2px #f45411;
+  width: 100%;
+  z-index: 1050;
+}
+.nssMobileUserLink{
+  a{
+    display: block;
+    padding: 10px;
+  }
+}
+/*Mobile header end*/

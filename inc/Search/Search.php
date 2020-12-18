@@ -16,6 +16,7 @@ class Search
 
     public function getItemIdsForCategory($slug)
     {
+
         return $this->adapter->getIdsForCategory($slug);
     }
 

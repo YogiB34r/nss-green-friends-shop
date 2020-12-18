@@ -1,0 +1,27 @@
+@mixin tabletsLandscapeAndOldDesktops {
+  @media only screen and (min-width: 1024px) and (max-width: 1365px) { @content; }
+}
+
+@mixin tabletsAndBelow {
+  @media only screen and (max-width: 1365px) { @content }
+}
+
+@mixin tabletsPortraitLargePhonesLandscape {
+  @media only screen and (min-width: 768px) and (max-width: 1023px) { @content; }
+}
+
+@mixin largePhonesAndBelow {
+  @media only screen and (max-width: 768px) { @content; }
+}
+
+@mixin phonesLandscape {
+  @media only screen and (min-width: 421px) and (max-width: 767px) { @content; }
+}
+
+@mixin phonesPortrait {
+  @media only screen and (max-width: 420px)  { @content; }
+}
+
+@mixin smallestPhones {
+  @media only screen and (max-width: 350px)  { @content; }
+}

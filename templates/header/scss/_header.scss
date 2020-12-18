@@ -1,0 +1,127 @@
+/*Header start*/
+.nssHeader {
+  position: relative;
+  min-width: 100%;
+  z-index: 2000;
+  background: #fff;
+  box-shadow: 0 0 7px rgba(0, 0, 0, 0.8);
+  overflow: visible;
+
+  .nssTopBar {
+    background-color: #1d1d1d;
+    color: white;
+    padding: 14px 0;
+    min-width: 100%;
+
+    a {
+      color: #f45411;
+    }
+
+    .nssTopBarMenu {
+      display: flex;
+      justify-content: space-around;
+      padding: 0 0 0 25px;
+      margin-left: 25%;
+    }
+
+  }
+
+  .nssPrimaryNav {
+    display: flex;
+    justify-content: space-between;
+    height: 70px;
+    width: 1156px;
+    align-items: center;
+    margin: 0 auto;
+
+    .nssLogo {
+      //height: 70px;
+      position: relative;
+      z-index: 1000;
+      padding: 0;
+      top: -20px;
+
+      img {
+        max-width: 66%;
+      }
+    }
+
+    .nssSearch {
+      position: relative;
+      width: 53%;
+      min-height: 1px;
+
+      .nssSearchForm {
+        padding: 35px;
+      }
+
+    }
+
+    .nssNavIcons {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      min-width: 196px;
+      margin-left: -35px;
+
+      .nssHeaderCart{
+        margin-right: 5%;
+        margin-left: auto;
+        .nssHeaderCartTitle{
+          font-size: 0.99rem; //kakva pobeda, ja ne mogu hahah
+          position: relative;
+
+        }
+      }
+
+      a {
+        color: #1d1d1d;
+        transition: 0.2s all;
+        font-weight: 600;
+      }
+
+      a:hover {
+        color: #f45411;
+        text-decoration: none;
+      }
+    }
+  }
+
+  .nssSearchSlider {
+    min-width: 100%;
+    display: none;
+  }
+}
+.nssCartCount {
+  position: absolute;
+  top: -7px;
+  left: 23px;
+  padding: 1px 7px 4px;
+  background: #d4480b;
+  border-radius: 50%;
+  color: #fff;
+}
+.fa-shopping-cart {
+  padding: 11px 11px 11px 9px;
+  background: #999;
+  color: #fff;
+  border-radius: 3px;
+  transition: 0.2s all;
+}
+
+//life's a bitch and then you die
+#menu-topbar{
+  display: flex;
+  :first-child{
+    padding-right: 20px;
+  }
+}
+
+
+.fa-shopping-cart:hover {
+  background: #888;
+}
+.fa-user {
+  padding: 11px 0 11px 9px;
+}
+/*Header end*/
