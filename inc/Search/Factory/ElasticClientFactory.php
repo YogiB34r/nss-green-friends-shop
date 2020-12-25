@@ -22,7 +22,7 @@ class ElasticClientFactory
     {
         $config = array(
             'host' => ES_HOST,
-            'port' => 9200
+            'port' => ES_PORT
         );
         return new \Elastica\Client($config);
     }

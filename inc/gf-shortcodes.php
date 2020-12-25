@@ -101,7 +101,7 @@ function gf_cart_shortcode()
     </a>
     <?php
 }
-
+/*
 add_shortcode('gf-mobile-nav-menu', 'gf_mobile_nav_menu_shortcode');
 function gf_mobile_nav_menu_shortcode()
 {
@@ -146,7 +146,7 @@ function gf_mobile_nav_menu_shortcode()
     <?php
     echo '</div>';
 }
-
+*/
 add_shortcode('gf-mobile-search', 'gf_mobile_search_form');
 function gf_mobile_search_form()
 {

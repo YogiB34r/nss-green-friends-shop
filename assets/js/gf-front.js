@@ -188,12 +188,12 @@ jQuery(document).ready(function ($) {
     });
 
     if (jQuery('body').is('.archive, .single-product, .woocommerce-account')) {
-        jQuery('.gf-wrapper-before span').toggleClass('fa-angle-down fa-angle-up');
+        jQuery('.nssAccordionHead span').toggleClass('fa-angle-down fa-angle-up');
     }
 
-    jQuery('.gf-wrapper-before').click(function () {
+    jQuery('.nssAccordionHead').click(function () {
         jQuery('.gf-navblock').slideToggle();
-        jQuery('.gf-wrapper-before span').toggleClass('fa-angle-down fa-angle-up');
+        jQuery('.nssAccordionHead span').toggleClass('fa-angle-down fa-angle-up');
     });
 
     /**

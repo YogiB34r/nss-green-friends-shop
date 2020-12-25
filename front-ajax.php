@@ -5,7 +5,7 @@ global $wpdb, $searchFunctions;
 
 $config = array(
     'host' => ES_HOST,
-    'port' => 9200
+    'port' => ES_PORT
 );
 
 if (isset($_GET['viewCount'])) {

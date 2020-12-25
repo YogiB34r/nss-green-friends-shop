@@ -1,6 +1,6 @@
 </div>
 <!-- gf main content container -->
-</div>
+<!--</div>-->
 <!-- .col-full -->
 </div>
 <!-- #content -->

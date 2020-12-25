@@ -368,10 +368,10 @@ function removeNonExistentProductsFromIndex() {
 function createElasticIndex() {
     $elasticaClient = new \GF\Search\Factory\ElasticClientFactory();
     $productSetupFactory = new \GF\Search\Factory\ProductSetupFactory($elasticaClient);
-//    $termSetupFactory = new \GF\Search\Factory\TermSetupFactory($elasticaClient);
+    $termSetupFactory = new \GF\Search\Factory\TermSetupFactory($elasticaClient);
     $recreate = true;
     $productSetupFactory->make()->createIndex($recreate);
-//    $termSetupFactory->make()->createIndex(false);
+    $termSetupFactory->make()->createIndex(false);
 }
 
 function syncElasticIndex() {

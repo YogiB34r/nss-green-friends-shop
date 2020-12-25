@@ -15,7 +15,11 @@ Text Domain: nss
 // Parts
 @import "templates/header/scss/header";
 @import "templates/footer/scss/footer";
+@import "templates/frontPage/scss/frontPage";
+@import "templates/template-parts/scss/singleProduct";
+@import "templates/megaMenu/scss/megaMenu";
 
-// Responsive
+// Responsive lol
+
 @import "templates/header/scss/headerMobile";
 @import "templates/footer/scss/footerMobile";

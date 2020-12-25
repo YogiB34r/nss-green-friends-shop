@@ -31,7 +31,7 @@
         <li class="nssMobileUserLink">
         </li>
     </div>
-    <?php printMobileMegaMenu(); ?>
+    <?php gf_category_mobile_toggle_shortcode(); ?>
 
 </div>
 </div>

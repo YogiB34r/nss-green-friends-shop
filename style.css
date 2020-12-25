@@ -996,7 +996,7 @@ body.home .saved-sale {
 
 .content-area .widget_price_filter,
 .content-area .woocommerce-widget-layered-nav {
-    display: none;
+    /*display: none;*/
 }
 
 .gf-sidebar .widget_price_filter,

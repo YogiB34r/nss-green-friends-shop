@@ -116,7 +116,7 @@ class Functions
     {
         $config = array(
             'host' => ES_HOST,
-            'port' => 9200
+            'port' => ES_PORT
         );
 //    $per_page = apply_filters('loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page());
         $per_page = 24;
@@ -160,7 +160,7 @@ class Functions
     {
         $config = array(
             'host' => ES_HOST,
-            'port' => 9200
+            'port' => ES_PORT
         );
         $per_page = 24;
         $currentPage = (get_query_var('paged')) ? get_query_var('paged') : 1;

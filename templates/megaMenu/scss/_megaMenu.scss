@@ -1,0 +1,25 @@
+/*Mega menu sidebar start*/
+.nssSidebar {
+  width: 25%;
+  box-shadow: 4px 0 6px rgba(13, 13, 13, 0.1);
+
+  .nssAccordionHead {
+    background: #fff;
+    padding: 25px 10px 10px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+
+    .nssAccordionTitle {
+      color: #f45411;
+      font-weight: 600;
+      font-size: 20px;
+    }
+  }
+
+  .nssAccordionHead:hover {
+    cursor: pointer;
+  }
+}
+
+/*Mega menu sidebar end*/

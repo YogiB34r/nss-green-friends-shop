@@ -5,25 +5,11 @@
         <?php dynamic_sidebar('gf-footer-row-1-column-1'); ?>
     </div>
     <div class="nssFooterSection">
-        <div class="nssFooterLinks">
-            <li class="nssMobileFooterLinks">
-                <a href="/o-kompaniji/"><?=__('O kompaniji');?></a>
-                <a href="/kontaktirajte-nas/"><?=__('Kontaktirajte nas')?></a>
-            </li>
-            <li class="nssMobileFooterLinks">
-                <?php if (is_user_logged_in()) :?>
-                    <a href="/moj-nalog/narudzbine/"><?=__('Praćenje narudžbenice'); ?></a>
-                <?php else:?>
-                    <a href="/pracenje-narudzbenice/"><?=__('Praćenje narudžbenice'); ?></a>
-                <?php endif;?>
-
-                <a href="/podrska/"><?=__('Podrška'); ?></a>
-            </li>
-            <li class="nssMobileFooterLinks">
-                <a href="/uslovi-kupovine/"><?=__('Uslovi kupovine'); ?></a>
-                <a href="/politika-privatnosti-2/"><?=__('Politika privatnosti'); ?></a>
-            </li>
-        </div>
+        <?php wp_nav_menu(array(
+            'menu' => 'Footer',
+            'menu_class' => 'footerMenu',
+            'container_class' => 'nssFooterLinks'
+        )); ?>
         <div class="nssFooterCardsWrapper">
             <li>
             <div class="nssVisaCard"></div>

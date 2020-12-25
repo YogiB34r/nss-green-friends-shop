@@ -74,6 +74,6 @@
 <div id="page" class="hfeed site">
     <?php gcGetTemplate('header'); ?>
     <div id="content" class="site-content" tabindex="-1">
-        <div class="col-full">
-            <div class="gf-main-content-container">
+<!--        <div class="col-full">-->
+            <div class="nssContentContainer">
 

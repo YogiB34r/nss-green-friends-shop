@@ -89,6 +89,8 @@ class Product implements ConfigInterface
                 'rating' => array('type' => 'integer'),
                 'product_type' => array('type' => 'text'),
                 'inputPrice' => array('type' => 'long'),
+                'salePriceStart' => array('type' => 'date'),
+                'salePriceEnd' => array('type' => 'date'),
             ]
         ],
         'order_data' => [

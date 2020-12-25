@@ -24,7 +24,7 @@ class Cli
 
         $config = array(
             'host' => ES_HOST,
-            'port' => 9200
+            'port' => ES_PORT
         );
         $esClient = new \Elastica\Client($config);
         $elasticaSearch = new \GF\Search\Elastica\Search($esClient);
