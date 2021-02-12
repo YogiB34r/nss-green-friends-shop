@@ -64,7 +64,6 @@ function testCron() {
     $message = 'cron started at : '  . date('d-m-Y H:i:s');
 
     $send = wp_mail($to, $subject, $message, $headers);
-//    $send = mail($to, $subject, $message);
     var_dump($send);
 }
 
@@ -87,9 +86,6 @@ function createNalog() {
             $orders = $backorder->getBackOrders($result->backOrderId);
             $supplierId = $orders[0]->supplierId;
             $backorder->sendBackOrderEmail($supplierId, $orders);
-            //        if ($backorder->sendBackOrderEmail($supplierId, $orders)) {
-            //            echo 'mail sent';
-            //        }
         }
 
         $from = 'mailer@nonstopshop.rs';
@@ -113,52 +109,21 @@ function daily() {
 
 add_action('syncMis', 'mis');
 function mis() {
-//    $item = wc_get_product(553396);  //
-//    new NSS_MIS_Item($item);
-//    die();
-
-//    $orderIds = [574521];
-//    foreach ($orderIds as $orderId) {
-//        $order = wc_get_order($orderId);
-//        new NSS_MIS_Order($order);
-//    }
-//    die();
-
-//    $order = wc_get_order(570514);
-//    new NSS_MIS_Order($order);
-//    die();
-
-//    $user = get_user_by('id', 732);
-//    new NSS_MIS_User($user);
-//    die();
-
-//    $dtStart = \DateTime::createFromFormat('d/m/Y', '28/4/2020');
-//    $dtEnd = \DateTime::createFromFormat('d/m/Y', '12/5/2020');
-//    $dt = $dtStart->getTimestamp() .'...'. $dtEnd->getTimestamp();
-
     $arg = array(
         'orderby' => 'date',
         'posts_per_page' => '300',
-//        'posts_per_page' => -1,
-//        'date_created' => $dt,
-//        'page' => 10,
     );
     $orders = WC_get_orders($arg);
-//    var_dump(count($orders));
-//    die();
+
     foreach ($orders as $order) {
         $ignoreStatuses = [
             'stornirano', 'cancelled', 'refunded', 'processing', 'reklamacija-pnns', 'pending', 'on-hold', 'failed'
         ];
         if (!in_array($order->get_status(), $ignoreStatuses)) {
             if (get_class($order) === WC_Order::class) {
-                if ($order->get_meta('synced') !== '') {
-//                    var_dump($order->get_status());
-                } else {
+                if ($order->get_meta('synced') === '') {
                     $misOrder = new NSS_MIS_Order($order);
                     $order->add_order_note('Synced to MIS at: ' . date('d/m/Y H:i'));
-//                    echo $order->get_id();
-//                    var_dump($order->get_meta('synced'));
                 }
             } else if (get_class($order) === WC_Order_Refund::class) {
                 continue;
@@ -317,13 +282,6 @@ function createXml(DOMDocument $xmlDoc, WC_Product $item, $root) {
 
 function passAllUsers() {
     global $wpdb;
-//    $args = array(
-//        'role'    => 'Customer',
-//        'orderby' => 'user_nicename',
-//        'order'   => 'ASC',
-//        'limit' => 1,
-//        'paged' => 1
-//    );
 
     $sql = "SELECT user_email FROM wp_users u WHERE u.user_email NOT IN 
 (SELECT email FROM wp_newsletter n) AND u.user_email NOT LIKE '%nonstopshop.rs' AND u.user_email NOT LIKE '!!DISABLED!!%' 
@@ -332,32 +290,21 @@ AND u.user_email <> '' AND user_email NOT LIKE '%telefonska%' LIMIT 30000";
 
     ob_start();
     foreach ($emails as $email) {
-//        $user = TNP::subscribe(['email' => $email->user_email, 'status' => 'C', 'send_emails' => false]);
-//        if ($user) { // if object, should mean user is subscribed
-//
-//        }
         echo $email->user_email . PHP_EOL;
     }
+
     $csv = ob_get_clean();
     file_put_contents('csv', $csv);
 }
 
 function createFromExcell($args) {
     $cli = new \GF\Cli();
-
-//    $cli->saleItems($args);
     $cli->createFromExcell();
-
-//    $cli->migrateSaleItems($args);
 }
 
 function passAllProducts($args) {
     $cli = new \GF\Cli();
-
-//    $cli->saleItems($args);
     $cli->listItems();
-
-//    $cli->migrateSaleItems($args);
 }
 
 function removeNonExistentProductsFromIndex() {
@@ -390,13 +337,11 @@ add_action('woocommerce_update_product', 'syncToElastic', 10, 1);
 function syncToElastic($id) {
     $product = wc_get_product($id);
     if ($product && strtolower($product->get_status()) != 'auto-draft' && strtolower($product->get_name()) != 'auto-draft') {
-//        && $product->get_sku() != '') {
 
         if ($product->get_sku() == "") {
-//            return;
             $product->set_sku(md5($product->get_id() . $product->get_name()));
-//            $product->save();
         }
+
         $productConfig = new \GF\Search\Elastica\Config\Product();
         $elasticaClientFactory = new \GF\Search\Factory\ElasticClientFactory();
         $productType = $elasticaClientFactory->make()->getIndex($productConfig->getIndex())->getType($productConfig->getType());
@@ -434,13 +379,13 @@ function nss_feed_start() {
 
 function nss_feed_parse($supplierId, $name) {
     \NSS_Log::log('nss_feed_parse start');
-//    $supplierId = $args[0];
-//    $name = $args[1];
+
     $from = 'mailer@nonstopshop.rs';
     $headers = [
         'Content-Type: text/html; charset=UTF-8',
         "From: NonStopShop <'{$from}'>",
     ];
+
     $to[] = 'djavolak@mail.ru';
     $subject = 'NSS feed cron report - parse items for: ' . SUPPLIERS[$supplierId]['name'];
 
@@ -452,7 +397,7 @@ function nss_feed_parse($supplierId, $name) {
 }
 
 function nss_feed_process_queue($supplierId) {
-//    \NSS_Log::log('nss_feed_process started');
+
     $from = 'mailer@nonstopshop.rs';
     $headers = [
         'Content-Type: text/html; charset=UTF-8',
@@ -475,9 +420,6 @@ function nss_feed_process($supplierId) {
     $redis = new \Redis();
     $redis->connect(REDIS_HOST);
 
-//    $key = 'importFeedQueueCreate:' . SUPPLIERS[$args[0]]['name'] .':';
-//    $importer = new \Nss\Feed\Importer($this->redis, $this->wpdb, $this->httpClient, $key);
-
     $key = 'importFeedQueueUpdate:' . SUPPLIERS[$supplierId]['name'] .':';
     $importer = new \Nss\Feed\Importer($redis, $wpdb, $httpClient, $key);
 
@@ -498,7 +440,7 @@ function nss_feed_queue($supplierId) {
 
     $message = 'Parse completed successfully.' . "\r\n";
     $message .= print_r($stats, true);
-//    $message .= print_r($args, true);
+
     $message .= $parser->parseErrors();
 
     return $message;

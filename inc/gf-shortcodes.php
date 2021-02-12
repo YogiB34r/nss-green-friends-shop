@@ -151,26 +151,26 @@ add_shortcode('gf-mobile-search', 'gf_mobile_search_form');
 function gf_mobile_search_form()
 {
 ?>
-<form role="search" method="get" class="gf-search-form gf-search-form--mobile"
+<form id="gfSearchFormMobile" role="search" method="get" class="gf-search-form gf-search-form--mobile"
       action="/pretraga/">
     <span class="screen-reader-text"><?php _x('Search for:', 'label') ?></span>
-    <input type="search" autocomplete="off" class="search-field gf-search-box" name="query"
+    <input aria-label="Unesite frazu pretrage" type="search" id="searchInput" autocomplete="off" class="search-field gf-search-box" name="query"
            placeholder="<?=esc_attr_x('Unesite frazu pretrage &hellip;', '')?>"
            value="<?= get_search_query() ?>"/>
 <!--    <button type="submit" class="search-submit"><i class="fa fa-search"></i></button>-->
-    <div class="gf-widht-100">
+    <div class="nssWidth100">
         <div class="gf-autocomplete-results suggesstion-box suggesstion-box-mobile"></div>
     </div>
 </form>
 <div class="gf-radio-search-wrapper-mobile">
     <?php if (get_queried_object() && is_product_category()): ?>
         <div class="gf-search-radio-button-wrapper">
-            <input class="search-radio-box search-radiobutton-cat" type="radio" id="search-radiobutton-cat" name="search-radiobutton" value="category"/>
-            <label for="search-radiobutton-cat" class="s-radio-btn-1"><?= get_queried_object()->name ?></label>
+            <input class="searchRadioBox searchRadioCat" type="radio" id="search-radiobutton-cat" name="search-radiobutton" value="category" checked />
+            <label for="search-radiobutton-cat" class="radioBtn1"><?= get_queried_object()->name ?></label>
         </div>
         <div class="gf-search-radio-button-wrapper">
-            <input class="search-radio-box search-radiobutton-main" type="radio" id="search-radiobutton-main" name="search-radiobutton" value="shop"/>
-            <label for="search-radiobutton-main" class="s-radio-btn-2">Pretraga celog sajta</label>
+            <input class="searchRadioBox searchRadioMain" type="radio" id="search-radiobutton-main" name="search-radiobutton" value="shop"/>
+            <label for="search-radiobutton-main" class="radioBtn2">Pretraga celog sajta</label>
         </div>
     <?php endif ;?>
 </div>

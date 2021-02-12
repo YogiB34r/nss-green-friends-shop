@@ -142,8 +142,8 @@ if (isset($_GET['action'])) {
 
         case 'backendProductSearch':
             backendProductSearch();
-
             break;
+
     }
 }
 

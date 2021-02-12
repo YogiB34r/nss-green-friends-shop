@@ -9,18 +9,12 @@ function gf_custom_post_date_column_time($h_time, $post) {
     return get_the_time(__('d/m/Y', 'woocommerce'), $post);
 }
 
-//add_filter( "views_edit-shop_order" , 'gfCacheStatusCounts', -PHP_INT_MAX);
 function gfCacheStatusCounts($views) {
     global $current_screen;
     $cache = new \GF_Cache();
 
-//    var_dump($views);
-//    die();
 
     switch($current_screen->id) {
-//        case 'edit-post':
-//            $views = wpse_30331_manipulate_views( 'post', $views );
-//            break;
         case 'edit-shop_order':
             $key = 'ordersStatusCounts';
             $cachedViews = $cache->redis->get($key);
@@ -97,7 +91,6 @@ function gf_get_order_payment_method_column($colname) {
         if ($the_order->get_meta('synced')) {
             $misDoneStyle = 'style="color:white;background-color:gray;font-style:italic;"';
         }
-//        echo '<a class="button" href="/back-ajax/?action=printOrder&id='. $the_order->get_id() .'" title="Print racuna" target="_blank">Racun</a>';
         echo '&nbsp;';
         echo '<a class="button" href="/back-ajax/?action=printPreorder&id=' . $the_order->get_id() . '" title="Print predracuna" target="_blank">Predracun</a>';
         echo '&nbsp;';
@@ -114,7 +107,6 @@ function gf_get_order_payment_method_column($colname) {
             echo '&nbsp;';
             echo '<a class="button nssOrderMis" ' . $misDoneStyle . ' href="/back-ajax/?action=mis&type=order&id=' . $the_order->get_id() . '" title="Sinkuj na mis" target="_blank">Mis</a>';
         }
-//        echo $the_order->get_meta('gf_order_created_method');
     }
 }
 
@@ -164,13 +156,10 @@ add_action('manage_product_posts_custom_column', 'gf_supplier_product_list_colum
 function gf_supplier_product_list_column_content($column, $product_id){
     global $metaCache, $product;
 
-//    $supplier_id = get_post_meta($product_id, 'supplier', true);
-
     switch ($column) {
         case 'supplier':
             $supplierId = $metaCache->getMetaFor($product_id, 'product', 'supplier');
             if ($supplierId) {
-//                echo get_user_by('ID', $supplierId)->display_name;
                 echo $metaCache->getMetaFor($product_id, 'product', 'supplierName', true);
             }
             break;
@@ -247,13 +236,6 @@ function gf_print_order_date_picker_admin_list(){
         }
         $output .= "</select>";
 
-//        $selected = get_query_var('gf_created_via');
-//        $output .= "<select name='gf_created_via' class='postform'>";
-//        $output .= '<option>Phone / WWW</option>';
-//        $output .= '<option ' . selected($selected, 'phone', false) . ' value="phone">Phone</option>';
-//        $output .= '<option ' . selected($selected, 'www', false) . ' value="www">WWW</option>';
-//        $output .= "</select>";
-
         echo $output;
     }
 }
@@ -265,15 +247,7 @@ function gf_order_date_apply_filter($query){
     if (!empty($order_date_str)) {
         $meta_query = $query->get('meta_query');
         if (empty($meta_query))
-            $meta_query = array();
 
-//        $meta_query[] = array(
-//            'key' => 'post_date',
-//            'value' => $order_date_str,
-//            'compare' => 'LIKE',
-//            'type' => 'DATE'
-//        );
-//        $query->set('meta_query',$meta_query);
         $query->set('day', $exploded_date[0]);
         $query->set('monthnum', $exploded_date[1]);
         $query->set('year', $exploded_date[2]);
@@ -358,7 +332,6 @@ function gf_featured_products_admin_filter_query($query) {
     }
 }
 //admin product list filter by supplier *** END ***
-
 
 add_filter('bulk_actions-edit-shop_order', 'bulkAdresniceExport', 20, 1);
 function bulkAdresniceExport($actions) {

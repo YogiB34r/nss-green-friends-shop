@@ -29,9 +29,15 @@ if ($result && !in_array('nss-sex-shop-agreement', $_COOKIE)): ?>
 <?php endif; ?>
 <div class="nssSingleWrapper">
     <?php
-    if (!wp_is_mobile())
-        gcGetTemplate('megaMenu');
-    ?>
+    if (!wp_is_mobile()):?>
+        <div class="nssSidebar">
+            <div id="accordionHead" class="nssAccordionHead">
+                <div class="nssAccordionTitle">Kategorije</div>
+                <span class="fas fa-angle-up"> </span>
+            </div>
+            <?php dynamic_sidebar('gf-sidebar-single-productpage'); ?>
+        </div>
+    <?php endif; ?>
     <div class="nssContentWrapper">
         <?php
         /**

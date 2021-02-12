@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="<?php bloginfo('charset'); ?>">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5.0, user-scalable=yes">
     <link rel="profile" href="http://gmpg.org/xfn/11">
     <link rel="pingback" href="<?php bloginfo('pingback_url'); ?>">
     <?php wp_head(); ?>
@@ -72,8 +72,5 @@
                   height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
 <div id="page" class="hfeed site">
-    <?php gcGetTemplate('header'); ?>
-    <div id="content" class="site-content" tabindex="-1">
-<!--        <div class="col-full">-->
-            <div class="nssContentContainer">
-
+    <?php gfGetTemplate('header'); ?>
+    <div id="content" class="siteContent" tabindex="-1">

@@ -3,7 +3,7 @@
 add_action('woocommerce_before_cart_table', 'gf_cart_display_tax_notice', 10);
 function gf_cart_display_tax_notice()
 {
-    echo '<div class="gf-seller-info">
+    echo '<div class="gfSellerInfo">
            <p>' . _e('Na ovoj stranici možete izabrati koliko komada nekog proizvoda želite da naručite a pomoću dugmeta "x" možete određeni proizvod izbaciti iz korpe. Sve prikazane cene su sa PDV-om. Troškovi dostave se dodatno plaćaju i prikazani su u poslednjem koraku kreiranja narudžbenice.', 'green-fiends') . '</p>
           </div>';
 }
@@ -11,9 +11,9 @@ function gf_cart_display_tax_notice()
 add_action('woocommerce_before_cart_table', 'gf_cart_display_seller_info', 11);
 function gf_cart_display_seller_info()
 {
-    echo '<div class="gf-seller-info">
+    echo '<div class="gfSellerInfo">
            <p>' . _e('Prodavac:', 'green-fiends') . ' 
-                <span class="gf-seller-info-title">Non Stop Shop</span>
+                <span class="gfSellerInfoTitle">Non Stop Shop</span>
                 <img src="/wp-content/themes/nss-green-friends-shop/assets/images/logo.png" alt="Non Stop Shop">
            </p>
           </div>';

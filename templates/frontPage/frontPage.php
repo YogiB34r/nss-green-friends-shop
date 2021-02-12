@@ -1,7 +1,7 @@
 <div class="nssSingleWrapper">
     <?php
     if (!wp_is_mobile())
-        gcGetTemplate('megaMenu');
+        gfGetTemplate('megaMenu');
     ?>
     <div class="nssContentWrapper">
         <?php

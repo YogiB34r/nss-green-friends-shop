@@ -39,8 +39,6 @@ $adminMenu->init();
 
 $metaCache = new \GF\Util\MetaCache($cache);
 
-
-
 add_filter('request', 'customRewriteFix');
 /**
  * Prevent main wp query from returning 404 page on a category page when it thinks there are no more results.
@@ -54,8 +52,6 @@ function customRewriteFix($query_string) {
     }
     return $query_string;
 }
-
-
 
 function get_search_category_aggregation() {
     return $GLOBALS['gf-search']['facets']['category'];
@@ -131,17 +127,9 @@ function add_async_attribute($tag, $handle) {
     return $tag;
 }
 
-
-
-
-
-
-
-
 //@TODO Custom admin product table
 //require(__DIR__ . '/templates/admin/search-settings.php');
 //require(__DIR__ . '/templates/admin/list-product-search-settings.php');
-
 
 remove_filter('authenticate', 'wp_authenticate_username_password');
 add_filter('authenticate', 'gf_authenticate_username_password', 20, 3);
@@ -248,7 +236,7 @@ function action_woocommerce_register_form()
 
 add_action('woocommerce_register_form', 'action_woocommerce_register_form', 20, 10);
 
-//Custom addd to cart message
+//Custom add to cart message
 add_filter('wc_add_to_cart_message_html', '__return_null');
 add_filter('wc_add_to_cart_message_html', 'gf_custom_add_to_cart_message', 10, 2);
 function gf_custom_add_to_cart_message($message)
@@ -274,8 +262,8 @@ function get_product_by_sku( $sku ) {
 
     $product_id = $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key='_sku' AND meta_value='%s' LIMIT 1", $sku ) );
     if ($product_id){
-        return get_product($product_id);
-//        return new WC_Product( $product_id );
+        //return get_product($product_id); this is depricated
+        return new WC_Product( $product_id );
     }
 
     return null;
@@ -343,15 +331,16 @@ function generateUploadsPath() {
     return WP_CONTENT_DIR . '/uploads/'. date('Y') .'/'. date('m') .'/'. date('d') . '/';
 }
 
-function gcGetTemplate($templateName)
+function gfGetTemplate($templateName)
 {
     include(__DIR__ . '/templates/' . $templateName . '/' . $templateName . '.php');
 }
 
+/*  is this doing something???
 add_action( 'rank_math/frontend/description', function( $description ) {
     if (is_product_category()) {
 //        $description = get_term_meta(get_queried_object_id(), '_aioseop_description', true);
     }
 
     return $description;
-});
+});*/

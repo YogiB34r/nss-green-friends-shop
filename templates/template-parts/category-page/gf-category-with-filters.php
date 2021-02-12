@@ -52,7 +52,7 @@ if ($sexyShopCats) {
 <div class="nssSingleWrapper">
     <?php if (!wp_is_mobile()) : ?>
         <div class="nssSidebar">
-            <div class="nssAccordionHead">
+            <div id="accordionHead" class="nssAccordionHead">
                 <div class="nssAccordionTitle">Kategorije</div>
                 <span class="fas fa-angle-up"></span>
             </div>
@@ -107,7 +107,7 @@ if ($sexyShopCats) {
             woocommerce_product_loop_start();
 
             echo '<div id="ajax-primary" class="content-area">
-                    <div id="ajax-content" class="content-area">';
+                    <ul id="ajax-content" class="content-area">';
 
             if (get_class($sortedProducts) === \Elastica\ResultSet::class) {
                 $searchFunctions->customShopLoop($sortedProducts);
@@ -115,8 +115,8 @@ if ($sexyShopCats) {
                 $searchFunctions->customSearchOutput($sortedProducts);
             }
 
-            echo '</div>';
-            echo '<a href="#" data-term="' . get_query_var('term') . '" data-query="' . $searchQuery . '" data-action="' . $action . '"
+            echo '</ul>';
+            echo '<a aria-label="infiniteScroll" href="#" data-term="' . get_query_var('term') . '" data-query="' . $searchQuery . '" data-action="' . $action . '"
             data-ppp="' . $ppp . '" id="loadMore" class="' . $mobile . '" data-page="1" data-url="' . admin_url("admin-ajax.php") . '" ></a></div>';
 
             woocommerce_product_loop_end();

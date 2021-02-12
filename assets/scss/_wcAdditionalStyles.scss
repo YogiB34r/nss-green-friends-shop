@@ -1,0 +1,165 @@
+.woocommerce-products-header {
+  margin-bottom: 20px;
+
+  &__title {
+    font-size: 2rem;
+    font-weight: 400;
+  }
+}
+
+.gf-category-expander {
+  overflow: hidden;
+  border: 1px solid #e2e2e2;
+  border-radius: 9px;
+  margin: 0 0 10px 0;
+  display: flex;
+  flex-wrap: wrap;
+
+  &__col {
+    padding: 10px;
+    word-break: keep-all;
+    text-overflow: ellipsis;
+
+    &__category {
+      font-weight: 600;
+      padding-bottom: 12px;
+      font-size: 18px;
+      color: #f45411;
+    }
+
+    &__subcategory {
+      color: #f45411;
+      font-weight: 400;
+
+      &:hover {
+        color: #333;
+      }
+    }
+
+    ul,
+    li {
+      padding-bottom: 10px;
+    }
+  }
+
+  &__footer {
+    text-align: center;
+    width: 100%;
+    padding-top: 10px;
+
+    .fas {
+      color: #f45411;
+      font-size: 25px;
+
+      &:hover {
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+.gf-expander-module-first-line {
+  height: 34px;
+  -webkit-transition: all 0.5s ease-in-out;
+  transition: all 0.5s ease-in-out;
+  overflow: hidden;
+  flex: 0 0 25%;
+  padding: 0 15px;
+
+  ul,
+  li {
+    padding-bottom: 10px;
+  }
+
+  .gf-expander-first-line-parent {
+    font-weight: 600;
+    padding-bottom: 12px;
+    font-size: 18px;
+    color: #f45411;
+
+    &:hover {
+      color: #333;
+    }
+  }
+}
+
+.gf-expander__subcategory-list {
+  -webkit-transition: all 0.5s linear;
+  transition: all 0.5s linear;
+
+  h2 {
+    font-size: 16px;
+  }
+}
+
+.gf-expander-ul-first-line {
+  display: none;
+}
+
+.gf-jos-kategorija {
+  width: 100%;
+  text-align: center;
+  font-size: 18px;
+  color: #f45411;
+}
+
+.woocommerce-Tabs-panel--description {
+  iframe {
+    width: 100%;
+  }
+}
+
+.gf-shop-button {
+  color: #f45411;
+  background-color: #fff;
+  border: 1px solid #f45411;
+  padding: 10px;
+  display: block;
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 18px;
+
+  &:hover {
+    background-color: #f45411;
+    color: #fff;
+  }
+}
+
+.phone_ordering_label {
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.phone_ordering_text {
+  font-size: 18px;
+  font-weight: bold;
+  display: inline-block;
+  margin-right: 30px;
+  margin-bottom: 10px;
+}
+
+.gf-category-items {
+  &:first-child {
+    &:first-child {
+      background-color: #c22a26;
+      font-size: 18px;
+    }
+  }
+}
+
+.woocommerce-shipping-calculator {
+  p {
+    display: none;
+  }
+}
+
+.quantity {
+  label {
+    &.screen-reader-text {
+      &:first-child {
+        display: block !important;
+      }
+    }
+  }
+}

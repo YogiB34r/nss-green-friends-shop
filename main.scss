@@ -7,19 +7,35 @@ License: GNU General Public License v2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: nss
 */
-
 // Base
 @import "scss/mixins";
 @import "scss/base";
-
+// WooCommerce Templates
+@import "woocommerce/wcTemplates";
+// Pages base
+@import "page";
 // Parts
 @import "templates/header/scss/header";
 @import "templates/footer/scss/footer";
 @import "templates/frontPage/scss/frontPage";
 @import "templates/template-parts/scss/singleProduct";
 @import "templates/megaMenu/scss/megaMenu";
-
+@import "templates/megaMenu/scss/mobileMegaMenu";
+//WooCommerce overrides
+@import "assets/scss/wcOverrides";
+//WooCommerce overrides
+@import "assets/scss/wcAdditionalStyles";
+//sidebar
+@import "assets/scss/sidebar";
+//bas mnogo random ne znam sta je ovo
+@import "assets/scss/majkoMoja";
+//checkout & registration
+@import "assets/scss/checkout";
+//banner slider
+@import "assets/scss/banner";
+//product slider
+@import "assets/scss/swiper";
 // Responsive lol
-
+@import "assets/scss/breakpoints";
 @import "templates/header/scss/headerMobile";
 @import "templates/footer/scss/footerMobile";

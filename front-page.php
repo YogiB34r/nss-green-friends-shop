@@ -1,5 +1,5 @@
 <?php get_header();?>
 
-<?php gcGetTemplate('frontPage'); ?>
+<?php gfGetTemplate('frontPage'); ?>
 
 <?php get_footer(); ?>

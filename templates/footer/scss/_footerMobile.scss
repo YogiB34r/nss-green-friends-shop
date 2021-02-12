@@ -1,22 +1,94 @@
-/*Mobile footer start*/
-.nssFooterContainer{
-  @include largePhonesAndBelow{
-    width: 98%;
-    display: block;
-    padding: 0 15px;
-    .nssFooterSection{
-      margin: 0px auto;
-      text-align: center;
-      min-height: 200px;
-      .nssMobileFooterLinks{
-        margin-bottom: 0.5rem;
-      }
-      .nssBancaIntesa{
-        margin-bottom: 20px;
-      }
+.nssFooter {
+  .nssFooterContainer {
+    @include largePhonesAndBelow {
+      width: 98%;
+      display: block;
+      .nssFooterSectionNav {
+        margin: 0 auto;
+        text-align: center;
+        min-height: 200px;
+        .footerMenu {
+          li {
+            display: inline-block;
+            margin: 8px 16px 8px 0;
 
+          }
+        }
+        .nssMobileFooterLinks {
+          margin-bottom: 0.5rem;
+        }
+
+        .nssBancaIntesa {
+          margin-bottom: 20px;
+        }
+
+      }
     }
   }
 }
 
-/*Mobile footer end*/
+.nssFooter {
+  .nssFooterContainer {
+    @include tabletsPortraitLargePhonesLandscape {
+      width: 90%;
+      margin: 0 auto;
+      padding-top: 20px;
+      display: flex;
+      justify-content: space-around;
+      .nssFooterSectionWidget{
+        width: 25%;
+      }
+      .nssFooterSectionNav {
+        width:70%;
+        justify-content: flex-end;
+        .footerMenu {
+          li {
+            display: inline-block;
+            margin: 8px 16px 8px 0;
+
+          }
+        }
+        .nssFooterCardsWrapper {
+          margin-top: 1.5rem;
+        }
+
+      }
+      .marginLeft{
+        margin-left: 27%;
+      }
+    }
+  }
+}
+
+.nssFooter {
+  .nssFooterContainer {
+    @include tabletsLandscapeAndOldDesktops {
+      width: 90%;
+      margin: 0 auto;
+      padding-top: 20px;
+      display: flex;
+      justify-content: space-around;
+      .nssFooterSectionWidget{
+        width: 25%;
+      }
+      .nssFooterSectionNav {
+        width:70%;
+        justify-content: flex-end;
+        .footerMenu {
+          li {
+            display: inline-block;
+            margin: 8px 16px 8px 0;
+
+          }
+        }
+        .nssFooterCardsWrapper {
+          margin-top: 1.5rem;
+        }
+
+      }
+      .marginLeft{
+        margin-left: 27%;
+      }
+    }
+  }
+}

@@ -22,14 +22,6 @@ if (isset($_GET['saveSearchRedirect'])) {
     exit();
 }
 
-
-//$sw = new \Symfony\Component\Stopwatch\Stopwatch();
-//$sw->start('gfmain');
-
-//if (isset($_GET['testVendor'])) {
-//    gf_change_supplier_id_by_vendor_id();
-//}
-
 if (isset($_POST['query'])) {
     $query = addslashes($_POST['query']);
 
@@ -41,7 +33,6 @@ if (isset($_POST['query'])) {
         $html .= '<ul>';
         foreach ($data->getResults() as $result) {
             if ($result->getData()['url'] !== '') {
-//                $category_link = get_term_link((int) $category->term_id);
                 $html .= '<li><a href="' . $result->getData()['url'] . '">' . $result->getData()['searchQuery'] . '</a></li>';
             }
         }
@@ -62,8 +53,6 @@ if (isset($_POST['query'])) {
         }
     }
 
-//    $product_results = gf_custom_search($query, 4);
-//    $product_results = gf_elastic_search($query, 4);
     /* @var \Elastica\ResultSet $product_results */
     $product_results = gf_elastic_search_with_data($query, 4);
 
@@ -81,10 +70,6 @@ if (isset($_POST['query'])) {
     $html .= '<span>Proizvodi</span>';
     $html .= '<ul>';
     if ($product_results) {
-//        foreach ($product_results->get_posts() as $post) {
-//            $product_link = get_permalink((int) $post->ID);
-//            $html .= '<li><a href="' . $product_link . '">' . $post->post_title . '</a></li>';
-//        }
         foreach ($product_results->getResults() as $result) {
             $product_link = get_permalink((int) $result->getId());
             $html .= '<li><a href="' . $product_link . '">' . $result->getData()['name'] . '</a></li>';
@@ -117,7 +102,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'ajax_load_more') {
     $page = addslashes($_POST['page']);
     $term = addslashes($_POST['term']);
     $query = addslashes($_GET['query']);
-//    $type = addslashes($_POST['type']);
+
     set_query_var('paged', $page);
     set_query_var('term', $term);
 

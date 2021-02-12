@@ -1,17 +1,7 @@
 </div>
 <!-- gf main content container -->
-<!--</div>-->
-<!-- .col-full -->
-</div>
-<!-- #content -->
 <footer id="colophon" class="nssFooter" role="contentinfo">
-    <?php
-    if(!wp_is_mobile()){
-        gcGetTemplate('footer');
-    }else{
-        include(__DIR__ . '/templates/footer/footerMobile.php');
-    }
-     ?>
+    <?php gfGetTemplate('footer'); ?>
 </footer>
 <!-- #colophon -->
 </div>
@@ -37,6 +27,22 @@
 
 <!--Twitter share-->
 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<script>
+    const cartForm = document.getElementById('wcCartForm');
+    const mutObserver = new MutationObserver(function callback(mutationsList, mutObserver) {
+        mutationsList.forEach(mutation => {
+            if (mutation.attributeName === 'class') {
+                ajaxRefreshCartCount();
+            }
+        });
+    });
+    if (cartForm !== null) {
+        mutObserver.observe(
+            cartForm,
+            {attributes: true}
+        );
+    }
+</script>
 </body>
 </html>
 

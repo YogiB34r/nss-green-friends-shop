@@ -1,5 +1,5 @@
 @mixin tabletsLandscapeAndOldDesktops {
-  @media only screen and (min-width: 1024px) and (max-width: 1365px) { @content; }
+  @media only screen and (min-width: 1025px) and (max-width: 1365px) { @content; }
 }
 
 @mixin tabletsAndBelow {
@@ -7,7 +7,7 @@
 }
 
 @mixin tabletsPortraitLargePhonesLandscape {
-  @media only screen and (min-width: 768px) and (max-width: 1023px) { @content; }
+  @media only screen and (min-width: 768px) and (max-width: 1024px) { @content; }
 }
 
 @mixin largePhonesAndBelow {
