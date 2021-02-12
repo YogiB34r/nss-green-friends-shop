@@ -19,7 +19,6 @@ function gf_cart_display_seller_info()
           </div>';
 }
 
-
 /*
  * Display total cart weight on cart & order page
  */
@@ -40,7 +39,6 @@ function bbloomer_print_cart_weight($posted)
         echo $html;
     }
 }
-
 
 remove_action('woocommerce_proceed_to_checkout', 'woocommerce_button_proceed_to_checkout', 20);
 
@@ -85,7 +83,6 @@ function wc_empty_cart_redirect_url()
     return get_home_url();
 }
 
-
 //They only way to translate shipping
 add_filter('woocommerce_shipping_package_name', 'gf_translate_shipping', 10, 3);
 function gf_translate_shipping($name, $package)
@@ -93,7 +90,6 @@ function gf_translate_shipping($name, $package)
 //    return sprintf( _nx( 'Dostava', 'Dostava %d', ( $i + 1 ), 'shipping packages', 'green-friends' ), ( $i + 1 ) );
     return 'Dostava';
 }
-
 
 add_action('woocommerce_before_cart', 'gf_cart_limit_notice');
 function gf_cart_limit_notice()

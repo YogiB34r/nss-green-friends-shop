@@ -226,6 +226,4 @@ function gf_add_ordering_phone_number() {
     echo '<p class="phone_ordering_label">Naručite telefonom</p>';
     echo '<p class="phone_ordering_text"><a href="tel:+381117450380">011/7450-380</a></p>
             <p class="phone_ordering_note">radnim danima od 8-17 subotom od 10-16</p>';
-
-//    return
 }

@@ -318,7 +318,6 @@ function gf_admin_product_list_supplier_filter($output) {
         $html .= '</select>';
         $cache->redis->set($key, $html, 60 * 60);
     }
-
     return $html . $output;
 }
 

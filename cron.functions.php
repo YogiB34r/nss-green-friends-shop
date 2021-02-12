@@ -331,8 +331,6 @@ function syncElasticIndex() {
     $indexer->indexAll();
 }
 
-//add_action('woocommerce_process_product_meta', 'syncToElastic', 666, 3);
-//function syncToElastic($id, WP_Post $post) {
 add_action('woocommerce_update_product', 'syncToElastic', 10, 1);
 function syncToElastic($id) {
     $product = wc_get_product($id);

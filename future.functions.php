@@ -1,6 +1,5 @@
 <?php
 
-//add_filter( 'wc_order_statuses', 'gf_remove_processing_status', 6666666 );
 function gf_remove_processing_status($statuses){
     if(isset($statuses['wc-processing'])){
         unset($statuses['wc-processing']);

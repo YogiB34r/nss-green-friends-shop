@@ -73,7 +73,6 @@ if (!class_exists('WP_Query')) {
     require_once(ABSPATH . 'wp-includes/class-wp-query.php');
 }
 
-
 /**
  * Create a new table class that will extend the WP_List_Table
  */
@@ -82,7 +81,6 @@ class Product_List_Table extends WP_List_Table
     public function __construct($args = array())
     {
         parent::__construct($args);
-        // $this->search = $search;
     }
 
     /**
@@ -109,8 +107,7 @@ class Product_List_Table extends WP_List_Table
             'per_page' => $perPage
         ));
         $data = array_slice($data, (($currentPage - 1) * $perPage), $perPage);
-        // var_dump($data);
-        // die();
+
         $this->_column_headers = array($columns, $hidden, $sortable);
         $this->items = $data;
     }
@@ -182,19 +179,13 @@ class Product_List_Table extends WP_List_Table
             }
         }
 
-        // var_dump($arguments);
-        // die();
-
         $query = new WP_Query($arguments);
-        // }
 
         if ($query->have_posts()) {
             while ($query->have_posts()) : $query->the_post();
 
-
             $product_id = get_the_ID();
-            // var_dump($product_id);
-            // die();
+
             $product = wc_get_product($product_id);
             $name = '<a href="' . esc_url(admin_url('post.php?post=' . get_the_ID() . ' &action=edit')) . ' ">' . esc_html(get_the_title()) . '</a>';
             $sku = get_post_meta($product_id, '_sku', true);
@@ -220,8 +211,7 @@ class Product_List_Table extends WP_List_Table
                              'date' => $date
                     );
             endwhile;
-            // var_dump($data);
-            // die();
+
             return $data;
         } else {
             echo __('No products found');
@@ -277,23 +267,6 @@ class Product_List_Table extends WP_List_Table
         }
         return -$result;
     }
-
-//    function column_url($item)
-//    {
-//        $actions = array(
-//            'edit' => sprintf('<a href="?page=%s&action=%s&url=%s">Edit</a>', $_REQUEST['page'], 'edit', $item['id']),
-//        );
-//
-//        return sprintf('%1$s %2$s', $item['url'], $this->row_actions($actions));
-//    }
-
-//    function get_bulk_actions()
-//    {
-//        $actions = array(
-//            'delete' => 'Delete'
-//        );
-//        return $actions;
-//    }
 
     public function column_cb($item)
     {

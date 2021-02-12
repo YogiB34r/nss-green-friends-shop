@@ -1,5 +1,5 @@
 <?php
-//ini_set('max_execution_time', '40');
+
 use Gf\Search\Functions;
 use GF\Theme;
 use Gf\Util\Url;

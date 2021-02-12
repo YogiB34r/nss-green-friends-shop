@@ -21,9 +21,6 @@ if (wp_is_mobile()) {
     $mobile = 'mobile';
 }
 $ppp = 24;
-//            if (isset($_POST["ppp"])) {
-//                $ppp = $_POST["ppp"];
-//            }
 
 $searchQuery = '';
 if (isset($_GET['query'])) {

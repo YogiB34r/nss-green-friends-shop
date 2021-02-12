@@ -62,8 +62,6 @@ class Elastic implements \GF\Search\AdapterInterface
     public function getIdsForCategory($slug)
     {
         return $this->search->getItemIdsForCategory($slug);
-
-//        return array_merge($allIds, array_keys($productsOutOfStock));
     }
 
     public function getAllItems($limit, $page, $order)

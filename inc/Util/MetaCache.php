@@ -114,9 +114,6 @@ class MetaCache
                     break;
             }
         }
-
-//        var_dump('not implemented for: ' . $metaKey);
-//        die();
     }
 
     private function setCachedContainer($postId, $postType, $data)

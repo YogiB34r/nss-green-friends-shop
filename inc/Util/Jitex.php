@@ -14,7 +14,6 @@ class Jitex
         header('Expires: 0');
         header('Pragma: no-cache');
 
-//    print iconv('utf-8','windows-1250',str_replace(array('Ð', 'ð'), array('Đ', 'đ'), $csvText));
         $csvText = static::fixJitexCharacters($csvText);
         echo $csvText;
     }

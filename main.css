@@ -55,7 +55,6 @@ html, body {
   header .fas {
     font-size: 18px; } }
 
-/* WooCommerce Templates START*/
 .customerDetails {
   display: flex; }
   .customerDetails .customerNote {
@@ -80,7 +79,6 @@ html, body {
   flex-basis: 100%;
   width: 100%; }
 
-/* WooCommerce Templates END*/
 .gf-content-wrapper {
   padding: 25px 0 25px 25px;
   max-width: 75%;

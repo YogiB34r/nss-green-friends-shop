@@ -44,7 +44,6 @@ function gf_order_fields($fields) {
         "billing_company",
         "billing_pib",
         "billing_address_1",
-//        "billing_address_2",
         "billing_city",
         "billing_postcode",
         "billing_country",
@@ -152,7 +151,6 @@ function gf_newsletter_on_checkout_page($orderid) {
         TNP::subscribe(['email' => $email, 'status' => 'C']);
     }
 
-//    if ($order->get_status() === "pending") {
     if ($order->get_status() === "on-hold") {
         if ($order->get_payment_method() === 'bacs') {
             $order->set_status('cekaseuplata');
@@ -227,18 +225,6 @@ function gf_order_created($post_id, $post, $update)
         }
     }
 }
-
-//add_action('woocommerce_review_order_before_submit', 'gf_add_www_field_on_checkout');
-//function gf_add_www_field_on_checkout($checkout) {
-//    woocommerce_form_field('gf_www_orders', array(
-//        'type' => 'hidden',
-//    ), true);
-//}
-//
-//add_action('woocommerce_checkout_update_order_meta', 'gf_custom_checkout_field_update_order_meta_created_method');
-//function gf_custom_checkout_field_update_order_meta_created_method($order_id) {
-//    if (isset($_POST['gf_www_orders']) && $_POST['gf_www_orders']) update_post_meta($order_id, 'gf_order_created_method', 'WWW');
-//}
 
 add_filter( 'woocommerce_checkout_fields', 'gf_change_city_field_to_dropdown' );
 /**

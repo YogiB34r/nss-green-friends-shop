@@ -36,7 +36,7 @@ class Enqueue
         wp_enqueue_style('gf-style-reset', get_stylesheet_directory_uri() . '/assets/css/reset.css');
         //wp_enqueue_style('gf-style', get_stylesheet_directory_uri() . '/style.css', ['woocommerce-layout'], '7e853');
         wp_enqueue_style('gf-style-index', get_stylesheet_directory_uri() . '/main.css');
-//        wp_enqueue_style('gf-style-index', get_stylesheet_directory_uri() . '/assets/css/main.min.css');
+        //wp_enqueue_style('gf-style-index', get_stylesheet_directory_uri() . '/assets/css/main.min.css');
         wp_enqueue_style( 'grid-list-layout', plugins_url( '/woocommerce-grid-list-toggle/assets/css/style.css'));
         wp_enqueue_style( 'grid-list-button', plugins_url( '/woocommerce-grid-list-toggle/assets/css/button.css'));
     }
@@ -54,19 +54,17 @@ class Enqueue
             wp_localize_script('nss-mobile-js', 'mobileMegaMenu', array('html'=>gf_category_mobile_toggle_shortcode()));
         }
         else{
-            wp_enqueue_script('gf-front-js', get_stylesheet_directory_uri() . '/assets/js/gf-front.js', [], '', true);
-            //required in order for ajax to work !?
-            wp_localize_script( 'gf-front-js', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php')));
+            wp_enqueue_script('nss-desktop-js', get_stylesheet_directory_uri() . '/assets/js/nssDesktop.js', [], '', true);
+            wp_localize_script( 'nss-desktop-js', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php')));
+            // wp_enqueue_script('gf-front-js', get_stylesheet_directory_uri() . '/assets/js/gf-front.js', [], '', true);
+            // wp_localize_script( 'gf-front-js', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php')));
         }
-
-
+        //@TODO proveri dal je ovde nesto potrebno 
 
         //wp_enqueue_script('jquery', '', [], false, true);
         //wp_enqueue_script('bootstrap-js', 'https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js', array(), '', 'true');
         //wp_enqueue_script('bootstrap-popper', 'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js', array(), '', 'true');
         //wp_enqueue_script('clamp', get_stylesheet_directory_uri() . '/assets/js/3rd-party/_clamp.min.js');
-
-
 
         //wp_enqueue_script('flexslider', plugins_url() . '/woocommerce/assets/js/flexslider/jquery.flexslider.min.js');
         //wp_enqueue_script('zoom', plugins_url() . '/woocommerce/assets/js/zoom/jquery.zoom.min.js');

@@ -2,8 +2,6 @@
 
 namespace GF\ExternalBannerWidget;
 
-//load_plugin_textdomain('gf-externalItemBannersWidget', '', plugins_url() . '/gf-externalItemBannersWidget/languages');
-
 class ExternalBannerWidget
 {
     const CACHE_KEY = 'nss#carouselWidget';

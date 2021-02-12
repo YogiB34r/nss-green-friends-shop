@@ -16,16 +16,9 @@ class OrderEmails
         $order = wc_get_order($order_id);
 
         $targetStatuses = [
-//            'naruceno' => 'Naručeno',
-//            'u-pripremi-placeno' => 'U pripremi (plaćeno)',
-//            'spz-pakovanje' => 'Spremno za pakovanje',
             'poslato' => 'Poslato',
-//            'isporuceno' => 'Isporučeno',
-//            'finalizovano' => 'Finalizovano',
-//            'reklamacija' => 'Reklamacija',
             'reklamacija-pnns' => 'Reklamacija - proizvod nema na stanju',
             'stornirano-pn' => 'Stornirano - proizvod nema na stanju',
-//            'stornirano' => 'Stornirano',
         ];
 
         if (in_array($new, array_keys($targetStatuses))) {

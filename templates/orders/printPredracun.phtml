@@ -144,8 +144,6 @@
             }
             /* @var \WC_Product $product */
             $modifier = (float) '1' .'.'. (int) number_format($product->get_meta('pdv'));
-//            $priceNoPdv = (int) $product->get_price() / $modifier;
-//            $pdvInDin = $product->get_price() - $priceNoPdv;
             $itemPrice = (int) $item->get_total() / $item->get_quantity();
             $priceNoPdv = $itemPrice / $modifier;
             $pdvInDin = $itemPrice - $priceNoPdv;
@@ -155,7 +153,7 @@
             ?>
             <tr>
                 <td width="30%" style="text-align: left">(<?=$product->get_sku()?>) <?=$item->get_name()?></td>
-<!--                <td width="30%" style="text-align: left"><?=$product->get_name()?></td> -->
+                <?=$product->get_name()?>
                 <td width="7%"><?=$item->get_quantity()?></td>
                 <td width="15%"><?=number_format($priceNoPdv, 2)?></td>
                 <td width="14%"><?=$product->get_meta('pdv')?> %</td>
@@ -163,6 +161,7 @@
                 <td style="text-align: right"><?=number_format($itemPrice, 2)?> din </td>
             </tr>
         <?php } ?>
+        <!-- sto ovo nije odradjeno kao colspan="5" -->
         <tr>
             <td>&nbsp;</td>
             <td></td>

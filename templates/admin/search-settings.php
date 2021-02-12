@@ -205,23 +205,6 @@ class Search_List_Table extends WP_List_Table
         return -$result;
     }
 
-//    function column_url($item)
-//    {
-//        $actions = array(
-//            'edit' => sprintf('<a href="?page=%s&action=%s&url=%s">Edit</a>', $_REQUEST['page'], 'edit', $item['id']),
-//        );
-//
-//        return sprintf('%1$s %2$s', $item['url'], $this->row_actions($actions));
-//    }
-
-//    function get_bulk_actions()
-//    {
-//        $actions = array(
-//            'delete' => 'Delete'
-//        );
-//        return $actions;
-//    }
-
     function column_cb($item)
     {
         return sprintf(

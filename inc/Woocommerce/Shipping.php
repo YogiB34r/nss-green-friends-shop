@@ -55,7 +55,7 @@ class Shipping
         $cartContent = [];
         $i = 0;
 
-        //Serbia iz zone id 1
+        //Serbia is zone id 1
         $zone = \WC_Shipping_Zones::get_zone('1');
         $rates = [];
 
@@ -291,7 +291,6 @@ class Shipping
     private
     function settingCustomShippingPriceOverride($cartWeight, $cartContents)
     {
-
         $customCost = 0;
         /** @var \WC_Product $product */
         foreach ($cartContents as $cartContent) {
@@ -369,6 +368,4 @@ class Shipping
         }
         return false;
     }
-
-
 }

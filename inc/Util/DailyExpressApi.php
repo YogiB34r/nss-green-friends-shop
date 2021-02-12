@@ -52,7 +52,6 @@ class DailyExpressApi
     }
 
     public function createDailyExport($orders) {
-//    ini_set('display_errors', 1);
         $adresnicaFields = [
             'ReferenceID','SBranchID','SName','SAddress','STownID','STown','SCName','SCPhone','PuBranchID','PuName',
             'PuAddress','PuTownID','PuTown','PuCName','PuCPhone','RBranchID','RName','RAddress','RTownID','RTown','RCName',
@@ -98,7 +97,6 @@ class DailyExpressApi
                 }
             }
 
-//            $dailyCode = 'SS'.preg_replace('/2018/', '', str_replace('-', '', $order->get_order_number()), 1);
             $codeLength = strlen($order->get_order_number());
             $dailyCode = 'SS' . preg_replace('/2019/', '', str_replace('-', '', $order->get_order_number()), 1);
             if (strlen($dailyCode) === $codeLength) {

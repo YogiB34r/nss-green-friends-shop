@@ -47,7 +47,7 @@ global $stickers;
         <?php if (has_post_thumbnail($product->get_id())): ?>
             <img src="<?=get_the_post_thumbnail_url($product->get_id(), 'shop_catalog')?>" class="attachment-post-thumbnail size-post-thumbnail wp-post-image"
                  alt="<?=$product->get_title()?>" width="200" height="200" />
-<?php // srcset="/wp-content/uploads/2018/10/02/34/2960630.jpg 500w, /wp-content/uploads/2018/10/02/34/2960630-150x150.jpg 150w, /wp-content/uploads/2018/10/02/34/2960630-300x300.jpg 300w, /wp-content/uploads/2018/10/02/34/2960630-100x100.jpg 100w" sizes="(max-width: 500px) 100vw, 500px" ';
+<?php
         else:
             echo '<img src="' . wc_placeholder_img_src() . '" alt="Placeholder" width="300px" height="300px" />';
         endif; ?>
@@ -58,8 +58,4 @@ global $stickers;
     </a>
     <span class="price"><?php echo $product->get_price_html(); ?></span>
     <div class="loop-short-description"><?=strip_tags($product->get_short_description())?></div>
-   <?php // ADD to cart button if needed, also hidden in css just in case?>
-    <?php //$list_grid->gridlist_buttonwrap_open()?>
-    <?php //woocommerce_template_loop_add_to_cart($product); ?>
-    <?php //$list_grid->gridlist_buttonwrap_close()?>
 </li>

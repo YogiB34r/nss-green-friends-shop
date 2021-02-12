@@ -1,4 +1,6 @@
 <?php
+//Mislim da se ovaj fajl uopste ne koristi, eventualno jedna-dve metode
+
 add_shortcode('gf-footer-credits', 'gf_footer_credits_shortcode');
 function gf_footer_credits_shortcode()
 {
@@ -44,6 +46,7 @@ function gf_category_dropdown_shortcode()
     }
 }
 
+//mislim da se ovo ne koristi, moram da proverim
 add_shortcode('gf-product-search', 'gf_product_search_shortcode');
 function gf_product_search_shortcode()
 {
@@ -182,9 +185,7 @@ add_shortcode('gf-best-selling-products', 'gf_display_best_selling_products');
 function gf_display_best_selling_products(){
     include_once(WC()->plugin_path().'/includes/admin/reports/class-wc-admin-report.php');
     $wc_report = new WC_Admin_Report();
-//    $wc_report->start_date = strtotime('20/10/2018');
 
-//    $filter_range = true;
     $data = $wc_report->get_order_report_data( array(
         'data' => array(
             '_qty' => array(
@@ -220,11 +221,9 @@ function gf_display_best_selling_products(){
     ) );
 
     $ids = [];
-    foreach ($data as $datum):
+    foreach ($data as $datum){
         $ids[] = $datum->product_id;
-//        $product = wc_get_product($datum->product_id);
-//        require(__DIR__ . "/../woocommerce/content-product.php");
-    endforeach;
+    }
 
     $args = array(
         'post_type' => 'product',
@@ -239,11 +238,6 @@ function gf_display_best_selling_products(){
         'suppress_filters' => true,
         'no_found_rows' => true
     );
-
-//    echo WC_Shortcodes::best_selling_products([
-//        'limit'        => '3',
-//        'columns'      => '1'
-//    ]);
 
 $query = new WP_Query($args);
 echo '<h2>Najprodavaniji proizvodi</h2>';

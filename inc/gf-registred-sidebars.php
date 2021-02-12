@@ -11,11 +11,6 @@ function gf_register_sidebars()
             'before_widget' => '',
             'after_widget' => '',
         ),
-//        array(
-//            'name' => __('Header Search form (desktop)', '' . $theme->get('TextDomain') . ''),
-//            'id' => 'gf-header-row-2-col-2',
-//            'description' => '',
-//        ),
         array(
             'name' => __('Home images slider/banners(desktop)', '' . $theme->get('TextDomain') . ''),
             'id' => 'gf-homepage-row-1',
@@ -88,13 +83,7 @@ function gf_register_sidebars()
             'before_widget' => '',
             'after_widget' => '',
         ),
-//        array(
-//            'name' => __('Category Sidebar (product filters for mobile)', '' . $theme->get('TextDomain') . ''),
-//            'id' => 'gf-category-sidebar-product-filters',
-//            'description' => 'Category page sidebar (product filters for mobile)',
-//        ),
     );
-
 
     foreach ($my_sidebars as $args) {
         register_sidebar($args);

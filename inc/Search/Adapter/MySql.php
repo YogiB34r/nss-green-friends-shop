@@ -32,11 +32,9 @@ class MySql implements \GF\Search\AdapterInterface
 
                 break;
 
-            //@TODO add sync for ratings
+            //@TODO add sync for ratings - Bojan: Excuse me?
             case 'rating':
-//            $orderBy = " ORDER BY rating DESC ";
                 $orderBy = " createdAt DESC ";
-
                 break;
 
             case 'date':
@@ -149,7 +147,6 @@ class MySql implements \GF\Search\AdapterInterface
             $sql .= " LIMIT {$limit} ";
         }
 
-//    echo $sql;
         $products = $this->wpdb->get_results($sql, OBJECT_K);
 
         return array_keys($products);
