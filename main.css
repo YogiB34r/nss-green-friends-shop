@@ -886,6 +886,8 @@ body.home .widget_gf_newsletter_widget {
       flex-flow: column;
       height: 340px;
       position: relative; }
+      .woocommerce ul.products.grid li.content-area {
+        height: unset; }
       .woocommerce ul.products.grid li.product a h5, .woocommerce ul.products.grid li.product a h3 {
         height: 40px; }
   .woocommerce ul.products.list {

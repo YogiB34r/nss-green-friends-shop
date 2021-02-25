@@ -114,8 +114,6 @@ function ajax_script_load_more($args)
 
 //********* infinite scroll END *********
 
-
-
 add_filter('script_loader_tag', 'add_async_attribute', 10, 2);
 function add_async_attribute($tag, $handle) {
     $scripts_to_defer = array('merged-script');
@@ -262,7 +260,6 @@ function get_product_by_sku( $sku ) {
 
     $product_id = $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key='_sku' AND meta_value='%s' LIMIT 1", $sku ) );
     if ($product_id){
-        //return get_product($product_id); this is depricated
         return new WC_Product( $product_id );
     }
 
@@ -299,7 +296,6 @@ function gf_migrate_comments()
         $commentContent = $comment['comment'];
         $userId = $user->get('ID');
         $commentDate = $comment['date'];
-
 
         $data = array(
             'comment_post_ID' => $postId,

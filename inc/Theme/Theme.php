@@ -3,7 +3,6 @@
 
 namespace GF;
 
-
 class Theme
 {
     /**

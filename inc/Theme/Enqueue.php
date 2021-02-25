@@ -43,9 +43,8 @@ class Enqueue
 
     public function addScripts()
     {
+        //swiper-js is vanilla js library for sliders
         wp_enqueue_script('swiper-js', 'https://unpkg.com/swiper/swiper-bundle.min.js', array(), '', true);
-        //wp_enqueue_script('cookie', get_stylesheet_directory_uri() . '/assets/js/jquery.cookie.js');
-        //wp_enqueue_script('grid-list-scripts', plugins_url( '/woocommerce-grid-list-toggle/assets/js/jquery.gridlistview.min.js'), ['jquery-ui-tabs']);
 
         //enqueue final js script based on device
         if(wp_is_mobile()){
@@ -56,9 +55,10 @@ class Enqueue
         else{
             wp_enqueue_script('nss-desktop-js', get_stylesheet_directory_uri() . '/assets/js/nssDesktop.js', [], '', true);
             wp_localize_script( 'nss-desktop-js', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php')));
-            // wp_enqueue_script('gf-front-js', get_stylesheet_directory_uri() . '/assets/js/gf-front.js', [], '', true);
-            // wp_localize_script( 'gf-front-js', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php')));
         }
+
+        
+    /**
         //@TODO proveri dal je ovde nesto potrebno 
 
         //wp_enqueue_script('jquery', '', [], false, true);
@@ -71,6 +71,7 @@ class Enqueue
         //wp_enqueue_script('photoswipe', plugins_url() . '/woocommerce/assets/js/photoswipe/jquery.photoswipe.min.js');
         //wp_enqueue_script('photoswipe-ui-default', plugins_url() . '/woocommerce/assets/js/photoswipe/jquery.photoswipe-ui-default.min.js');
         //wp_enqueue_script('wc-single-product', plugins_url() . '/woocommerce/assets/js/frontend/single-product.min.js', ['photoswipe']);
+    **/
     }
 
     public function addAdminStyles ()

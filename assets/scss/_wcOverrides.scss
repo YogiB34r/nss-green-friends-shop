@@ -365,7 +365,9 @@
           flex-flow: column;
           height: 340px;
           position: relative;
-
+          &.content-area{
+            height: unset;
+          }
           &.product {
             a {
               h5, h3 {

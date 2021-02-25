@@ -1,4 +1,5 @@
 const body = document.getElementsByTagName("BODY")[0];
+
 document.addEventListener('DOMContentLoaded', () => {
     ajaxRefreshCartCount();
     if (body.classList.contains('single-product')) {
@@ -9,29 +10,14 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(autoSlide, banner_speed.speed * 1000);
     }
 });
-function ajaxRefreshCartCount() {
-    let request = new XMLHttpRequest();
-    let cartCount = document.getElementById("cartCount");
-    // let userCartCount = document.getElementById("accCartCount");
-    let userCartCount = document.querySelector('.nssMobileUserLink:first-child a');
 
-    request.open("POST", "/gf-ajax/", true);
-    request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-
-    request.onload = function () {
-        if (this.status >= 200 && this.status < 400) {
-            cartCount.innerHTML = this.responseText;
-            userCartCount.innerHTML = `Korpa (${this.responseText})`;
-        }
-    };
-    request.send("action=refreshCartCount");
-}
 const userIcon = document.getElementById('nssFancyUser');
 const mobileUserMenu = document.getElementById('nssMobileUserMenu');
 let mobileUserMenuHeight = 0;
 for (let el of mobileUserMenu.children) {
     mobileUserMenuHeight += el.offsetHeight;
 }
+
 userIcon.onclick = () => {
     userIcon.classList.toggle('fancy-header-icons');
     mobileUserMenu.classList.toggle('show');
@@ -60,6 +46,30 @@ searchIcon.onclick = function () {
         setTimeout(() => searchInputMobile.focus(), 500); //fokusiraj input posle 0.5s (kraj animacije)
     }
 };
+const searchFormMob = document.getElementById('gfSearchFormMobile');
+searchFormMob.addEventListener('submit', searchSubmit);
+function searchSubmit() {
+    let radio = document.querySelector('[name^=search-radiobutton]:checked');
+    if (radio !== null) {
+        if (radio.value === 'category') {
+            searchFormMob.setAttribute('action', '');
+        }
+    }
+}
+//expander for archive page
+const expanderArrow = document.getElementById('nssCatExpander');
+const expanderSubCats = document.getElementsByClassName('gf-expander__subcategory-list');
+if (expanderArrow != null && expanderArrow.firstElementChild != null) {
+    expanderArrow.firstElementChild.onclick = function () {
+        toggleClass(this, ['fa-angle-down', 'fa-angle-up']);
+        for (let cat of expanderSubCats) {
+            let height = cat.parentElement.clientHeight + cat.clientHeight;
+            let style = 'height:' + height + 'px;';
+            sliderToggle(cat.parentElement, style);
+        }
+    };
+}
+
 //animation for mobile megaMenu
 const megaMenuIcon = document.getElementById('gf-bars-icon-toggle');
 const megaMenuList = document.getElementById('mobileMegaMenu');
@@ -76,29 +86,11 @@ megaMenuIcon.onclick = function () {
     }
 
 };
+/* load megamenu html */
 function getMenu() {
     document.getElementById('mobileMegaMenu').innerHTML += mobileMegaMenu.html;
 }
-//expander for archive page
-const expanderArrow = document.getElementById('nssCatExpander');
-const expanderSubCats = document.getElementsByClassName('gf-expander__subcategory-list');
-if (expanderArrow != null && expanderArrow.firstElementChild != null) {
-    expanderArrow.firstElementChild.onclick = function () {
-        toggleClass(this, ['fa-angle-down', 'fa-angle-up']);
-        for (let cat of expanderSubCats) {
-            let height = cat.parentElement.clientHeight + cat.clientHeight;
-            let style = 'height:' + height + 'px;';
-            sliderToggle(cat.parentElement, style);
-        }
-    };
-}
-function viewCountAjax() {
-    let request = new XMLHttpRequest();
-    let productNum = document.querySelector('[id^=product]').getAttribute('id').split('-')[1];
-    request.open("POST", "/gf-ajax/?viewCount=true&postId=" + productNum, true);
-    request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-    request.send('viewCount=true&postId=' + productNum);
-}
+
 //subcategories for megaMenu
 function addMegaMenuEvents() {
     const expandIcons = document.getElementsByClassName('openMoreCategories');
@@ -123,17 +115,8 @@ if (descriptionButton !== null) {
         document.querySelector('.gf-archive-description p').classList.toggle('gf-display-category-description');
     });
 }
-const searchFormMob = document.getElementById('gfSearchFormMobile');
-searchFormMob.addEventListener('submit', searchSubmit);
-function searchSubmit() {
-    let radio = document.querySelector('[name^=search-radiobutton]:checked');
-    if (radio !== null) {
-        if (radio.value === 'category') {
-            searchFormMob.setAttribute('action', '');
-        }
-    }
-}
-/***Slider buttons***/
+
+/***Slider banner***/
 let marginLeft = 0;
 const buttons = document.getElementsByClassName('sliderButton');
 const buttonPrevious = document.querySelector('.buttonPrevious');
@@ -164,10 +147,13 @@ function sliderButtons() {
             buttons[idButton + 1].click();
     });
 }
+/* slide automatically, banner_speed.speed is from slider.php */
 function autoSlide() {
     buttonNext.click();
     setTimeout(autoSlide, banner_speed.speed * 1000);
 }
+
+/* product sliders homepage */
 const swiper = new Swiper('.swiper-container', {
     slidesPerView: 2,
     spaceBetween: 0,
@@ -193,6 +179,7 @@ const swiper = new Swiper('.swiper-container', {
     }
 
 });
+/* prev/next button for product sliders */
 const prevButtons = document.getElementsByClassName('product-slider__control-prev');
 const nextButtons = document.getElementsByClassName('product-slider__control-next');
 if (prevButtons != null) {
@@ -211,6 +198,67 @@ if (nextButtons != null) {
             e.preventDefault();
             swipeNext.slideNext();
         })
+    }
+}
+
+//billing on login
+const billingPostcode = document.getElementById('billing_postcode');
+const shippingPostcode = document.getElementById('shipping_postcode');
+const billingCompany = document.getElementById('billing_company_checkbox');
+const billingCompanySettings = document.querySelector('p#billing_company_field > label > span');
+const billingPibSettings = document.querySelector('p#billing_pib_field > label > span');
+if (billingPostcode !== null) {
+    checkoutCityAjax();
+    document.getElementById('ship-to-different-address-checkbox').checked = false;
+    billingCompany.checked = false;
+    billingPostcode.addEventListener('keypress', (e) => {
+        if (billingPostcode.value.length >= 6) {
+            e.preventDefault();
+        }
+    });
+    billingPostcode.addEventListener('keyup', () => {
+        billingPostcode.value = billingPostcode.value.replace(/\D/g, '');
+    });
+    shippingPostcode.addEventListener('keypress', (e) => {
+        if (billingPostcode.value.length >= 6) {
+            e.preventDefault();
+        }
+    });
+    shippingPostcode.addEventListener('keyup', () => {
+        shippingPostcode.value = shippingPostcode.value.replace(/\D/g, '');
+    });
+    billingCompany.addEventListener('click', (e) => {
+        toggleViewing(document.getElementById('billing_pib_field'));
+        toggleViewing(document.getElementById('billing_company_field'));
+        if (billingCompany.checked) {
+            document.getElementById('billing_company_field').classList.add('validate-required');
+            document.getElementById('billing_pib_field').classList.add('validate-required');
+            billingCompanySettings.classList.remove('optional');
+            billingCompanySettings.classList.add('required');
+            billingCompanySettings.textContent = '*';
+            billingPibSettings.classList.remove('optional');
+            billingPibSettings.classList.add('required');
+            billingPibSettings.textContent = '*';
+        }
+    });
+}
+/** showing password via checkbox **/
+function showPassword() {
+    const x = document.getElementById('password');
+    if (x.getAttribute('type') === "password") {
+        x.setAttribute('type', 'text')
+    } else {
+        x.setAttribute('type', 'password')
+    }
+}
+
+/* functions that jQuery basically has, but homemade */
+//toggle() from jquery to js, homemade :)
+function toggleViewing(domEl) {
+    if (window.getComputedStyle(domEl)['display'] === 'none') {
+        domEl.style.display = 'block';
+    } else {
+        domEl.removeAttribute('style');
     }
 }
 //Function for sliding animation
@@ -249,76 +297,46 @@ function toggleClass(div, params) {
         div.classList.toggle(param);
     }
 }
-//billing on login
-const billingPostcode = document.getElementById('billing_postcode');
-const shippingPostcode = document.getElementById('shipping_postcode');
-const billingCompany = document.getElementById('billing_company_checkbox');
-const billingCompanySettings = document.querySelector('p#billing_company_field > label > span');
-const billingPibSettings = document.querySelector('p#billing_pib_field > label > span');
-if (billingPostcode !== null) {
-    checkoutCityAjax();
-    document.getElementById('ship-to-different-address-checkbox').checked = false;
-    billingCompany.checked = false;
-    billingPostcode.addEventListener('keypress', (e) => {
-        if (billingPostcode.value.length >= 6) {
-            e.preventDefault();
+
+/* AJAX Requests */
+function ajaxRefreshCartCount() {
+    let request = new XMLHttpRequest();
+    let cartCount = document.getElementById("cartCount");
+
+    let userCartCount = document.querySelector('.nssMobileUserLink:first-child a');
+
+    request.open("POST", "/gf-ajax/", true);
+    request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+
+    request.onload = function () {
+        if (this.status >= 200 && this.status < 400) {
+            cartCount.innerHTML = this.responseText;
+            userCartCount.innerHTML = `Korpa (${this.responseText})`;
         }
-    });
-    billingPostcode .addEventListener('keyup', () => {
-        billingPostcode.value = billingPostcode.value.replace(/\D/g, '');
-    });
-    shippingPostcode.addEventListener('keypress', (e) => {
-        if (billingPostcode.value.length >= 6) {
-            e.preventDefault();
-        }
-    });
-    shippingPostcode.addEventListener('keyup', () => {
-        shippingPostcode.value = shippingPostcode.value.replace(/\D/g, '');
-    });
-    billingCompany.addEventListener('click', (e)=>{
-        toggleViewing(document.getElementById('billing_pib_field'));
-        toggleViewing(document.getElementById('billing_company_field'));
-        if(billingCompany.checked){
-            document.getElementById('billing_company_field').classList.add('validate-required');
-            document.getElementById('billing_pib_field').classList.add('validate-required');
-            billingCompanySettings.classList.remove('optional');
-            billingCompanySettings.classList.add('required');
-            billingCompanySettings.textContent = '*';
-            billingPibSettings.classList.remove('optional');
-            billingPibSettings.classList.add('required');
-            billingPibSettings.textContent = '*';
-        }
-    });
+    };
+    request.send("action=refreshCartCount");
 }
-//toggle() from jquery to js, homemade :)
-function toggleViewing(domEl){
-    if(window.getComputedStyle(domEl)['display'] === 'none'){
-        domEl.style.display = 'block';
-    }else{
-        domEl.removeAttribute('style');
-    }
+
+function viewCountAjax() {
+    let request = new XMLHttpRequest();
+    let productNum = document.querySelector('[id^=product]').getAttribute('id').split('-')[1];
+    request.open("POST", "/gf-ajax/?viewCount=true&postId=" + productNum, true);
+    request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+    request.send('viewCount=true&postId=' + productNum);
 }
-/** ovo sluzi samo za checkbox na loginu**/
-function showPassword() {
-    const x = document.getElementById('password');
-    if (x.getAttribute('type') === "password") {
-        x.setAttribute('type', 'text')
-    } else {
-        x.setAttribute('type', 'password')
-    }
-}
+
 //have to finish later
-function checkoutCityAjax(){
+function checkoutCityAjax() {
     const billingCity = document.getElementById('billing_city');
     const shippingCity = document.getElementById('shipping_city');
-    billingCity.addEventListener('change', ()=>{
+    billingCity.addEventListener('change', () => {
         let city = billingCity.value,
             name = billingCity.getAttribute('name');
         let request = new XMLHttpRequest();
         request.open("POST", `/gf-ajax/`, true);
         request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-        request.onload = ()=>{
-            if(this.status >= 200 && this.status <= 400){
+        request.onload = () => {
+            if (this.status >= 200 && this.status <= 400) {
                 billingPostcode.value = this.response;
             }
         };

@@ -82,8 +82,10 @@ function woocommerce_result_count() {
     $total = wc_get_loop_prop('total');
     $per_page = wc_get_loop_prop('per_page');
     $current = wc_get_loop_prop('current_page');
+
     //zar nije lepsa formula per_page*(current-1) + 1?
     $first = ($per_page * $current) - $per_page + 1;
+    
     $last = min($total, $per_page * $current);
     // @TODO solve this properly :) Ne razumem
     if ($last === 0) {

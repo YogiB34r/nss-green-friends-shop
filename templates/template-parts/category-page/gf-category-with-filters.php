@@ -7,22 +7,25 @@ global $searchFunctions;
  * Has to be called on top in order to properly set all required filters
  */
 $action = 'search';
+$query = '';
+$numOfMainCategories = 24;
+$searchQuery = '';
+
 if (get_query_var('term') !== '') {
     $action = 'category';
 }
-$query = '';
+
 if (isset($_GET['query'])) {
     $query = $_GET['query'];
 }
+
 $sortedProducts = $searchFunctions->getResults(get_query_var('term'), $query);
 
 $mobile = 'desktop';
 if (wp_is_mobile()) {
     $mobile = 'mobile';
 }
-$ppp = 24;
 
-$searchQuery = '';
 if (isset($_GET['query'])) {
     $searchQuery = $_GET['query'];
 }
@@ -103,7 +106,7 @@ if ($sexyShopCats) {
 
             woocommerce_product_loop_start();
 
-            echo '<div id="ajax-primary" class="content-area">
+            echo '<li id="ajax-primary" class="content-area">
                     <ul id="ajax-content" class="content-area">';
 
             if (get_class($sortedProducts) === \Elastica\ResultSet::class) {
@@ -114,7 +117,7 @@ if ($sexyShopCats) {
 
             echo '</ul>';
             echo '<a aria-label="infiniteScroll" href="#" data-term="' . get_query_var('term') . '" data-query="' . $searchQuery . '" data-action="' . $action . '"
-            data-ppp="' . $ppp . '" id="loadMore" class="' . $mobile . '" data-page="1" data-url="' . admin_url("admin-ajax.php") . '" ></a></div>';
+            data-ppp="' . $numOfMainCategories . '" id="loadMore" class="' . $mobile . '" data-page="1" data-url="' . admin_url("admin-ajax.php") . '" ></a></div>';
 
             woocommerce_product_loop_end();
 

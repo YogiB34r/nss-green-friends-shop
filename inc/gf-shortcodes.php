@@ -1,12 +1,13 @@
 <?php
-//Mislim da se ovaj fajl uopste ne koristi, eventualno jedna-dve metode
 
+//good
 add_shortcode('gf-footer-credits', 'gf_footer_credits_shortcode');
 function gf_footer_credits_shortcode()
 {
     echo get_bloginfo('name') . ' ' . date('Y');
 }
-
+//bad
+/*
 add_shortcode('gf_my_account_link', 'gf_my_account_link_shortcode');
 function gf_my_account_link_shortcode()
 {
@@ -18,6 +19,7 @@ function gf_my_account_link_shortcode()
     echo '<div class="gf-my-account"><a href=" ' . $myaccount_page_url . '"><i class="fas fa-user"></i> ' . __('Moj nalog') . '</a></div>';
 }
 
+//bad
 add_shortcode('gf-category-dropdown', 'gf_category_dropdown_shortcode');
 function gf_category_dropdown_shortcode()
 {
@@ -46,6 +48,7 @@ function gf_category_dropdown_shortcode()
     }
 }
 
+//bad
 //mislim da se ovo ne koristi, moram da proverim
 add_shortcode('gf-product-search', 'gf_product_search_shortcode');
 function gf_product_search_shortcode()
@@ -91,10 +94,12 @@ function gf_product_search_shortcode()
     <?php
 }
 
+//bad
 add_shortcode('gf-cart', 'gf_cart_shortcode');
 function gf_cart_shortcode()
 {
-    global $woocommerce ?>
+    global $woocommerce;
+    ?>
     <a class="gf-header-cart" href="<?php echo wc_get_cart_url(); ?>"
        title="<?php _e('Cart View', 'green-friends'); ?>">
         <p class="gf-header-cart__title">
@@ -104,6 +109,7 @@ function gf_cart_shortcode()
     </a>
     <?php
 }
+*/
 /*
 add_shortcode('gf-mobile-nav-menu', 'gf_mobile_nav_menu_shortcode');
 function gf_mobile_nav_menu_shortcode()
@@ -150,6 +156,7 @@ function gf_mobile_nav_menu_shortcode()
     echo '</div>';
 }
 */
+//good, mobile header search
 add_shortcode('gf-mobile-search', 'gf_mobile_search_form');
 function gf_mobile_search_form()
 {
@@ -180,7 +187,7 @@ function gf_mobile_search_form()
 <?php
 }
 
-
+//good
 add_shortcode('gf-best-selling-products', 'gf_display_best_selling_products');
 function gf_display_best_selling_products(){
     include_once(WC()->plugin_path().'/includes/admin/reports/class-wc-admin-report.php');
