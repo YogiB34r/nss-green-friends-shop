@@ -295,33 +295,63 @@ function gf_product_list_bulk_action_handler($redirect_to, $doaction, $post_ids)
     if ($doaction !== 'remove_product_from_sliders') {
         return $redirect_to;
     }
+//    $sliderOptions = getSlidersOptions();
     $category_slug = $_GET['product_cat'];
-    $specialPromoId = get_term_by('slug', 'specijalne-promocije','product_cat')->term_id;
-    $taxonomyParentId = wp_get_term_taxonomy_parent_id(get_term_by( 'slug', $category_slug, 'product_cat' ),
+    $specialPromoId = get_term_by('slug', 'specijalne-promocije', 'product_cat')->term_id;
+//    $categoryId = get_term_by('slug', $category_slug, 'product_cat')->term_id;
+    $taxonomyParentId = wp_get_term_taxonomy_parent_id(get_term_by('slug', $category_slug, 'product_cat'),
         'product_cat');
 
 
     /*Specijalne promocije is parent category for slider cats, so if filtered cat is aforementioned cat
       get all child cats and remove them from product
      **/
-    if ($category_slug === 'specijalne-promocije'){
-        $category = get_term_by( 'slug', $category_slug, 'product_cat' );
-        $childCats = get_terms(['parent' => $category->term_id, 'taxonomy' => 'product_cat' , 'number' => 50]);
+    if ($category_slug === 'specijalne-promocije') {
+        $category = get_term_by('slug', $category_slug, 'product_cat');
+        $childCats = get_terms(['parent' => $category->term_id, 'taxonomy' => 'product_cat', 'number' => 50]);
     }
     foreach ($post_ids as $post_id) {
-        if (count($childCats ) > 0) {
-            foreach ($childCats as $cat){
+        $productObj = wc_get_product($post_id);
+        if (count($childCats) > 0) {
+            foreach ($childCats as $cat) {
                 wp_remove_object_terms($post_id, $cat->term_id, 'product_cat');
             }
         }
         //If parent cat is specijalne-promocije, also remove specijalne promocije cat from product
-        if( $taxonomyParentId === $specialPromoId){
+        if ($taxonomyParentId === $specialPromoId) {
             wp_remove_object_terms($post_id, 'specijalne-promocije', 'product_cat');
         }
         wp_remove_object_terms($post_id, $category_slug, 'product_cat');
+        $productObj->save();
+//        $sliderOptions = removeItemsIfInSlider($sliderOptions, $categoryId, $post_id);
     }
+//    updateSlidersOptions($sliderOptions);
     $redirect_to = add_query_arg('bulk_remove_product_from_sliders', count($post_ids), $redirect_to);
     return $redirect_to;
+}
+
+function removeItemsIfInSlider($sliderOptions, $categoryId, $productId)
+{
+    foreach ($sliderOptions['sliders'] as $slider) {
+        if ($categoryId === (int)$slider['category']['id']) {
+            foreach ($slider['products'] as $key => $value) {
+                if ((int)$value['id'] === $productId) {
+                    unset($slider['products'][$key]);
+                }
+            }
+        }
+    }
+    return $sliderOptions;
+}
+
+function getSlidersOptions()
+{
+    return get_option('gf_category_product_slider_options');
+}
+
+function updateSlidersOptions($options)
+{
+    update_option('gf_category_product_slider_options', $options);
 }
 
 //admin product list filter by supplier *** START ***

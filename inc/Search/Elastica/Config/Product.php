@@ -73,6 +73,8 @@ class Product implements ConfigInterface
                 'name' => array('type' => 'text', 'boost' => 5, 'fielddata' => true),
                 'manufacturer' => array('type' => 'text', 'boost' => 5),
                 'createdAt' => array('type' => 'date'),
+                'salePriceStart' => array('type' => 'date'),
+                'salePriceEnd' => array('type' => 'date'),
                 'supplierId' => array('type' => 'integer'),
                 'supplierSku' => array('type' => 'text'),
                 'thumbnail' => array('type' => 'text'),

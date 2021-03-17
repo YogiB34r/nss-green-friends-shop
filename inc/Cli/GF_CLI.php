@@ -70,9 +70,9 @@ class Cli
         $products = wc_get_products(array(
             'limit' => -1,
             'return' => 'ids',
-            'status' => 'publish',
-            'meta_key' => 'supplier',
-            'meta_value' => 296,
+//            'status' => 'publish',
+//            'meta_key' => 'supplier',
+//            'meta_value' => 45,
         ));
         $removed = 0;
         $diff = array_diff($this->getIndexedIds(), $products);

@@ -31,6 +31,15 @@ if (defined('WP_CLI') && WP_CLI) {
     \WP_CLI::add_command('createJitexItemExport', 'createJitexItemExport');
 
     \WP_CLI::add_command('testCron', 'testCron');
+
+    \WP_CLI::add_command('testNl', 'testNl');
+}
+
+function testNl()
+{
+    $nl = new Newsletter();
+    $nl->hook_newsletter();
+
 }
 
 /*
@@ -73,7 +82,6 @@ function createNalog() {
     global $wpdb;
 
     if (ENVIRONMENT === 'production') {
-
         $dt = new \DateTime('now', new \DateTimeZone('Europe/Belgrade'));
         if (in_array($dt->format('D'), ['Sun', 'Sat'])) {
             return;
@@ -83,13 +91,11 @@ function createNalog() {
         $backorder->createBackOrders();
 
         $sql = "SELECT backOrderId FROM wp_nss_backorder WHERE status <> 4 AND mailSent = 0";
+//        $sql = "SELECT backOrderId FROM wp_nss_backorder WHERE status = 2 AND mailSent = 0 AND DATE(createdAt) = '2020-12-18'";
         foreach ($wpdb->get_results($sql) as $result) {
             $orders = $backorder->getBackOrders($result->backOrderId);
             $supplierId = $orders[0]->supplierId;
             $backorder->sendBackOrderEmail($supplierId, $orders);
-            //        if ($backorder->sendBackOrderEmail($supplierId, $orders)) {
-            //            echo 'mail sent';
-            //        }
         }
 
         $from = 'mailer@nonstopshop.rs';
@@ -113,18 +119,18 @@ function daily() {
 
 add_action('syncMis', 'mis');
 function mis() {
-//    $item = wc_get_product(553396);  //
+//    $item = wc_get_product(558409);  //
 //    new NSS_MIS_Item($item);
 //    die();
 
-//    $orderIds = [574521];
+//    $orderIds = [596937];
 //    foreach ($orderIds as $orderId) {
 //        $order = wc_get_order($orderId);
 //        new NSS_MIS_Order($order);
 //    }
 //    die();
 
-//    $order = wc_get_order(570514);
+//    $order = wc_get_order(586068);
 //    new NSS_MIS_Order($order);
 //    die();
 
@@ -138,7 +144,7 @@ function mis() {
 
     $arg = array(
         'orderby' => 'date',
-        'posts_per_page' => '300',
+        'posts_per_page' => '1000',
 //        'posts_per_page' => -1,
 //        'date_created' => $dt,
 //        'page' => 10,
@@ -157,6 +163,7 @@ function mis() {
                 } else {
                     $misOrder = new NSS_MIS_Order($order);
                     $order->add_order_note('Synced to MIS at: ' . date('d/m/Y H:i'));
+                    $order->update_meta_data('synced', 1);
 //                    echo $order->get_id();
 //                    var_dump($order->get_meta('synced'));
                 }
@@ -176,27 +183,29 @@ add_action('createJitexItemExport', 'createJitexItemExport');
 function createJitexItemExport()
 {
     $csv = '';
-    for ($i = 1; $i < 15; $i++) {
+    for ($i = 1; $i < 20; $i++) {
         $args = array(
             'post_type' => 'product',
-            'posts_per_page' => 2000,
+            'posts_per_page' => 3000,
             'page' => $i,
-            'status' => 'publish'
+            'status' => ['publish']
         );
         $products = wc_get_products($args);
-
+//        $itemsSaved = 0;
         /* @var $product WC_Product_Simple|WC_Product_Variable */
-        foreach ($products as $product) {
+        foreach ($products as $key => $product) {
             try {
                 if ($product->get_meta('pdv') >= 10) {
-                    $taxcalc = (int)('1' . $product->get_meta('pdv'));
+                    $taxcalc = (int) ('1' . $product->get_meta('pdv'));
                 } else {
-                    $taxcalc = (int)('10' . (int)$product->get_meta('pdv'));
+                    $taxcalc = (int) ('10' . (int)$product->get_meta('pdv'));
                 }
 
                 $csv .= iconv('utf-8', 'windows-1250//IGNORE', $product->get_sku() . "\t" . trim(mb_strtoupper($product->get_name(), 'UTF-8')) . "\t" .
-                        str_replace('.', ',', $product->get_meta('pdv')) . "\t" . str_replace('.', ',', round($product->get_price() * 100 / (double)$taxcalc, 2)) . "\t" .
-                        str_replace('.', ',', round($product->get_price(), 2))) . "\r\n";
+                        str_replace('.', ',', $product->get_meta('pdv')) . "\t" .
+                        str_replace('.', ',', round((int) $product->get_price() * 100 / (double) $taxcalc, 2)) . "\t" .
+                        str_replace('.', ',', round((int) $product->get_price(), 2))) . "\r\n";
+//                $itemsSaved++;
 
                 if (get_class($product) === WC_Product_Variable::class) {
                     $passedIds = [];
@@ -215,10 +224,12 @@ function createJitexItemExport()
                 }
             } catch (\Exception $e) {
                 var_dump($e->getMessage());
+                die();
                 continue;
             }
         }
     }
+//    echo 'saved items: ' . $itemsSaved;
 
     $fileName = 'jitexItems.txt';
     $filePath = __DIR__ . '/../../uploads/feed/' . $fileName;

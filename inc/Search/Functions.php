@@ -282,16 +282,16 @@ class Functions
         global $stickers;
         $html = '';
         $i = 0;
+        $dtNow = time();
         foreach ($products->getResults() as $productData) {
             $productId = $productData->postId;
             $product = new \Nss\Feed\Product($productData->getData());
             $price = $product->getRegularPrice();
             $saved_percentage = 0;
             $showSalePrice = false;
-            $dtNow = date('now');
             if ($productData->getData()['salePriceStart'] !== '' && $dtNow > $productData->getData()['salePriceStart'] && $dtNow < $productData->getData()['salePriceEnd']) {
                 $showSalePrice = true;
-            } elseif ($product->getSalePrice() > 0) {
+            } elseif ($productData->getData()['salePriceStart'] == '' && $product->getSalePrice() > 0) {
                 $showSalePrice = true;
             }
 
