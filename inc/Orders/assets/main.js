@@ -123,7 +123,7 @@ jQuery(function () {
     selectAllInput.on('change',function(){
         if (jQuery(this).is(':checked')) {
             jQuery('.individualCheckbox').each(function(){
-               jQuery(this).prop('checked',true);
+                jQuery(this).prop('checked',true);
             });
         } else {
             jQuery('.individualCheckbox').each(function(){
@@ -150,8 +150,14 @@ jQuery(function () {
                     orderIds: checkedInputs,
                     bulkAction: jQuery('#bulkActions').val()
                 },
-            }).done(function () {
+            }).done(function (response) {
                 refreshTable();
+                if (
+                    typeof response !== 'undefined'
+                    && typeof response.data !== 'undefined'
+                    && typeof response.data.zipUrl !== 'undefined'){
+                    window.open(response.data.zipUrl, '_blank');
+                }
                 jQuery('#bulkActions').val('-1');
             });
         }

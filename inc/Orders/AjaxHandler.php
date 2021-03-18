@@ -4,6 +4,8 @@
 namespace GF\Orders;
 
 
+use ZipArchive;
+
 class AjaxHandler
 {
     /**
@@ -51,6 +53,7 @@ class AjaxHandler
         wp_send_json_success();
 
     }
+
     private function adresnice($orderIds)
     {
         $zipArchive = new ZipArchive();
@@ -77,19 +80,25 @@ class AjaxHandler
             throw new \Exception('could not close archive.');
         }
         $path = str_replace('public_html', '', str_replace(strstr($zipPath, 'public_html', true), '', $zipPath));
-
-        return $redirect_to = add_query_arg([
-            'adresniceExport' => '1',
-            'processed_count' => count($orderIds),
-            'zipPath' => $path,
-        ], $redirect_to);
+        wp_send_json_success(['zipUrl' => get_home_url().$path]);
     }
+
     private function jitexExport($orderIds)
     {
-        foreach($orderIds as $orderId) {
-
+        $zipArchive = new ZipArchive();
+        $zipPath = generateUploadsPath() . date('Ymdhis') . '-export-' . md5(serialize($orderIds)) . '.zip';
+        $zipArchive->open($zipPath, ZipArchive::CREATE);
+        foreach ($orderIds as $orderId) {
+            $order = wc_get_order($orderId);
+            $csvText = \Gf\Util\Jitex::parseJitexDataFromOrder($order);
+            $zipArchive->addFromString($order->get_order_number() . '.txt', $csvText);
         }
-        wp_send_json_success();
+        if ($zipArchive->close() !== true) {
+            var_dump('could not close archive.');
+            die();
+        }
+        $path = str_replace('public_html', '', str_replace(strstr($zipPath, 'public_html', true), '', $zipPath));
+        wp_send_json_success(['zipUrl' => get_home_url().$path]);
     }
 
     private function changeOrderStats($orderIds,$status)
@@ -101,7 +110,6 @@ class AjaxHandler
         }
         wp_send_json_success();
     }
-
 
     private function getOrders()
     {
