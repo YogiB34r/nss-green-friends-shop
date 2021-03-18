@@ -172,7 +172,7 @@ class AjaxHandler
                 'status' => $orderStatus,
                 'date_created' => $dateFrom . '...' . $dateTo,
                 'return' => 'ids',
-                'exclude' => $formattedArray
+                'exclude' => $formattedArray,
             ]);
             $results = $query->get_orders();
 
@@ -224,7 +224,8 @@ class AjaxHandler
                 'status' => $order->get_status(),
                 'shippingTotal' => $order->get_shipping_total(),
                 'itemsTotal' => $order->get_subtotal(),
-                'orderId' => sprintf('<input class="individualCheckbox" type="checkbox" data-id="%s">',$order->get_id())
+                'orderId' => sprintf('<input class="individualCheckbox" type="checkbox" data-id="%s">',$order->get_id()),
+                'actions' => $this->getActionsForOrder($order)
             ];
         }
         $data = [
@@ -237,5 +238,22 @@ class AjaxHandler
             'pageOrderSubtotals' => $pageOrdersSubtotal
         ];
         wp_send_json($data);
+    }
+
+    private function getActionsForOrder(\WC_Order $order)
+    {
+        ob_start();
+        $orderId = $order->get_id();
+        echo $this->getActionHtml('Predracun','printPreorder', $orderId);
+        echo $this->getActionHtml('Export','exportJitexOrder', $orderId);
+        echo $this->getActionHtml('Adresnica','adresnica', $orderId);
+        return ob_get_clean();
+
+    }
+
+    private function getActionHtml($title, $action, $orderId)
+    {
+        $actionUrl = sprintf('/back-ajax/?action=%s&id=%s',$action, $orderId);
+        return sprintf('<a class="button" href="%s" title="%s" target="_blank">%s</a>',$actionUrl, $title, $title);
     }
 }

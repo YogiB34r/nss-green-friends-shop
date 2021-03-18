@@ -13,7 +13,6 @@ var table = jQuery('#orderTable').DataTable({
             data:'orderId',
             name:'orderId',
             className: 'selectCheckbox',
-            searchable:false,
             orderable:false,
         },
         {
@@ -62,6 +61,11 @@ var table = jQuery('#orderTable').DataTable({
             name: "status",
             orderable:false,
         },
+        {
+            data:"actions",
+            name:"actions",
+            orderable: false
+        }
     ],
     drawCallback: function (data) {
         var api = this.api();
