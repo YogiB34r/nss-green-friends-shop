@@ -5,6 +5,9 @@ namespace GF\Woocommerce;
 
 
 use Composer\Package\Loader\ValidatingArrayLoader;
+use GF\Marketplace\Marketplace;
+
+use function GuzzleHttp\Psr7\parse_query;
 
 class Shipping
 {
@@ -14,13 +17,12 @@ class Shipping
      */
     public function __construct()
     {
-
     }
 
     public function init()
     {
         //Customer orders
-        add_filter('woocommerce_package_rates', [$this, 'customShippingRatesCustomer'], 10, 2);
+        add_filter('woocommerce_package_rates', [$this, 'customShippingRatesCustomer'], 12, 2);
         add_action('woocommerce_before_cart', [$this, 'customShippingPriceNotice'], 50);
 
         //Manual orders
@@ -43,14 +45,13 @@ class Shipping
         if ($customCost > 0) {
             $this->changeRatesBasedOnPriceOverride($rates, $cartWeight, $customCost);
         }
-
         return $this->getWeightBasedShippingRate($rates, $cartWeight);
     }
 
 
-    public function manualOrdersShippingCalculation($orderid)
+    public function manualOrdersShippingCalculation($orderId)
     {
-        $order = wc_get_order($orderid);
+        $order = wc_get_order($orderId);
         $cartWeight = 0;
         $cartContent = [];
         $i = 0;
@@ -63,24 +64,94 @@ class Shipping
         foreach ($zone->get_shipping_methods() as $shippingMethod) {
             $rates[$shippingMethod->get_rate_id()] = $shippingMethod;
         }
-
+        $suppliers = [];
         /** @var \WC_Order_Item_Product $item */
         foreach ($order->get_items() as $item) {
             $cartWeight += $item->get_product()->get_weight() * $item->get_quantity();
             $cartContent[$i]['data'] = $item->get_product();
             $cartContent[$i]['quantity'] = $item->get_quantity();
+            $product = wc_get_product($item->get_product_id());
+            $supplierId = (int)$product->get_meta('supplier');
+            if (!in_array($supplierId, $suppliers, true)) {
+                $suppliers[] = $supplierId;
+            }
             $i++;
         }
-        $overrides = $this->settingCustomShippingPriceOverride($cartWeight, $cartContent);;
+        $overrides = $this->settingCustomShippingPriceOverride($cartWeight, $cartContent);
         $customCost = $overrides['customShippingCost'];
         $cartWeight = $overrides['cartWeight'];
 
         $rate = $this->getWeightBasedShippingRate($rates, $cartWeight);
         $rate = array_values($rate)[0];
 
+
+        if (count($suppliers) === 1) {
+            $marketplace = new Marketplace();
+            $vendor = $marketplace->getByVendorId($suppliers[0]);
+            if (isset($vendor['isActive']) && $vendor['isActive'] === '1') {
+                $minPrice = (int)$vendor['minFreeShippingCost'];
+                if ($minPrice) {
+                    $orderPrice = $order->get_subtotal();
+                    if ($orderPrice > $minPrice) {
+                        $case = 1;
+                    } else {
+                        $case = 0;
+                        $shippingPriceTable = unserialize($vendor['shippingPrices'],
+                                ['allowed_classes' => false]) ?? [];
+                        $overWeightPrice = (int)($shippingPriceTable['overWeightPrice'] ?? 0);
+                        unset($shippingPriceTable['overWeightPrice']);
+                        if (count($shippingPriceTable) > 0) {
+                            foreach ($shippingPriceTable as $key => $value) {
+                                if ((float)$value['weight'] >= $cartWeight) {
+                                    $maxWeight = (float)$value['weight'];
+                                    $minWeight = (float)$shippingPriceTable[$key - 1]['weight'];
+                                    $label = $minWeight . ' - ' . $maxWeight . ' kg';
+                                    $shippingPrice = (float)$value['price'];
+                                    break;
+                                }
+                                if ($overWeightPrice !== 0 && $key === array_key_last($shippingPriceTable) && ((float)$value['weight'] < $cartWeight)) {
+                                    $shippingPrice = (float)$value['price'] + ($cartWeight - (float)$value['weight']) * $overWeightPrice;
+                                    $label = sprintf('Preko %d kg (%d) + %ddin po kg',
+                                    (float)$value['weight'], (int)$value['price'], $overWeightPrice);
+                                } else {
+                                    $maxWeight = (float)$value['weight'];
+                                    $label = 'Preko ' . $maxWeight . ' kg';
+                                    $shippingPrice = (float)$value['price'];
+                                }
+                            }
+
+                            /** @var \WC_Shipping_Flat_Rate $rate */
+                            foreach ($rates as $index => $rate) {
+                                if ($rate->get_rate_id() === 'flat_rate:12') {
+                                    $marketplaceRate = $rate;
+                                    $marketplaceRateLabel = $label;
+                                    $marketplaceRateCost = $shippingPrice;
+                                    $marketplaceRateId = $rate->get_rate_id();
+                                    break;
+                                }
+                            }
+                            $rate = $marketplaceRate ?? $rate;
+                        }
+                    }
+                }
+            }
+        } elseif (isset($_POST['action']) && ($_POST['action'] === 'woocommerce_save_order_items' ||
+                $_POST['action'] === 'woocommerce_calc_line_taxes')) {
+            $case = 0;
+            if (in_array('free_shipping', parse_query(urldecode($_POST['items'])))) {
+                $case = 1;
+            }
+        }
         /** @var \WC_Shipping_Flat_Rate $rate */
         $cost = $rate->get_option('cost');
         $title = $rate->title;
+        if (isset($marketplaceRateLabel, $marketplaceRateId, $marketplaceRateCost)
+            && $marketplaceRateLabel !== ''
+            && $marketplaceRateId !== ''
+            && $marketplaceRateCost !== '') {
+            $title = $marketplaceRateLabel;
+            $cost = (int)$marketplaceRateCost;
+        }
 
         if ($cartWeight == 0) {
             $cost = 0;
@@ -92,33 +163,8 @@ class Shipping
         } else {
             $title = 'Dostava: ' . $title;
         }
-
-        $activeShippingMethod = array_values($order->get_shipping_methods())[0];
-        if (isset($activeShippingMethod)) {
-            $activeMethodName = $activeShippingMethod->get_method_id();
-        }
-
-        if ($activeMethodName === 'free_shipping') {
-            $case = 1;
-        } else {
-            $case = 0;
-        }
-
-
-        if (($_POST['action'] === 'woocommerce_save_order_items')
-            && array_search('flat_rate', \GuzzleHttp\Psr7\parse_query(urldecode($_POST['items'])))) {
-            $case = 0;
-        }
-
-        if (($_POST['action'] === 'woocommerce_save_order_items')
-            && array_search('free_shipping', \GuzzleHttp\Psr7\parse_query(urldecode($_POST['items'])))) {
-            $case = 1;
-        }
-
-
         if (isset($_POST['items'])) {
             switch ($case) {
-
                 case 0:
                     $order->remove_order_items('shipping');
                     $shipping = new \WC_Order_Item_Shipping();
@@ -134,7 +180,11 @@ class Shipping
                     $order->remove_order_items('shipping');
                     $shipping = new \WC_Order_Item_Shipping();
                     $freeShipping = new \WC_Shipping_Free_Shipping();
-                    $shipping->set_props(['method_title' => $freeShipping->title, 'method_id' => $freeShipping->id, 'total' => 0]);
+                    $shipping->set_props([
+                        'method_title' => $freeShipping->title,
+                        'method_id' => $freeShipping->id,
+                        'total' => 0
+                    ]);
                     $shipping->set_name('Besplatna Dostava');
                     $order->add_item($shipping);
                     $order->calculate_totals();
@@ -149,6 +199,7 @@ class Shipping
                     $order->add_item($shipping);
                     $order->calculate_totals();
                     $order->save();
+                    break;
             }
         }
     }
@@ -156,8 +207,7 @@ class Shipping
     /**
      * Adds notice if cart has item with custom shipping Price
      */
-    public
-    function customShippingPriceNotice()
+    public function customShippingPriceNotice()
     {
         $cartContents = WC()->cart->get_cart_contents();
 
@@ -177,11 +227,10 @@ class Shipping
      * @param $cartWeight
      * @return \WC_Shipping_Rate[]
      */
-    private
-    function getWeightBasedShippingRate($rates, $cartWeight)
+    private function getWeightBasedShippingRate($rates, $cartWeight)
     {
         if ($cartWeight <= 0.5) {
-            if (isset($rates['flat_rate:3']))
+            if (isset($rates['flat_rate:3'])) {
                 unset(
                     $rates['flat_rate:4'],
                     $rates['flat_rate:5'],
@@ -190,8 +239,9 @@ class Shipping
                     $rates['flat_rate:8'],
                     $rates['flat_rate:9'],
                     $rates['flat_rate:10']);
+            }
         } elseif ($cartWeight > 0.5 and $cartWeight <= 2) {
-            if (isset($rates['flat_rate:4']))
+            if (isset($rates['flat_rate:4'])) {
                 unset(
                     $rates['flat_rate:3'],
                     $rates['flat_rate:5'],
@@ -200,8 +250,9 @@ class Shipping
                     $rates['flat_rate:8'],
                     $rates['flat_rate:9'],
                     $rates['flat_rate:10']);
+            }
         } elseif ($cartWeight > 2 and $cartWeight <= 5) {
-            if (isset($rates['flat_rate:5']))
+            if (isset($rates['flat_rate:5'])) {
                 unset(
                     $rates['flat_rate:3'],
                     $rates['flat_rate:4'],
@@ -210,8 +261,9 @@ class Shipping
                     $rates['flat_rate:8'],
                     $rates['flat_rate:9'],
                     $rates['flat_rate:10']);
+            }
         } elseif ($cartWeight > 5 and $cartWeight <= 10) {
-            if (isset($rates['flat_rate:6']))
+            if (isset($rates['flat_rate:6'])) {
                 unset(
                     $rates['flat_rate:3'],
                     $rates['flat_rate:4'],
@@ -220,8 +272,9 @@ class Shipping
                     $rates['flat_rate:8'],
                     $rates['flat_rate:9'],
                     $rates['flat_rate:10']);
+            }
         } elseif ($cartWeight > 10 and $cartWeight <= 20) {
-            if (isset($rates['flat_rate:7']))
+            if (isset($rates['flat_rate:7'])) {
                 unset(
                     $rates['flat_rate:3'],
                     $rates['flat_rate:4'],
@@ -230,8 +283,9 @@ class Shipping
                     $rates['flat_rate:8'],
                     $rates['flat_rate:9'],
                     $rates['flat_rate:10']);
+            }
         } elseif ($cartWeight > 20 and $cartWeight <= 30) {
-            if (isset($rates['flat_rate:8']))
+            if (isset($rates['flat_rate:8'])) {
                 unset(
                     $rates['flat_rate:3'],
                     $rates['flat_rate:4'],
@@ -240,8 +294,9 @@ class Shipping
                     $rates['flat_rate:7'],
                     $rates['flat_rate:9'],
                     $rates['flat_rate:10']);
+            }
         } elseif ($cartWeight > 30 and $cartWeight <= 50) {
-            if (isset($rates['flat_rate:9']))
+            if (isset($rates['flat_rate:9'])) {
                 unset(
                     $rates['flat_rate:3'],
                     $rates['flat_rate:4'],
@@ -250,6 +305,7 @@ class Shipping
                     $rates['flat_rate:7'],
                     $rates['flat_rate:8'],
                     $rates['flat_rate:10']);
+            }
         } elseif ($cartWeight > 50) {
             if (isset($rates['flat_rate:10'])) {
                 $myExtraWeight = $cartWeight - 50;
@@ -266,7 +322,6 @@ class Shipping
                 } else {
                     $rates['flat_rate:10']->set_cost($myNewPrice);
                 }
-
                 unset(
                     $rates['flat_rate:3'],
                     $rates['flat_rate:4'],
@@ -288,15 +343,12 @@ class Shipping
      * @param $cartContents
      * @return array
      */
-    private
-    function settingCustomShippingPriceOverride($cartWeight, $cartContents)
+    private function settingCustomShippingPriceOverride($cartWeight, $cartContents)
     {
-
         $customCost = 0;
         /** @var \WC_Product $product */
         foreach ($cartContents as $cartContent) {
             $product = $cartContent['data'];
-
             //If there is more than one product with custom shipping price add price for each of them to custom cost total
             if ($cartContent['quantity'] > 1) {
                 if ($this->getCustomShippingPrice($product)) {
@@ -331,11 +383,13 @@ class Shipping
      * @param $cartWeight
      * @param $customCost
      */
-    private
-    function changeRatesBasedOnPriceOverride($rates, $cartWeight, $customCost)
+    private function changeRatesBasedOnPriceOverride($rates, $cartWeight, $customCost)
     {
         /** @var \WC_Shipping_Rate $rate */
         foreach ($rates as $rate) {
+            if ($rate->get_method_id() === 'free_shipping') {
+                continue;
+            }
             //If cart weight after deducting special products is 0 or less set all weight based cost to 0
             if ($cartWeight <= 0) {
                 $rate->set_cost('0');
@@ -356,8 +410,7 @@ class Shipping
      * @param \WC_Product $product
      * @return bool|string
      */
-    private
-    function getCustomShippingPrice(\WC_Product $product)
+    private function getCustomShippingPrice(\WC_Product $product)
     {
         if ($product instanceof \WC_Product_Variation) {
             $product = wc_get_product($product->get_parent_id());

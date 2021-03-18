@@ -2,6 +2,17 @@
 /*
  * Template Name: uplatnica
  */
+$marketPlaceField = (int)get_post_meta($order->get_id(), 'marketplaceVendor', true);
+$dateCreated = date('dmY', strtotime($order->get_date_created()));
+if ($marketPlaceField !== '') {
+    $marketPLace = new \GF\Marketplace\Marketplace();
+    $vendor = $marketPLace->getByVendorId($marketPlaceField);
+}
+$svrhaUplate ='Kupovina na NonStopShop-u';
+$companyName = $vendor['companyName'] ?? 'NON STOP SHOP d.o.o';
+$companyAddress = $vendor['companyAddress'] ?? 'Beograd, Gvozdićeva 4';
+$primalac = $companyName.'<br>'.$companyAddress;
+$racunPrimaoca = $vendor['bankAccountNumber'] ?? '160-487203-63';
 ?>
 <div class="payment-slip" style="border:1px solid;padding: 10px;overflow: auto">
     <h2 style="text-align: right">Nalog za uplatu</h2>
@@ -16,14 +27,15 @@
         <div>
             <h3>Svrha uplate</h3>
             <div style="border:1px solid;">
-                <p>Kupovina na NonStopShop-u</p>
+                <p><?=$svrhaUplate?></p>
         </div>
         </div>
         <div>
             <h3>Primalac</h3>
             <div style="border:1px solid;">
-                <p>NON STOP SHOP d.o.o</p>
-                <p>Beograd, Gvozdićeva 4</p>
+                <p>
+                    <?=$primalac?>
+                </p>
             </div>
         </div>
     </div>
@@ -50,7 +62,7 @@
         <div>
             <h3>Račun primaoca</h3>
             <div style="border:1px solid;text-align: center;">
-                <p style="margin: 8px;min-height: 17px;min-width: 300px">160-487203-63</p>
+                <p style="margin: 8px;min-height: 17px;min-width: 300px"><?=$racunPrimaoca?></p>
             </div>
         </div>
         <div style="float: left;">

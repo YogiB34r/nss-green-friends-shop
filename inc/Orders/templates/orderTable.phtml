@@ -1,0 +1,111 @@
+<div class="filterWrapper">
+    <label>
+        <span>Datum</span>
+        <label>
+            <span>Od</span>
+            <input autocomplete="off" class="filterSelect" type="text" id="from" name="from">
+        </label>
+        <label>
+            <span>Do</span>
+            <input autocomplete="off" class="filterSelect" type="text" id="to" name="to">
+        </label>
+    </label>
+    <label>
+        <span>Tip porudžbenice</span>
+        <select class="filterSelect" id="orderType">
+            <option value="-1">Svi tipovi</option>
+            <option value="admin">Telefonom</option>
+            <option value="checkout">WWW</option>
+        </select>
+    </label>
+    <label>
+        <span>Način plaćanja</span>
+        <select class="filterSelect" id="paymentMethod">
+            <option value="-1">Svi načini</option>
+            <?php
+            foreach (WC()->payment_gateways()->get_available_payment_gateways() as $gateway):?>
+                <option value="<?=$gateway->id?>"><?=$gateway->title?></option>
+            <?php
+            endforeach; ?>
+        </select>
+    </label>
+    <label>
+        <span>Status Narudžbine</span>
+        <select class="filterSelect" id="orderStatus">
+            <option value="-1">Izaberite status</option>
+            <?php
+            foreach (wc_get_order_statuses() as $key => $value):?>
+                <option value="<?=$key?>"><?=$value?></option>
+            <?php
+            endforeach; ?>
+        </select>
+    </label>
+    <label>
+        <span>Marketplace Narudžbenice</span>
+        <select class="filterSelect" id="marketplaceOrder">
+            <option value="-1">Marketplace Narudžbenica</option>
+            <option value="1">Da</option>
+            <option value="2">Ne</option>
+        </select>
+    </label>
+    <label>
+        <span>Izaberite Vendora</span>
+        <select class="filterSelect" id="vendorIdSelect">
+            <option value="-1">Izaberite Vendora</option>
+            <?php
+            foreach ($activeVendors as $vendor) :
+                $userData = get_userdata($vendor->vendorId);
+                ?>
+                <option value="<?=$vendor->vendorId?>"><?=$userData->display_name?></option>
+            <?php
+            endforeach;
+            ?>
+        </select>
+    </label>
+</div>
+<div class="bulkActionsWrapper">
+    <select class="bulkActionsSelect" id="bulkActions">
+        <option value="-1">Grupne akcije</option>
+        <?php
+        foreach (wc_get_order_statuses() as $key => $value):?>
+            <option name="statusChange" value="<?=$key?>">Promeni status u <?=$value?></option>
+        <?php
+        endforeach; ?>
+        <option name="moveToTrash" value="1">Pomeri na otpad</option>
+        <option name="adresnice" value="2">Adresnice</option>
+        <option name="jitexExport" value="3">Jitex Export</option>
+    </select>
+    <button id="submitBulk">Primeni</button>
+</div>
+<table id="orderTable" class="stripe cell-border">
+    <thead>
+    <tr>
+        <th><input id="selectAll" name="selectAll" value="1" type="checkbox"></th>
+        <th>Narudžbina</th>
+        <th>Dostava</th>
+        <th>Cena dostave</th>
+        <th>Cena proizvoda</th>
+        <th>Ukupno</th>
+        <th>Način plaćanja</th>
+        <th>Telfonom / www</th>
+        <th>Datum</th>
+        <th>Status</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+    <tfoot>
+    <tr>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+    </tr>
+    </tfoot>
+</table>
