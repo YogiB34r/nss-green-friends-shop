@@ -128,7 +128,7 @@ class AdminListFilters
                 foreach ($activeVendors as $vendor) :
                     $selected = '';
                     $userData = get_userdata($vendor->vendorId);
-                    if ($vendor->vendorId == $_GET['gfVendorId']) {
+                    if (isset($_GET['gfVendorId']) && $vendor->vendorId == $_GET['gfVendorId']) {
                         $selected = 'selected';
                     }
                     ?>
