@@ -338,7 +338,7 @@ class Marketplace
         }
     }
 
-    public function sendVendorEmailOnManualOrder($orderId): void1
+    public function sendVendorEmailOnManualOrder($orderId): void
     {
       $order = wc_get_order($orderId);
        if ($order->get_meta('marketplaceVendor',true) !== ''){
