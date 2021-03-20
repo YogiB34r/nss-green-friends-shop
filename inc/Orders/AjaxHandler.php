@@ -35,7 +35,7 @@ class AjaxHandler
                         $this->jitexExport($_POST['orderIds']);
                         break;
                     default:
-                        $this->changeOrderStats($_POST['orderIds'], $_POST['bulkAction']);
+                        $this->changeOrderStatus($_POST['orderIds'], $_POST['bulkAction']);
                 }
 
                 break;
@@ -99,7 +99,7 @@ class AjaxHandler
         wp_send_json_success(['zipUrl' => get_home_url() . $path]);
     }
 
-    private function changeOrderStats($orderIds, $status)
+    private function changeOrderStatus($orderIds, $status)
     {
         foreach ($orderIds as $orderId) {
             $order = wc_get_order($orderId);
@@ -148,6 +148,7 @@ class AjaxHandler
          *  update do not use wp query this is faster :D
          */
         $searchValue = $_GET['search']['value'] ?? '';
+
         //Without search
         if ($searchValue === '') {
             if ($marketplaceOrder === '1') {
