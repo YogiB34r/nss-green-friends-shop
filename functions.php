@@ -34,8 +34,8 @@ $marketplace = new Marketplace();
 $marketplace->init();
 $orderListFilters = new AdminListFilters();
 $orderListFilters->init();
-//$orderAnalytics = new OrderAnalytics();
-//$orderAnalytics->init();
+$orderAnalytics = new OrderAnalytics();
+$orderAnalytics->init();
 
 //used only once
 //$marketplace->activate();
