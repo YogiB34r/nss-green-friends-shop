@@ -3688,3 +3688,13 @@ button[name='update_cart'] {
 .swiper-wrapper {
     transform: translate3d(0, 0, 0)
 }
+
+.swiper-slide h4 {
+    font-size: 1rem
+}
+.g {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
