@@ -22,7 +22,7 @@ class Marketplace
         $this->tableName = $wpdb->prefix . 'mpVendorData';
     }
 
-    public function init(): void
+    public function init()
     {
         add_action('show_user_profile', [$this, 'marketplaceExtraFields']);
         add_action('edit_user_profile', [$this, 'marketplaceExtraFields']);
@@ -38,14 +38,14 @@ class Marketplace
         add_filter('woocommerce_email_recipient_new_order', [$this,'changeEmailRecipient'], 10, 2);
     }
 
-    public function activate(): void
+    public function activate()
     {
         $this->createTable();
         $this->createIndex('isActive');
         $this->createIndex('minFreeShippingCost');
     }
 
-    private function createTable(): void
+    private function createTable()
     {
         $charset = $this->db->get_charset_collate();
         $sql = "CREATE TABLE {$this->tableName} ( 
@@ -62,13 +62,13 @@ class Marketplace
         dbDelta($sql);
     }
 
-    private function createIndex($columnName): void
+    private function createIndex($columnName)
     {
         $sql = "CREATE INDEX {$columnName} ON {$this->tableName} ({$columnName}) ";
         $this->db->query($sql);
     }
 
-    public function marketplaceExtraFields($user): void
+    public function marketplaceExtraFields($user)
     {
         $vendorData = $this->getByVendorId($user->ID);
         $companyName = $vendorData['companyName'] ?? '';
@@ -147,7 +147,7 @@ class Marketplace
         endif;
     }
 
-    public function saveMarketplaceExtraFields($userId): bool
+    public function saveMarketplaceExtraFields($userId)
     {
         $user = get_user_by('ID', $userId);
         $data['vendorId'] = (int)$userId;
@@ -196,7 +196,7 @@ class Marketplace
         return true;
     }
 
-    private function insert(array $data): void
+    private function insert(array $data)
     {
         $this->db->insert($this->tableName,
             [
@@ -211,7 +211,7 @@ class Marketplace
             ], ['%d', '%s', '%s', '%s', '%d', '%s', '%d', '%s']);
     }
 
-    private function update(array $data): void
+    private function update(array $data)
     {
         $this->db->update($this->tableName,
             [
@@ -226,7 +226,7 @@ class Marketplace
             ], ['vendorId' => $data['vendorId']], ['%d', '%s', '%s', '%s', '%d', '%s', '%d', '%s']);
     }
 
-    public function getByVendorId(int $vendorId): array
+    public function getByVendorId(int $vendorId)
     {
         $sql = "SELECT * FROM {$this->tableName} WHERE `vendorId` = {$vendorId}";
         return $this->db->get_results($sql, ARRAY_A)[0] ?? [];
@@ -276,7 +276,9 @@ class Marketplace
             $shippingPriceTable = unserialize($vendor['shippingPrices'], ['allowed_classes' => false]) ?? [];
             $overWeightPrice = (int)$shippingPriceTable['overWeightPrice'];
             unset($shippingPriceTable['overWeightPrice']);
-            if (count($shippingPriceTable) > 0) {
+            $elementCount = count($shippingPriceTable);
+
+            if ( $elementCount > 0) {
                 foreach ($shippingPriceTable as $key => $value) {
                     if ((float)$value['weight'] >= $cartWeight) {
                         $maxWeight = (float)$value['weight'];
@@ -285,7 +287,7 @@ class Marketplace
                         $shippingPrice = (float)$value['price'];
                         break;
                     }
-                    if ($overWeightPrice !== 0 && $key === array_key_last($shippingPriceTable) && ((float)$value['weight'] < $cartWeight)) {
+                    if ($overWeightPrice !== 0 && $key === $shippingPriceTable[$elementCount] && ((float)$value['weight'] < $cartWeight)) {
                         $shippingPrice = (float)$value['price'] + ($cartWeight - (float)$value['weight']) * $overWeightPrice;
                         $label = sprintf('Preko %d kg (%d) + %ddin po kg',
                             (float)$value['weight'], (int)$value['price'], $overWeightPrice);
@@ -311,7 +313,7 @@ class Marketplace
         return $rates;
     }
 
-    public function markOrderAsMarketplace($postId, \WP_Post $post): void
+    public function markOrderAsMarketplace($postId, \WP_Post $post)
     {
         //@todo send email to vendor
         if ($post->post_type === 'shop_order') {
@@ -338,7 +340,7 @@ class Marketplace
         }
     }
 
-    public function sendVendorEmailOnManualOrder($orderId): void
+    public function sendVendorEmailOnManualOrder($orderId)
     {
       $order = wc_get_order($orderId);
        if ($order->get_meta('marketplaceVendor',true) !== ''){
@@ -351,7 +353,7 @@ class Marketplace
      * in the list
      * @param $column
      */
-    public function marketplaceColumnPopulate($column): void
+    public function marketplaceColumnPopulate($column)
     {
         $marketPlaceField = get_post_meta(get_the_ID(), 'marketplaceVendor', true);
         if ($marketPlaceField !== '') {
@@ -359,7 +361,7 @@ class Marketplace
         }
     }
 
-    public function marketplaceCustomScript(): void
+    public function marketplaceCustomScript()
     {
         ?>
         <script>

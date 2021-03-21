@@ -22,7 +22,7 @@ jQuery(document).ready(function ($) {
     }
 
     var radioValue = '';
-    jQuery(".gf-search-form, .gf-search-form--mobile").submit(function () {
+    jQuery(".gf-search-form, .gf-search-form--mobile").on('submit',function () {
         var radioValue = jQuery('input[name=search-radiobutton]:checked').val();
         if (radioValue === 'category') {
             jQuery(".gf-search-form, .gf-search-form--mobile").attr("action", "");
@@ -55,7 +55,7 @@ jQuery(document).ready(function ($) {
     });
 
 
-    jQuery(document).mouseup(function (e) {
+    jQuery(document).on('mouseup',function (e) {
         var category_list_accordion = jQuery('.gf-category-accordion');
         var category_list_toggle = jQuery('.gf-category-mobile-toggle');
         var category_list_bars_icon_toggle = jQuery('#gf-bars-icon-toggle');
@@ -133,7 +133,7 @@ jQuery(document).ready(function ($) {
     });
 
 
-    jQuery('.category-item a').hover(function (e) {
+    jQuery('.category-item a').on('hover', function (e) {
 
         var half_a_screen = jQuery(window).height() / 2;
         var currentLink = jQuery(this);
@@ -246,7 +246,7 @@ jQuery(document).ready(function ($) {
     }
 
     // set default search radio button value
-    jQuery(".gf-search-form").submit(function () {
+    jQuery(".gf-search-form").on('submit', function () {
         var radioValue = jQuery('input[name=search-radiobutton]:checked').val();
         if (radioValue === 'category') {
             jQuery(".gf-search-form").attr("action", "");
@@ -291,7 +291,7 @@ jQuery(document).ready(function ($) {
         var gfSliderColumnCount = 4;
         // if (typeof gfSliderColumnCount !== "undefined") {
         // @Important activate slider after tab is displayed in order to have access to proper width
-        $("#tabs").tabs({
+/*        $("#tabs").tabs({
             activate: function (event, ui) {
                 if (!$(ui.newPanel.selector).hasClass('slick-initialized')) {
                     startSlider(ui.newPanel.selector);
@@ -300,7 +300,7 @@ jQuery(document).ready(function ($) {
         });
         startSlider('#tabs-1');
         hookSliderEvents();
-        startSlider('.without-tabs');
+        startSlider('.without-tabs');*/
     }
 
     function startSlider(selector) {
@@ -374,6 +374,50 @@ jQuery(document).ready(function ($) {
         });
     }
 });
+const swiper = new Swiper(".swiper-container", {
+        slidesPerView: 2,
+        spaceBetween: 0,
+        loop: !0,
+        arrows: !1,
+        breakpoints: {
+            320: {
+                slidesPerView: 2,
+                spaceBetween: 0
+            },
+            640: {
+                slidesPerView: 2,
+                spaceBetween: 5
+            },
+            1023: {
+                slidesPerView: 2,
+                spaceBetween: 5
+            },
+            1024: {
+                slidesPerView: 3,
+                spaceBetween: 10
+            },
+            1376: {
+                slidesPerView: 4,
+                spaceBetween: 15
+            }
+        }
+    }),
+    prevButtons = document.getElementsByClassName("product-slider__control-prev"),
+    nextButtons = document.getElementsByClassName("product-slider__control-next");
+if (null != prevButtons)
+    for (let e of prevButtons) {
+        const t = e.parentElement.parentElement.parentElement.lastElementChild.swiper;
+        e.addEventListener("click", e => {
+            e.preventDefault(), t.slidePrev()
+        })
+    }
+if (null != nextButtons)
+    for (let e of nextButtons) {
+        const t = e.parentElement.parentElement.parentElement.lastElementChild.swiper;
+        e.addEventListener("click", e => {
+            e.preventDefault(), t.slideNext()
+        })
+    }
 jQuery(document).ready(function ($) {
 
     if ($('#billing_postcode').length === 1) {
@@ -405,7 +449,7 @@ jQuery(document).ready(function ($) {
 
 });
 
-jQuery('.gf-archive-description-button').click(function () {
+jQuery('.gf-archive-description-button').on('click',function () {
     jQuery('.gf-archive-description p').toggleClass('gf-display-category-description');
 });
 jQuery(document).ready(function ($) {
@@ -444,7 +488,7 @@ jQuery(document).ready(function ($) {
 
 
 //    checkout city ajax
-    $('#billing_city, #shipping_city').change(function () {
+    $('#billing_city, #shipping_city').on('change',function () {
         var city = $(this).val();
         var name = $(this).attr('name');
         $.ajax({
