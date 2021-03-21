@@ -543,7 +543,7 @@ jQuery(document).ready(function ($) {
                         url: url,
                         type: 'post',
                         data: {
-                            page: newPage,
+                            strana: newPage,
                             term: that.data('term'),
                             type: that.data('action'),
                             action: 'ajax_load_more'
