@@ -96,7 +96,6 @@ class AdminListFilters
         switch ($marketplaceOrder) {
             case '1':
             case '3':
-                $posts = [];
                 break;
             case '2':
                 global $wpdb;
@@ -108,9 +107,10 @@ class AdminListFilters
                 foreach ($posts as $post) {
                     $formattedArray[] = $post[0];
                 }
+                $query->set('post__in', $formattedArray);
                 break;
         }
-        $query->set('post__in', $formattedArray);
+
     }
 
     private function vendorIdFilter()
