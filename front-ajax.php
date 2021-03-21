@@ -114,7 +114,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'getZipCode') {
 if (isset($_POST['action']) && $_POST['action'] == 'ajax_load_more') {
     global $searchFunctions;
 
-    $page = addslashes($_POST['page']);
+    $page = addslashes($_POST['strana']);
     $term = addslashes($_POST['term']);
     $query = addslashes($_GET['query']);
 //    $type = addslashes($_POST['type']);
