@@ -375,7 +375,8 @@ jQuery(document).ready(function ($) {
     }
 });
 const swiper = new Swiper(".swiper-container", {
-        slidesPerView: 2,
+        slidesPerView: 4,
+        slidesPerGroup: 2,
         spaceBetween: 0,
         loop: !0,
         arrows: !1,
@@ -394,10 +395,12 @@ const swiper = new Swiper(".swiper-container", {
             },
             1024: {
                 slidesPerView: 3,
+                slidesPerGroup: 3,
                 spaceBetween: 10
             },
             1376: {
                 slidesPerView: 4,
+                slidesPerGroup: 4,
                 spaceBetween: 15
             }
         }
