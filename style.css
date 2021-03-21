@@ -3703,15 +3703,21 @@ button[name='update_cart'] {
     width: 150px;
 }
 
-@media only screen and (min-width: 1025px) {
+@media only screen and (min-width: 1025px)  {
     .swiper-slide {
         width: 189.25px;
         margin-right: 15px;
     }
 }
 
-@media only screen and (max-width: 1024px) {
+@media only screen and (max-width: 767px) {
     .swiper-slide {
         width: 201.5px;
+    }
+}
+@media only screen and (min-width: 768px) and (max-width: 1024px) {
+    .swiper-slide {
+        width: 210.667px;
+        margin-right: 10px;
     }
 }
