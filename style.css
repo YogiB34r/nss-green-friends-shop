@@ -3698,3 +3698,20 @@ button[name='update_cart'] {
     justify-content: space-between;
     margin-bottom: 10px;
 }
+
+.swiper-container img {
+    width: 150px;
+}
+
+@media only screen and (min-width: 1025px) {
+    .swiper-slide {
+        width: 189.25px;
+        margin-right: 15px;
+    }
+}
+
+@media only screen and (max-width: 1024px) {
+    .swiper-slide {
+        width: 201.5px;
+    }
+}
