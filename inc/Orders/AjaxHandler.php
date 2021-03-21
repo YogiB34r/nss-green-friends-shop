@@ -141,12 +141,7 @@ class AjaxHandler
             $vendorId = $_GET['vendorIdSelect'];
         }
         $formattedArray = [];
-        /*
-         * BECAUSE WC DEVELOPERS ARE FUCKING RETARDED THEY DON'T HAVE INCLUDE FUCKING FILTER, THIS IS WORKAROUND FOR IT
-         * @todo change to wp query
-         * @todo don't be lazy make pr for this change
-         *  update do not use wp query this is faster :D
-         */
+
         $searchValue = $_GET['search']['value'] ?? '';
 
         //Without search
@@ -161,85 +156,56 @@ class AjaxHandler
                 foreach ($posts as $post) {
                     $formattedArray[] = $post[0];
                 }
-
-                $query = new \WC_Order_Query([
-                    'paginate' => false,
-                    'orderby' => 'date',
-                    'limit' => '-1',
-                    'order' => 'DESC',
-                    'created_via' => $orderType,
-                    'payment_method' => $paymentMethod,
-                    'status' => $orderStatus,
-                    'date_created' => $dateFrom . '...' . $dateTo,
-                    'return' => 'ids',
-                    'exclude' => $formattedArray,
-                ]);
-                $results = $query->get_orders();
-
-                $query = new \WC_Order_Query([
-                    'paginate' => true,
-                    'offset' => $_GET['start'],
-                    'limit' => $_GET['length'],
-                    'orderby' => 'date',
-                    'order' => 'DESC',
-                    'created_via' => $orderType,
-                    'payment_method' => $paymentMethod,
-                    'status' => $orderStatus,
-                    'date_created' => $dateFrom . '...' . $dateTo,
-                    'exclude' => $results
-                ]);
-                $result = $query->get_orders();
-            } else {
-                //Default query
-                $query = new \WC_Order_Query([
-                    'paginate' => true,
-                    'offset' => $_GET['start'],
-                    'limit' => $_GET['length'],
-                    'orderby' => 'date',
-                    'order' => 'DESC',
-                    'created_via' => $orderType,
-                    'payment_method' => $paymentMethod,
-                    'status' => $orderStatus,
-                    'date_created' => $dateFrom . '...' . $dateTo,
-                ]);
-                $result = $query->get_orders();
             }
-            $orders = [];
-            $pageOrdersSubtotal = 0;
-            $pageShippingTotal = 0;
-            $pageOrdersTotal = 0;
-            /** @var \WC_Order $order */
-            foreach ($result->orders as $order) {
-                $pageOrdersSubtotal += $order->get_subtotal();
-                $pageShippingTotal += (int)$order->get_shipping_total();
-                $pageOrdersTotal += (int)$order->get_total();
-                $orders[] = [
-                    'orderTitle' => $this->orderPage->formatOrderName($order),
-                    'paymentMethod' => $order->get_payment_method(),
-                    'createdVia' => $order->get_created_via(),
-                    'date' => $order->get_date_created()->format('d/m/y'),
-                    'shippingMethod' => $order->get_shipping_method(),
-                    'total' => $order->get_total(),
-                    'status' => $order->get_status(),
-                    'shippingTotal' => $order->get_shipping_total(),
-                    'itemsTotal' => $order->get_subtotal(),
-                    'orderId' => sprintf('<input class="individualCheckbox" type="checkbox" data-id="%s">',
-                        $order->get_id()),
-                    'actions' => $this->getActionsForOrder($order)
-                ];
-            }
-            $data = [
-                'draw' => (int)$_GET['draw'],
-                'recordsTotal' => $result->total,
-                'recordsFiltered' => $result->total,
-                'data' => $orders,
-                'pageOrdersTotal' => $pageOrdersTotal,
-                'pageShippingTotal' => $pageShippingTotal,
-                'pageOrderSubtotals' => $pageOrdersSubtotal
-            ];
-            wp_send_json($data);
+            //Default query
+            $query = new \WC_Order_Query([
+                'paginate' => true,
+                'offset' => $_GET['start'],
+                'limit' => $_GET['length'],
+                'orderby' => 'date',
+                'order' => 'DESC',
+                'created_via' => $orderType,
+                'payment_method' => $paymentMethod,
+                'status' => $orderStatus,
+                'date_created' => $dateFrom . '...' . $dateTo,
+                'post__in' => $formattedArray,
+            ]);
+            $result = $query->get_orders();
         }
-
+        $orders = [];
+        $pageOrdersSubtotal = 0;
+        $pageShippingTotal = 0;
+        $pageOrdersTotal = 0;
+        /** @var \WC_Order $order */
+        foreach ($result->orders as $order) {
+            $pageOrdersSubtotal += $order->get_subtotal();
+            $pageShippingTotal += (int)$order->get_shipping_total();
+            $pageOrdersTotal += (int)$order->get_total();
+            $orders[] = [
+                'orderTitle' => $this->orderPage->formatOrderName($order),
+                'paymentMethod' => $order->get_payment_method(),
+                'createdVia' => $order->get_created_via(),
+                'date' => $order->get_date_created()->format('d/m/y'),
+                'shippingMethod' => $order->get_shipping_method(),
+                'total' => $order->get_total(),
+                'status' => $order->get_status(),
+                'shippingTotal' => $order->get_shipping_total(),
+                'itemsTotal' => $order->get_subtotal(),
+                'orderId' => sprintf('<input class="individualCheckbox" type="checkbox" data-id="%s">',
+                    $order->get_id()),
+                'actions' => $this->getActionsForOrder($order)
+            ];
+        }
+        $data = [
+            'draw' => (int)$_GET['draw'],
+            'recordsTotal' => $result->total,
+            'recordsFiltered' => $result->total,
+            'data' => $orders,
+            'pageOrdersTotal' => $pageOrdersTotal,
+            'pageShippingTotal' => $pageShippingTotal,
+            'pageOrderSubtotals' => $pageOrdersSubtotal
+        ];
+        wp_send_json($data);
         //With Search
         global $wpdb;
         $countSql = "SELECT COUNT(ID) FROM wp_posts WHERE (ID LIKE '%{$searchValue}%' OR ID IN (SELECT post_id FROM wp_postmeta WHERE meta_key = '_customer_user' AND meta_value IN (SELECT ID FROM wp_users WHERE display_name LIKE '%{$searchValue}%'))) AND post_status NOT LIKE 'trash' AND post_status NOT LIKE 'auto-draft' LIMIT {$_GET['length']} OFFSET {$_GET['start']}";
