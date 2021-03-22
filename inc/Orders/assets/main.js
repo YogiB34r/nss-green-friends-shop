@@ -3,7 +3,9 @@ let ajaxUrlWithFilters = baseAjaxUrl;
 var table = jQuery('#orderTable').DataTable({
     'processing': true,
     'serverSide': true,
-    'searching': true,
+    'searching': false,
+    'pageLength': 25,
+    'lengthMenu': [ 10, 25, 50, 75, 100,250,500,1000 ],
     'ajax': ajaxUrlWithFilters,
     'dataSrc': function (data) {
         return data.data;

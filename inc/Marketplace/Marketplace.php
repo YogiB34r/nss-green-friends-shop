@@ -70,7 +70,7 @@ class Marketplace
 
     public function marketplaceExtraFields($user)
     {
-        $vendorData = $this->getByVendorId($user->ID);
+        $vendorData = $this->getByVendorId($user->ID) ?? [];
         $companyName = $vendorData['companyName'] ?? '';
         $companyAddress = $vendorData['companyAddress'] ?? '';
         $bankAccountNumber = $vendorData['bankAccountNumber'] ?? '';

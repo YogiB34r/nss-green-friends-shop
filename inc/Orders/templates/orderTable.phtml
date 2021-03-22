@@ -66,14 +66,14 @@
 <div class="bulkActionsWrapper">
     <select class="bulkActionsSelect" id="bulkActions">
         <option value="-1">Grupne akcije</option>
+        <option name="moveToTrash" value="1">Pomeri na otpad</option>
+        <option name="adresnice" value="2">Adresnice</option>
+        <option name="jitexExport" value="3">Jitex Export</option>
         <?php
         foreach (wc_get_order_statuses() as $key => $value):?>
             <option name="statusChange" value="<?=$key?>">Promeni status u <?=$value?></option>
         <?php
         endforeach; ?>
-        <option name="moveToTrash" value="1">Pomeri na otpad</option>
-        <option name="adresnice" value="2">Adresnice</option>
-        <option name="jitexExport" value="3">Jitex Export</option>
     </select>
     <button id="submitBulk">Primeni</button>
 </div>

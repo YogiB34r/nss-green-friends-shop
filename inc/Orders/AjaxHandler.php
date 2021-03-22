@@ -135,21 +135,20 @@ class AjaxHandler
             $dateTo = (string)time();
         }
         if (isset($_GET['marketplaceOrder'])) {
-            $marketplaceOrder = $_GET['marketplaceOrder'] !== '-1' ? $_GET['marketplaceOrder'] : '2';
+            $marketplaceOrder = $_GET['marketplaceOrder'];
         }
         if (isset($_GET['vendorIdSelect'])) {
             $vendorId = $_GET['vendorIdSelect'];
         }
         $formattedArray = [];
-
         $searchValue = $_GET['search']['value'] ?? '';
 
         //Without search
         if ($searchValue === '') {
-            if ($marketplaceOrder === '1') {
+            if ($marketplaceOrder !== '-1') {
                 global $wpdb;
                 $sql = "SELECT `post_id` FROM {$wpdb->postmeta} WHERE `meta_key` = 'marketplaceVendor'";
-                if ($vendorId !== '-1') {
+                if (isset($vendorId) && $vendorId !== '-1') {
                     $sql .= ' AND `meta_value` = ' . $_GET['vendorIdSelect'];
                 }
                 $posts = $wpdb->get_results($sql, ARRAY_N);
@@ -157,21 +156,30 @@ class AjaxHandler
                     $formattedArray[] = $post[0];
                 }
             }
+            $args = [
+                    'paginate' => true,
+                    'offset' => $_GET['start'],
+                    'limit' => $_GET['length'],
+                    'orderby' => 'date',
+                    'order' => 'DESC',
+                    'created_via' => $orderType,
+                    'payment_method' => $paymentMethod,
+                    'status' => $orderStatus,
+                    'date_created' => $dateFrom . '...' . $dateTo
+                ];
+
+            if ($marketplaceOrder === '1') {
+                $args['post__in'] = $formattedArray;
+            }
+            if ($marketplaceOrder === '2'){
+                $args['post__not_in'] = $formattedArray;
+            }
+
             //Default query
-            $query = new \WC_Order_Query([
-                'paginate' => true,
-                'offset' => $_GET['start'],
-                'limit' => $_GET['length'],
-                'orderby' => 'date',
-                'order' => 'DESC',
-                'created_via' => $orderType,
-                'payment_method' => $paymentMethod,
-                'status' => $orderStatus,
-                'date_created' => $dateFrom . '...' . $dateTo,
-                'post__in' => $formattedArray,
-            ]);
+            $query = new \WC_Order_Query($args);
             $result = $query->get_orders();
         }
+
         $orders = [];
         $pageOrdersSubtotal = 0;
         $pageShippingTotal = 0;
@@ -188,7 +196,7 @@ class AjaxHandler
                 'date' => $order->get_date_created()->format('d/m/y'),
                 'shippingMethod' => $order->get_shipping_method(),
                 'total' => $order->get_total(),
-                'status' => $order->get_status(),
+                'status' => $this->getStatusMarkup($order->get_status()),
                 'shippingTotal' => $order->get_shipping_total(),
                 'itemsTotal' => $order->get_subtotal(),
                 'orderId' => sprintf('<input class="individualCheckbox" type="checkbox" data-id="%s">',
@@ -213,6 +221,7 @@ class AjaxHandler
         $sql = "SELECT * FROM wp_posts WHERE (ID LIKE '%{$searchValue}%' OR ID IN (SELECT post_id FROM wp_postmeta WHERE meta_key = '_customer_user' AND meta_value IN (SELECT ID FROM wp_users WHERE display_name LIKE '%{$searchValue}%'))) AND post_status NOT LIKE 'trash' AND post_status NOT LIKE 'auto-draft' LIMIT {$_GET['length']} OFFSET {$_GET['start']}";
         $posts = $wpdb->get_results($sql);
         $formattedArray = [];
+
         foreach ($posts as $post) {
             $formattedArray[] = $post->ID;
         }
@@ -233,7 +242,7 @@ class AjaxHandler
                     'date' => $order->get_date_created()->format('d/m/y'),
                     'shippingMethod' => $order->get_shipping_method(),
                     'total' => $order->get_total(),
-                    'status' => $order->get_status(),
+                    'status' => sprintf('<span class="order-status status-%s">%s</span>',$order->get_status(),$order->get_status()),
                     'shippingTotal' => $order->get_shipping_total(),
                     'itemsTotal' => $order->get_subtotal(),
                     'orderId' => sprintf('<input class="individualCheckbox" type="checkbox" data-id="%s">',
@@ -267,5 +276,26 @@ class AjaxHandler
     {
         $actionUrl = sprintf('/back-ajax/?action=%s&id=%s', $action, $orderId);
         return sprintf('<a class="button" href="%s" title="%s" target="_blank">%s</a>', $actionUrl, $title, $title);
+    }
+
+    private function getStatusMarkup($status)
+    {
+        switch ($status){
+            case 'pending':
+                $title = 'Čeka se naplata';
+                break;
+            case 'processing':
+                $color = '#5b841b';
+                $title = 'Procesuira se';
+                break;
+            case 'on-hold':
+                $color = '#94660c';
+                $title= 'Na čekanju';
+                break;
+            default :
+                $color = '#fff';
+                $title = 'Nepoznat status';
+        }
+        return sprintf('<span class="tableStatus" style="background-color: %s">%s</span>', $color, $title);
     }
 }
