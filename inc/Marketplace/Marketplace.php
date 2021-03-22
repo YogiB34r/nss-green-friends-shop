@@ -287,7 +287,7 @@ class Marketplace
                         $shippingPrice = (float)$value['price'];
                         break;
                     }
-                    if ($overWeightPrice !== 0 && $key === $shippingPriceTable[$elementCount] && ((float)$value['weight'] < $cartWeight)) {
+                    if ($overWeightPrice !== 0 && $key === $shippingPriceTable[$elementCount-1] && ((float)$value['weight'] < $cartWeight)) {
                         $shippingPrice = (float)$value['price'] + ($cartWeight - (float)$value['weight']) * $overWeightPrice;
                         $label = sprintf('Preko %d kg (%d) + %ddin po kg',
                             (float)$value['weight'], (int)$value['price'], $overWeightPrice);
