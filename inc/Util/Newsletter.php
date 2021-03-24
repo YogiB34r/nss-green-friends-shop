@@ -9,7 +9,7 @@ class Newsletter
     {
         add_action('init', [$this, 'addNewsletterEndPoint']);
         add_filter('query_vars', [$this, 'newsletterQueryVars'], 0);
-        add_filter('woocommerce_account_menu_items', [$this, 'newsletterMenu']);
+//         add_filter('woocommerce_account_menu_items', [$this, 'newsletterMenu']);
         add_action('woocommerce_account_newsletter-account_endpoint', [$this, 'newsletterMenuPage']);
     }
 
