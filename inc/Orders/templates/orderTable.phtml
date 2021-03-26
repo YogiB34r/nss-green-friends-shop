@@ -34,7 +34,11 @@
         <select class="filterSelect" id="orderStatus">
             <option value="-1">Izaberite status</option>
             <?php
-            foreach (wc_get_order_statuses() as $key => $value):?>
+            foreach (wc_get_order_statuses() as $key => $value):
+                //Client is using custom status for refunded orders
+                if ($key === 'wc-refunded') {
+                    continue;
+                } ?>
                 <option value="<?=$key?>"><?=$value?></option>
             <?php
             endforeach; ?>
@@ -93,8 +97,7 @@
         <th>Akcije</th>
     </tr>
     </thead>
-    <tbody>
-    </tbody>
+    <tbody></tbody>
     <tfoot>
     <tr>
         <th></th>

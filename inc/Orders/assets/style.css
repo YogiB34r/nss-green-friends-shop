@@ -51,3 +51,9 @@
 .orderTable_wrapper {
     margin-top: 10px;
 }
+.tableStatus {
+    padding: 5px;
+}
+.tableStatus .dashicons {
+    margin-left: 5px;
+}

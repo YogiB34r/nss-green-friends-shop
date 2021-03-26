@@ -175,7 +175,6 @@ class AjaxHandler
                 $args['post__not_in'] = $formattedArray;
             }
 
-            //Default query
             $query = new \WC_Order_Query($args);
             $result = $query->get_orders();
         }
@@ -191,16 +190,17 @@ class AjaxHandler
             $pageOrdersTotal += (int)$order->get_total();
             $orders[] = [
                 'orderTitle' => $this->orderPage->formatOrderName($order),
-                'paymentMethod' => $order->get_payment_method(),
-                'createdVia' => $order->get_created_via(),
+                'paymentMethod' => $order->get_payment_method_title(),
+                'createdVia' =>$this->changeCreatedViaTitle($order->get_created_via()),
                 'date' => $order->get_date_created()->format('d/m/y'),
                 'shippingMethod' => $order->get_shipping_method(),
-                'total' => $order->get_total(),
-                'status' => $this->getStatusMarkup($order->get_status()),
-                'shippingTotal' => $order->get_shipping_total(),
-                'itemsTotal' => $order->get_subtotal(),
+                'total' => $order->get_total().get_woocommerce_currency_symbol(),
+                'status' => $this->getStatusMarkup($order->get_status(), wc_get_order_notes(['order_id' => $order->get_id(),
+                    'customer_note' => 'false','added_by' => 'system'])),
+                'shippingTotal' => $order->get_shipping_total().get_woocommerce_currency_symbol(),
+                'itemsTotal' => $order->get_subtotal().get_woocommerce_currency_symbol(),
                 'orderId' => sprintf('<input class="individualCheckbox" type="checkbox" data-id="%s">',
-                    $order->get_id()),
+                    $order->get_id()[0]),
                 'actions' => $this->getActionsForOrder($order)
             ];
         }
@@ -209,11 +209,12 @@ class AjaxHandler
             'recordsTotal' => $result->total,
             'recordsFiltered' => $result->total,
             'data' => $orders,
-            'pageOrdersTotal' => $pageOrdersTotal,
-            'pageShippingTotal' => $pageShippingTotal,
-            'pageOrderSubtotals' => $pageOrdersSubtotal
+            'pageOrdersTotal' => $pageOrdersTotal.get_woocommerce_currency_symbol(),
+            'pageShippingTotal' => $pageShippingTotal.get_woocommerce_currency_symbol(),
+            'pageOrderSubtotals' => $pageOrdersSubtotal.get_woocommerce_currency_symbol()
         ];
         wp_send_json($data);
+
         //With Search
         global $wpdb;
         $countSql = "SELECT COUNT(ID) FROM wp_posts WHERE (ID LIKE '%{$searchValue}%' OR ID IN (SELECT post_id FROM wp_postmeta WHERE meta_key = '_customer_user' AND meta_value IN (SELECT ID FROM wp_users WHERE display_name LIKE '%{$searchValue}%'))) AND post_status NOT LIKE 'trash' AND post_status NOT LIKE 'auto-draft' LIMIT {$_GET['length']} OFFSET {$_GET['start']}";
@@ -237,14 +238,15 @@ class AjaxHandler
                 $pageOrdersTotal += (int)$order->get_total();
                 $orders[] = [
                     'orderTitle' => $this->orderPage->formatOrderName($order),
-                    'paymentMethod' => $order->get_payment_method(),
-                    'createdVia' => $order->get_created_via(),
+                    'paymentMethod' => $order->get_payment_method_title(),
+                    'createdVia' =>$this->changeCreatedViaTitle($order->get_created_via()),
                     'date' => $order->get_date_created()->format('d/m/y'),
                     'shippingMethod' => $order->get_shipping_method(),
-                    'total' => $order->get_total(),
-                    'status' => sprintf('<span class="order-status status-%s">%s</span>',$order->get_status(),$order->get_status()),
-                    'shippingTotal' => $order->get_shipping_total(),
-                    'itemsTotal' => $order->get_subtotal(),
+                    'total' => $order->get_total().get_woocommerce_currency_symbol(),
+                    'status' => $this->getStatusMarkup($order->get_status(), wc_get_order_notes(['order_id' => $order->get_id(),
+                        'customer_note' => 'false','added_by' => 'system'])),
+                    'shippingTotal' => $order->get_shipping_total().get_woocommerce_currency_symbol(),
+                    'itemsTotal' => $order->get_subtotal().get_woocommerce_currency_symbol(),
                     'orderId' => sprintf('<input class="individualCheckbox" type="checkbox" data-id="%s">',
                         $order->get_id()),
                     'actions' => $this->getActionsForOrder($order)
@@ -256,46 +258,180 @@ class AjaxHandler
             'recordsTotal' => $totalOrdersCount,
             'recordsFiltered' => $totalOrdersCount,
             'data' => $orders,
-            'pageOrdersTotal' => $pageOrdersTotal,
-            'pageShippingTotal' => $pageShippingTotal,
-            'pageOrderSubtotals' => $pageOrdersSubtotal
+            'pageOrdersTotal' => $pageOrdersTotal.get_woocommerce_currency_symbol(),
+            'pageShippingTotal' => $pageShippingTotal.get_woocommerce_currency_symbol(),
+            'pageOrderSubtotals' => $pageOrdersSubtotal.get_woocommerce_currency_symbol()
         ];
         wp_send_json($data);
     }
 
     private function getActionsForOrder(\WC_Order $order)
     {
-        $orderId = $order->get_id();
-        return
-            $this->getActionHtml('Predracun', 'printPreorder', $orderId) .
-            $this->getActionHtml('Export', 'exportJitexOrder', $orderId) .
-            $this->getActionHtml('Adresnica', 'adresnica', $orderId);
+        return $this->predracunAction($order) . $this->exportAction($order) . $this->adresnicaAction($order) .
+            $this->noteAction($order) . $this->syncToMisAction($order);
     }
 
-    private function getActionHtml($title, $action, $orderId)
+    private function adresnicaAction($order)
     {
-        $actionUrl = sprintf('/back-ajax/?action=%s&id=%s', $action, $orderId);
-        return sprintf('<a class="button" href="%s" title="%s" target="_blank">%s</a>', $actionUrl, $title, $title);
+        if ($order->get_meta('adresnicaCreated')) {
+            $style = 'color:white;background-color:gray;font-style:italic;';
+        }
+        return sprintf('<a style="%s" class="button" href="/back-ajax/?action=adresnica&id=%s" target="_blank">%s</a>',
+            $style ?? '', $order->get_id(), 'Adresnica');
     }
 
-    private function getStatusMarkup($status)
+    private function exportAction($order)
     {
+        if ($order->get_meta('jitexExportCreated')) {
+            $style = 'color:white;background-color:gray;font-style:italic;';
+        }
+        return sprintf('<a style="%s" class="button" href="/back-ajax/?action=exportJitexOrder&id=%s" target="_blank">%s</a>',
+            $style ?? '', $order->get_id(), 'Export');
+    }
+
+    private function predracunAction($order)
+    {
+        return sprintf('<a class="button" href="/back-ajax/?action=exportJitexOrder&id=%s" target="_blank">%s</a>',
+             $order->get_id(), 'Predracun');
+    }
+
+    private function syncToMisAction($order)
+    {
+        if ($order->get_meta('synced')) {
+            $style = 'color:white;background-color:gray;font-style:italic';
+        }
+        $user = wp_get_current_user();
+        if ($user->ID === 1) {
+            return sprintf('<a style="%s" class="button" href="/back-ajax/?action=mis&type=order&id=%s" target="_blank">%s</a>',
+                $style ?? '' ,$order->get_id(), 'Mis');
+        }
+        return '';
+    }
+
+    private function noteAction($order)
+    {
+        $orderNote = $order->get_customer_note();
+        if ($orderNote !== '') {
+            return sprintf('<a class="button" style="background-color:yellow;" href="#" title="%s" 
+            target="_blank">Napomena</a>', $orderNote);
+        }
+        return '';
+    }
+
+    private function getStatusMarkup($status, $notes)
+    {
+        $color = 'black';
+        $title = 'Nepoznat Status';
+        $backgroundColor = '#e5e5e5';
+        $note = '';
+        $dashicon = '';
+        if (count($notes) > 0) {
+            $note = $notes[0]->content;
+            $dashicon = '<span class="dashicons dashicons-format-status"></span></span>';
+        }
         switch ($status){
             case 'pending':
                 $title = 'Čeka se naplata';
                 break;
             case 'processing':
-                $color = '#5b841b';
+                $backgroundColor = '#5b841b';
                 $title = 'Procesuira se';
                 break;
             case 'on-hold':
-                $color = '#94660c';
+                $backgroundColor = '#94660c';
                 $title= 'Na čekanju';
                 break;
-            default :
-                $color = '#fff';
-                $title = 'Nepoznat status';
+            case 'completed':
+                $backgroundColor = '';
+                $title = 'Završeno';
+                break;
+            case 'cancelled':
+                $backgroundColor = '';
+                $title = 'Otkazano';
+                break;
+            case 'failed':
+                $backgroundColor = '';
+                $title = 'Neuspelo';
+                break;
+            case 'stornirano':
+                $backgroundColor = '#D50000';
+                $title = 'Stornirano';
+                break;
+            case 'reklamacija':
+                $backgroundColor = 'D50000';
+                $title = 'Reklamacija';
+                break;
+            case 'vracena-posiljka':
+                $backgroundColor = 'D50000 ';
+                $title = 'Vraćena pošiljka';
+                break;
+            case 'stornirano-pn':
+                $backgroundColor = 'D50000 ';
+                $title = 'Stornirano (povraćaj novca)';
+                break;
+            case 'reklamacija-pnns':
+                $backgroundColor = 'D50000 ';
+                $title = 'Reklamacija (proizvod nema na stanju)';
+                break;
+            case 'finalizovano':
+                $backgroundColor = '#5b841b';
+                $title = 'Finalizovano';
+                break;
+            case 'isporuceno':
+                $backgroundColor = '#6600cc';
+                $title = 'Isporučeno';
+                break;
+            case 'spz-slanje':
+                $backgroundColor = '#cc00ff';
+                $title = 'Spremno za slanje';
+                break;
+            case 'spz-pakovanje':
+                $backgroundColor = '#80B0FF';
+                $title = 'Spremno za pakovanje';
+                break;
+            case 'naruceno':
+                $backgroundColor = '#80B0FF';
+                $title = 'Naručeno';
+                break;
+            case 'poslato':
+                $backgroundColor = '#FFA3A3';
+                $title = 'Poslato';
+                break;
+            case 'u-obradi':
+                $title = 'U obradi';
+                break;
+            case 'u-pripremiplaceno':
+                $backgroundColor = 'yellow';
+                $title = 'U pripremi (plaćeno)';
+                break;
+            case 'u-pripremi':
+                $backgroundColor = 'yellow';
+                $title = 'U pripremi';
+                break;
+            case 'cekaseuplata':
+                $backgroundColor = '#5b841b';
+                $title = 'Čeka se uplata';
+                break;
         }
-        return sprintf('<span class="tableStatus" style="background-color: %s">%s</span>', $color, $title);
+        if ($backgroundColor === 'yellow') {
+            $color = 'black';
+        }
+        return sprintf('<span title="%s" class="tableStatus" style=" font-weight:bold;background-color: %s;color: %s">%s%s</span>',
+            $note, $backgroundColor, $color, $title, $dashicon);
+    }
+
+    private function changeCreatedViaTitle($createdVia)
+    {
+        switch ($createdVia){
+            case 'checkout':
+                $title = 'WWW';
+                break;
+            case 'admin':
+                $title = 'Telefonom';
+                break;
+            default :
+                $title = 'Nepoznat nacin kreiranja';
+        }
+        return $title;
     }
 }
