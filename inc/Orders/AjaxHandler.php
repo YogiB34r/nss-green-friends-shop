@@ -116,8 +116,9 @@ class AjaxHandler
         $dateTo = $_GET['to'] ?? null;
         $dateFrom = $_GET['from'] ?? null;
         $marketplaceOrder = '';
-        $orderStatus = '';
+        $orderStatus = array_keys( wc_get_order_statuses());
         $paymentMethod = '';
+        $orders = [];
 
         if (isset($_GET['orderType'])) {
             $orderType = $_GET['orderType'] !== '-1' ? $_GET['orderType'] : '';
@@ -126,13 +127,13 @@ class AjaxHandler
             $paymentMethod = $_GET['paymentMethod'] !== '-1' ? $_GET['paymentMethod'] : '';
         }
         if (isset($_GET['orderStatus'])) {
-            $orderStatus = $_GET['orderStatus'] !== '-1' ? $_GET['orderStatus'] : '';
+            $orderStatus = $_GET['orderStatus'] !== '-1' ? $_GET['orderStatus'] : array_keys( wc_get_order_statuses());
         }
         if ($dateFrom === null || $dateFrom === '') {
             $dateFrom = (string)$dt->setTimestamp(0)->getTimestamp();
         }
         if ($dateTo === null || $dateTo === '') {
-            $dateTo = (string)time();
+            $dateTo = time();
         }
         if (isset($_GET['marketplaceOrder'])) {
             $marketplaceOrder = $_GET['marketplaceOrder'];
@@ -143,7 +144,14 @@ class AjaxHandler
         $formattedArray = [];
         $searchValue = $_GET['search']['value'] ?? '';
 
-        //Without search
+        //Used for sql to get sum for order subtotal,total and shipping total for all pages
+        $filters = [
+            '_created_via' => $orderType,
+            '_payment_method' => $paymentMethod,
+            'post_status' => $orderStatus,
+            'date_created' => $dateFrom . '...' . $dateTo
+        ];
+
         if ($searchValue === '') {
             if ($marketplaceOrder !== '-1') {
                 global $wpdb;
@@ -170,99 +178,72 @@ class AjaxHandler
 
             if ($marketplaceOrder === '1') {
                 $args['post__in'] = $formattedArray;
+                $filters['post__in'] = implode(',',$formattedArray);
             }
             if ($marketplaceOrder === '2'){
                 $args['post__not_in'] = $formattedArray;
+                $filters['post__not_in'] = implode(',',$formattedArray);
             }
-
             $query = new \WC_Order_Query($args);
             $result = $query->get_orders();
-        }
-
-        $orders = [];
-        $pageOrdersSubtotal = 0;
-        $pageShippingTotal = 0;
-        $pageOrdersTotal = 0;
-        /** @var \WC_Order $order */
-        foreach ($result->orders as $order) {
-            $pageOrdersSubtotal += $order->get_subtotal();
-            $pageShippingTotal += (int)$order->get_shipping_total();
-            $pageOrdersTotal += (int)$order->get_total();
-            $orders[] = [
-                'orderTitle' => $this->orderPage->formatOrderName($order),
-                'paymentMethod' => $order->get_payment_method_title(),
-                'createdVia' =>$this->changeCreatedViaTitle($order->get_created_via()),
-                'date' => $order->get_date_created()->format('d/m/y'),
-                'shippingMethod' => $order->get_shipping_method(),
-                'total' => $order->get_total().get_woocommerce_currency_symbol(),
-                'status' => $this->getStatusMarkup($order->get_status(), wc_get_order_notes(['order_id' => $order->get_id(),
-                    'customer_note' => 'false','added_by' => 'system'])),
-                'shippingTotal' => $order->get_shipping_total().get_woocommerce_currency_symbol(),
-                'itemsTotal' => $order->get_subtotal().get_woocommerce_currency_symbol(),
-                'orderId' => sprintf('<input class="individualCheckbox" type="checkbox" data-id="%s">',
-                    $order->get_id()[0]),
-                'actions' => $this->getActionsForOrder($order)
-            ];
-        }
-        $data = [
-            'draw' => (int)$_GET['draw'],
-            'recordsTotal' => $result->total,
-            'recordsFiltered' => $result->total,
-            'data' => $orders,
-            'pageOrdersTotal' => $pageOrdersTotal.get_woocommerce_currency_symbol(),
-            'pageShippingTotal' => $pageShippingTotal.get_woocommerce_currency_symbol(),
-            'pageOrderSubtotals' => $pageOrdersSubtotal.get_woocommerce_currency_symbol()
-        ];
-        wp_send_json($data);
-
-        //With Search
-        global $wpdb;
-        $countSql = "SELECT COUNT(ID) FROM wp_posts WHERE (ID LIKE '%{$searchValue}%' OR ID IN (SELECT post_id FROM wp_postmeta WHERE meta_key = '_customer_user' AND meta_value IN (SELECT ID FROM wp_users WHERE display_name LIKE '%{$searchValue}%'))) AND post_status NOT LIKE 'trash' AND post_status NOT LIKE 'auto-draft' LIMIT {$_GET['length']} OFFSET {$_GET['start']}";
-        $totalOrdersCount = $wpdb->get_results($countSql, ARRAY_N)[0][0];
-        $sql = "SELECT * FROM wp_posts WHERE (ID LIKE '%{$searchValue}%' OR ID IN (SELECT post_id FROM wp_postmeta WHERE meta_key = '_customer_user' AND meta_value IN (SELECT ID FROM wp_users WHERE display_name LIKE '%{$searchValue}%'))) AND post_status NOT LIKE 'trash' AND post_status NOT LIKE 'auto-draft' LIMIT {$_GET['length']} OFFSET {$_GET['start']}";
-        $posts = $wpdb->get_results($sql);
-        $formattedArray = [];
-
-        foreach ($posts as $post) {
-            $formattedArray[] = $post->ID;
-        }
-        $orders = [];
-        $pageOrdersTotal = 0;
-        $pageShippingTotal = 0;
-        $pageOrdersSubtotal = 0;
-        foreach ($formattedArray as $postId) {
-            $order = wc_get_order($postId);
-            if ($order) {
-                $pageOrdersSubtotal += $order->get_subtotal();
-                $pageShippingTotal += (int)$order->get_shipping_total();
-                $pageOrdersTotal += (int)$order->get_total();
-                $orders[] = [
-                    'orderTitle' => $this->orderPage->formatOrderName($order),
-                    'paymentMethod' => $order->get_payment_method_title(),
-                    'createdVia' =>$this->changeCreatedViaTitle($order->get_created_via()),
-                    'date' => $order->get_date_created()->format('d/m/y'),
-                    'shippingMethod' => $order->get_shipping_method(),
-                    'total' => $order->get_total().get_woocommerce_currency_symbol(),
-                    'status' => $this->getStatusMarkup($order->get_status(), wc_get_order_notes(['order_id' => $order->get_id(),
-                        'customer_note' => 'false','added_by' => 'system'])),
-                    'shippingTotal' => $order->get_shipping_total().get_woocommerce_currency_symbol(),
-                    'itemsTotal' => $order->get_subtotal().get_woocommerce_currency_symbol(),
-                    'orderId' => sprintf('<input class="individualCheckbox" type="checkbox" data-id="%s">',
-                        $order->get_id()),
-                    'actions' => $this->getActionsForOrder($order)
-                ];
+            $pageOrdersSubtotal = 0;
+            $pageShippingTotal = 0;
+            $pageOrdersTotal = 0;
+            $orders = $result->orders;
+            $totalOrdersCount = $result->total;
+            $allPagesTotal = $this->getOrdersTotal($filters);
+            $allPagesShippingTotal = $this->getOrdersShippingTotal($filters);
+        } else {
+            global $wpdb;
+            $countSql = "SELECT COUNT(ID) FROM wp_posts WHERE (ID LIKE '%{$searchValue}%' OR ID IN (SELECT post_id FROM wp_postmeta WHERE meta_key = '_customer_user' AND meta_value IN (SELECT ID FROM wp_users WHERE display_name LIKE '%{$searchValue}%'))) AND post_status NOT LIKE 'trash' AND post_status NOT LIKE 'auto-draft' LIMIT {$_GET['length']} OFFSET {$_GET['start']}";
+            $totalOrdersCount = $wpdb->get_results($countSql, ARRAY_N)[0][0];
+            $sql = "SELECT * FROM wp_posts WHERE (ID LIKE '%{$searchValue}%' OR ID IN (SELECT post_id FROM wp_postmeta WHERE meta_key = '_customer_user' AND meta_value IN (SELECT ID FROM wp_users WHERE display_name LIKE '%{$searchValue}%'))) AND post_status NOT LIKE 'trash' AND post_status NOT LIKE 'auto-draft' LIMIT {$_GET['length']} OFFSET {$_GET['start']}";
+            $posts = $wpdb->get_results($sql);
+            foreach ($posts as $post) {
+                $orders[] = wc_get_order($post->ID);
             }
+            $filters['post__in'] = implode(',', $formattedArray);
+            $allPagesTotal = $this->getOrdersTotal($filters);
+            $allPagesShippingTotal = $this->getOrdersShippingTotal($filters);
+            $pageOrdersTotal = 0;
+            $pageShippingTotal = 0;
+            $pageOrdersSubtotal = 0;
         }
+        $formattedOrders = [];
+        foreach ($orders as $order) {
+                    $pageOrdersSubtotal += $order->get_subtotal();
+                    $pageShippingTotal += (int)$order->get_shipping_total();
+                    $pageOrdersTotal += (int)$order->get_total();
+                    $formattedOrders[] = [
+                        'orderTitle' => $this->orderPage->formatOrderName($order),
+                        'paymentMethod' => $order->get_payment_method_title(),
+                        'createdVia' =>$this->changeCreatedViaTitle($order->get_created_via()),
+                        'date' => $order->get_date_created()->format('d/m/y'),
+                        'shippingMethod' => $order->get_shipping_method(),
+                        'total' => $order->get_total().get_woocommerce_currency_symbol(),
+                        'status' => $this->getStatusMarkup($order->get_status(), wc_get_order_notes(['order_id' => $order->get_id(),
+                            'customer_note' => 'false','added_by' => 'system'])),
+                        'shippingTotal' => $order->get_shipping_total().get_woocommerce_currency_symbol(),
+                        'itemsTotal' => $order->get_subtotal().get_woocommerce_currency_symbol(),
+                        'orderId' => sprintf('<input class="individualCheckbox" type="checkbox" data-id="%s">',
+                            $order->get_id()),
+                        'actions' => $this->getActionsForOrder($order)
+                    ];
+        }
+
         $data = [
             'draw' => (int)$_GET['draw'],
             'recordsTotal' => $totalOrdersCount,
             'recordsFiltered' => $totalOrdersCount,
-            'data' => $orders,
-            'pageOrdersTotal' => $pageOrdersTotal.get_woocommerce_currency_symbol(),
-            'pageShippingTotal' => $pageShippingTotal.get_woocommerce_currency_symbol(),
-            'pageOrderSubtotals' => $pageOrdersSubtotal.get_woocommerce_currency_symbol()
+            'data' => $formattedOrders,
+            'pageOrdersTotal' => number_format($pageOrdersTotal,2,',','.').get_woocommerce_currency_symbol(),
+            'pageShippingTotal' => number_format($pageShippingTotal,2,',','.').get_woocommerce_currency_symbol(),
+            'pageOrderSubtotals' => number_format($pageOrdersSubtotal,2,',','.').get_woocommerce_currency_symbol(),
+            'allPagesTotal' => number_format($allPagesTotal,2,',','.').get_woocommerce_currency_symbol(),
+            'allPagesSubtotal' => number_format($allPagesTotal-$allPagesShippingTotal,2,',','.').get_woocommerce_currency_symbol(),
+            'allPagesShippingTotal' => number_format($allPagesShippingTotal,2,',','.').get_woocommerce_currency_symbol()
         ];
-        wp_send_json($data);
+           wp_send_json($data);
     }
 
     private function getActionsForOrder(\WC_Order $order)
@@ -312,15 +293,14 @@ class AjaxHandler
     {
         $orderNote = $order->get_customer_note();
         if ($orderNote !== '') {
-            return sprintf('<a class="button" style="background-color:yellow;" href="#" title="%s" 
-            target="_blank">Napomena</a>', $orderNote);
+            return sprintf('<span class="button" style="background-color:yellow;" title="%s">Napomena</span>', $orderNote);
         }
         return '';
     }
 
     private function getStatusMarkup($status, $notes)
     {
-        $color = 'black';
+        $color = '#fff';
         $title = 'Nepoznat Status';
         $backgroundColor = '#e5e5e5';
         $note = '';
@@ -399,6 +379,7 @@ class AjaxHandler
                 break;
             case 'u-obradi':
                 $title = 'U obradi';
+                $color = 'black';
                 break;
             case 'u-pripremiplaceno':
                 $backgroundColor = 'yellow';
@@ -433,5 +414,85 @@ class AjaxHandler
                 $title = 'Nepoznat nacin kreiranja';
         }
         return $title;
+    }
+
+    private function getOrdersTotal($args = [])
+    {
+        global $wpdb;
+        $filters1 = '';
+        $filters2 = '';
+        foreach ($args as $filter => $value){
+            if ($value !== ''){
+                switch ($filter){
+                    case 'post__in':
+                        $filters2.= "AND `ID` IN ({$value})";
+                        break;
+                    case 'post__not_in':
+                        $filters2.= "AND `ID` NOT IN ({$value})";
+                        break;
+                    case '_payment_method':
+                        $filters1 .= "AND post_id in (SELECT post_id FROM wp_postmeta WHERE meta_key = '_payment_method' AND meta_value ='{$value}')";
+                        break;
+                    case '_created_via':
+                        $filters1.= "AND post_id in (SELECT post_id FROM wp_postmeta WHERE meta_key = '_created_via' AND meta_value ='{$value}')";
+                        break;
+                    case 'post_status':
+                        if (is_array($value)){
+                            break;
+                        }
+                        $filters2.= "AND `post_status` = '{$value}'";
+                        break;
+                    case 'date_created':
+                        list ($dateFrom, $dateTo) = explode('...', $value);
+                        $dt = new \DateTime();
+                        $dt->setTimezone(new \DateTimeZone('Europe/Belgrade'));
+                        $dateFrom = $dt->setTimestamp($dateFrom)->format('Y-m-d H:m:s');
+                        $dateTo = $dt->setTimestamp($dateTo)->format('Y-m-d H:m:s');
+                        $filters2 = "AND post_date BETWEEN '{$dateFrom}' AND '$dateTo'";
+                }
+            }
+        }
+        $sql = "SELECT SUM(meta_value) FROM wp_postmeta WHERE meta_key = '_order_total' {$filters1} AND post_id in (SELECT ID FROM wp_posts WHERE post_status != 'trash'{$filters2})";
+        return $wpdb->get_results($sql, ARRAY_N)[0][0];
+    }
+
+    private function getOrdersShippingTotal($args = [])
+    {
+        global $wpdb;
+        $filters1 = '';
+        $filters2 = '';
+        foreach ($args as $filter => $value){
+            if ($value !== ''){
+                switch ($filter){
+                    case 'post__in':
+                        $filters2.= "AND `ID` IN ({$value})";
+                        break;
+                    case 'post__not_in':
+                        $filters2.= "AND `ID` NOT IN ({$value})";
+                        break;
+                    case '_payment_method':
+                        $filters1 .= "AND post_id in (SELECT post_id FROM wp_postmeta WHERE meta_key = '_payment_method' AND meta_value ='{$value}')";
+                        break;
+                    case '_created_via':
+                        $filters1.= "AND post_id in (SELECT post_id FROM wp_postmeta WHERE meta_key = '_created_via' AND meta_value ='{$value}')";
+                        break;
+                    case 'post_status':
+                        if (is_array($value)){
+                            break;
+                        }
+                        $filters2.= "AND `post_status` = '{$value}'";
+                        break;
+                    case 'date_created':
+                        list ($dateFrom, $dateTo) = explode('...', $value);
+                        $dt = new \DateTime();
+                        $dt->setTimezone(new \DateTimeZone('Europe/Belgrade'));
+                        $dateFrom = $dt->setTimestamp($dateFrom)->format('Y-m-d H:m:s');
+                        $dateTo = $dt->setTimestamp($dateTo)->format('Y-m-d H:m:s');
+                        $filters2 = "AND post_date BETWEEN '{$dateFrom}' AND '$dateTo'";
+                }
+            }
+        }
+        $sql = "SELECT SUM(meta_value) FROM wp_postmeta WHERE meta_key = '_order_shipping' {$filters1} AND post_id in (SELECT ID FROM wp_posts WHERE post_status != 'trash'{$filters2})";
+        return $wpdb->get_results($sql, ARRAY_N)[0][0];
     }
 }

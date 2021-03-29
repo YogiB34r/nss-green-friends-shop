@@ -10,6 +10,7 @@ var table = jQuery('#orderTable').DataTable({
     'dataSrc': function (data) {
         return data.data;
     },
+    'dom': '<"top"flp<"clear">>rt<"bottom"ifp<"clear">>',
     'columns': [
         {
             data:'orderId',
@@ -71,23 +72,38 @@ var table = jQuery('#orderTable').DataTable({
     ],
     drawCallback: function (data) {
         var api = this.api();
+        var data = api.ajax.json();
         jQuery(api.column(1).footer()).html(
             'Zbir stranice'
         );
         jQuery(api.column(3).footer()).html(
-            api.ajax.json().pageShippingTotal
+            data.pageShippingTotal
         );
         jQuery(api.column(4).footer()).html(
-            api.ajax.json().pageOrderSubtotals
+            data.pageOrderSubtotals
         );
         jQuery(api.column(5).footer()).html(
-            api.ajax.json().pageOrdersTotal
+            data.pageOrdersTotal
         );
+        appendHtml(data.allPagesShippingTotal, data.allPagesSubtotal, data.allPagesTotal);
     }
 });
 var filters = document.getElementsByClassName('filterSelect')
 Array.prototype.forEach.call(filters, function (elem) {
     elem.addEventListener('change', function () {
+        refreshTable()
+    })
+})
+var statusFilters = document.getElementsByClassName('statusSelect')
+Array.prototype.forEach.call(statusFilters, function (elem) {
+    elem.addEventListener('click', function (e) {
+        e.preventDefault()
+        let value = e.target.getAttribute('value')
+        if (value !== ''){
+            baseAjaxUrl += '&orderStatus=' + value
+        } else {
+            baseAjaxUrl = gfData.ajaxUrl+'?action=gfOrdersTable&ajaxAction=getOrders';
+        }
         refreshTable()
     })
 })
@@ -177,4 +193,13 @@ function refreshTable() {
     })
     table.ajax.url(ajaxUrlWithFilters);
     table.draw()
+}
+
+function appendHtml(shipping, subtotal, total){
+    if (typeof jQuery('#totals') !== 'undefined'){
+        jQuery('#totals').remove();
+    }
+    jQuery('tfoot').append(
+        '<tr id="totals"><th class="selectCheckbox" rowspan="1" colspan="1"></th><th rowspan="1" colspan="1">Zbir</th><th rowspan="1" colspan="1"></th><th rowspan="1" colspan="1">'+shipping+'</th><th rowspan="1" colspan="1">'+subtotal+'</th><th rowspan="1" colspan="1">'+total+'</th><th rowspan="1" colspan="1"></th><th rowspan="1" colspan="1"></th><th rowspan="1" colspan="1"></th><th rowspan="1" colspan="1"></th><th rowspan="1" colspan="1"></th></tr>'
+    )
 }

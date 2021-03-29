@@ -1,3 +1,20 @@
+<div class="header">
+    <h1>Narudžbine</h1>
+    <span><a href="https://nss-devel.ha.rs/wp-admin/post-new.php?post_type=shop_order"
+             class="page-title-action">Napravi novu narudžbinu</a></span>
+</div>
+<div class="statusFilters">
+    <a data-id="orderStatus" class="statusSelect" href="#" value="">Sve</a>
+    <?php
+    foreach (wc_get_order_statuses() as $key => $value):
+        //Client is using custom status for refunded orders
+        if ($key === 'wc-refunded') {
+            continue;
+        } ?>
+        <a data-id="orderStatus" class="statusSelect" href="#" value="<?=$key?>"><?=$value?></a>
+    <?php
+    endforeach; ?>
+</div>
 <div class="filterWrapper">
     <label>
         <span>Datum</span>
@@ -25,21 +42,6 @@
             <?php
             foreach (WC()->payment_gateways()->get_available_payment_gateways() as $gateway):?>
                 <option value="<?=$gateway->id?>"><?=$gateway->title?></option>
-            <?php
-            endforeach; ?>
-        </select>
-    </label>
-    <label>
-        <span>Status Narudžbine</span>
-        <select class="filterSelect" id="orderStatus">
-            <option value="-1">Izaberite status</option>
-            <?php
-            foreach (wc_get_order_statuses() as $key => $value):
-                //Client is using custom status for refunded orders
-                if ($key === 'wc-refunded') {
-                    continue;
-                } ?>
-                <option value="<?=$key?>"><?=$value?></option>
             <?php
             endforeach; ?>
         </select>

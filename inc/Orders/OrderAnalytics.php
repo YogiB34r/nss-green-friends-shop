@@ -32,13 +32,15 @@ class OrderAnalytics
     public function menuPage()
     {
         global $wpdb;
+
+        //Used in select menu for filters
         $vendorDataTable = $wpdb->prefix . 'mpVendorData';
         $sql = "SELECT `vendorId` FROM {$vendorDataTable} WHERE `isActive` = 1";
         $activeVendors = $wpdb->get_results($sql);
         include('templates/orderTable.phtml');
     }
 
-    public function formatOrderName($order)
+    public function formatOrderName(\WC_Order $order)
     {
         $orderDate = $order->get_date_created()->format('dmY');
         $orderTitle = sprintf('# %s - %d %s %s', $orderDate, $order->get_id(), $order->get_billing_first_name(),
