@@ -70,7 +70,7 @@ class Cli
         $products = wc_get_products(array(
             'limit' => -1,
             'return' => 'ids',
-//            'status' => 'publish',
+            'status' => 'draft',
 //            'meta_key' => 'supplier',
 //            'meta_value' => 45,
         ));
@@ -78,7 +78,10 @@ class Cli
         $diff = array_diff($this->getIndexedIds(), $products);
         foreach ($diff as $postId) {
             $p = wc_get_product($postId);
-            if (!$p) {
+            if (!$p || ($p && $p->get_status() !== 'publish')) {
+//                var_dump($p->get_status());
+//                var_dump($p);
+//                die();
                 $response = $elasticaClient->getIndex('product')->getType('product')->deleteById($postId);
                 $removed++;
                 if (!$response->isOk()) {
