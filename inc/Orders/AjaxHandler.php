@@ -211,6 +211,11 @@ class AjaxHandler
         }
         $formattedOrders = [];
         foreach ($orders as $order) {
+            if (($order instanceof \Automattic\WooCommerce\Admin\Overrides\OrderRefund
+                    ||  $order instanceof \Automattic\WooCommerce\Admin\Overrides\Order)
+                &&  !$order instanceof \WC_Order) {
+                    continue;
+            }
                     $pageOrdersSubtotal += $order->get_subtotal();
                     $pageShippingTotal += (int)$order->get_shipping_total();
                     $pageOrdersTotal += (int)$order->get_total();
@@ -246,7 +251,7 @@ class AjaxHandler
            wp_send_json($data);
     }
 
-    private function getActionsForOrder(\WC_Order $order)
+    private function getActionsForOrder($order)
     {
         return $this->predracunAction($order) . $this->exportAction($order) . $this->adresnicaAction($order) .
             $this->noteAction($order) . $this->syncToMisAction($order);
@@ -448,7 +453,7 @@ class AjaxHandler
                         $dt->setTimezone(new \DateTimeZone('Europe/Belgrade'));
                         $dateFrom = $dt->setTimestamp($dateFrom)->format('Y-m-d H:m:s');
                         $dateTo = $dt->setTimestamp($dateTo)->format('Y-m-d H:m:s');
-                        $filters2 = "AND post_date BETWEEN '{$dateFrom}' AND '$dateTo'";
+                        $filters2 .= "AND post_date BETWEEN '{$dateFrom}' AND '$dateTo'";
                 }
             }
         }
@@ -488,7 +493,7 @@ class AjaxHandler
                         $dt->setTimezone(new \DateTimeZone('Europe/Belgrade'));
                         $dateFrom = $dt->setTimestamp($dateFrom)->format('Y-m-d H:m:s');
                         $dateTo = $dt->setTimestamp($dateTo)->format('Y-m-d H:m:s');
-                        $filters2 = "AND post_date BETWEEN '{$dateFrom}' AND '$dateTo'";
+                        $filters2 .= "AND post_date BETWEEN '{$dateFrom}' AND '$dateTo'";
                 }
             }
         }

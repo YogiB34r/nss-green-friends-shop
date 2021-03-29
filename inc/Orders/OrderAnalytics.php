@@ -40,7 +40,11 @@ class OrderAnalytics
         include('templates/orderTable.phtml');
     }
 
-    public function formatOrderName(\WC_Order $order)
+    /**
+     * @param $order
+     * @return string
+     */
+    public function formatOrderName($order)
     {
         $orderDate = $order->get_date_created()->format('dmY');
         $orderTitle = sprintf('# %s - %d %s %s', $orderDate, $order->get_id(), $order->get_billing_first_name(),

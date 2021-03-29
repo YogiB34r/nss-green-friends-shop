@@ -99,11 +99,10 @@ Array.prototype.forEach.call(statusFilters, function (elem) {
     elem.addEventListener('click', function (e) {
         e.preventDefault()
         let value = e.target.getAttribute('value')
-        if (value !== ''){
-            baseAjaxUrl += '&orderStatus=' + value
-        } else {
-            baseAjaxUrl = gfData.ajaxUrl+'?action=gfOrdersTable&ajaxAction=getOrders';
+        if (value === ''){
+            value = '-1';
         }
+        baseAjaxUrl += '&orderStatus=' + value
         refreshTable()
     })
 })
