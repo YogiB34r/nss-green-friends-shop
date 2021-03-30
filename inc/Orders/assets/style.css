@@ -110,16 +110,8 @@
     order: 18;
 }
 
-.wc-u-pripremi {
-    order: 2;
-}
-
-.wc-cekaseuplata {
-    order: 3;
-}
-
 .wc-u-pripremiplaceno {
-    order: 4;
+    order: 3;
 }
 
 .wc-on-hold {
@@ -174,14 +166,10 @@
     order: 16;
 }
 
-.wc-u-pripremiplaceno {
-    order: 4;
-}
-
 .wc-u-pripremi {
     order: 2;
 }
 
 .wc-cekaseuplata {
-    order: 3;
+    order: 4;
 }
