@@ -1,5 +1,6 @@
 const baseAjaxUrlOrders = gfData.ajaxUrl+'?action=gfOrdersTable&ajaxAction=getOrders';
 const baseAjaxUrlCount = gfData.ajaxUrl+'?action=gfOrdersTable&ajaxAction=getPagesTotals';
+let activeStatus = '-1';
 let ajaxUrlWithFilters = baseAjaxUrlOrders;
 let ajaxUrlWithFiltersForCount = baseAjaxUrlCount;
 
@@ -12,6 +13,9 @@ var table = jQuery('#orderTable').DataTable({
     'ajax': ajaxUrlWithFilters,
     'dataSrc': function (data) {
         return data.data;
+    },
+    "language": {
+        "emptyTable": "Nije pronadjena nijedna narudžbina sa zadatim filterima"
     },
     'dom': '<"top"flp<"clear">>rt<"bottom"ifp<"clear">>',
     'columns': [
@@ -93,24 +97,20 @@ var table = jQuery('#orderTable').DataTable({
 var filters = document.getElementsByClassName('filterSelect')
 Array.prototype.forEach.call(filters, function (elem) {
     elem.addEventListener('change', function () {
-        ajaxUrlWithFilters = baseAjaxUrlOrders
-        ajaxUrlWithFiltersForCount += baseAjaxUrlCount
-        refreshTable()
+        refreshTable(activeStatus)
     })
 })
 var statusFilters = document.getElementsByClassName('statusSelect')
 Array.prototype.forEach.call(statusFilters, function (elem) {
     elem.addEventListener('click', function (e) {
-        ajaxUrlWithFilters = baseAjaxUrlOrders
-        ajaxUrlWithFiltersForCount += baseAjaxUrlCount
         e.preventDefault()
         let value = e.target.getAttribute('value')
         if (value === ''){
             value = '-1';
         }
-        ajaxUrlWithFilters += '&orderStatus=' + value
-        ajaxUrlWithFiltersForCount += '&orderStatus=' + value
-        refreshTable()
+        activeStatus = '&orderStatus=' + value
+        activeStatus = '&orderStatus=' + value
+        refreshTable(activeStatus)
     })
 })
 jQuery(function () {
@@ -192,10 +192,12 @@ jQuery(function () {
     });
 
 });
-function refreshTable() {
+function refreshTable(status) {
+    ajaxUrlWithFiltersForCount = baseAjaxUrlCount;
+    ajaxUrlWithFilters = baseAjaxUrlOrders;
     Array.prototype.forEach.call(filters, function (elem) {
-        ajaxUrlWithFilters += '&' + elem.id + '=' + elem.value
-        ajaxUrlWithFiltersForCount += '&' + elem.id + '=' + elem.value
+        ajaxUrlWithFilters += '&' + elem.id + '=' + elem.value + status
+        ajaxUrlWithFiltersForCount += '&' + elem.id + '=' + elem.value + status
     })
     table.ajax.url(ajaxUrlWithFilters);
     table.draw()
