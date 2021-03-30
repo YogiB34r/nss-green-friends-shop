@@ -318,7 +318,6 @@ class Marketplace
 
     public function markOrderAsMarketplace($postId, \WP_Post $post)
     {
-        //@todo send email to vendor
         if ($post->post_type === 'shop_order') {
             $suppliers = [];
             $order = wc_get_order($postId);

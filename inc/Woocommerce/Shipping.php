@@ -92,7 +92,7 @@ class Shipping
                 $minPrice = (int)$vendor['minFreeShippingCost'];
                 if ($minPrice) {
                     $orderPrice = $order->get_subtotal();
-                    if ($orderPrice > $minPrice) {
+                    if ($orderPrice >= $minPrice) {
                         $case = 1;
                     } else {
                         $case = 0;
