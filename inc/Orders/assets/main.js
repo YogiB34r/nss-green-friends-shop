@@ -216,3 +216,14 @@ jQuery('#orderTable').on('draw.dt', function (){
         appendHtml(response.data.allPagesShippingTotal, response.data.allPagesSubtotal, response.data.allPagesTotal);
     })
 })
+jQuery('#marketplaceOrder').on('change', function (e){
+    if (e.target.value === '1') {
+        jQuery('#vendorSelect').css('display','flex');
+    }
+    if (e.target.value === '2') {
+        jQuery('#vendorSelect').css('display','none');
+    }
+    if (e.target.value === '-1') {
+        jQuery('#vendorSelect').css('display','none');
+    }
+})

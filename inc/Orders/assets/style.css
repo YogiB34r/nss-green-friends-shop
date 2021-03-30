@@ -173,3 +173,6 @@
 .wc-cekaseuplata {
     order: 4;
 }
+#vendorSelect {
+    display: none;
+}
