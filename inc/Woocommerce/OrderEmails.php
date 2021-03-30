@@ -65,7 +65,7 @@ class OrderEmails
         if (count($order->get_items()) > 1) {
             $subject = 'Neki od proizvoda koji ste naručili nemamo na stanju';
         }
-        $msg = 'Poštovani, nažalost, neki od proizvoda iz Vaše narudžbenice trenutno nemamo na stanju.<br />
+        $msg = 'Poštovani, nažalost, neki od proizvoda iz Vaše narudžbenice: '.$order->get_order_number().' trenutno nemamo na stanju.<br />
                 Kolege će se potruditi da Vam pronađu odgovarajuću zamenu (ukoliko postoji), a zatim će Vas kontaktirati. <br />
                 Hvala na razumevanju.';
         $this->sendOrderStatusUpdateMail($order, $subject, $msg);
@@ -76,7 +76,7 @@ class OrderEmails
         $order = wc_get_order($orderId);
         $subject = 'Vaša uplata je upravo evidentirana';
         $msg = 'Poštovani,<br /> 
-                Vaša uplata je upravo evidentirana.<br />
+                Vaša uplata za narudžbenicu: '.$order->get_order_number().' je upravo evidentirana.<br />
                 Očekivani rok isporuke je 3-5 radnih dana. Dodatno ćemo Vas obavestiti kad pošaljemo narudžbinu. ';
         $this->sendOrderStatusUpdateMail($order, $subject, $msg);
     }
@@ -86,7 +86,7 @@ class OrderEmails
         $order = wc_get_order($orderId);
         $subject = 'Vaša narudžbina je poslata';
         $msg = 'Poštovani, <br />
-                Vaša pošiljka je upravo poslata. Isporuku možete očekivati sutra.<br/> 
+                Vaša pošiljka za narudžbenicu: '.$order->get_order_number().' je upravo poslata. Isporuku možete očekivati sutra.<br/> 
                 Isporuku vrši kurirska služba D Express, čiji će Vas kurir kontaktirati kako bi Vam uručio pošiljku.';
         $this->sendOrderStatusUpdateMail($order, $subject, $msg);
     }
