@@ -121,7 +121,7 @@ class AjaxHandler
         $orderStatus = array_keys( wc_get_order_statuses());
         $paymentMethod = '';
         $orders = [];
-        $trash = null;
+        $operator = null;
 
         if (isset($_GET['orderType'])) {
             $orderType = $_GET['orderType'] !== '-1' ? $_GET['orderType'] : '';
@@ -145,7 +145,7 @@ class AjaxHandler
             $vendorId = $_GET['vendorIdSelect'];
         }
         if (isset($_GET['trash'])) {
-            $trash = true;
+            $operator = true;
             $orderStatus = 'trash';
         }
         $formattedArray = [];
@@ -416,7 +416,7 @@ class AjaxHandler
         return $title;
     }
 
-    private function getOrdersTotal($trash, $args = [])
+    private function getOrdersTotal($operator, $args = [])
     {
         global $wpdb;
         $filters1 = '';
@@ -454,11 +454,11 @@ class AjaxHandler
                 }
             }
         }
-        $sql = "SELECT SUM(meta_value) FROM wp_postmeta WHERE meta_key = '_order_total' {$filters1} AND post_id in (SELECT ID FROM wp_posts WHERE post_status {$trash} 'trash'{$filters2})";
+        $sql = "SELECT SUM(meta_value) FROM wp_postmeta WHERE meta_key = '_order_total' {$filters1} AND post_id in (SELECT ID FROM wp_posts WHERE post_status {$operator} 'trash'{$filters2})";
         return $wpdb->get_results($sql, ARRAY_N)[0][0];
     }
 
-    private function getOrdersShippingTotal($trash, $args = [])
+    private function getOrdersShippingTotal($operator, $args = [])
     {
         global $wpdb;
         $filters1 = '';
@@ -496,7 +496,7 @@ class AjaxHandler
                 }
             }
         }
-        $sql = "SELECT SUM(meta_value) FROM wp_postmeta WHERE meta_key = '_order_shipping' {$filters1} AND post_id in (SELECT ID FROM wp_posts WHERE post_status {$trash} 'trash'{$filters2})";
+        $sql = "SELECT SUM(meta_value) FROM wp_postmeta WHERE meta_key = '_order_shipping' {$filters1} AND post_id in (SELECT ID FROM wp_posts WHERE post_status {$operator} 'trash'{$filters2})";
         return $wpdb->get_results($sql, ARRAY_N)[0][0];
     }
 
@@ -508,7 +508,7 @@ class AjaxHandler
         $dateFrom = $_GET['from'] ?? null;
         $orderStatus = array_keys( wc_get_order_statuses());
         $paymentMethod = '';
-        $trash = '!=';
+        $operator = '!=';
         if (isset($_GET['orderType'])) {
             $orderType = $_GET['orderType'] !== '-1' ? $_GET['orderType'] : '';
         }
@@ -517,15 +517,15 @@ class AjaxHandler
         }
         if (isset($_GET['orderStatus'])) {
             $orderStatus = $_GET['orderStatus'] !== '-1' ? $_GET['orderStatus'] : array_keys( wc_get_order_statuses());
+            if ($orderStatus === 'trash') {
+                $operator = '=';
+            }
         }
         if ($dateFrom === null || $dateFrom === '') {
             $dateFrom = (string)$dt->setTimestamp(0)->format('m/d/Y');
         }
         if ($dateTo === null || $dateTo === '') {
             $dateTo = $dt->setTimestamp(time())->format('m/d/Y');
-        }
-        if (isset($_GET['trash'])){
-            $trash = '=';
         }
         $filters = [
             '_created_via' => $orderType,
@@ -537,15 +537,15 @@ class AjaxHandler
         if ($searchValue !== ''){
             $orderIds = [];
             global $wpdb;
-            $sql = "SELECT * FROM wp_posts WHERE (ID LIKE '%{$searchValue}%' OR ID IN (SELECT post_id FROM wp_postmeta WHERE meta_key = '_customer_user' AND meta_value IN (SELECT ID FROM wp_users WHERE display_name LIKE '%{$searchValue}%'))) AND post_status {$trash} 'trash' AND post_status NOT LIKE 'auto-draft' LIMIT {$_GET['length']} OFFSET {$_GET['start']}";
+            $sql = "SELECT * FROM wp_posts WHERE (ID LIKE '%{$searchValue}%' OR ID IN (SELECT post_id FROM wp_postmeta WHERE meta_key = '_customer_user' AND meta_value IN (SELECT ID FROM wp_users WHERE display_name LIKE '%{$searchValue}%'))) AND post_status {$operator} 'trash' AND post_status NOT LIKE 'auto-draft' LIMIT {$_GET['length']} OFFSET {$_GET['start']}";
             $posts = $wpdb->get_results($sql);
             foreach ($posts as $post) {
                 $orderIds[] = $post->ID;
             }
             $filters['post__in'] = implode(',', $orderIds);
         }
-        $allPagesTotal = $this->getOrdersTotal($trash, $filters);
-        $allPagesShippingTotal = $this->getOrdersShippingTotal($trash, $filters);
+        $allPagesTotal = $this->getOrdersTotal($operator, $filters);
+        $allPagesShippingTotal = $this->getOrdersShippingTotal($operator, $filters);
         $data = [
             'allPagesTotal' => number_format($allPagesTotal,2,',','.').get_woocommerce_currency_symbol(),
             'allPagesSubtotal' => number_format($allPagesTotal-$allPagesShippingTotal,2,',','.').get_woocommerce_currency_symbol(),

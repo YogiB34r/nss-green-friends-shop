@@ -1,7 +1,8 @@
-let baseAjaxUrl = gfData.ajaxUrl+'?action=gfOrdersTable&ajaxAction=getOrders';
-let baseAjaxUrlForCount = gfData.ajaxUrl+'?action=gfOrdersTable&ajaxAction=getPagesTotals';
-let ajaxUrlWithFilters = baseAjaxUrl;
-let ajaxUrlWithFiltersForCount = baseAjaxUrlForCount;
+const baseAjaxUrlOrders = gfData.ajaxUrl+'?action=gfOrdersTable&ajaxAction=getOrders';
+const baseAjaxUrlCount = gfData.ajaxUrl+'?action=gfOrdersTable&ajaxAction=getPagesTotals';
+let ajaxUrlWithFilters = baseAjaxUrlOrders;
+let ajaxUrlWithFiltersForCount = baseAjaxUrlCount;
+
 var table = jQuery('#orderTable').DataTable({
     'processing': true,
     'serverSide': true,
@@ -103,7 +104,8 @@ Array.prototype.forEach.call(statusFilters, function (elem) {
         if (value === ''){
             value = '-1';
         }
-        baseAjaxUrl += '&orderStatus=' + value
+        ajaxUrlWithFilters += '&orderStatus=' + value
+        ajaxUrlWithFiltersForCount += '&orderStatus=' + value
         refreshTable()
     })
 })
@@ -187,7 +189,6 @@ jQuery(function () {
 
 });
 function refreshTable() {
-    ajaxUrlWithFilters = baseAjaxUrl;
     Array.prototype.forEach.call(filters, function (elem) {
         ajaxUrlWithFilters += '&' + elem.id + '=' + elem.value
         ajaxUrlWithFiltersForCount += '&' + elem.id + '=' + elem.value
@@ -207,7 +208,9 @@ function appendHtml(shipping, subtotal, total){
 
 jQuery('#orderTable').on('draw.dt', function (){
     appendHtml('','','');
-    jQuery.post(ajaxUrlWithFiltersForCount, function (response){
+    jQuery.get(ajaxUrlWithFiltersForCount, function (response){
         appendHtml(response.data.allPagesShippingTotal, response.data.allPagesSubtotal, response.data.allPagesTotal);
+        ajaxUrlWithFilters = baseAjaxUrlOrders
+        ajaxUrlWithFiltersForCount += baseAjaxUrlCount
     })
 })
