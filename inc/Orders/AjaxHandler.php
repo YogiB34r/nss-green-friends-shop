@@ -509,6 +509,9 @@ class AjaxHandler
         $orderStatus = array_keys( wc_get_order_statuses());
         $paymentMethod = '';
         $operator = '!=';
+        $marketplaceOrder = '-1';
+        $vendorId = '';
+
         if (isset($_GET['orderType'])) {
             $orderType = $_GET['orderType'] !== '-1' ? $_GET['orderType'] : '';
         }
@@ -527,6 +530,12 @@ class AjaxHandler
         if ($dateTo === null || $dateTo === '') {
             $dateTo = $dt->setTimestamp(time())->format('m/d/Y');
         }
+        if (isset($_GET['marketplaceOrder'])) {
+            $marketplaceOrder = $_GET['marketplaceOrder'];
+        }
+        if (isset($_GET['vendorIdSelect'])) {
+            $vendorId = $_GET['vendorIdSelect'];
+        }
         $filters = [
             '_created_via' => $orderType,
             '_payment_method' => $paymentMethod,
@@ -543,6 +552,27 @@ class AjaxHandler
                 $orderIds[] = $post->ID;
             }
             $filters['post__in'] = implode(',', $orderIds);
+        } else {
+            $formattedArray = [];
+            if ($marketplaceOrder !== '-1') {
+                global $wpdb;
+                $sql = "SELECT `post_id` FROM {$wpdb->postmeta} WHERE `meta_key` = 'marketplaceVendor'";
+                if (isset($vendorId) && $vendorId !== '-1') {
+                    $sql .= ' AND `meta_value` = ' . $_GET['vendorIdSelect'];
+                }
+                $posts = $wpdb->get_results($sql, ARRAY_N);
+                foreach ($posts as $post) {
+                    $formattedArray[] = $post[0];
+                }
+            }
+            if ($marketplaceOrder === '1') {
+                $args['post__in'] = $formattedArray;
+                $filters['post__in'] = implode(',',$formattedArray);
+            }
+            if ($marketplaceOrder === '2'){
+                $args['post__not_in'] = $formattedArray;
+                $filters['post__not_in'] = implode(',',$formattedArray);
+            }
         }
         $allPagesTotal = $this->getOrdersTotal($operator, $filters);
         $allPagesShippingTotal = $this->getOrdersShippingTotal($operator, $filters);

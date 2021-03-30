@@ -93,12 +93,16 @@ var table = jQuery('#orderTable').DataTable({
 var filters = document.getElementsByClassName('filterSelect')
 Array.prototype.forEach.call(filters, function (elem) {
     elem.addEventListener('change', function () {
+        ajaxUrlWithFilters = baseAjaxUrlOrders
+        ajaxUrlWithFiltersForCount += baseAjaxUrlCount
         refreshTable()
     })
 })
 var statusFilters = document.getElementsByClassName('statusSelect')
 Array.prototype.forEach.call(statusFilters, function (elem) {
     elem.addEventListener('click', function (e) {
+        ajaxUrlWithFilters = baseAjaxUrlOrders
+        ajaxUrlWithFiltersForCount += baseAjaxUrlCount
         e.preventDefault()
         let value = e.target.getAttribute('value')
         if (value === ''){
@@ -210,7 +214,5 @@ jQuery('#orderTable').on('draw.dt', function (){
     appendHtml('','','');
     jQuery.get(ajaxUrlWithFiltersForCount, function (response){
         appendHtml(response.data.allPagesShippingTotal, response.data.allPagesSubtotal, response.data.allPagesTotal);
-        ajaxUrlWithFilters = baseAjaxUrlOrders
-        ajaxUrlWithFiltersForCount += baseAjaxUrlCount
     })
 })
