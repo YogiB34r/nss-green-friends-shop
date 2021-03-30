@@ -109,7 +109,8 @@ class Shipping
                                     $shippingPrice = (float)$value['price'];
                                     break;
                                 }
-                                if ($overWeightPrice !== 0 && $key === array_key_last($shippingPriceTable) && ((float)$value['weight'] < $cartWeight)) {
+                                $lastItemIndex = count($shippingPriceTable)-1;
+                                if ($overWeightPrice !== 0 && $key === $shippingPriceTable[$lastItemIndex] && ((float)$value['weight'] < $cartWeight)) {
                                     $shippingPrice = (float)$value['price'] + ($cartWeight - (float)$value['weight']) * $overWeightPrice;
                                     $label = sprintf('Preko %d kg (%d) + %ddin po kg',
                                     (float)$value['weight'], (int)$value['price'], $overWeightPrice);
@@ -134,6 +135,9 @@ class Shipping
                         }
                     }
                 }
+            }
+            if (in_array('free_shipping', parse_query(urldecode($_POST['items'])))) {
+                $case = 1;
             }
         } elseif (isset($_POST['action']) && ($_POST['action'] === 'woocommerce_save_order_items' ||
                 $_POST['action'] === 'woocommerce_calc_line_taxes')) {
