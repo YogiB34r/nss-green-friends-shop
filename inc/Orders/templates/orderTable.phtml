@@ -11,7 +11,8 @@
         if ($key === 'wc-refunded') {
             continue;
         } ?>
-        <a data-id="orderStatus" class="statusSelect" href="#" value="<?=$key?>"><?=$value?></a>
+        <a data-id="orderStatus" class="statusSelect" href="#" value="<?=$key?>"><?=$value?>
+            (<?=wc_orders_count(str_replace('wc-','',$key))?>)</a>
     <?php
     endforeach; ?>
 </div>

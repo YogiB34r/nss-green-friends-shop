@@ -1,5 +1,7 @@
 let baseAjaxUrl = gfData.ajaxUrl+'?action=gfOrdersTable&ajaxAction=getOrders';
+let baseAjaxUrlForCount = gfData.ajaxUrl+'?action=gfOrdersTable&ajaxAction=getPagesTotals';
 let ajaxUrlWithFilters = baseAjaxUrl;
+let ajaxUrlWithFiltersForCount = baseAjaxUrlForCount;
 var table = jQuery('#orderTable').DataTable({
     'processing': true,
     'serverSide': true,
@@ -85,7 +87,6 @@ var table = jQuery('#orderTable').DataTable({
         jQuery(api.column(5).footer()).html(
             data.pageOrdersTotal
         );
-        appendHtml(data.allPagesShippingTotal, data.allPagesSubtotal, data.allPagesTotal);
     }
 });
 var filters = document.getElementsByClassName('filterSelect')
@@ -189,6 +190,7 @@ function refreshTable() {
     ajaxUrlWithFilters = baseAjaxUrl;
     Array.prototype.forEach.call(filters, function (elem) {
         ajaxUrlWithFilters += '&' + elem.id + '=' + elem.value
+        ajaxUrlWithFiltersForCount += '&' + elem.id + '=' + elem.value
     })
     table.ajax.url(ajaxUrlWithFilters);
     table.draw()
@@ -202,3 +204,10 @@ function appendHtml(shipping, subtotal, total){
         '<tr id="totals"><th class="selectCheckbox" rowspan="1" colspan="1"></th><th rowspan="1" colspan="1">Zbir</th><th rowspan="1" colspan="1"></th><th rowspan="1" colspan="1">'+shipping+'</th><th rowspan="1" colspan="1">'+subtotal+'</th><th rowspan="1" colspan="1">'+total+'</th><th rowspan="1" colspan="1"></th><th rowspan="1" colspan="1"></th><th rowspan="1" colspan="1"></th><th rowspan="1" colspan="1"></th><th rowspan="1" colspan="1"></th></tr>'
     )
 }
+
+jQuery('#orderTable').on('draw.dt', function (){
+    appendHtml('','','');
+    jQuery.post(ajaxUrlWithFiltersForCount, function (response){
+        appendHtml(response.data.allPagesShippingTotal, response.data.allPagesSubtotal, response.data.allPagesTotal);
+    })
+})

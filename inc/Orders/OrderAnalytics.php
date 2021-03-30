@@ -39,7 +39,6 @@ class OrderAnalytics
         $activeVendors = $wpdb->get_results($sql);
         include('templates/orderTable.phtml');
     }
-
     /**
      * @param $order
      * @return string

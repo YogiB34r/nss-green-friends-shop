@@ -12,7 +12,7 @@ class AdminListFilters
 
     private function hooks()
     {
-        add_action('init', function (){
+        add_action('init', function () {
             add_action('restrict_manage_posts', [$this, 'restrictManagePostHook']);
             add_action('pre_get_posts', [$this, 'preGetPostHook']);
         });
@@ -110,7 +110,6 @@ class AdminListFilters
                 $query->set('post__in', $formattedArray);
                 break;
         }
-
     }
 
     private function vendorIdFilter()

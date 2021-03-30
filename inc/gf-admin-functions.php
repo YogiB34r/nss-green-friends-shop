@@ -138,10 +138,9 @@ function redirect_page()
 {
     switch (get_post_type()) {
         case "shop_order":
-            $url = admin_url() . 'edit.php?post_type=shop_order';
+            $url = admin_url() . 'admin.php?page=order-analytics';
             wp_redirect($url);
             exit;
-            break;
     }
 }
 
