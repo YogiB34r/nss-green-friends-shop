@@ -390,11 +390,14 @@ class AjaxHandler
                 $backgroundColor = '#5b841b';
                 $title = 'Čeka se uplata';
                 break;
+            case 'cekasenaplata':
+                $color = 'black';
+                break;
             case 'trash':
                 $title = 'Obrisano';
                 break;
         }
-        if ($backgroundColor === 'yellow') {
+        if ($backgroundColor === 'yellow' || $backgroundColor === '#e5e5e5') {
             $color = 'black';
         }
         return sprintf('<span title="%s" class="tableStatus" style=" font-weight:bold;background-color: %s;color: %s">%s%s</span>',
