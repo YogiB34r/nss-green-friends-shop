@@ -4,17 +4,14 @@
              class="page-title-action">Napravi novu narudžbinu</a></span>
 </div>
 <div class="statusFilters">
-    <a data-id="orderStatus" class="statusSelect" href="#" value="">Sve</a>
+    <a data-id="orderStatus" class="statusSelect wc-all" href="#" value="">Sve</a>
     <?php
-    foreach (wc_get_order_statuses() as $key => $value):
-        //Client is using custom status for refunded orders
-        if ($key === 'wc-refunded') {
-            continue;
-        } ?>
-        <a data-id="orderStatus" class="statusSelect" href="#" value="<?=$key?>"><?=$value?>
-            (<?=wc_orders_count(str_replace('wc-','',$key))?>)</a>
+    foreach ($this->getOrderStatuses() as $status):?>
+        <a data-id="orderStatus" class="statusSelect <?=$status['slug']?>" href="#" value="<?=$status['slug']?>"><?=$status['value']?>
+            (<?=$dataStore->get_order_count($status['slug'])?>)</a>
     <?php
     endforeach; ?>
+    <a data-id="orderStatus" class="statusSelect wc-trash" href="#" value="trash">Obrisano (<?=$dataStore->get_order_count('trash')?>)</a>
 </div>
 <div class="filterWrapper">
     <label>

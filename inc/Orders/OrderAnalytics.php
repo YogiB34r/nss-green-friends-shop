@@ -37,6 +37,7 @@ class OrderAnalytics
         $vendorDataTable = $wpdb->prefix . 'mpVendorData';
         $sql = "SELECT `vendorId` FROM {$vendorDataTable} WHERE `isActive` = 1";
         $activeVendors = $wpdb->get_results($sql);
+        $dataStore = \WC_Data_Store::load('order');
         include('templates/orderTable.phtml');
     }
     /**
@@ -70,4 +71,18 @@ class OrderAnalytics
         wp_localize_script('orderTableJs','gfData', ['ajaxUrl' => admin_url('admin-ajax.php')]);
     }
 
+    public function getOrderStatuses()
+    {
+        $defaultStatusesInUse = ['wc-on-hold' => _x( 'On hold', 'Order status', 'woocommerce' )];
+        $withCustomStatuses = apply_filters('wc_order_statuses', $defaultStatusesInUse);
+        $statuses = [];
+        foreach ($withCustomStatuses as $key => $status) {
+            $statuses[] =
+                [
+                    'slug' => $key,
+                    'value' => $status
+                ];
+        }
+        return $statuses;
+    }
 }
