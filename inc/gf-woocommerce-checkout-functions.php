@@ -149,7 +149,8 @@ function gf_newsletter_on_checkout_page($orderid) {
     $newsletter_value = $order->get_meta('gf_newsletter_checkout', true);
 
     if ($newsletter_value == 1) {
-        TNP::subscribe(['email' => $email, 'status' => 'C']);
+        //@todo subscribe na now newsletter
+//        TNP::subscribe(['email' => $email, 'status' => 'C']);
     }
 
 //    if ($order->get_status() === "pending") {
