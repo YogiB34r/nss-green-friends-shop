@@ -1,6 +1,6 @@
 const baseAjaxUrlOrders = gfData.ajaxUrl+'?action=gfOrdersTable&ajaxAction=getOrders';
 const baseAjaxUrlCount = gfData.ajaxUrl+'?action=gfOrdersTable&ajaxAction=getPagesTotals';
-let activeStatus = '-1';
+let activeStatus = '&orderStatus=-1';
 let ajaxUrlWithFilters = baseAjaxUrlOrders;
 let ajaxUrlWithFiltersForCount = baseAjaxUrlCount;
 
@@ -109,7 +109,6 @@ Array.prototype.forEach.call(statusFilters, function (elem) {
             value = '-1';
         }
         activeStatus = '&orderStatus=' + value
-        activeStatus = '&orderStatus=' + value
         refreshTable(activeStatus)
     })
 })
@@ -123,7 +122,7 @@ jQuery(function () {
             })
             .on("change", function () {
                 to.datepicker("option", "minDate", getDate(this));
-                refreshTable()
+                refreshTable(activeStatus)
             }),
         to = jQuery("#to").datepicker({
             defaultDate: "+1w",
@@ -132,7 +131,7 @@ jQuery(function () {
         })
             .on("change", function () {
                 from.datepicker("option", "maxDate", getDate(this));
-                refreshTable()
+                refreshTable(activeStatus)
             });
 
     function getDate(element) {
@@ -179,7 +178,7 @@ jQuery(function () {
                     bulkAction: jQuery('#bulkActions').val()
                 },
             }).done(function (response) {
-                refreshTable();
+                refreshTable(activeStatus);
                 if (
                     typeof response !== 'undefined'
                     && typeof response.data !== 'undefined'

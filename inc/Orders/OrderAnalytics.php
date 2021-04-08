@@ -57,7 +57,7 @@ class OrderAnalytics
     {
         wp_enqueue_style('datatables','https://cdn.datatables.net/v/dt/dt-1.10.24/datatables.min.css');
         wp_enqueue_style('datepicker','//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css');
-        wp_enqueue_style('orderTableCss',get_stylesheet_directory_uri().'/inc/Orders/assets/style.css');
+        wp_enqueue_style('orderTableCss',get_stylesheet_directory_uri().'/inc/Orders/assets/style.css',[],'1.0.1');
     }
 
     public function enqueueScripts()
@@ -67,7 +67,7 @@ class OrderAnalytics
         wp_enqueue_script('datatables','https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js',
             ['jquery'],'1.0.0', true);
         wp_enqueue_script('orderTableJs', get_stylesheet_directory_uri().'/inc/Orders/assets/main.js',
-            ['jqueryUi', 'datatables', 'jquery'],'1.0.0',true);
+            ['jqueryUi', 'datatables', 'jquery'],'1.0.1',true);
         wp_localize_script('orderTableJs','gfData', ['ajaxUrl' => admin_url('admin-ajax.php')]);
     }
 

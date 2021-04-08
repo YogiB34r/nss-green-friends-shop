@@ -335,19 +335,19 @@ class AjaxHandler
                 $title = 'Stornirano';
                 break;
             case 'reklamacija':
-                $backgroundColor = 'D50000';
+                $backgroundColor = '#D50000';
                 $title = 'Reklamacija';
                 break;
             case 'vracena-posiljka':
-                $backgroundColor = 'D50000 ';
+                $backgroundColor = '#D50000 ';
                 $title = 'Vraćena pošiljka';
                 break;
             case 'stornirano-pn':
-                $backgroundColor = 'D50000 ';
+                $backgroundColor = '#D50000 ';
                 $title = 'Stornirano (povraćaj novca)';
                 break;
             case 'reklamacija-pnns':
-                $backgroundColor = 'D50000 ';
+                $backgroundColor = '#D50000 ';
                 $title = 'Reklamacija (proizvod nema na stanju)';
                 break;
             case 'finalizovano':
