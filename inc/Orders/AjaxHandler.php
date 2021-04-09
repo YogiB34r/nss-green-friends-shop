@@ -316,14 +316,15 @@ class AjaxHandler
                 break;
             case 'on-hold':
                 $backgroundColor = '#94660c';
-                $title= 'Na čekanju';
+                $color = 'black';
+                $title = 'Na čekanju';
                 break;
             case 'completed':
                 $backgroundColor = '';
                 $title = 'Završeno';
                 break;
             case 'cancelled':
-                $backgroundColor = '';
+                $color = 'black';
                 $title = 'Otkazano';
                 break;
             case 'failed':
@@ -457,7 +458,7 @@ class AjaxHandler
                 }
             }
         }
-        $sql = "SELECT SUM(meta_value) FROM wp_postmeta WHERE meta_key = '_order_total' {$filters1} AND post_id in (SELECT ID FROM wp_posts WHERE post_status {$operator} 'trash'{$filters2})";
+        $sql = "SELECT SUM(meta_value) FROM wp_postmeta WHERE meta_key = '_order_total' {$filters1} AND post_id in (SELECT ID FROM wp_posts WHERE post_status != 'auto-draft' AND post_status != 'wc-auto-draft' AND post_type = 'shop_order'AND post_status {$operator} 'trash'{$filters2});";
         return $wpdb->get_results($sql, ARRAY_N)[0][0];
     }
 
