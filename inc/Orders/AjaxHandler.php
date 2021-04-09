@@ -500,7 +500,7 @@ class AjaxHandler
                 }
             }
         }
-        $sql = "SELECT SUM(meta_value) FROM wp_postmeta WHERE meta_key = '_order_shipping' {$filters1} AND post_id in (SELECT ID FROM wp_posts WHERE post_status {$operator} 'trash'{$filters2})";
+        $sql = "SELECT SUM(meta_value) FROM wp_postmeta WHERE meta_key = '_order_shipping' {$filters1} AND post_id in (SELECT ID FROM wp_posts WHERE post_status != 'auto-draft' AND post_status != 'wc-auto-draft' AND post_type = 'shop_order'AND post_status {$operator} 'trash'{$filters2});";
         return $wpdb->get_results($sql, ARRAY_N)[0][0];
     }
 
