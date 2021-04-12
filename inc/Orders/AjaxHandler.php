@@ -3,6 +3,7 @@
 
 namespace GF\Orders;
 
+use GF\Marketplace\Marketplace;
 use ZipArchive;
 
 class AjaxHandler
@@ -120,8 +121,8 @@ class AjaxHandler
         $marketplaceOrder = '';
         $orderStatus = array_keys( wc_get_order_statuses());
         $paymentMethod = '';
+        $vendorId = null;
         $orders = [];
-        $operator = null;
 
         if (isset($_GET['orderType'])) {
             $orderType = $_GET['orderType'] !== '-1' ? $_GET['orderType'] : '';
@@ -145,23 +146,15 @@ class AjaxHandler
             $vendorId = $_GET['vendorIdSelect'];
         }
         if (isset($_GET['trash'])) {
-            $operator = true;
             $orderStatus = 'trash';
         }
-        $formattedArray = [];
         $searchValue = $_GET['search']['value'] ?? '';
+        $mpOrders = $this->getMpOrders($vendorId);
 
         if ($searchValue === '') {
+            $mpOrderIds = [];
             if ($marketplaceOrder !== '-1') {
-                global $wpdb;
-                $sql = "SELECT `post_id` FROM {$wpdb->postmeta} WHERE `meta_key` = 'marketplaceVendor'";
-                if (isset($vendorId) && $vendorId !== '-1') {
-                    $sql .= ' AND `meta_value` = ' . $_GET['vendorIdSelect'];
-                }
-                $posts = $wpdb->get_results($sql, ARRAY_N);
-                foreach ($posts as $post) {
-                    $formattedArray[] = $post[0];
-                }
+               $mpOrderIds = $mpOrders;
             }
             $args = [
                     'paginate' => true,
@@ -176,12 +169,12 @@ class AjaxHandler
                 ];
 
             if ($marketplaceOrder === '1') {
-                $args['post__in'] = $formattedArray;
-                $filters['post__in'] = implode(',',$formattedArray);
+                $args['post__in'] = $mpOrderIds;
+                $filters['post__in'] = implode(',',$mpOrderIds);
             }
             if ($marketplaceOrder === '2'){
-                $args['post__not_in'] = $formattedArray;
-                $filters['post__not_in'] = implode(',',$formattedArray);
+                $args['post__not_in'] = $mpOrderIds;
+                $filters['post__not_in'] = implode(',',$mpOrderIds);
             }
             $query = new \WC_Order_Query($args);
             $result = $query->get_orders();
@@ -227,7 +220,8 @@ class AjaxHandler
                         'itemsTotal' => $order->get_subtotal().get_woocommerce_currency_symbol(),
                         'orderId' => sprintf('<input class="individualCheckbox" type="checkbox" data-id="%s">',
                             $order->get_id()),
-                        'actions' => $this->getActionsForOrder($order)
+                        'actions' => $this->getActionsForOrder($order),
+                        'mpOrder' => in_array($order->get_id(), $mpOrders, false)
                     ];
         }
 
@@ -586,5 +580,19 @@ class AjaxHandler
             'allPagesShippingTotal' => number_format($allPagesShippingTotal,2,',','.').get_woocommerce_currency_symbol()
         ];
         wp_send_json_success($data);
+    }
+
+    private function getMpOrders($vendorId = null)
+    {
+        global $wpdb;
+        $formattedArray = [];
+        $sql = "SELECT `post_id` FROM {$wpdb->postmeta} WHERE `meta_key` = 'marketplaceVendor'";
+        if (isset($vendorId) && $vendorId !== '-1') {
+            $sql .= ' AND `meta_value` = ' . $_GET['vendorIdSelect'];
+        }
+        foreach ($wpdb->get_results($sql, ARRAY_N) as $post) {
+            $formattedArray[] = $post[0];
+        }
+        return $formattedArray ;
     }
 }

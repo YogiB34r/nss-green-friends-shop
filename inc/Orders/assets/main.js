@@ -77,7 +77,7 @@ var table = jQuery('#orderTable').DataTable({
             orderable: false
         }
     ],
-    drawCallback: function (data) {
+    drawCallback: function () {
         var api = this.api();
         var data = api.ajax.json();
         jQuery(api.column(1).footer()).html(
@@ -92,6 +92,12 @@ var table = jQuery('#orderTable').DataTable({
         jQuery(api.column(5).footer()).html(
             data.pageOrdersTotal
         );
+        for (const index in data.data){
+            const columnData = data.data[index];
+            if (columnData.mpOrder === true) {
+               api.row(index).node().style.background = '#FFCCCC';
+            }
+        }
     }
 });
 var filters = document.getElementsByClassName('filterSelect')
