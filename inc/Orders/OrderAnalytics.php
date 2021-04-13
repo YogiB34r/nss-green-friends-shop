@@ -73,7 +73,7 @@ class OrderAnalytics
 
     public function getOrderStatuses()
     {
-        $defaultStatusesInUse = ['wc-on-hold' => _x( 'On hold', 'Order status', 'woocommerce' )];
+        $defaultStatusesInUse = ['wc-on-hold' => _x( 'On hold', 'Order status', 'woocommerce' ),'wc-pending' => _x( 'Pending payment', 'Order status', 'woocommerce' )];
         $withCustomStatuses = apply_filters('wc_order_statuses', $defaultStatusesInUse);
         $statuses = [];
         foreach ($withCustomStatuses as $key => $status) {

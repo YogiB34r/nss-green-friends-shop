@@ -173,6 +173,9 @@
 .wc-cekaseuplata {
     order: 4;
 }
+.wc-pending {
+    order:17;
+}
 #vendorSelect {
     display: none;
 }
