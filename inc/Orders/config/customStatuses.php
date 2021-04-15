@@ -3,7 +3,7 @@ return [
     'statuses' =>
         [
             'wc-cekaseuplata' => 'Čeka se uplata',
-            'wc-u-pripremi' => 'U prirpemi',
+            'wc-u-pripremi' => 'U pripremi',
             'wc-u-pripremiplaceno' => 'U pripremi (plaćeno)',
             'wc-u-obradi' => 'U obradi',
             'wc-poslato' => 'Poslato',
