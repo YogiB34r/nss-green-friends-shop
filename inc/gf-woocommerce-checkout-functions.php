@@ -153,18 +153,6 @@ function gf_newsletter_on_checkout_page($orderid) {
 //        TNP::subscribe(['email' => $email, 'status' => 'C']);
     }
 
-//    if ($order->get_status() === "pending") {
-    if ($order->get_status() === "on-hold") {
-        if ($order->get_payment_method() === 'bacs') {
-            $order->set_status('cekaseuplata');
-        } elseif ($order->get_payment_method() === 'cod') {
-            $order->set_status('u-pripremi');
-        } else {
-
-        }
-        $order->save();
-    }
-
     $viledaItem = false;
     /* @var WC_Order_Item_Product $item */
     foreach ($order->get_items() as $item) {
