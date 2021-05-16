@@ -1,4 +1,7 @@
 <?php
+
+use Newsletter\Subscribers\Actions\SubscribeAction;
+
 add_filter('woocommerce_checkout_fields', 'gf_woocommerce_billing_field_checkbox');
 function gf_woocommerce_billing_field_checkbox($fields) {
     $fields['billing']['billing_company_checkbox'] = array(
@@ -149,8 +152,9 @@ function gf_newsletter_on_checkout_page($orderid) {
     $newsletter_value = $order->get_meta('gf_newsletter_checkout', true);
 
     if ($newsletter_value == 1) {
-        //@todo subscribe na now newsletter
-//        TNP::subscribe(['email' => $email, 'status' => 'C']);
+        if (class_exists(SubscribeAction::class)) {
+            SubscribeAction::subscribe(['email' => $email]);
+        }
     }
 
     $viledaItem = false;
