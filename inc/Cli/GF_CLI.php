@@ -2,6 +2,7 @@
 
 namespace GF;
 
+
 class Cli
 {
     public function getCategoryList()
@@ -15,6 +16,56 @@ class Cli
                 echo $cat->term_id .','. $cat->name .',0,none' . "\r\n";
             }
         }
+    }
+
+    public function createSexyFeed()
+    {
+        ini_set('display_errors', '1');
+        $items = [];
+        /* @var \WC_Product $product */
+        foreach (wc_get_products([
+            'limit' => -1,
+            'status' => 'published',
+            'tax_query' => [[
+                'taxonomy'      => 'product_cat',
+                'terms'         => 2690,
+            ]],
+            'paged' => 1
+        ]) as $key => $product) {
+
+            foreach ($product->get_category_ids() as $catId) {
+                if ($catId === 2690) {
+                    continue;
+                }
+                $subCat = '';
+                $cat = get_term($catId, 'product_cat');
+                if ($cat->parent === 2690) {
+                    $mainCat = $cat->name;
+                } else {
+                    $subCat = $cat->name;
+                }
+            }
+            $images = [];
+            $images[] = wp_get_attachment_url($product->get_image_id());
+            foreach ($product->get_gallery_image_ids() as $imageId) {
+                $images[] = wp_get_attachment_url($imageId);
+            }
+
+            $items[] = [
+                "title" => trim($product->get_title()),
+                "description" => trim($product->get_description()),
+                "mainCategory" => trim($mainCat),
+                "subCategory" => trim($subCat),
+                "price" => $product->get_price(),
+                "salePrice" => $product->get_sale_price(),
+                "weight" => $product->get_weight(),
+                "status" => $product->get_stock_status(),
+                "productId" => $product->get_id(),
+                "images" => $images,
+                "sku" => $product->get_sku()
+            ];
+        }
+        file_put_contents(__DIR__ . '/../../uploads/sexyExport.json', json_encode($items));
     }
 
     public function cleanupIndex()
@@ -71,11 +122,12 @@ class Cli
             'limit' => -1,
             'return' => 'ids',
             'status' => 'draft',
-//            'meta_key' => 'supplier',
-//            'meta_value' => 45,
+            'meta_key' => 'supplier',
+            'meta_value' => 27,
         ));
         $removed = 0;
-        $diff = array_diff($this->getIndexedIds(), $products);
+//        $diff = array_diff($this->getIndexedIds(), $products);
+        $diff = array_intersect($products, $this->getIndexedIds());
         foreach ($diff as $postId) {
             $p = wc_get_product($postId);
             if (!$p || ($p && $p->get_status() !== 'publish')) {
@@ -188,7 +240,14 @@ class Cli
 
     public function listItems()
     {
-        $total = 0;
+//        $subscibers = new \Subscriber\Repository\Subscriber(new \Subscriber\Mapper\Subscriber());
+//        $data = file_get_contents(WP_CONTENT_DIR . '/uploads/subscribers.txt');
+//        foreach (explode(PHP_EOL, $data) as $datum) {
+//            $subscibers->create(['email' => $datum, 'emailStatus' => 'confirmed']);
+//        }
+//        die();
+
+//        $total = 0;
 
 //        $order = wc_get_order(544649);
 
