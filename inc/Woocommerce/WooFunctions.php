@@ -172,9 +172,7 @@ class WooFunctions
      */
     public function saveCodCheckbox($id, $post)
     {
-        if (isset($_POST['disableCod'])) {
-            update_post_meta($id, 'disableCod', $_POST['disableCod']);
-        }
+        update_post_meta($id, 'disableCod', $_POST['disableCod']);
     }
 
     /**
@@ -269,6 +267,8 @@ class WooFunctions
     {
         if ($_POST['soloInCart'] === 'yes') {
             $_POST['_sold_individually'] = 'yes';
+        } else {
+            $_POST['_sold_individually'] = null;
         }
         update_post_meta($id, 'soloInCart', $_POST['soloInCart']);
     }

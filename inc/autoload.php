@@ -34,6 +34,10 @@ foreach (glob(__DIR__ . "/Util/*.php") as $file) {
 foreach (glob(__DIR__ . "/Theme/*.php") as $file) {
     require_once $file;
 }
+foreach (glob(__DIR__ . "/Util/FilterProductsByMeta/*.php") as $file) {
+    require_once $file;
+}
+
 require_once(__DIR__ . '/archive-page-functions.php');
 require_once(__DIR__ . '/class-wc-breadcrumb.php');
 require_once(__DIR__ . '/gf-admin-functions.php');

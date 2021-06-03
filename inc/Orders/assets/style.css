@@ -1,27 +1,29 @@
-.filterWrapper{
+.filterWrapper {
     display: flex;
     flex-wrap: wrap;
     margin: 20px 0;
 }
 
 .filterWrapper > label {
-    display:flex;
+    display: flex;
     flex-direction: column;
     padding: 0 10px;
 }
 
 .filterWrapper > label > span {
-    font-weight:bold;
+    font-weight: bold;
 }
 
-.filterWrapper > label:nth-of-type(1){
+.filterWrapper > label:nth-of-type(1) {
     display: block;
     text-align: center;
 }
-.filterWrapper > label:nth-of-type(1) > span{
+
+.filterWrapper > label:nth-of-type(1) > span {
     display: block;
 }
-.filterWrapper > label:nth-of-type(1) label{
+
+.filterWrapper > label:nth-of-type(1) label {
     display: inline-block;
 }
 
@@ -34,17 +36,146 @@
 #orderTable tbody tr td:nth-of-type(6),
 #orderTable tfoot tr th:nth-of-type(4),
 #orderTable tfoot tr th:nth-of-type(5),
-#orderTable tfoot tr th:nth-of-type(6){
+#orderTable tfoot tr th:nth-of-type(6) {
     text-align: right;
     padding-right: 10px;
 }
+
 #orderTable tfoot tr {
     background-color: #ddd;
     border: 1px solid white;
 }
+
 #orderTable tfoot tr th {
-    border:1px solid white;
+    border: 1px solid white;
 }
+
 .selectCheckbox {
     text-align: center;
+}
+
+.orderTable_wrapper {
+    margin-top: 10px;
+}
+
+.tableStatus {
+    padding: 5px;
+}
+
+.tableStatus .dashicons {
+    margin-left: 5px;
+}
+
+.top {
+    margin-top: 10px;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+}
+
+.header span {
+    margin-left: 1em;
+    border: 1px solid black;
+    padding: 5px;
+    background-color: white;
+}
+
+.header span a {
+    text-decoration: none;
+    color: black;
+}
+
+.statusFilters {
+    display: flex;
+    flex-wrap: wrap;
+    width: 60%;
+}
+
+.statusSelect {
+    border: 1px solid black;
+    padding: 5px;
+    text-decoration: none;
+    color: black;
+    align-items: center;
+    margin: 5px
+}
+
+.wc-all {
+    order: 1;
+}
+
+.wc-trash {
+    order: 18;
+}
+
+.wc-u-pripremiplaceno {
+    order: 3;
+}
+
+.wc-on-hold {
+    order: 17;
+}
+
+.wc-stornirano {
+    order: 15;
+}
+
+.wc-reklamacija {
+    order: 13;
+}
+
+.wc-vracena-posiljka {
+    order: 11;
+}
+
+.wc-stornirano-pn {
+    order: 14;
+}
+
+.wc-reklamacija-pnns {
+    order: 6;
+}
+
+.wc-finalizovano {
+    order: 12;
+}
+
+.wc-isporuceno {
+    order: 10;
+}
+
+.wc-spz-slanje {
+    order: 8;
+}
+
+.wc-spz-pakovanje {
+    order: 7;
+}
+
+.wc-naruceno {
+    order: 5;
+}
+
+.wc-poslato {
+    order: 9;
+}
+
+.wc-u-obradi {
+    order: 16;
+}
+
+.wc-u-pripremi {
+    order: 2;
+}
+
+.wc-cekaseuplata {
+    order: 4;
+}
+.wc-pending {
+    order:17;
+}
+#vendorSelect {
+    display: none;
 }

@@ -1,13 +1,23 @@
-let baseAjaxUrl = gfData.ajaxUrl+'?action=gfOrdersTable&ajaxAction=getOrders';
-let ajaxUrlWithFilters = baseAjaxUrl;
+const baseAjaxUrlOrders = gfData.ajaxUrl+'?action=gfOrdersTable&ajaxAction=getOrders';
+const baseAjaxUrlCount = gfData.ajaxUrl+'?action=gfOrdersTable&ajaxAction=getPagesTotals';
+let activeStatus = '&orderStatus=-1';
+let ajaxUrlWithFilters = baseAjaxUrlOrders;
+let ajaxUrlWithFiltersForCount = baseAjaxUrlCount;
+
 var table = jQuery('#orderTable').DataTable({
     'processing': true,
     'serverSide': true,
-    'searching': true,
+    'searching': false,
+    'pageLength': 25,
+    'lengthMenu': [ 10, 25, 50, 75, 100,250,500, 1000 ],
     'ajax': ajaxUrlWithFilters,
     'dataSrc': function (data) {
         return data.data;
     },
+    "language": {
+        "emptyTable": "Nije pronadjena nijedna narudžbina sa zadatim filterima"
+    },
+    'dom': '<"top"flp<"clear">>rt<"bottom"ifp<"clear">>',
     'columns': [
         {
             data:'orderId',
@@ -67,26 +77,45 @@ var table = jQuery('#orderTable').DataTable({
             orderable: false
         }
     ],
-    drawCallback: function (data) {
+    drawCallback: function () {
         var api = this.api();
+        var data = api.ajax.json();
         jQuery(api.column(1).footer()).html(
             'Zbir stranice'
         );
         jQuery(api.column(3).footer()).html(
-            api.ajax.json().pageShippingTotal
+            data.pageShippingTotal
         );
         jQuery(api.column(4).footer()).html(
-            api.ajax.json().pageOrderSubtotals
+            data.pageOrderSubtotals
         );
         jQuery(api.column(5).footer()).html(
-            api.ajax.json().pageOrdersTotal
+            data.pageOrdersTotal
         );
+        for (const index in data.data){
+            const columnData = data.data[index];
+            if (columnData.mpOrder === true) {
+               api.row(index).node().style.background = '#FFCCCC';
+            }
+        }
     }
 });
 var filters = document.getElementsByClassName('filterSelect')
 Array.prototype.forEach.call(filters, function (elem) {
     elem.addEventListener('change', function () {
-        refreshTable()
+        refreshTable(activeStatus)
+    })
+})
+var statusFilters = document.getElementsByClassName('statusSelect')
+Array.prototype.forEach.call(statusFilters, function (elem) {
+    elem.addEventListener('click', function (e) {
+        e.preventDefault()
+        let value = e.target.getAttribute('value')
+        if (value === ''){
+            value = '-1';
+        }
+        activeStatus = '&orderStatus=' + value
+        refreshTable(activeStatus)
     })
 })
 jQuery(function () {
@@ -99,7 +128,7 @@ jQuery(function () {
             })
             .on("change", function () {
                 to.datepicker("option", "minDate", getDate(this));
-                refreshTable()
+                refreshTable(activeStatus)
             }),
         to = jQuery("#to").datepicker({
             defaultDate: "+1w",
@@ -108,7 +137,7 @@ jQuery(function () {
         })
             .on("change", function () {
                 from.datepicker("option", "maxDate", getDate(this));
-                refreshTable()
+                refreshTable(activeStatus)
             });
 
     function getDate(element) {
@@ -155,7 +184,7 @@ jQuery(function () {
                     bulkAction: jQuery('#bulkActions').val()
                 },
             }).done(function (response) {
-                refreshTable();
+                refreshTable(activeStatus);
                 if (
                     typeof response !== 'undefined'
                     && typeof response.data !== 'undefined'
@@ -168,11 +197,40 @@ jQuery(function () {
     });
 
 });
-function refreshTable() {
-    ajaxUrlWithFilters = baseAjaxUrl;
+function refreshTable(status) {
+    ajaxUrlWithFiltersForCount = baseAjaxUrlCount;
+    ajaxUrlWithFilters = baseAjaxUrlOrders;
     Array.prototype.forEach.call(filters, function (elem) {
-        ajaxUrlWithFilters += '&' + elem.id + '=' + elem.value
+        ajaxUrlWithFilters += '&' + elem.id + '=' + elem.value + status
+        ajaxUrlWithFiltersForCount += '&' + elem.id + '=' + elem.value + status
     })
     table.ajax.url(ajaxUrlWithFilters);
     table.draw()
 }
+
+function appendHtml(shipping, subtotal, total){
+    if (typeof jQuery('#totals') !== 'undefined'){
+        jQuery('#totals').remove();
+    }
+    jQuery('tfoot').append(
+        '<tr id="totals"><th class="selectCheckbox" rowspan="1" colspan="1"></th><th rowspan="1" colspan="1">Zbir</th><th rowspan="1" colspan="1"></th><th rowspan="1" colspan="1">'+shipping+'</th><th rowspan="1" colspan="1">'+subtotal+'</th><th rowspan="1" colspan="1">'+total+'</th><th rowspan="1" colspan="1"></th><th rowspan="1" colspan="1"></th><th rowspan="1" colspan="1"></th><th rowspan="1" colspan="1"></th><th rowspan="1" colspan="1"></th></tr>'
+    )
+}
+
+jQuery('#orderTable').on('draw.dt', function (){
+    appendHtml('','','');
+    jQuery.get(ajaxUrlWithFiltersForCount, function (response){
+        appendHtml(response.data.allPagesShippingTotal, response.data.allPagesSubtotal, response.data.allPagesTotal);
+    })
+})
+jQuery('#marketplaceOrder').on('change', function (e){
+    if (e.target.value === '1') {
+        jQuery('#vendorSelect').css('display','flex');
+    }
+    if (e.target.value === '2') {
+        jQuery('#vendorSelect').css('display','none');
+    }
+    if (e.target.value === '-1') {
+        jQuery('#vendorSelect').css('display','none');
+    }
+})

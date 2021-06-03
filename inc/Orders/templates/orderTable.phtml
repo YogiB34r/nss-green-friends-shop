@@ -1,3 +1,18 @@
+<div class="header">
+    <h1>Narudžbine</h1>
+    <span><a href="https://nss-devel.ha.rs/wp-admin/post-new.php?post_type=shop_order"
+             class="page-title-action">Napravi novu narudžbinu</a></span>
+</div>
+<div class="statusFilters">
+    <a data-id="orderStatus" class="statusSelect wc-all" href="#" value="">Sve</a>
+    <?php
+    foreach ($this->getOrderStatuses() as $status):?>
+        <a data-id="orderStatus" class="statusSelect <?=$status['slug']?>" href="#" value="<?=$status['slug']?>"><?=$status['value']?>
+            (<?=$dataStore->get_order_count($status['slug'])?>)</a>
+    <?php
+    endforeach; ?>
+    <a data-id="orderStatus" class="statusSelect wc-trash" href="#" value="trash">Obrisano (<?=$dataStore->get_order_count('trash')?>)</a>
+</div>
 <div class="filterWrapper">
     <label>
         <span>Datum</span>
@@ -30,17 +45,6 @@
         </select>
     </label>
     <label>
-        <span>Status Narudžbine</span>
-        <select class="filterSelect" id="orderStatus">
-            <option value="-1">Izaberite status</option>
-            <?php
-            foreach (wc_get_order_statuses() as $key => $value):?>
-                <option value="<?=$key?>"><?=$value?></option>
-            <?php
-            endforeach; ?>
-        </select>
-    </label>
-    <label>
         <span>Marketplace Narudžbenice</span>
         <select class="filterSelect" id="marketplaceOrder">
             <option value="-1">Marketplace Narudžbenica</option>
@@ -48,7 +52,7 @@
             <option value="2">Ne</option>
         </select>
     </label>
-    <label>
+    <label id="vendorSelect">
         <span>Izaberite Vendora</span>
         <select class="filterSelect" id="vendorIdSelect">
             <option value="-1">Izaberite Vendora</option>
@@ -66,14 +70,14 @@
 <div class="bulkActionsWrapper">
     <select class="bulkActionsSelect" id="bulkActions">
         <option value="-1">Grupne akcije</option>
+        <option name="moveToTrash" value="1">Pomeri na otpad</option>
+        <option name="adresnice" value="2">Adresnice</option>
+        <option name="jitexExport" value="3">Jitex Export</option>
         <?php
         foreach (wc_get_order_statuses() as $key => $value):?>
             <option name="statusChange" value="<?=$key?>">Promeni status u <?=$value?></option>
         <?php
         endforeach; ?>
-        <option name="moveToTrash" value="1">Pomeri na otpad</option>
-        <option name="adresnice" value="2">Adresnice</option>
-        <option name="jitexExport" value="3">Jitex Export</option>
     </select>
     <button id="submitBulk">Primeni</button>
 </div>
@@ -93,8 +97,7 @@
         <th>Akcije</th>
     </tr>
     </thead>
-    <tbody>
-    </tbody>
+    <tbody></tbody>
     <tfoot>
     <tr>
         <th></th>

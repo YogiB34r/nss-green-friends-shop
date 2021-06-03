@@ -1778,7 +1778,7 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title {
     .gf-expander-module-first-line{
         padding: 0px 10px;
     }
-    
+
 }
 
 @media only screen and (min-width: 1200px) {
@@ -3721,3 +3721,81 @@ button[name='update_cart'] {
         margin-right: 10px;
     }
 }
+/* Newsletter global (in common) start */
+.newsletterInput {
+    border: none;
+    border-bottom: 1px solid gray;
+}
+.newsletterInput:focus{
+    outline: none;
+}
+.newsletterSubmit {
+    background: #f45411;
+    color: white;
+    outline: 0;
+    border: none;
+    border-radius: 10px;
+    padding: 2px 7px;
+}
+.newsletterSubmit {
+    cursor:pointer;
+}
+/* Newsletter global (in common) end */
+
+/* Newsletter on other pages (not homepage) start */
+.page .gf-footer-newsletter{
+    display: flex;
+    align-items: center;
+}
+.page .gf-footer-newsletter > .widget_newsletter_widget > .widgettitle {
+    font-size: 1.5em;
+
+}
+.page .gf-footer-newsletter .newsletterForma {
+    border: 3px solid #f45411;
+    display: flex;
+    justify-content: space-around;
+    margin-top: 10px;
+    padding: 7px;
+    border-radius: 10px;
+}
+/* Newsletter on other pages (not homepage) end */
+
+/* Newsletter on homepage start */
+.home .widget_newsletter_widget {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 15px;
+    width: 100%;
+    border: 3px solid #f45411;
+    border-radius: 10px;
+}
+.home .newsletterInput {
+    font-size:1.4em;
+}
+.home .newsletterSubmit {
+    font-size:1.4em;
+    padding: 5px 15px;
+}
+@media only screen and (max-width:1200px) {
+    .home .widget_newsletter_widget {
+        flex-direction: column;
+    }
+}
+@media only screen and (max-width:476px) {
+    .home .newsletterForma {
+        display: flex;
+        flex-direction: column;
+    }
+    .home .newsletterSubmit {
+        margin-top:15px;
+    }
+}
+@media only screen and (max-width:476px) {
+    .home .widget_newsletter_widget h2 {
+        font-size: 1.5em;
+        margin-bottom:10px;
+    }
+}
+/* Newsletter on homepage end */

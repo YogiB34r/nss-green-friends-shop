@@ -48,6 +48,10 @@ $adminMenu->init();
 
 $metaCache = new \GF\Util\MetaCache($cache);
 
+$orderStatuses = new \GF\Orders\Statuses(include (__DIR__ . '/inc/Orders/config/customStatuses.php'));
+$orderStatuses->registerStatuses();
+$orderStatuses->setDefaultOrderStatus('cod','u-pripremi');
+$orderStatuses->setDefaultOrderStatus('bacs','cekaseuplata');
 
 
 add_filter('request', 'customRewriteFix');

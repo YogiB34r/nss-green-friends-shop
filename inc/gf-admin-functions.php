@@ -141,7 +141,6 @@ function redirect_page()
             $url = admin_url() . 'edit.php?post_type=shop_order';
             wp_redirect($url);
             exit;
-            break;
     }
 }
 

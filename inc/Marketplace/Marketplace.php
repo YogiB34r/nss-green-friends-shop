@@ -70,7 +70,7 @@ class Marketplace
 
     public function marketplaceExtraFields($user)
     {
-        $vendorData = $this->getByVendorId($user->ID);
+        $vendorData = $this->getByVendorId($user->ID) ?? [];
         $companyName = $vendorData['companyName'] ?? '';
         $companyAddress = $vendorData['companyAddress'] ?? '';
         $bankAccountNumber = $vendorData['bankAccountNumber'] ?? '';
@@ -244,7 +244,11 @@ class Marketplace
         $suppliers = [];
         foreach ($cartContents as $item) {
             $product = $item['data'];
-            $supplierId = (int)$product->get_meta('supplier');
+            if ($product instanceof \WC_Product_Variation){
+                $supplierId = $product->parent->get_meta('supplier');
+            } else {
+                $supplierId = (int)$product->get_meta('supplier');
+            }
             if (!in_array($supplierId, $suppliers, true)) {
                 $suppliers[] = $supplierId;
             }
@@ -254,7 +258,6 @@ class Marketplace
             unset($rates['free_shipping:11'], $rates['flat_rate:12']);
             return $rates;
         }
-
         $minPrice = null;
         $vendor = $this->getByVendorId($suppliers[0]);
 
@@ -262,7 +265,7 @@ class Marketplace
             $minPrice = (int)$vendor['minFreeShippingCost'];
             if ($minPrice) {
                 $cartPrice = (int)WC()->cart->get_totals()['cart_contents_total'];
-                if ($cartPrice > $minPrice) {
+                if ($cartPrice >= $minPrice) {
                     /** @var \WC_Shipping_Rate $rate */
                     foreach ($rates as $key => $rate) {
                         if ($rate->get_method_id() === 'free_shipping') {
@@ -315,7 +318,6 @@ class Marketplace
 
     public function markOrderAsMarketplace($postId, \WP_Post $post)
     {
-        //@todo send email to vendor
         if ($post->post_type === 'shop_order') {
             $suppliers = [];
             $order = wc_get_order($postId);
