@@ -3,6 +3,9 @@
 // @TODO move this to class
 if (defined('WP_CLI') && WP_CLI) {
     ini_set('max_execution_time', 1200);
+    $cli = new \GF\Cli();
+
+    \WP_CLI::add_command('fixCategoryTree', [$cli, 'fixCategoryTree']);
 
     // elastic operations
     \WP_CLI::add_command('createElasticIndex', 'createElasticIndex');
