@@ -383,7 +383,7 @@ class Marketplace
             return $recipient;
         }
 
-        $marketPlaceField = get_post_meta($order->ID, 'marketplaceVendor', true);
+        $marketPlaceField = get_post_meta($order->get_id(), 'marketplaceVendor', true);
         if ($marketPlaceField !== '') {
             $vendor = $this->getByVendorId($marketPlaceField);
             $recipient = $vendor['email'];
