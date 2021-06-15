@@ -153,7 +153,7 @@ function gf_newsletter_on_checkout_page($orderid) {
 
     if ($newsletter_value == 1) {
         if (class_exists(SubscribeAction::class)) {
-            SubscribeAction::subscribeFromCheckout(['email' => $email]);
+            SubscribeAction::subscribe(['email' => $email]);
         }
     }
 
