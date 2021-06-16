@@ -3,6 +3,9 @@
 // @TODO move this to class
 if (defined('WP_CLI') && WP_CLI) {
     ini_set('max_execution_time', 1200);
+    $cli = new \GF\Cli();
+
+    \WP_CLI::add_command('fixCategoryTree', [$cli, 'fixCategoryTree']);
 
     // elastic operations
     \WP_CLI::add_command('createElasticIndex', 'createElasticIndex');
@@ -119,11 +122,11 @@ function daily() {
 
 add_action('syncMis', 'mis');
 function mis() {
-//    $item = wc_get_product(558409);  //
+//    $item = wc_get_product(531420);  //
 //    new NSS_MIS_Item($item);
 //    die();
 
-//    $orderIds = [596937];
+//    $orderIds = [602021, 601985];
 //    foreach ($orderIds as $orderId) {
 //        $order = wc_get_order($orderId);
 //        new NSS_MIS_Order($order);
@@ -169,6 +172,12 @@ function mis() {
                 }
             } else if (get_class($order) === WC_Order_Refund::class) {
                 continue;
+            } else if (get_class($order) === \Automattic\WooCommerce\Admin\Overrides\Order::class) {
+                if ($order->get_meta('synced') === '') {
+                    $misOrder = new NSS_MIS_Order($order);
+                    $order->add_order_note('Synced to MIS at: ' . date('d/m/Y H:i'));
+                    $order->update_meta_data('synced', 1);
+                }
             } else {
                 var_dump($order);
                 var_dump('problem ?');

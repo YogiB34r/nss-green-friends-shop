@@ -1778,7 +1778,7 @@ body.home .widget_gf_newsletter_widget .gf-newsletter__title {
     .gf-expander-module-first-line{
         padding: 0px 10px;
     }
-    
+
 }
 
 @media only screen and (min-width: 1200px) {
@@ -3402,9 +3402,7 @@ p.woocommerce-thankyou-order-received {
         padding-top: 35px;
     }
 }
-.gf-product-slider{
-    visibility: hidden;
-}
+
 .padding-left-45{
     padding-left: 45px;
 }
@@ -3608,3 +3606,196 @@ button[name='update_cart'] {
     text-decoration: underline;
     color: white;
 }
+
+.swiper-container {
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    overflow: hidden;
+    list-style: none;
+    padding: 0;
+    z-index: 1
+}
+
+.swiper-container-pointer-events {
+    touch-action: pan-y
+}
+
+.swiper-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    display: flex;
+    transition-property: transform;
+    box-sizing: content-box
+}
+
+.swiper-slide,
+.swiper-wrapper {
+    transform: translate3d(0, 0, 0)
+}
+
+.swiper-slide {
+    flex-shrink: 0;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transition-property: transform
+}
+
+.swiper-slide h4 {
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    max-height: 40px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden
+}
+
+.swiper-slide img {
+    width: 100%;
+    height: auto
+}
+
+@media only screen and (max-width:768px) {
+    .swiper-slide img {
+        width: unset;
+        height: unset
+    }
+}
+
+@media only screen and (min-width:768px) and (max-width:1024px) {
+    .swiper-slide img {
+        width: 70%;
+        height: auto
+    }
+}
+
+@media only screen and (max-width:1365px) {
+    .swiper-slide img {
+        width: 80%;
+        height: auto
+    }
+}
+
+.swiper-slide-invisible-blank {
+    visibility: hidden
+}
+
+.swiper-container-android .swiper-slide,
+.swiper-wrapper {
+    transform: translate3d(0, 0, 0)
+}
+
+.swiper-slide h4 {
+    font-size: 1rem
+}
+.g {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.swiper-container img {
+    width: 150px;
+}
+
+@media only screen and (min-width: 1025px)  {
+    .swiper-slide {
+        width: 189.25px;
+        margin-right: 15px;
+    }
+}
+
+@media only screen and (max-width: 767px) {
+    .swiper-slide {
+        width: 201.5px;
+    }
+}
+@media only screen and (min-width: 768px) and (max-width: 1024px) {
+    .swiper-slide {
+        width: 210.667px;
+        margin-right: 10px;
+    }
+}
+/* Newsletter global (in common) start */
+.newsletterInput {
+    border: none;
+    border-bottom: 1px solid gray;
+}
+.newsletterInput:focus{
+    outline: none;
+}
+.newsletterSubmit {
+    background: #f45411;
+    color: white;
+    outline: 0;
+    border: none;
+    border-radius: 10px;
+    padding: 2px 7px;
+}
+.newsletterSubmit {
+    cursor:pointer;
+}
+/* Newsletter global (in common) end */
+
+/* Newsletter on other pages (not homepage) start */
+.page .gf-footer-newsletter{
+    display: flex;
+    align-items: center;
+}
+.page .gf-footer-newsletter > .widget_newsletter_widget > .widgettitle {
+    font-size: 1.5em;
+
+}
+.page .gf-footer-newsletter .newsletterForma {
+    border: 3px solid #f45411;
+    display: flex;
+    justify-content: space-around;
+    margin-top: 10px;
+    padding: 7px;
+    border-radius: 10px;
+}
+/* Newsletter on other pages (not homepage) end */
+
+/* Newsletter on homepage start */
+.home .widget_newsletter_widget {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 15px;
+    width: 100%;
+    border: 3px solid #f45411;
+    border-radius: 10px;
+}
+.home .newsletterInput {
+    font-size:1.4em;
+}
+.home .newsletterSubmit {
+    font-size:1.4em;
+    padding: 5px 15px;
+}
+@media only screen and (max-width:1200px) {
+    .home .widget_newsletter_widget {
+        flex-direction: column;
+    }
+}
+@media only screen and (max-width:476px) {
+    .home .newsletterForma {
+        display: flex;
+        flex-direction: column;
+    }
+    .home .newsletterSubmit {
+        margin-top:15px;
+    }
+}
+@media only screen and (max-width:476px) {
+    .home .widget_newsletter_widget h2 {
+        font-size: 1.5em;
+        margin-bottom:10px;
+    }
+}
+/* Newsletter on homepage end */

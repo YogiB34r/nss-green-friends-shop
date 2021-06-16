@@ -48,7 +48,6 @@ do_action('woocommerce_email_order_meta', $order, $sent_to_admin, $plain_text, $
  */
 do_action('woocommerce_email_customer_details', $order, $sent_to_admin, $plain_text, $email);
 if ($order->get_payment_method() == 'bacs') {
-    $dateCreated = date('dmY', strtotime($order->get_date_created()));
     require(realpath(__DIR__ . '/../../templates/template-parts/email/order-on-hold-payment-slip.php'));
 }
 /**

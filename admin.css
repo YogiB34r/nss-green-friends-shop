@@ -153,3 +153,8 @@ GF SORTABLE CATEGORIES
 .externalItemBannersWidget-table td{
     vertical-align: middle;
 }
+.marketplaceWrapper div {
+    display: flex;
+    flex-direction: column;
+    width:20%;
+}

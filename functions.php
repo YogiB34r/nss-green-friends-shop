@@ -1,5 +1,8 @@
 <?php
 //ini_set('max_execution_time', '40');
+use GF\Marketplace\Marketplace;
+use GF\Orders\AdminListFilters;
+use GF\Orders\OrderAnalytics;
 use Gf\Search\Functions;
 use GF\Theme;
 use Gf\Util\Url;
@@ -27,6 +30,15 @@ $wooShipping = new Shipping();
 $wooShipping->init();
 $theme = new Theme();
 $theme->init();
+$marketplace = new Marketplace();
+$marketplace->init();
+$orderListFilters = new AdminListFilters();
+$orderListFilters->init();
+$orderAnalytics = new OrderAnalytics();
+$orderAnalytics->init();
+
+//used only once
+//$marketplace->activate();
 
 $urlUtils = new Url();
 $urlUtils->init();
@@ -36,6 +48,10 @@ $adminMenu->init();
 
 $metaCache = new \GF\Util\MetaCache($cache);
 
+$orderStatuses = new \GF\Orders\Statuses(include (__DIR__ . '/inc/Orders/config/customStatuses.php'));
+$orderStatuses->registerStatuses();
+$orderStatuses->setDefaultOrderStatus('cod','u-pripremi');
+$orderStatuses->setDefaultOrderStatus('bacs','cekaseuplata');
 
 
 add_filter('request', 'customRewriteFix');

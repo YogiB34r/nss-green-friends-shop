@@ -1,0 +1,92 @@
+<h1>Filtriraj proizvode</h1>
+<ul>
+    <li>
+        <button class="filterButton active" value="soloInCart" id="soloInCart">Sam u korpi</button>
+    </li>
+    <li>
+        <button class="filterButton" value="disableCod" id="disableCod">Onemogućeno plaćanje pouzećem</button>
+    </li>
+    <li>
+        <button class="filterButton" value="ignoreFeedPriceUpdate"
+                id="ignorePriceUpdates">Ignoriši promene cena sa feed-a
+        </button>
+    </li>
+</ul>
+<div class="tableWrapper">
+    <table id="productTable" class="stripe cell-border">
+        <thead>
+        <tr>
+            <th>Naziv</th>
+            <th>Id proizvoda</th>
+            <th>Sku</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+        <tfoot>
+        <tr>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+        </tfoot>
+    </table>
+</div>
+<script>
+    jQuery(document).ready(function () {
+        let table = jQuery('#productTable').DataTable({
+            'processing': true,
+            'serverSide': true,
+            'searching': false,
+            'ajax': '<?=admin_url('admin-ajax.php?action=gfGetProducts&metaField=soloInCart')?>',
+            'pageLength': 25,
+            'lengthMenu': [10, 25, 50, 75, 100, 250, 500, 1000],
+            'dataSrc': function (data) {
+                return data.data;
+            },
+            'language': {
+                'emptyTable': 'Nije pronadjen nijedan proizvod sa zadatim filterima',
+                'zeroRecords': 'Nije pronadjen nijedan proizvod'
+            },
+            'dom': '<"top"flp<"clear">>rt<"bottom"ifp<"clear">>',
+            'columns': [
+                {
+                    data: "post_name",
+                    name: "post_name",
+                    orderable: false,
+                    width: '30%'
+                },
+                {
+                    data: 'ID',
+                    name: 'ID',
+                    orderable: false,
+                    width: '7%'
+                },
+                {
+                    data: "sku",
+                    name: "sku",
+                    orderable: false,
+                    width: '7%'
+                }
+            ]
+        })
+        jQuery('.filterButton').on('click', function (e) {
+            let url = '<?=admin_url('admin-ajax.php?action=gfGetProducts&metaField=')?>' + e.target.value
+            jQuery('.active').removeClass('active')
+            jQuery(this).addClass('active')
+            table.ajax.url(url);
+            table.draw()
+        })
+    })
+</script>
+<style>
+    .active {
+        background-color: deepskyblue;
+    }
+
+    #productTable {
+        text-align: left;
+    }
+    .tableWrapper {
+        width: 50%;
+    }
+</style>
