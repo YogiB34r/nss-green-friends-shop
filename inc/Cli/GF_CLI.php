@@ -2,6 +2,9 @@
 
 namespace GF;
 
+use WP_CLI;
+
+use function WP_CLI\Utils\make_progress_bar;
 
 class Cli
 {
@@ -11,9 +14,9 @@ class Cli
         foreach (gf_get_categories() as $cat) {
             $parent = get_term_by('id', $cat->parent, 'product_cat');
             if ($parent) {
-                echo $cat->term_id .','. $cat->name .','. $cat->parent .','. $parent->name . "\r\n";
+                echo $cat->term_id . ',' . $cat->name . ',' . $cat->parent . ',' . $parent->name . "\r\n";
             } else {
-                echo $cat->term_id .','. $cat->name .',0,none' . "\r\n";
+                echo $cat->term_id . ',' . $cat->name . ',0,none' . "\r\n";
             }
         }
     }
@@ -73,17 +76,17 @@ class Cli
         $limit = 5000;
         $page = 1;
 
-        $config = array(
+        $config = [
             'host' => ES_HOST,
             'port' => 9200
-        );
+        ];
         $esClient = new \Elastica\Client($config);
         $elasticaSearch = new \GF\Search\Elastica\Search($esClient);
         $search = new \GF\Search\Adapter\Elastic($elasticaSearch);
 
-        $args = array(
-            'taxonomy'   => "product_cat",
-        );
+        $args = [
+            'taxonomy' => "product_cat",
+        ];
         $product_categories = get_terms($args);
         $limit = 10;
         foreach ($product_categories as $key => $category) {
@@ -96,7 +99,7 @@ class Cli
                     try {
                         $esClient->getIndex('product')->getType('product')->deleteById($productId);
                         $deleted[] = $product;
-                    } catch(\Exception $e) {
+                    } catch (\Exception $e) {
                         var_dump($e->getMessage());
                     }
                 }
@@ -106,7 +109,6 @@ class Cli
             var_dump(count($deleted));
             echo 'from';
             var_dump(count($items));
-
         }
     }
 
@@ -118,13 +120,13 @@ class Cli
         /* @var \Elastica\Client $elasticaClient */
         $factory = new \GF\Search\Factory\ElasticClientFactory();
         $elasticaClient = $factory->make();
-        $products = wc_get_products(array(
+        $products = wc_get_products([
             'limit' => -1,
             'return' => 'ids',
             'status' => 'draft',
             'meta_key' => 'supplier',
             'meta_value' => 27,
-        ));
+        ]);
         $removed = 0;
 //        $diff = array_diff($this->getIndexedIds(), $products);
         $diff = array_intersect($products, $this->getIndexedIds());
@@ -196,7 +198,6 @@ class Cli
 //            }
             $this->createProduct($item);
         }
-
     }
 
     public function createProduct($item)
@@ -218,7 +219,7 @@ class Cli
         $price = 100;
         $product->set_catalog_visibility('visible');
         $product->set_short_description($item[6]);
-        $product->set_description($item[6] . '<p>Garancija: '. $item[5] .'</p>');
+        $product->set_description($item[6] . '<p>Garancija: ' . $item[5] . '</p>');
         $product->set_weight(2);
         $product->set_reviews_allowed(1);
         $product->set_price($price);
@@ -278,13 +279,13 @@ class Cli
 //        }
 //        die();
 
-        $products = wc_get_products(array(
+        $products = wc_get_products([
             'limit' => -1,
 //            'status' => 'published',
             'meta_key' => 'supplier',
             'meta_value' => 296,
             'paged' => 1
-        ));
+        ]);
 
         /* @var \WC_Product $product */
         foreach ($products as $key => $product) {
@@ -305,12 +306,14 @@ class Cli
 //            $product->save();
 
 
-            $status = ($product->get_status() === 'publish') ? 1:2;
+            $status = ($product->get_status() === 'publish') ? 1 : 2;
             if ($product->get_stock_status() === 'outofstock') {
                 $status = 3;
             }
-            echo '"' . $product->get_sku() . '",' . $product->get_meta('inputprice', true) . ',' . $product->get_regular_price()
-                . ',' . $product->get_sale_price() . ',' . $status . ',' . '"' . $product->get_meta('vendor_code', true) .'"'. PHP_EOL;
+            echo '"' . $product->get_sku() . '",' . $product->get_meta('inputprice',
+                    true) . ',' . $product->get_regular_price()
+                . ',' . $product->get_sale_price() . ',' . $status . ',' . '"' . $product->get_meta('vendor_code',
+                    true) . '"' . PHP_EOL;
         }
 
 //        var_dump($order->get_payment_method_title() === 'Pouzećem');
@@ -326,7 +329,7 @@ class Cli
 //        $drafted = 0;
 //        $vendor = [];
 //        $items = [];
-        $products = wc_get_products(array(
+        $products = wc_get_products([
             'limit' => -1,
 //            'status' => 'published',
             'meta_key' => 'supplier',
@@ -335,7 +338,7 @@ class Cli
 //                'compare' => 'IN',
 //            'return' => 'ids',
 //            'paged' => 1
-        ));
+        ]);
 
 //        var_dump(count($products));
 //        die();
@@ -344,13 +347,33 @@ class Cli
         /* @var \WC_Product $wcProduct */
         foreach ($products as $wcProduct) {
 //            if (get_class($wcProduct) == \WC_Product_Variable::class) {
-                $wcProduct->set_status('draft');
-                $wcProduct->save();
-                $total++;
+            $wcProduct->set_status('draft');
+            $wcProduct->save();
+            $total++;
 //            }
         }
 
 //        echo 'new ' . $newItems . ' items' . "\r\n";
         echo 'drafted ' . $total . ' items';
+    }
+
+    public function fixCategoryTree($args)
+    {
+        $category = get_term_by('slug', $args[0], 'product_cat');
+        $categoryAncestors = get_ancestors($category->term_id, 'product_cat');
+        $catsToSet = array_merge($categoryAncestors, [$category->term_id]);
+        $products = wc_get_products([
+            'limit' => -1,
+            'category' => [$category->slug],
+            'paged' => 1
+        ]);
+        $progress = make_progress_bar('Progress', count($products));
+        /** @var \WC_Product $product */
+        foreach ($products as $product) {
+            $product->set_category_ids($catsToSet);
+            $product->save();
+            $progress->tick();
+        }
+        $progress->finish();
     }
 }
