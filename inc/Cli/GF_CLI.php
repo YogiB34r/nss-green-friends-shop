@@ -65,7 +65,7 @@ class Cli
                 "sku" => $product->get_sku()
             ];
         }
-        file_put_contents(__DIR__ . '/../../uploads/sexyExport.json', json_encode($items));
+        file_put_contents(WP_CONTENT_DIR . '/uploads/sexyExport.json', json_encode($items));
     }
 
     public function cleanupIndex()

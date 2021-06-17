@@ -1,5 +1,9 @@
 <?php
 
+use Laminas\Mail\Transport\Smtp;
+use Laminas\Mail\Transport\File;
+use Laminas\Mail\Transport\FileOptions;
+
 // @TODO move this to class
 if (defined('WP_CLI') && WP_CLI) {
     ini_set('max_execution_time', 1200);
@@ -32,14 +36,22 @@ if (defined('WP_CLI') && WP_CLI) {
 
     \WP_CLI::add_command('testCron', 'testCron');
 
-    \WP_CLI::add_command('testNl', 'testNl');
+    \WP_CLI::add_command('sendNlTest', 'sendNlTest');
+
+//    \WP_CLI::add_command('createOglasiFeed', 'createOglasiFeed');
+
+    \WP_CLI::add_command('createSexyFeed', 'createSexyFeed');
 }
 
-function testNl()
-{
-    $nl = new Newsletter();
-    $nl->hook_newsletter();
+function sendNlTest() {
+    ini_set('display_errors', 1);
+    do_action('gfNewsletterSend', 15);
+    exit();
+}
 
+function createSexyFeed() {
+    $cli = new \GF\Cli();
+    $cli->createSexyFeed();
 }
 
 /*
@@ -119,11 +131,11 @@ function daily() {
 
 add_action('syncMis', 'mis');
 function mis() {
-//    $item = wc_get_product(531420);  //
+//    $item = wc_get_product(560186);  //
 //    new NSS_MIS_Item($item);
 //    die();
 
-//    $orderIds = [602021, 601985];
+//    $orderIds = [609969];
 //    foreach ($orderIds as $orderId) {
 //        $order = wc_get_order($orderId);
 //        new NSS_MIS_Order($order);
