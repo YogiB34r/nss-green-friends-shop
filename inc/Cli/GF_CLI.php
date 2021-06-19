@@ -321,9 +321,8 @@ class Cli
             'fields' => 'ids'
         ])[0];
         $catChildren[] = $specCatId;
-        foreach (get_term_children($specCatId,'product_cat') as $catId){
-            $catChildren[] = $catId;
-        }
+        $catChildren = array_merge($catChildren, get_term_children($specCatId,'product_cat'));
+
         $progress = make_progress_bar('Progress', count($products));
         $i = 0;
         /** @var \WC_Product $product */
