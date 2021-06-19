@@ -301,20 +301,53 @@ class Cli
 
     public function fixCategoryTree($args)
     {
+        ini_set('max_execution_time', 3600);
+        //Ovo je kategorija nad kojom pozivamo funkciju
         $category = get_term_by('slug', $args[0], 'product_cat');
+        //Mozda ima parente
         $categoryAncestors = get_ancestors($category->term_id, 'product_cat');
+        //Spoji parente ako ih ima i dodaj ovu kategoriju u niz
         $catsToSet = array_merge($categoryAncestors, [$category->term_id]);
+        //Dohvati decu kategorije
+        $catChildren = get_term_children($category->term_id,'product_cat');
         $products = wc_get_products([
             'limit' => -1,
-            'category' => [$category->slug],
-            'paged' => 1
+            'category' => [$category->slug]
         ]);
+        //Add specijalne promocije and its tree to cat children array so we do not remove those
+        $specCatId = get_terms([
+            'taxonomy' => 'product_cat',
+            'name__like' => 'Specijalne promocije',
+            'fields' => 'ids'
+        ])[0];
+        $catChildren[] = $specCatId;
+        foreach (get_term_children($specCatId,'product_cat') as $catId){
+            $catChildren[] = $catId;
+        }
         $progress = make_progress_bar('Progress', count($products));
+        $i = 0;
         /** @var \WC_Product $product */
         foreach ($products as $product) {
-            $product->set_category_ids($catsToSet);
+            $setProductCats = $catsToSet;
+            //prevents db from dying
+            if ($i === 500) {
+                sleep(1);
+                $i = 0;
+            }
+            $cats = $product->get_category_ids();
+            foreach ($cats as $catId){
+                //Ako neka od kategorija ne pripada deci kategorije nad kojom pozivamo funkciju ne zelimo ih u proizvodu
+                if (!in_array($catId, $catChildren, true)){
+                    continue;
+                }
+                //Sve ostale koje jesu deca kategorije nad kojom pozivamo funkciju treba da budu u proizvodu
+                $setProductCats[] = $catId;
+            }
+            $product->set_category_ids($setProductCats);
             $product->save();
             $progress->tick();
+            $i++;
+
         }
         $progress->finish();
     }
