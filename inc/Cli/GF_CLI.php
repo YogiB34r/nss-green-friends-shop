@@ -320,8 +320,9 @@ class Cli
             'name__like' => 'Specijalne promocije',
             'fields' => 'ids'
         ])[0];
-        $catChildren[] = $specCatId;
-        $catChildren = array_merge($catChildren, get_term_children($specCatId,'product_cat'));
+        $specCatToIgnore = [];
+        $specCatToIgnore[] = $specCatId;
+        $specCatToIgnore = array_merge($specCatToIgnore, get_term_children($specCatId,'product_cat'));
 
         $progress = make_progress_bar('Progress', count($products));
         $i = 0;
@@ -334,10 +335,20 @@ class Cli
                 $i = 0;
             }
             $cats = $product->get_category_ids();
+            $level3Found = false;
             foreach ($cats as $catId){
                 //Ako neka od kategorija ne pripada deci kategorije nad kojom pozivamo funkciju ne zelimo ih u proizvodu
-                if (!in_array($catId, $catChildren, true)){
+                if (!in_array($catId, $catChildren, false)){
+                    //Ako je mozda ta kategorija u specijalnim promocijama dodaj je
+                    if (in_array($catId, $specCatToIgnore,false)){
+                        $setProductCats[] = $catId;
+                    }
                     continue;
+                }
+                if (!$level3Found && get_term_children($catId, 'product_cat') > 0) {
+                    //This is the level 2 cat for this product
+                    $setProductCats[] = get_ancestors($catId,'product_cat')[0];
+                    $level3Found = true;
                 }
                 //Sve ostale koje jesu deca kategorije nad kojom pozivamo funkciju treba da budu u proizvodu
                 $setProductCats[] = $catId;
