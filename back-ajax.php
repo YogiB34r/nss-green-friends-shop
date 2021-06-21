@@ -1,12 +1,7 @@
 <?php
 /* Template Name: back ajax */
 
-
-//ini_set('display_errors', 1);
 global $wpdb;
-
-//$sw = new \Symfony\Component\Stopwatch\Stopwatch();
-//$sw->start('gfmain');
 
 if (isset($_GET['action'])) {
     ini_set('max_execution_time', 1200);
@@ -142,8 +137,8 @@ if (isset($_GET['action'])) {
 
         case 'backendProductSearch':
             backendProductSearch();
-
             break;
+
     }
 }
 

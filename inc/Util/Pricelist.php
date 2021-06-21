@@ -151,10 +151,6 @@ class Pricelist
 
     protected function readFile($fileInfo)
     {
-//        $targetFile = '/tmp/' . $fileInfo['tmp_name'];
-//        move_uploaded_file($fileInfo['tmp_name'], $targetFile);
-//        var_dump($fileInfo);
-//        die();
         $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xls();
         $reader->setReadDataOnly(true);
         $data = $reader->load($fileInfo['tmp_name']);

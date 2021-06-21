@@ -14,9 +14,9 @@ $companyAddress = $vendor['companyAddress'] ?? 'Beograd, Gvozdićeva 4';
 $primalac = $companyName.'<br>'.$companyAddress;
 $racunPrimaoca = $vendor['bankAccountNumber'] ?? '160-487203-63';
 ?>
-<div class="payment-slip" style="border:1px solid;padding: 10px;overflow: auto">
-    <h2 style="text-align: right">Nalog za uplatu</h2>
-    <div class="gf-left-column" style=";padding-right: 15px;float: left;width: 46%">
+<div class="payment-slip" style="border:1px solid;padding: 10px;overflow: auto;">
+    <h2 style="text-align: right;">Nalog za uplatu</h2>
+    <div class="gf-left-column" style="padding-right: 15px;float: left;width: 46%;">
         <div>
             <h3>Uplatilac</h3>
             <div style="border:1px solid;">
@@ -39,17 +39,17 @@ $racunPrimaoca = $vendor['bankAccountNumber'] ?? '160-487203-63';
             </div>
         </div>
     </div>
-    <div class="right-column" style=";float: left;padding-left: 15px;margin-bottom: 10px;overflow:hidden;border-left: solid;width: 46%">
+    <div class="right-column" style="float: left;padding-left: 15px;margin-bottom: 10px;overflow:hidden;border-left: solid;width: 46%">
         <div style="float: left;">
             <h3 style="padding-bottom:6px ">Šifra Plaćanja</h3>
-            <div style="border:1px solid;text-align: center;display: inline-block">
-                <p style="margin: 8px;min-height: 17px;min-width: 30px">221</p>
+            <div style="border:1px solid;text-align: center;display: inline-block;">
+                <p style="margin: 8px;min-height: 17px;min-width: 30px;">221</p>
             </div>
         </div>
         <div style="float: left;margin-left: 20px;">
             <h3 style="padding-bottom:6px ">Valuta</h3>
-            <div style="border:1px solid;text-align: center;display: inline-block">
-                <p style="margin: 8px;min-height: 17px;min-width: 30px">RSD</p>
+            <div style="border:1px solid;text-align: center;display: inline-block;">
+                <p style="margin: 8px;min-height: 17px;min-width: 30px;">RSD</p>
             </div>
         </div>
         <div style="float: left;">

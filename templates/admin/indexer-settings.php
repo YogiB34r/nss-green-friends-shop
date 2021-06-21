@@ -106,7 +106,6 @@ class Search_List_Table extends WP_List_Table
             'total_items' => $this->indexer->getTotalCount(),
             'per_page' => $perPage
         ));
-//        $data = array_slice($data, (($currentPage - 1) * $perPage), $perPage);
         $this->_column_headers = array($columns, $hidden, $sortable);
         $this->items = $data;
     }
@@ -119,35 +118,6 @@ class Search_List_Table extends WP_List_Table
     private function parseData($keywords, $perPage)
     {
         $data = [];
-
-
-//        $this->indexer->removeNonExistentProducts();
-
-
-
-        /* @var \Elastica\Result $term */
-//        foreach ($this->indexer->getResultsTest($keywords, $perPage) as $term) {
-////            $url = '<input type="text" style="display:none;" />';
-////            if ($term->getData()['url'] !== '') {
-////                $url = '<input readonly size="55" class="redirected" type="text" value="' . $term->getData()['url'] . '" />';
-////            }
-////            $url .= '<button style="display: none" data-query="'. $term->getData()['searchQuery'] .'" class="redirect">
-////                    Snimi
-////                </button>';
-//            $data[] = array(
-//                'id' => $term->getData()['postId'],
-//                'name' => $term->getData()['name'],
-//                'sku' => $term->getData()['sku'],
-//                'status' => $term->getData()['status'],
-//                'stockStatus' => $term->getData()['stockStatus'],
-//                'regularPrice' => $term->getData()['regularPrice'],
-//                'salePrice' => $term->getData()['salePrice'],
-//                'sorting' => $term->getData()['order_data'],
-////                'url' => $url,
-//                'action' => '<a href="#" class="showRedirect">#</a>'
-//            );
-//        }
-
         return $data;
     }
 
@@ -167,7 +137,6 @@ class Search_List_Table extends WP_List_Table
             'regularPrice' => 'regularPrice',
             'salePrice' => 'salePrice',
             'sorting' => 'sorting',
-//            'url' => 'Preusmeren Na',
             'action' => 'Akcija',
         );
         return $columns;
@@ -195,7 +164,6 @@ class Search_List_Table extends WP_List_Table
             'regularPrice' => ['regularPrice', false],
             'salePrice' => ['salePrice', false],
             'searchQuery' => ['searchQuery', false],
-//            'count' => array('count', false)
         );
     }
 

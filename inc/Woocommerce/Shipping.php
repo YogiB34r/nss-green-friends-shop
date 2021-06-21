@@ -56,7 +56,7 @@ class Shipping
         $cartContent = [];
         $i = 0;
 
-        //Serbia iz zone id 1
+        //Serbia is zone id 1
         $zone = \WC_Shipping_Zones::get_zone('1');
         $rates = [];
 
@@ -426,6 +426,4 @@ class Shipping
         }
         return false;
     }
-
-
 }

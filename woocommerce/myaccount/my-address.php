@@ -47,7 +47,7 @@ $col    = 1;
 
 <?php foreach ( $get_addresses as $name => $title ) : ?>
 
-	<div class="col-12 woocommerce-Address">
+	<div class="nssBig woocommerce-Address">
 		<header class="woocommerce-Address-title title">
 			<h3><?php echo $title; ?></h3>
 			<a href="<?php echo esc_url( wc_get_endpoint_url( 'edit-address', $name ) ); ?>" class="edit"><?php _e( 'Edit', 'woocommerce' ); ?></a>

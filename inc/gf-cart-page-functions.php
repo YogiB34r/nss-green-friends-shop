@@ -3,7 +3,7 @@
 add_action('woocommerce_before_cart_table', 'gf_cart_display_tax_notice', 10);
 function gf_cart_display_tax_notice()
 {
-    echo '<div class="gf-seller-info">
+    echo '<div class="gfSellerInfo">
            <p>' . _e('Na ovoj stranici možete izabrati koliko komada nekog proizvoda želite da naručite a pomoću dugmeta "x" možete određeni proizvod izbaciti iz korpe. Sve prikazane cene su sa PDV-om. Troškovi dostave se dodatno plaćaju i prikazani su u poslednjem koraku kreiranja narudžbenice.', 'green-fiends') . '</p>
           </div>';
 }
@@ -11,14 +11,13 @@ function gf_cart_display_tax_notice()
 add_action('woocommerce_before_cart_table', 'gf_cart_display_seller_info', 11);
 function gf_cart_display_seller_info()
 {
-    echo '<div class="gf-seller-info">
+    echo '<div class="gfSellerInfo">
            <p>' . _e('Prodavac:', 'green-fiends') . ' 
-                <span class="gf-seller-info-title">Non Stop Shop</span>
+                <span class="gfSellerInfoTitle">Non Stop Shop</span>
                 <img src="/wp-content/themes/nss-green-friends-shop/assets/images/logo.png" alt="Non Stop Shop">
            </p>
           </div>';
 }
-
 
 /*
  * Display total cart weight on cart & order page
@@ -40,7 +39,6 @@ function bbloomer_print_cart_weight($posted)
         echo $html;
     }
 }
-
 
 remove_action('woocommerce_proceed_to_checkout', 'woocommerce_button_proceed_to_checkout', 20);
 
@@ -85,7 +83,6 @@ function wc_empty_cart_redirect_url()
     return get_home_url();
 }
 
-
 //They only way to translate shipping
 add_filter('woocommerce_shipping_package_name', 'gf_translate_shipping', 10, 3);
 function gf_translate_shipping($name, $package)
@@ -93,7 +90,6 @@ function gf_translate_shipping($name, $package)
 //    return sprintf( _nx( 'Dostava', 'Dostava %d', ( $i + 1 ), 'shipping packages', 'green-friends' ), ( $i + 1 ) );
     return 'Dostava';
 }
-
 
 add_action('woocommerce_before_cart', 'gf_cart_limit_notice');
 function gf_cart_limit_notice()

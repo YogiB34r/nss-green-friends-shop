@@ -1,0 +1,168 @@
+.nssFooter {
+  border-top: solid 1px rgba(204, 204, 204, 0.7);
+  padding-top: 2%;
+  min-height: 40vh;
+
+  .nssFooterContainer {
+    width: 80%;
+    margin: 0 auto;
+    padding-top: 20px;
+    display: flex;
+    justify-content: space-around;
+
+    .nssFooterSectionNav {
+
+      justify-content: flex-end;
+
+      .footerMenu {
+        li {
+          display: inline-block;
+          margin: 8px 16px 0 0;
+
+        }
+      }
+
+      .nssFooterCardsWrapper {
+        margin-top: 1.5rem;
+      }
+
+    }
+
+    .marginLeft {
+      margin-left: 27%;
+    }
+
+  }
+}
+
+body {
+  &.home {
+    .widget_gf_newsletter_widget {
+      display: flex;
+      width: 100%;
+      justify-content: space-around;
+      border: solid 2px #f45411;
+      border-radius: 7px;
+      padding: 10px;
+      text-align: center;
+      align-items: center;
+      margin: 40px auto;
+
+      h2 {
+        font-size: 1.5rem;
+      }
+
+      .gf-newsletter__input {
+        width: 50%;
+      }
+
+      .gf-newsletter__submit {
+        background: #f45411;
+        color: #fff;
+        font-weight: 700;
+        width: 50%;
+
+        &:hover {
+          background-color: #f45411;
+          text-decoration: underline;
+        }
+      }
+
+      .gf-newsletter__title {
+        display: none;
+      }
+    }
+  }
+}
+
+.newsLetterCancelLink {
+  background-color: #f45411;
+  color: white;
+  padding: 10px;
+  display: block;
+  border: 1px solid #ddd;
+  background-image: none;
+  text-shadow: none;
+  font-size: 14px;
+  line-height: normal;
+  box-sizing: border-box;
+  border-radius: 0;
+  height: auto;
+  float: none;
+  width: 50%;
+  text-align: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.newsletterCancelLinkWrapper :hover {
+  text-decoration: underline;
+  color: white;
+}
+
+.tnp-email,
+.tnp-submit {
+  width: 50% !important;
+}
+
+.tnp-submit {
+  background-color: #f45411 !important;
+  font-weight: bold !important;
+
+  &:hover {
+    background-color: #f45411 !important;
+    text-decoration: underline !important;
+    cursor: pointer !important;
+  }
+}
+
+.nssBancaIntesa, .nssMasterSecure, .nssVisaVerified, .nssVisaCard, .nssMasterCard,
+.nssMaestroCard, .nssAmericanExpress {
+  display: inline-block;
+  background: url(/wp-content/themes/nss-green-friends-shop/assets/images/footer-sprites.png) no-repeat;
+  overflow: hidden;
+  text-indent: -9999px;
+  text-align: left;
+}
+
+.nssBancaIntesa {
+  background-position: -2px -0px;
+  width: 267px;
+  height: 40px;
+}
+
+.nssMasterSecure {
+  background-position: -2px -42px;
+  width: 75px;
+  height: 40px;
+}
+
+.nssVisaVerified {
+  background-position: -79px -42px;
+  width: 68px;
+  height: 40px;
+}
+
+.nssVisaCard {
+  background-position: -149px -42px;
+  width: 66px;
+  height: 40px;
+}
+
+.nssMasterCard {
+  background-position: -2px -84px;
+  width: 62px;
+  height: 40px;
+}
+
+.nssMaestroCard {
+  background-position: -66px -84px;
+  width: 62px;
+  height: 40px;
+}
+
+.nssAmericanExpress {
+  background-position: -217px -42px;
+  width: 40px;
+  height: 40px;
+}

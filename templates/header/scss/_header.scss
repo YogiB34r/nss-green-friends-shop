@@ -1,0 +1,210 @@
+.nssHeader {
+  position: relative;
+  width: 100%;
+  z-index: 2000;
+  background: #fff;
+  box-shadow: 0 0 7px rgba(0, 0, 0, 0.8);
+  overflow: visible;
+
+  .nssTopBar {
+    background-color: #1d1d1d;
+    color: white;
+    padding: 14px 0;
+    width: 100%;
+
+    a {
+      color: #f45411;
+      padding-right: 20px;
+    }
+
+    .nssTopBarMenu {
+      display: flex;
+      justify-content: space-around;
+      padding: 0 0 0 25px;
+      margin-left: 25%;
+    }
+
+  }
+
+  .nssPrimaryNav {
+    display: flex;
+    justify-content: space-between;
+    height: 70px;
+    width: 75%;
+    align-items: center;
+    margin: 0 auto;
+
+    .nssLogo {
+      position: relative;
+      z-index: 1000;
+      padding: 0;
+      top: -20px;
+
+      img {
+        width: 66%;
+        height: auto;
+      }
+    }
+
+    .nssSearch {
+      position: relative;
+      width: 53%;
+      min-height: 1px;
+    }
+
+    .nssNavIcons {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      min-width: 196px;
+      margin-left: -35px;
+
+      .nssHeaderCart {
+        display: block;
+        margin-right: 5%;
+        margin-left: auto;
+
+        .nssHeaderCartTitle {
+          font-size: .99rem;
+          position: relative;
+          line-height: 1;
+        }
+      }
+
+      a {
+        color: #1d1d1d;
+        transition: 0.2s all;
+        font-weight: 600;
+      }
+
+      a:hover {
+        color: #f45411;
+        text-decoration: none;
+      }
+    }
+  }
+
+
+}
+
+.nssCartCount {
+  position: absolute;
+  top: -7px;
+  left: 23px;
+  padding: 1px 7px 4px;
+  background: #d4480b;
+  border-radius: 50%;
+  color: #fff;
+}
+
+.fa-shopping-cart {
+  padding: 11px 11px 11px 9px;
+  background: #999;
+  color: #fff;
+  border-radius: 3px;
+  transition: 0.2s all;
+}
+
+#menu-topbar {
+  display: flex;
+
+  &:first-child {
+    padding-right: 20px;
+  }
+}
+
+.fa-search {
+  margin-right: 10px;
+  margin-left: 10px;
+}
+
+.fa-shopping-cart:hover {
+  background: #888;
+}
+
+.searchField {
+  width: 85%;
+  color: #1d1d1d;
+  background: #f6f6f6;
+  text-align: left;
+  border-radius: 0;
+  border: 1px solid #e2e2e2;
+  padding: 13px 14px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.searchSubmit {
+  padding: 13px 4px;
+  border: 1px solid #e2e2e2;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+  background: #f6f6f6;
+  margin-left: -5px;
+  font-size: 14px;
+
+  :hover {
+    cursor: pointer;
+  }
+}
+
+.nssWidth100 {
+  width: 100%;
+  text-align: center;
+
+  .nssAutocompleteResults {
+    display: none;
+    position: absolute;
+    width: 85%;
+    background: #fff;
+    border: 1px solid #ccc;
+
+    ul {
+      margin-bottom: 10px;
+      margin-top: 5px;
+      padding-left: 5px;
+
+      li {
+        display: list-item;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 5px;
+        padding-top: 5px;
+
+        a {
+          font-weight: normal;
+        }
+      }
+    }
+
+    span {
+      margin-bottom: 6px;
+      display: block;
+      background-color: #f6f6f6;
+      padding: 5px 0 5px 5px;
+      font-weight: 400;
+    }
+
+  }
+
+}
+
+.nssRadioSearchWrapper {
+  @include largePhonesAndBelow {
+    display: none;
+  }
+
+  .nssRadioButtonWrapper {
+    display: inline-flex;
+    margin-right: 15px;
+    label {
+      cursor: pointer;
+    }
+  }
+}
+.searchRadioBox:checked ~ label {
+  color: #f45411;
+}
+
+.screen-reader-text {
+  display: none;
+}

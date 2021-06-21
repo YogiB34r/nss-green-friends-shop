@@ -1,0 +1,76 @@
+#billing_pib_field {
+  display: none;
+}
+
+#billing_company_field {
+  display: none;
+}
+
+#billing_country_field,
+#billing_state_field,
+#shipping_country_field,
+#shipping_state_field {
+  display: none;
+}
+
+#billing_city_field {
+  display: block;
+}
+
+.gf-image-banners {
+  margin: 0;
+
+  &-wider {
+    padding: 10px 20px;
+
+    img {
+      width: 100%;
+    }
+  }
+}
+
+.gf-checkout-shipping-notice {
+  background-color: #eee;
+}
+
+#grid em,
+#list em {
+  display: none;
+}
+
+
+.gf-wc-registration-info {
+  .woocommerce-info {
+    padding: 5px;
+    margin: 10px 0;
+
+    &:before {
+      content: none;
+    }
+  }
+}
+
+.gf-welcome-wrapper {
+  a {
+    color: #f45411;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.show-password-wrapper {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  margin-left: 4px;
+}
+
+#show-password-checkbox {
+  margin-right: 5px;
+}
+
+.gf_login_notice {
+  background: #eee;
+  border-bottom: 2px solid #f45411;
+}

@@ -19,9 +19,7 @@ class Url
         add_action('rewrite_rules_array', [$this, 'rewriteRules']);
 
 // @TODO check if this triggers upon new category creation, will the new url work ?
-//        add_action('init', [$this, 'flushRules']);
     }
-
     /**
      * Enables custom URL structure to work for single product: /last-category/product-slug
      *
@@ -72,7 +70,6 @@ class Url
 
         foreach ($terms as $term) {
             $slug = \Gf\Util\CategoryFunctions::buildTermPath($term);
-//        add_rewrite_rule("{$slug}/?\$", 'index.php?product_cat=' . $term->slug, 'top');
             $customRules["{$slug}/?\$"] = 'index.php?product_cat=' . $term->slug;
         }
 

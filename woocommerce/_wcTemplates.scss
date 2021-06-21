@@ -1,0 +1,32 @@
+//checkoutForm
+.customerDetails{
+  display:flex;
+  .customerNote{
+    flex-shrink: 0;
+    flex-basis: 50%;
+  }
+}
+
+//pagination
+.gf-wc-pagination-wrapper{
+  order: 5;
+}
+// login form
+.loginWrapper{
+  display: flex;
+  .loginForms{
+    flex-shrink: 0;
+    flex-basis: 50%;
+  }
+  @include largePhonesAndBelow{
+    flex-direction: column;
+    .loginForms{
+      flex-basis: 100%;
+    }
+  }
+}
+//my address php
+.nssBig{
+  flex-basis:100%;
+  width: 100%;
+}

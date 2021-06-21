@@ -6,7 +6,6 @@ function remove_stubborn_js() {
     wp_dequeue_script('grid-list-scripts');
     wp_deregister_script('grid-list-scripts');
 }
-//add_action('wp_print_scripts', 'remove_stubborn_js', 99999);
 
 // @TODO create option from admin to reset assets
 $compileOverrideActive = false;

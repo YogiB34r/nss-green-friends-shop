@@ -70,11 +70,7 @@ class ThemeSupport
      */
     private function customLogo($height, $width, $flexWidth)
     {
-        add_theme_support('custom-logo', array(
-            'height' => $height,
-            'width' => $width,
-            'flex-width' => $flexWidth,
-        ));
+        add_theme_support('custom-logo');
     }
 
     /**

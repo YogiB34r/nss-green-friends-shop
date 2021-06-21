@@ -36,7 +36,7 @@ class AdminMenu
                 function() {
                     $config = array(
                         'host' => ES_HOST,
-                        'port' => 9200
+                        'port' => ES_PORT
                     );
                     $client = new \Elastica\Client($config);
                     $indexer = new \GF\Search\Indexer\Indexer($client);

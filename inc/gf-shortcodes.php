@@ -1,10 +1,13 @@
 <?php
+
+//good
 add_shortcode('gf-footer-credits', 'gf_footer_credits_shortcode');
 function gf_footer_credits_shortcode()
 {
     echo get_bloginfo('name') . ' ' . date('Y');
 }
-
+//bad
+/*
 add_shortcode('gf_my_account_link', 'gf_my_account_link_shortcode');
 function gf_my_account_link_shortcode()
 {
@@ -16,6 +19,7 @@ function gf_my_account_link_shortcode()
     echo '<div class="gf-my-account"><a href=" ' . $myaccount_page_url . '"><i class="fas fa-user"></i> ' . __('Moj nalog') . '</a></div>';
 }
 
+//bad
 add_shortcode('gf-category-dropdown', 'gf_category_dropdown_shortcode');
 function gf_category_dropdown_shortcode()
 {
@@ -44,6 +48,8 @@ function gf_category_dropdown_shortcode()
     }
 }
 
+//bad
+//mislim da se ovo ne koristi, moram da proverim
 add_shortcode('gf-product-search', 'gf_product_search_shortcode');
 function gf_product_search_shortcode()
 {
@@ -88,10 +94,12 @@ function gf_product_search_shortcode()
     <?php
 }
 
+//bad
 add_shortcode('gf-cart', 'gf_cart_shortcode');
 function gf_cart_shortcode()
 {
-    global $woocommerce ?>
+    global $woocommerce;
+    ?>
     <a class="gf-header-cart" href="<?php echo wc_get_cart_url(); ?>"
        title="<?php _e('Cart View', 'green-friends'); ?>">
         <p class="gf-header-cart__title">
@@ -101,7 +109,8 @@ function gf_cart_shortcode()
     </a>
     <?php
 }
-
+*/
+/*
 add_shortcode('gf-mobile-nav-menu', 'gf_mobile_nav_menu_shortcode');
 function gf_mobile_nav_menu_shortcode()
 {
@@ -146,45 +155,44 @@ function gf_mobile_nav_menu_shortcode()
     <?php
     echo '</div>';
 }
-
+*/
+//good, mobile header search
 add_shortcode('gf-mobile-search', 'gf_mobile_search_form');
 function gf_mobile_search_form()
 {
 ?>
-<form role="search" method="get" class="gf-search-form gf-search-form--mobile"
+<form id="gfSearchFormMobile" role="search" method="get" class="gf-search-form gf-search-form--mobile"
       action="/pretraga/">
     <span class="screen-reader-text"><?php _x('Search for:', 'label') ?></span>
-    <input type="search" autocomplete="off" class="search-field gf-search-box" name="query"
+    <input aria-label="Unesite frazu pretrage" type="search" id="searchInput" autocomplete="off" class="search-field gf-search-box" name="query"
            placeholder="<?=esc_attr_x('Unesite frazu pretrage &hellip;', '')?>"
            value="<?= get_search_query() ?>"/>
 <!--    <button type="submit" class="search-submit"><i class="fa fa-search"></i></button>-->
-    <div class="gf-widht-100">
+    <div class="nssWidth100">
         <div class="gf-autocomplete-results suggesstion-box suggesstion-box-mobile"></div>
     </div>
 </form>
 <div class="gf-radio-search-wrapper-mobile">
     <?php if (get_queried_object() && is_product_category()): ?>
         <div class="gf-search-radio-button-wrapper">
-            <input class="search-radio-box search-radiobutton-cat" type="radio" id="search-radiobutton-cat" name="search-radiobutton" value="category"/>
-            <label for="search-radiobutton-cat" class="s-radio-btn-1"><?= get_queried_object()->name ?></label>
+            <input class="searchRadioBox searchRadioCat" type="radio" id="search-radiobutton-cat" name="search-radiobutton" value="category" checked />
+            <label for="search-radiobutton-cat" class="radioBtn1"><?= get_queried_object()->name ?></label>
         </div>
         <div class="gf-search-radio-button-wrapper">
-            <input class="search-radio-box search-radiobutton-main" type="radio" id="search-radiobutton-main" name="search-radiobutton" value="shop"/>
-            <label for="search-radiobutton-main" class="s-radio-btn-2">Pretraga celog sajta</label>
+            <input class="searchRadioBox searchRadioMain" type="radio" id="search-radiobutton-main" name="search-radiobutton" value="shop"/>
+            <label for="search-radiobutton-main" class="radioBtn2">Pretraga celog sajta</label>
         </div>
     <?php endif ;?>
 </div>
 <?php
 }
 
-
+//good
 add_shortcode('gf-best-selling-products', 'gf_display_best_selling_products');
 function gf_display_best_selling_products(){
     include_once(WC()->plugin_path().'/includes/admin/reports/class-wc-admin-report.php');
     $wc_report = new WC_Admin_Report();
-//    $wc_report->start_date = strtotime('20/10/2018');
 
-//    $filter_range = true;
     $data = $wc_report->get_order_report_data( array(
         'data' => array(
             '_qty' => array(
@@ -220,11 +228,9 @@ function gf_display_best_selling_products(){
     ) );
 
     $ids = [];
-    foreach ($data as $datum):
+    foreach ($data as $datum){
         $ids[] = $datum->product_id;
-//        $product = wc_get_product($datum->product_id);
-//        require(__DIR__ . "/../woocommerce/content-product.php");
-    endforeach;
+    }
 
     $args = array(
         'post_type' => 'product',
@@ -239,11 +245,6 @@ function gf_display_best_selling_products(){
         'suppress_filters' => true,
         'no_found_rows' => true
     );
-
-//    echo WC_Shortcodes::best_selling_products([
-//        'limit'        => '3',
-//        'columns'      => '1'
-//    ]);
 
 $query = new WP_Query($args);
 echo '<h2>Najprodavaniji proizvodi</h2>';

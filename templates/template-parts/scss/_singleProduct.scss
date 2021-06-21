@@ -1,0 +1,29 @@
+.siteContent {
+  display: flex;
+  width: 76%;
+  margin-left: 12%;
+
+  @include largePhonesAndBelow {
+    width: 100%;
+    margin: 0;
+  }
+
+  .nssSingleWrapper {
+    display: flex;
+    width: 100%;
+
+    .nssContentWrapper {
+      width: 75%;
+      padding: 25px 0 25px 25px;
+      @include largePhonesAndBelow {
+        width: 98%;
+        margin-left: 1%;
+        padding: 0;
+      }
+    }
+  }
+}
+/*category with filters 1-2 test test*/
+.content-area {
+  width: 100%;
+}

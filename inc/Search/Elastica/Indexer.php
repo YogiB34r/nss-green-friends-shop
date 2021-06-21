@@ -179,7 +179,7 @@ LIMIT {$offset}, {$perPage};";
             'thumbnail' => $thumbnail,
             'permalink' => $product_link,
             'shortDescription' => $product->get_short_description(),
-            'regularPrice' => $regularPrice,
+            'regularPrice' => (int) $regularPrice,
             'salePrice' => $salePrice,
             'salePriceStart' => get_post_meta($product->get_id(), '_sale_price_dates_from', true),
             'salePriceEnd' => get_post_meta($product->get_id(), '_sale_price_dates_to', true),

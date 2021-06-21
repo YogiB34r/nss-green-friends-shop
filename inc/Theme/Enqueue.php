@@ -32,36 +32,46 @@ class Enqueue
     public function addStyles()
     {
         wp_enqueue_style('font-awesome', 'https://use.fontawesome.com/releases/v5.1.1/css/all.css');
-        wp_enqueue_style('bootstrap 4.1', 'https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css');
-// loads anyway
-//        wp_enqueue_style('woocommerce-layout');
-//        wp_enqueue_style('woocommerce-general');
 
         wp_enqueue_style('gf-style-reset', get_stylesheet_directory_uri() . '/assets/css/reset.css');
-        wp_enqueue_style('gf-style', get_stylesheet_directory_uri() . '/style.css', ['woocommerce-layout'], '7e853');
+        //wp_enqueue_style('gf-style', get_stylesheet_directory_uri() . '/style.css', ['woocommerce-layout'], '7e853');
+        wp_enqueue_style('gf-style-index', get_stylesheet_directory_uri() . '/main.css');
+        //wp_enqueue_style('gf-style-index', get_stylesheet_directory_uri() . '/assets/css/main.min.css');
         wp_enqueue_style( 'grid-list-layout', plugins_url( '/woocommerce-grid-list-toggle/assets/css/style.css'));
         wp_enqueue_style( 'grid-list-button', plugins_url( '/woocommerce-grid-list-toggle/assets/css/button.css'));
     }
 
     public function addScripts()
     {
-        wp_enqueue_script('jquery', '', [], false, true);
-        wp_enqueue_script('swiper-js', 'https://unpkg.com/swiper/swiper-bundle.min.js', array(), '1.0.5', true);
-        wp_enqueue_script('bootstrap-js', 'https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js', array(), '', 'true');
-        wp_enqueue_script('bootstrap-popper', 'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js', array(), '', 'true');
-        wp_enqueue_script('clamp', get_stylesheet_directory_uri() . '/assets/js/3rd-party/clamp.min.js');
-        wp_enqueue_script('cookie', get_stylesheet_directory_uri() . '/assets/js/jquery.cookie.js');
-        wp_enqueue_script('flexslider', plugins_url() . '/woocommerce/assets/js/flexslider/jquery.flexslider.min.js');
-        wp_enqueue_script('zoom', plugins_url() . '/woocommerce/assets/js/zoom/jquery.zoom.min.js');
-        wp_enqueue_script('photoswipe', plugins_url() . '/woocommerce/assets/js/photoswipe/jquery.photoswipe.min.js');
-        wp_enqueue_script('photoswipe-ui-default', plugins_url() . '/woocommerce/assets/js/photoswipe/jquery.photoswipe-ui-default.min.js');
-        wp_enqueue_script('wc-single-product', plugins_url() . '/woocommerce/assets/js/frontend/single-product.min.js', ['photoswipe']);
+        //swiper-js is vanilla js library for sliders
+        wp_enqueue_script('swiper-js', 'https://unpkg.com/swiper/swiper-bundle.min.js', array(), '', true);
 
-        wp_enqueue_script('grid-list-scripts', plugins_url( '/woocommerce-grid-list-toggle/assets/js/jquery.gridlistview.min.js'), ['jquery-ui-tabs']);
-        wp_enqueue_script('gf-front-js', get_stylesheet_directory_uri() . '/assets/js/gf-front.js', [], '1.0.5', true);
+        //enqueue final js script based on device
+        if(wp_is_mobile()){
+            wp_enqueue_script('nss-mobile-js', get_stylesheet_directory_uri().'/assets/js/nssMobile.js', array(), '', true);
+            wp_localize_script( 'nss-mobile-js', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php')));
+            wp_localize_script('nss-mobile-js', 'mobileMegaMenu', array('html'=>gf_category_mobile_toggle_shortcode()));
+        }
+        else{
+            wp_enqueue_script('nss-desktop-js', get_stylesheet_directory_uri() . '/assets/js/nssDesktop.js', [], '', true);
+            wp_localize_script( 'nss-desktop-js', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php')));
+        }
 
-        //required in order for ajax to work !?
-        wp_localize_script( 'gf-front-js', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php')));
+        
+    /**
+        //@TODO proveri dal je ovde nesto potrebno 
+
+        //wp_enqueue_script('jquery', '', [], false, true);
+        //wp_enqueue_script('bootstrap-js', 'https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js', array(), '', 'true');
+        //wp_enqueue_script('bootstrap-popper', 'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js', array(), '', 'true');
+        //wp_enqueue_script('clamp', get_stylesheet_directory_uri() . '/assets/js/3rd-party/_clamp.min.js');
+
+        //wp_enqueue_script('flexslider', plugins_url() . '/woocommerce/assets/js/flexslider/jquery.flexslider.min.js');
+        //wp_enqueue_script('zoom', plugins_url() . '/woocommerce/assets/js/zoom/jquery.zoom.min.js');
+        //wp_enqueue_script('photoswipe', plugins_url() . '/woocommerce/assets/js/photoswipe/jquery.photoswipe.min.js');
+        //wp_enqueue_script('photoswipe-ui-default', plugins_url() . '/woocommerce/assets/js/photoswipe/jquery.photoswipe-ui-default.min.js');
+        //wp_enqueue_script('wc-single-product', plugins_url() . '/woocommerce/assets/js/frontend/single-product.min.js', ['photoswipe']);
+    **/
     }
 
     public function addAdminStyles ()

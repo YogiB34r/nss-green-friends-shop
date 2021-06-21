@@ -44,7 +44,6 @@ class WooFunctions
         return 'din.';
     }
 
-
     public function wooc_validate_custom_field($args, $user)
     {
         $user_id = $user->ID;
@@ -97,14 +96,12 @@ class WooFunctions
         echo '</div>';
     }
 
-
     public function gf_remove_my_account_links($menu_links)
     {
         unset($menu_links['dashboard']); // Addresses
 
         return $menu_links;
     }
-
 
     public function wc_customize_product_sorting($sorting_options)
     {
@@ -130,7 +127,6 @@ class WooFunctions
     /**
      * Checks if disable cod is active for product
      */
-
     public function restrictCod($available_gateways)
     {
         // Not in backend (admin)

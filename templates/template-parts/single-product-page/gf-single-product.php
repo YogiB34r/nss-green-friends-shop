@@ -8,36 +8,37 @@ if (!is_object($product)) $product = wc_get_product(get_the_ID());
 $sexyShopCats = \Gf\Util\CategoryFunctions::gf_get_category_children_ids('sexy-shop');
 $product_cats = wc_get_product(get_queried_object_id())->get_category_ids();
 $result = false;
-foreach ($product_cats as $product_cat){
-    if (in_array($product_cat,$sexyShopCats)){
+foreach ($product_cats as $product_cat) {
+    if (in_array($product_cat, $sexyShopCats)) {
         $result = true;
         break;
     }
 }
-    if ($result && !in_array('nss-sex-shop-agreement', $_COOKIE)): ?>
-        <script type="text/javascript">
-            if (confirm('Da bi ste videli sadržaj ovog odeljka morate se složiti sa uslovima i prihvatiti da imate preko 18 godina.')
-                == true) {
-                var expiryDate = new Date();
-                expiryDate.setMonth(expiryDate.getMonth() + 6);
-                document.cookie = 'name = nss-sex-shop-agreement; path=/; expires =' + expiryDate;
-                document.getElementsByTagName("BODY")[0].style.display = "block";
-            } else {
-                document.location.href = "/";
-            }
-        </script>
-    <?php endif;?>
-<div class="row">
-    <div class="col-3 list-unstyled gf-sidebar">
-      <div class="gf-left-sidebar-wrapper">
-        <div class="gf-wrapper-before">
-          <div class="gf-category-sidebar-toggle">Kategorije</div>
-          <span class="fas fa-angle-up"></span>
+if ($result && !in_array('nss-sex-shop-agreement', $_COOKIE)): ?>
+    <script type="text/javascript">
+        if (confirm('Da bi ste videli sadržaj ovog odeljka morate se složiti sa uslovima i prihvatiti da imate preko 18 godina.')
+            == true) {
+            var expiryDate = new Date();
+            expiryDate.setMonth(expiryDate.getMonth() + 6);
+            document.cookie = 'name = nss-sex-shop-agreement; path=/; expires =' + expiryDate;
+            document.getElementsByTagName("BODY")[0].style.display = "block";
+        } else {
+            document.location.href = "/";
+        }
+    </script>
+<?php endif; ?>
+<div class="nssSingleWrapper">
+    <?php
+    if (!wp_is_mobile()):?>
+        <div class="nssSidebar">
+            <div id="accordionHead" class="nssAccordionHead">
+                <div class="nssAccordionTitle">Kategorije</div>
+                <span class="fas fa-angle-up"> </span>
+            </div>
+            <?php dynamic_sidebar('gf-sidebar-single-productpage'); ?>
         </div>
-        <?php dynamic_sidebar('gf-sidebar-single-productpage')?>
-      </div>
-    </div>
-    <div class="gf-content-wrapper col-md-9 col-sm-12">
+    <?php endif; ?>
+    <div class="nssContentWrapper">
         <?php
         /**
          * The template for displaying product content in the single-product.php template
@@ -55,15 +56,15 @@ foreach ($product_cats as $product_cat){
          * @version 3.4.0
          */
 
-        defined( 'ABSPATH' ) || exit;
+        defined('ABSPATH') || exit;
         /**
          * Hook: woocommerce_before_single_product.
          *
          * @hooked wc_print_notices - 10
          */
-        do_action( 'woocommerce_before_single_product' );
+        do_action('woocommerce_before_single_product');
 
-        if ( post_password_required() ) {
+        if (post_password_required()) {
             echo get_the_password_form(); // WPCS: XSS ok.
             return;
         }
@@ -78,7 +79,7 @@ foreach ($product_cats as $product_cat){
              * @hooked woocommerce_show_product_sale_flash - 10
              * @hooked woocommerce_show_product_images - 20
              */
-            do_action( 'woocommerce_before_single_product_summary' );
+            do_action('woocommerce_before_single_product_summary');
             ?>
 
             <div class="summary entry-summary">
@@ -95,7 +96,7 @@ foreach ($product_cats as $product_cat){
                  * @hooked woocommerce_template_single_sharing - 50
                  * @hooked WC_Structured_Data::generate_product_data() - 60
                  */
-                do_action( 'woocommerce_single_product_summary' );
+                do_action('woocommerce_single_product_summary');
                 ?>
             </div>
 
@@ -107,10 +108,10 @@ foreach ($product_cats as $product_cat){
              * @hooked woocommerce_upsell_display - 15
              * @hooked woocommerce_output_related_products - 20
              */
-            do_action( 'woocommerce_after_single_product_summary' );
+            do_action('woocommerce_after_single_product_summary');
             ?>
         </div>
 
-        <?php do_action( 'woocommerce_after_single_product' ); ?>
+        <?php do_action('woocommerce_after_single_product'); ?>
     </div>
 </div>

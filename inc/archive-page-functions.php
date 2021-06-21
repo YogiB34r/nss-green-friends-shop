@@ -25,10 +25,9 @@ function gf_check_if_slug_is_in_url_and_product_count()
 }
 
 //@TODO not used remove
-//@TODO fix typo here !!
 function gf_check_for_second_level_categories() {
     global $wp;
-    $resault = '';
+    $result = '';
     $request_path = explode('/', $wp->request);
     $slugArray = [];
     $cat_args = array(
@@ -50,14 +49,13 @@ function gf_check_for_second_level_categories() {
     foreach ($slugArray as $slug) {
         $category = get_term_by('slug', $slug, 'product_cat');
         if (in_array($slug, $request_path) && $category->count > 1) {
-            $resault = true;
+            $result = true;
             break;
         }
-        $resault = false;
+        $result = false;
     }
-    return $resault;
+    return $result;
 }
-
 
 add_action('woocommerce_archive_description', 'gf_display_categories_on_archive_page', 15);
 function gf_display_categories_on_archive_page() {
@@ -75,9 +73,6 @@ remove_action('woocommerce_after_shop_loop', 'woocommerce_pagination', 10);
 
 add_action('woocommerce_before_shop_loop', 'woocommerce_result_count', 20);
 add_action('woocommerce_before_shop_loop', 'woocommerce_catalog_ordering', 26);
-//add_action('woocommerce_after_shop_loop', 'woocommerce_catalog_ordering', 26);
-//add_action('woocommerce_before_shop_loop', 'woocommerce_pagination', 27);
-//add_action('woocommerce_after_shop_loop', 'woocommerce_pagination', 27);
 
 function woocommerce_result_count() {
     if (!wc_get_loop_prop('is_paginated')) {
@@ -87,9 +82,12 @@ function woocommerce_result_count() {
     $total = wc_get_loop_prop('total');
     $per_page = wc_get_loop_prop('per_page');
     $current = wc_get_loop_prop('current_page');
+
+    //zar nije lepsa formula per_page*(current-1) + 1?
     $first = ($per_page * $current) - $per_page + 1;
+    
     $last = min($total, $per_page * $current);
-    // @TODO solve this properly :)
+    // @TODO solve this properly :) Ne razumem
     if ($last === 0) {
         $first = 0;
     }
@@ -100,7 +98,6 @@ function woocommerce_result_count() {
 
     echo sprintf($tpl, $first, $last, $total);
 }
-
 
 remove_action('woocommerce_archive_description', 'woocommerce_taxonomy_archive_description');
 remove_action('woocommerce_archive_description', 'woocommerce_product_archive_description');

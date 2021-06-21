@@ -1,57 +1,7 @@
 </div>
 <!-- gf main content container -->
-</div>
-<!-- .col-full -->
-</div>
-<!-- #content -->
-<footer id="colophon" class="site-footer" role="contentinfo">
-    <div class="container-fluid">
-        <div class="gf-main-content-container">
-            <div class="row list-unstyled gf-footer justify-content-end">
-                <div class="col-xs-12 col-md-3 gf-footer-section gf-footer-newsletter">
-                    <?php dynamic_sidebar('gf-footer-row-1-column-1'); ?>
-                </div>
-                <div class="col-xs-12 col-md-9 gf-footer-section ">
-                    <div class="row gf-footer-links-wrapper padding-left-45">
-                        <a class="mr-3 mt-2" href="/o-kompaniji/">O kompaniji</a>
-                        <a class="mr-3 mt-2" href="/kontaktirajte-nas/">Kontaktirajte nas</a>
-
-                            <?php if (is_user_logged_in()) {
-                                echo '<a class="mr-3 mt-2" href="/moj-nalog/narudzbine/">Praćenje narudžbenice</a>';
-                            } else {
-                                '<a class="mr-3 mt-2" href="/pracenje-narudzbenice/">Praćenje narudžbenice</a>';
-                            }
-                            ?>
-
-
-                        <a class="mr-3 mt-2" href="/podrska/">Podrška</a>
-                        <a class="mr-3 mt-2" href="/uslovi-kupovine/">Uslovi kupovine</a>
-                        <a class="mr-3 mt-2" href="/politika-privatnosti-2/">Politika privatnosti</a>
-
-                        </div>
-                        <div class="row mt-4 gf-footer-card-images-wrapper padding-left-45">
-                            <div class="">
-                                <div class="gffooter-card-3"></div>
-                                <div class="gffooter-card-4"></div>
-                                <div class="gffooter-card-5"></div>
-                                <div class="gffooter-card-6"></div>
-                            </div>
-                            <div class="">
-                                <a rel="nofollow" href="https://www.visa.ca/en_CA/run-your-business/merchant-resources/verified-by-visa.html">
-                                    <div class="gffooter-card-1"></div>
-                                </a>
-                                <a rel="nofollow" href="https://www.mastercard.us/en-us/merchants/safety-security/securecode.html">
-                                    <div class="gffooter-card-2"></div>
-                                </a>
-                                <a rel="nofollow" href="http://www.bancaintesa.rs/pocetna.1.html">
-                                    <div class="gffooter-card-7"></div>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<footer id="colophon" class="nssFooter" role="contentinfo">
+    <?php gfGetTemplate('footer'); ?>
 </footer>
 <!-- #colophon -->
 </div>
@@ -77,6 +27,22 @@
 
 <!--Twitter share-->
 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<script>
+    const cartForm = document.getElementById('wcCartForm');
+    const mutObserver = new MutationObserver(function callback(mutationsList, mutObserver) {
+        mutationsList.forEach(mutation => {
+            if (mutation.attributeName === 'class') {
+                ajaxRefreshCartCount();
+            }
+        });
+    });
+    if (cartForm !== null) {
+        mutObserver.observe(
+            cartForm,
+            {attributes: true}
+        );
+    }
+</script>
 </body>
 </html>
 

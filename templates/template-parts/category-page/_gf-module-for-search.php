@@ -11,7 +11,7 @@ if (count($categories) != 0) {
         $html .= '</div>';
     }
 
-    $html .= '<div class="gf-category-expander__footer"></div>';
+    $html .= '<div id="nssCatExpander" class="gf-category-expander__footer"></div>';
     $html .= '</div>';
 
     echo $html;
