@@ -34,9 +34,8 @@ class Enqueue
         wp_enqueue_style('font-awesome', 'https://use.fontawesome.com/releases/v5.1.1/css/all.css');
 
         wp_enqueue_style('gf-style-reset', get_stylesheet_directory_uri() . '/assets/css/reset.css');
-        //wp_enqueue_style('gf-style', get_stylesheet_directory_uri() . '/style.css', ['woocommerce-layout'], '7e853');
         wp_enqueue_style('gf-style-index', get_stylesheet_directory_uri() . '/main.css');
-        //wp_enqueue_style('gf-style-index', get_stylesheet_directory_uri() . '/assets/css/main.min.css');
+        wp_enqueue_style('gf-style-index', get_stylesheet_directory_uri() . '/assets/css/main.min.css');
         wp_enqueue_style( 'grid-list-layout', plugins_url( '/woocommerce-grid-list-toggle/assets/css/style.css'));
         wp_enqueue_style( 'grid-list-button', plugins_url( '/woocommerce-grid-list-toggle/assets/css/button.css'));
     }
