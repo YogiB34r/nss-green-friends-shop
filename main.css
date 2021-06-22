@@ -1917,6 +1917,32 @@ button[name='update_cart'] {
 .swiper-container-android .swiper-slide, .swiper-wrapper {
   transform: translate3d(0px, 0, 0); }
 
+.gf-product-slider .headerContainer {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px; }
+  .gf-product-slider .headerContainer > h3 {
+    font-size: 1.75rem; }
+    .gf-product-slider .headerContainer > h3 > a {
+      color: #666;
+      transition: 0.2s all;
+      font-weight: 600; }
+      .gf-product-slider .headerContainer > h3 > a:hover {
+        color: #f45411;
+        text-decoration: none; }
+  .gf-product-slider .headerContainer .gf-product-slider__header__controls {
+    padding-bottom: 10px;
+    width: auto; }
+    .gf-product-slider .headerContainer .gf-product-slider__header__controls .product-slider__control-prev-icon {
+      padding-right: 10px;
+      padding-left: 14px;
+      margin-right: 10px; }
+    .gf-product-slider .headerContainer .gf-product-slider__header__controls .product-slider__control-next-icon {
+      padding-right: 10px; }
+.gf-product-slider .swiper-container .swiper-slide a img {
+  width: 150px;
+  height: auto; }
+
 @media only screen and (max-width: 768px) {
   .gf-search-form--mobile {
     display: none; }
@@ -2344,44 +2370,100 @@ button[name='update_cart'] {
       .nssFooter .nssFooterContainer .nssFooterSectionNav .nssBancaIntesa {
         margin-bottom: 20px; } }
 
-@media only screen and (min-width: 768px) and (max-width: 1024px) {
+@media only screen and (max-width: 1024px) {
   .nssFooter .nssFooterContainer {
     width: 90%;
     margin: 0 auto;
-    padding-top: 20px;
-    display: flex;
-    justify-content: space-around; }
-    .nssFooter .nssFooterContainer .nssFooterSectionWidget {
-      width: 25%; }
-    .nssFooter .nssFooterContainer .nssFooterSectionNav {
-      width: 70%;
-      justify-content: flex-end; }
-      .nssFooter .nssFooterContainer .nssFooterSectionNav .footerMenu li {
-        display: inline-block;
-        margin: 8px 16px 8px 0; }
-      .nssFooter .nssFooterContainer .nssFooterSectionNav .nssFooterCardsWrapper {
-        margin-top: 1.5rem; }
+    padding-top: 20px; }
+    .nssFooter .nssFooterContainer .nssFooterSectionNav .footerMenu li {
+      display: inline-block;
+      margin: 8px 16px 8px 0; }
+    .nssFooter .nssFooterContainer .nssFooterSectionNav .nssFooterCardsWrapper {
+      justify-content: center;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 1.5rem; }
     .nssFooter .nssFooterContainer .marginLeft {
       margin-left: 27%; } }
 
-@media only screen and (min-width: 1025px) and (max-width: 1365px) {
-  .nssFooter .nssFooterContainer {
-    width: 90%;
-    margin: 0 auto;
-    padding-top: 20px;
+/* Newsletter global (in common) start */
+.newsletterInput {
+  border: none;
+  border-bottom: 1px solid gray; }
+
+.newsletterInput:focus {
+  outline: none; }
+
+.newsletterSubmit {
+  background: #f45411;
+  color: white;
+  outline: 0;
+  border: none;
+  border-radius: 10px;
+  padding: 2px 7px; }
+
+.newsletterSubmit {
+  cursor: pointer; }
+
+/* Newsletter global (in common) end */
+/* Newsletter on other pages (not homepage) start */
+.nssFooter .newsLetterWidgetContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center; }
+
+.nssFooter .newsLetterWidgetContainer h3 {
+  font-size: 1.5em; }
+
+.nssFooter .newsLetterWidgetContainer .newsletterForm {
+  border: 3px solid #f45411;
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+  padding: 7px;
+  border-radius: 10px; }
+
+/* Newsletter on other pages (not homepage) end */
+/* Newsletter on homepage start */
+.home .newsLetterWidgetContainer {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 15px;
+  width: 100%;
+  border: 3px solid #f45411;
+  border-radius: 10px; }
+  @media only screen and (max-width: 1919px) {
+    .home .newsLetterWidgetContainer {
+      flex-direction: column;
+      width: 90%; } }
+
+.home .newsletterInput {
+  font-size: 1.4em; }
+
+.home .newsletterSubmit {
+  font-size: 1.4em;
+  padding: 5px 15px; }
+
+@media only screen and (max-width: 1200px) {
+  .home .newsLetterWidgetContainer {
+    flex-direction: column; } }
+@media only screen and (max-width: 1365px) and (min-width: 768px) {
+  .nssFooterContainer {
+    flex-direction: column;
+    align-items: center; } }
+@media only screen and (max-width: 476px) {
+  .home .newsletterForm {
     display: flex;
-    justify-content: space-around; }
-    .nssFooter .nssFooterContainer .nssFooterSectionWidget {
-      width: 25%; }
-    .nssFooter .nssFooterContainer .nssFooterSectionNav {
-      width: 70%;
-      justify-content: flex-end; }
-      .nssFooter .nssFooterContainer .nssFooterSectionNav .footerMenu li {
-        display: inline-block;
-        margin: 8px 16px 8px 0; }
-      .nssFooter .nssFooterContainer .nssFooterSectionNav .nssFooterCardsWrapper {
-        margin-top: 1.5rem; }
-    .nssFooter .nssFooterContainer .marginLeft {
-      margin-left: 27%; } }
+    flex-direction: column; }
+
+  .home .newsletterSubmit {
+    margin-top: 15px; } }
+@media only screen and (max-width: 476px) {
+  .newsLetterWidgetContainer h2 {
+    font-size: 1.2em;
+    margin-bottom: 10px; } }
+/* Newsletter on homepage end */
 
 /*# sourceMappingURL=main.css.map */

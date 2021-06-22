@@ -72,6 +72,7 @@ if (desktopMenu !== null) {
     height += mainCategory.getBoundingClientRect().height;
   }
 }
+
 //slider for desktop megamenu
 if (accordionHead != null) {
   accordionHead.onclick = function () {
@@ -216,33 +217,36 @@ function getCookie(name) {
 
 //product slider
 const swiper = new Swiper(".swiper-container", {
-  slidesPerView: 2,
+  slidesPerView: 4,
+  slidesPerGroup: 2,
   spaceBetween: 0,
-  loop: true,
-  arrows: false,
+  loop: !0,
+  arrows: !1,
   breakpoints: {
     320: {
       slidesPerView: 2,
-      spaceBetween: 0,
+      spaceBetween: 0
     },
     640: {
       slidesPerView: 2,
-      spaceBetween: 5,
+      spaceBetween: 5
     },
     1023: {
       slidesPerView: 2,
-      spaceBetween: 5,
+      spaceBetween: 5
     },
     1024: {
       slidesPerView: 3,
-      spaceBetween: 10,
+      slidesPerGroup: 3,
+      spaceBetween: 10
     },
     1376: {
       slidesPerView: 4,
-      spaceBetween: 15,
-    },
-  },
-});
+      slidesPerGroup: 4,
+      spaceBetween: 15
+    }
+  }
+})
 
 const prevButtons = document.getElementsByClassName(
   "product-slider__control-prev"

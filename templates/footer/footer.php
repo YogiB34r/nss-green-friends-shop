@@ -4,7 +4,7 @@ $currentPageID = get_queried_object_id();
 $mobile = wp_is_mobile();
 ?>
 <div class="nssFooterContainer">
-    <?php if($mobile || $currentPageID != $frontPageID) :?>
+    <?php if($currentPageID !== $frontPageID) :?>
     <div class="nssFooterSectionWidget">
         <?php dynamic_sidebar('gf-footer-row-1-column-1'); ?>
     </div>

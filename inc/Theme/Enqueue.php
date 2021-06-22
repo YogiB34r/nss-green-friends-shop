@@ -35,7 +35,7 @@ class Enqueue
 
         wp_enqueue_style('gf-style-reset', get_stylesheet_directory_uri() . '/assets/css/reset.css');
         wp_enqueue_style('gf-style-index', get_stylesheet_directory_uri() . '/main.css');
-        wp_enqueue_style('gf-style-index', get_stylesheet_directory_uri() . '/assets/css/main.min.css');
+//        wp_enqueue_style('gf-style-index', get_stylesheet_directory_uri() . '/assets/css/main.min.css');
         wp_enqueue_style( 'grid-list-layout', plugins_url( '/woocommerce-grid-list-toggle/assets/css/style.css'));
         wp_enqueue_style( 'grid-list-button', plugins_url( '/woocommerce-grid-list-toggle/assets/css/button.css'));
     }

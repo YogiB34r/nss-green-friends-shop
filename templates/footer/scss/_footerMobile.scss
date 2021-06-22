@@ -29,18 +29,11 @@
 
 .nssFooter {
   .nssFooterContainer {
-    @include tabletsPortraitLargePhonesLandscape {
+    @media only screen and(max-width:1024px) {
       width: 90%;
       margin: 0 auto;
       padding-top: 20px;
-      display: flex;
-      justify-content: space-around;
-      .nssFooterSectionWidget{
-        width: 25%;
-      }
       .nssFooterSectionNav {
-        width:70%;
-        justify-content: flex-end;
         .footerMenu {
           li {
             display: inline-block;
@@ -49,39 +42,10 @@
           }
         }
         .nssFooterCardsWrapper {
-          margin-top: 1.5rem;
-        }
-
-      }
-      .marginLeft{
-        margin-left: 27%;
-      }
-    }
-  }
-}
-
-.nssFooter {
-  .nssFooterContainer {
-    @include tabletsLandscapeAndOldDesktops {
-      width: 90%;
-      margin: 0 auto;
-      padding-top: 20px;
-      display: flex;
-      justify-content: space-around;
-      .nssFooterSectionWidget{
-        width: 25%;
-      }
-      .nssFooterSectionNav {
-        width:70%;
-        justify-content: flex-end;
-        .footerMenu {
-          li {
-            display: inline-block;
-            margin: 8px 16px 8px 0;
-
-          }
-        }
-        .nssFooterCardsWrapper {
+          justify-content: center;
+          display:flex;
+          flex-wrap:wrap;
+          gap:5px;
           margin-top: 1.5rem;
         }
 
