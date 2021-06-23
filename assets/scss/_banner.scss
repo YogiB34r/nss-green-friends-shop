@@ -23,7 +23,7 @@
 
 .buttons {
   position: absolute;
-  bottom: 0;
+  bottom: 10px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -31,8 +31,8 @@
   justify-content: center;
 
   div {
-    height: 8px;
-    width: 10%;
+    height: 4px;
+    width: 4%;
     background: rgba(255, 255, 255, 0.6);
     border: 2px solid rgba(255, 69, 0, 0.6);
     margin: 0 5px;
