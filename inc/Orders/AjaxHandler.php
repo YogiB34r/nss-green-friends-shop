@@ -43,11 +43,37 @@ class AjaxHandler
             case 'getPagesTotals':
                 $this->getPagesTotals();
                 break;
+            case 'orderPreview':
+                $this->orderPreview();
+                break;
             default:
                 $this->getOrders();
         }
     }
-
+    private function orderPreview()
+    {
+        $order = wc_get_order($_POST['orderId']);
+        $editUrl = get_edit_post_link($order->get_id());
+        $title = $this->orderPage->formatOrderName($order);
+        $status = $this->getStatusMarkup($order->get_status(),[]);
+        $shippingMethod = $order->get_shipping_method();
+        $paymentMethod = $order->get_payment_method_title();
+        $billingName = "{$order->get_billing_first_name()} {$order->get_billing_last_name()}";
+        $billingAddress = $order->get_billing_address_1();
+        $billingCity = $order->get_billing_city();
+        $billingPostCode = $order->get_billing_postcode();
+        $shippingName = "{$order->get_shipping_first_name()} {$order->get_shipping_last_name()}";
+        $shippingAddress = $order->get_shipping_address_1();
+        $shippingCity = $order->get_shipping_city();
+        $shippingPostCode = $order->get_shipping_postcode();
+        $email = $order->get_billing_email();
+        $phone = $order->get_billing_phone();
+        $products = $order->get_items();
+        ob_start();
+        include __DIR__.'/templates/orderPreview.php';
+        $template = ob_get_clean();
+        wp_send_json(["html" => $template]);
+    }
     private function moveToTrash($orderIds)
     {
         foreach ($orderIds as $orderId) {
@@ -414,6 +440,7 @@ class AjaxHandler
         return sprintf('<span title="%s" class="tableStatus" style=" font-weight:bold;background-color: %s;color: %s">%s%s</span>',
             $note, $backgroundColor, $color, $title, $dashicon);
     }
+
 
     private function changeCreatedViaTitle($createdVia)
     {

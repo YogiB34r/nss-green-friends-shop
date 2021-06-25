@@ -29,6 +29,8 @@ var table = jQuery('#orderTable').DataTable({
         {
             data: "orderTitle",
             name: "orderTitle",
+            className: 'orderTitleWrapper',
+            width:"20%",
             orderable:false,
         },
 
@@ -69,6 +71,7 @@ var table = jQuery('#orderTable').DataTable({
         },
         {
             data: "status",
+            width:"13%",
             name: "status",
             orderable:false,
         },
@@ -234,4 +237,21 @@ jQuery('#marketplaceOrder').on('change', function (e){
     if (e.target.value === '-1') {
         jQuery('#vendorSelect').css('display','none');
     }
+})
+
+jQuery(document).ready(function (){
+    //preview button
+    setTimeout(function (){
+        jQuery('.previewButton').on('click', function (e){
+            jQuery.ajax({
+                url: gfData.ajaxUrl + '?action=gfOrdersTable&ajaxAction=orderPreview',
+                type: 'POST',
+                data: {
+                    orderId: e.target.getAttribute('data-orderId')
+                },
+            }).done(function (response) {
+                jQuery('body').append(response.html);
+            });
+        })
+    }, 500)
 })

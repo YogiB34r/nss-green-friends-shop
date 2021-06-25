@@ -179,3 +179,13 @@
 #vendorSelect {
     display: none;
 }
+.orderTitleWrapper {
+    position: relative;
+    text-align: left;
+}
+.orderTitleWrapper .dashicons {
+    position: absolute;
+    right: 10px;
+    color: #0073aa;
+    cursor:pointer;
+}
