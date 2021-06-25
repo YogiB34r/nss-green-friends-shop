@@ -7,8 +7,9 @@ let ajaxUrlWithFiltersForCount = baseAjaxUrlCount;
 var table = jQuery('#orderTable').DataTable({
     'processing': true,
     'serverSide': true,
-    'searching': false,
+    'searching': true,
     'pageLength': 25,
+    'searchDelay': 1,
     'lengthMenu': [ 10, 25, 50, 75, 100,250,500, 1000 ],
     'ajax': ajaxUrlWithFilters,
     'dataSrc': function (data) {
@@ -17,7 +18,7 @@ var table = jQuery('#orderTable').DataTable({
     "language": {
         "emptyTable": "Nije pronadjena nijedna narudžbina sa zadatim filterima"
     },
-    'dom': '<"top"flp<"clear">>rt<"bottom"ifp<"clear">>',
+    dom: 'lfriptrip',
     'columns': [
         {
             data:'orderId',
@@ -28,6 +29,8 @@ var table = jQuery('#orderTable').DataTable({
         {
             data: "orderTitle",
             name: "orderTitle",
+            className: 'orderTitleWrapper',
+            width:"20%",
             orderable:false,
         },
 
@@ -68,6 +71,7 @@ var table = jQuery('#orderTable').DataTable({
         },
         {
             data: "status",
+            width:"13%",
             name: "status",
             orderable:false,
         },
@@ -233,4 +237,21 @@ jQuery('#marketplaceOrder').on('change', function (e){
     if (e.target.value === '-1') {
         jQuery('#vendorSelect').css('display','none');
     }
+})
+
+jQuery(document).ready(function (){
+    //preview button
+    setTimeout(function (){
+        jQuery('.previewButton').on('click', function (e){
+            jQuery.ajax({
+                url: gfData.ajaxUrl + '?action=gfOrdersTable&ajaxAction=orderPreview',
+                type: 'POST',
+                data: {
+                    orderId: e.target.getAttribute('data-orderId')
+                },
+            }).done(function (response) {
+                jQuery('body').append(response.html);
+            });
+        })
+    }, 500)
 })

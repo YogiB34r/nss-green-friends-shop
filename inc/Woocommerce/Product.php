@@ -52,7 +52,6 @@ class Product
             update_post_meta($id, 'ignoreFeedPriceUpdate', 'no');
         }
     }
-
 }
 
 $product = new Product();

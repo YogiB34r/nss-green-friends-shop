@@ -3,7 +3,8 @@
 
 namespace GF\Orders;
 
-use GF\Marketplace\Marketplace;
+use Automattic\WooCommerce\Admin\Overrides\Order as AdminOverride;
+use Automattic\WooCommerce\Admin\Overrides\OrderRefund;
 use ZipArchive;
 
 class AjaxHandler
@@ -42,11 +43,37 @@ class AjaxHandler
             case 'getPagesTotals':
                 $this->getPagesTotals();
                 break;
+            case 'orderPreview':
+                $this->orderPreview();
+                break;
             default:
                 $this->getOrders();
         }
     }
-
+    private function orderPreview()
+    {
+        $order = wc_get_order($_POST['orderId']);
+        $editUrl = get_edit_post_link($order->get_id());
+        $title = $this->orderPage->formatOrderName($order);
+        $status = $this->getStatusMarkup($order->get_status(),[]);
+        $shippingMethod = $order->get_shipping_method();
+        $paymentMethod = $order->get_payment_method_title();
+        $billingName = "{$order->get_billing_first_name()} {$order->get_billing_last_name()}";
+        $billingAddress = $order->get_billing_address_1();
+        $billingCity = $order->get_billing_city();
+        $billingPostCode = $order->get_billing_postcode();
+        $shippingName = "{$order->get_shipping_first_name()} {$order->get_shipping_last_name()}";
+        $shippingAddress = $order->get_shipping_address_1();
+        $shippingCity = $order->get_shipping_city();
+        $shippingPostCode = $order->get_shipping_postcode();
+        $email = $order->get_billing_email();
+        $phone = $order->get_billing_phone();
+        $products = $order->get_items();
+        ob_start();
+        include __DIR__.'/templates/orderPreview.php';
+        $template = ob_get_clean();
+        wp_send_json(["html" => $template]);
+    }
     private function moveToTrash($orderIds)
     {
         foreach ($orderIds as $orderId) {
@@ -150,7 +177,6 @@ class AjaxHandler
         }
         $searchValue = $_GET['search']['value'] ?? '';
         $mpOrders = $this->getMpOrders($vendorId);
-
         if ($searchValue === '') {
             $mpOrderIds = [];
             if ($marketplaceOrder !== '-1') {
@@ -186,12 +212,30 @@ class AjaxHandler
 
         } else {
             global $wpdb;
-            $countSql = "SELECT COUNT(ID) FROM wp_posts WHERE (ID LIKE '%{$searchValue}%' OR ID IN (SELECT post_id FROM wp_postmeta WHERE meta_key = '_customer_user' AND meta_value IN (SELECT ID FROM wp_users WHERE display_name LIKE '%{$searchValue}%'))) AND post_status NOT LIKE 'trash' AND post_status NOT LIKE 'auto-draft' LIMIT {$_GET['length']} OFFSET {$_GET['start']}";
+            if(!preg_match("/[a-z]/i", $searchValue)){
+                //Order id search
+                $sql = "SELECT * FROM wp_posts WHERE ID LIKE '{$searchValue}%' AND post_type = 'shop_order'";
+                $countSql = "SELECT COUNT(ID) FROM wp_posts WHERE ID LIKE '{$searchValue}%' AND post_type = 'shop_order'";
+            } else {
+                //Display name search
+                $sql = "SELECT * FROM wp_posts WHERE ID IN 
+                (SELECT post_id FROM wp_postmeta WHERE meta_key = '_customer_user' AND 
+                meta_value IN (SELECT ID FROM wp_users WHERE display_name LIKE '%{$searchValue}%'))";
+
+                $countSql = "SELECT COUNT(ID) FROM wp_posts WHERE ID IN 
+                (SELECT post_id FROM wp_postmeta WHERE meta_key = '_customer_user' AND 
+                meta_value IN (SELECT ID FROM wp_users WHERE display_name LIKE '%{$searchValue}%'))";
+            }
+
+            $sql .= " AND post_status NOT LIKE 'trash'
+             AND post_status NOT LIKE 'auto-draft' LIMIT {$_GET['length']} OFFSET {$_GET['start']}";
             $totalOrdersCount = $wpdb->get_results($countSql, ARRAY_N)[0][0];
-            $sql = "SELECT * FROM wp_posts WHERE (ID LIKE '%{$searchValue}%' OR ID IN (SELECT post_id FROM wp_postmeta WHERE meta_key = '_customer_user' AND meta_value IN (SELECT ID FROM wp_users WHERE display_name LIKE '%{$searchValue}%'))) AND post_status NOT LIKE 'trash' AND post_status NOT LIKE 'auto-draft' LIMIT {$_GET['length']} OFFSET {$_GET['start']}";
             $posts = $wpdb->get_results($sql);
+
             foreach ($posts as $post) {
-                $orders[] = wc_get_order($post->ID);
+                if ($post->post_type === 'shop_order'){
+                    $orders[] = wc_get_order($post->ID);
+                }
             }
             $pageOrdersTotal = 0;
             $pageShippingTotal = 0;
@@ -199,9 +243,7 @@ class AjaxHandler
         }
         $formattedOrders = [];
         foreach ($orders as $order) {
-            if (($order instanceof \Automattic\WooCommerce\Admin\Overrides\OrderRefund
-                    ||  $order instanceof \Automattic\WooCommerce\Admin\Overrides\Order)
-                &&  !$order instanceof \WC_Order) {
+            if (($order instanceof OrderRefund ||  $order instanceof AdminOverride) &&  !$order instanceof \WC_Order) {
                     continue;
             }
                     $pageOrdersSubtotal += $order->get_subtotal();
@@ -215,7 +257,7 @@ class AjaxHandler
                         'shippingMethod' => $order->get_shipping_method(),
                         'total' => $order->get_total().get_woocommerce_currency_symbol(),
                         'status' => $this->getStatusMarkup($order->get_status(), wc_get_order_notes(['order_id' => $order->get_id(),
-                            'customer_note' => 'false','added_by' => 'system'])),
+                        'customer_note' => 'false','added_by' => 'system'])),
                         'shippingTotal' => $order->get_shipping_total().get_woocommerce_currency_symbol(),
                         'itemsTotal' => $order->get_subtotal().get_woocommerce_currency_symbol(),
                         'orderId' => sprintf('<input class="individualCheckbox" type="checkbox" data-id="%s">',
@@ -399,6 +441,7 @@ class AjaxHandler
             $note, $backgroundColor, $color, $title, $dashicon);
     }
 
+
     private function changeCreatedViaTitle($createdVia)
     {
         switch ($createdVia){
@@ -441,7 +484,7 @@ class AjaxHandler
                         $filters2.= "AND `post_status` = '{$value}'";
                         break;
                     case 'date_created':
-                        list ($dateFrom, $dateTo) = explode('...', $value);
+                        [$dateFrom, $dateTo] = explode('...', $value);
                         $dt = new \DateTime();
                         $dt->setTimezone(new \DateTimeZone('Europe/Belgrade'));
                         $from = $dt::createFromFormat('m/d/Y', $dateFrom,$dt->getTimezone());
@@ -483,7 +526,7 @@ class AjaxHandler
                         $filters2.= "AND `post_status` = '{$value}'";
                         break;
                     case 'date_created':
-                        list ($dateFrom, $dateTo) = explode('...', $value);
+                        [$dateFrom, $dateTo] = explode('...', $value);
                         $dt = new \DateTime();
                         $dt->setTimezone(new \DateTimeZone('Europe/Belgrade'));
                         $from = $dt::createFromFormat('m/d/Y', $dateFrom,$dt->getTimezone());

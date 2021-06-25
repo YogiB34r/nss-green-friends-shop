@@ -50,7 +50,7 @@ class OrderAnalytics
         $orderTitle = sprintf('# %s - %d %s %s', $orderDate, $order->get_id(), $order->get_billing_first_name(),
             $order->get_billing_last_name());
         $editLink = admin_url() . '/post.php?post=' . $order->get_id() . '&action=edit';
-        return sprintf('<a target="_blank" href="%s">%s</a>', $editLink, $orderTitle);
+        return sprintf('<a target="_blank" href="%s">%s</a><span data-orderId="'.$order->get_id().'" class="previewButton dashicons dashicons-visibility"></span>', $editLink, $orderTitle);
     }
 
     public function enqueueStyles()
@@ -67,7 +67,7 @@ class OrderAnalytics
         wp_enqueue_script('datatables','https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js',
             ['jquery'],'1.0.0', true);
         wp_enqueue_script('orderTableJs', get_stylesheet_directory_uri().'/inc/Orders/assets/main.js',
-            ['jqueryUi', 'datatables', 'jquery'],'1.0.1',true);
+            ['jqueryUi', 'datatables', 'jquery'],'1.0.2',true);
         wp_localize_script('orderTableJs','gfData', ['ajaxUrl' => admin_url('admin-ajax.php')]);
     }
 
