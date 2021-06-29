@@ -12,10 +12,20 @@
         </button>
     </li>
 </ul>
+<div class="bulkActionsWrapper">
+    <select class="bulkActionsSelect" id="bulkActions">
+        <option value="-1">Grupne akcije</option>
+        <option name="soloInCartRemove" value="soloInCartRemove">Skloni sam u korpi</option>
+        <option name="disableCodRemove" value="disableCodRemove">Skloni onemogućeno plaćanje pouuzećem</option>
+        <option name="disableIgnorePriceUpdates" value="disableIgnorePriceUpdates">Skloni ignorisanje promene cene sa feed-a</option>
+    </select>
+    <button id="submitBulk">Primeni</button>
+</div>
 <div class="tableWrapper">
     <table id="productTable" class="stripe cell-border">
         <thead>
         <tr>
+            <th><input id="selectAll" name="selectAll" value="1" type="checkbox"></th>
             <th>Naziv</th>
             <th>Id proizvoda</th>
             <th>Sku</th>
@@ -37,6 +47,7 @@
             'processing': true,
             'serverSide': true,
             'searching': false,
+            "ordering": false,
             'ajax': '<?=admin_url('admin-ajax.php?action=gfGetProducts&metaField=soloInCart')?>',
             'pageLength': 25,
             'lengthMenu': [10, 25, 50, 75, 100, 250, 500, 1000],
@@ -47,8 +58,15 @@
                 'emptyTable': 'Nije pronadjen nijedan proizvod sa zadatim filterima',
                 'zeroRecords': 'Nije pronadjen nijedan proizvod'
             },
-            'dom': '<"top"flp<"clear">>rt<"bottom"ifp<"clear">>',
+            'dom': 'lfriptrip',
             'columns': [
+                {
+                    data: "id",
+                    name: "checkbox",
+                    orderable: false,
+                    width: '0.5%',
+                    className: 'selectCheckbox'
+                },
                 {
                     data: "post_name",
                     name: "post_name",
@@ -76,6 +94,45 @@
             table.ajax.url(url);
             table.draw()
         })
+
+        let selectAllInput = jQuery('#selectAll');
+        let submitBulk = jQuery('#submitBulk');
+        selectAllInput.on('change', function () {
+            if (jQuery(this).is(':checked')) {
+                jQuery('.individualCheckbox').each(function () {
+                    jQuery(this).prop('checked', true);
+                });
+            } else {
+                jQuery('.individualCheckbox').each(function () {
+                    jQuery(this).prop('checked', false);
+                });
+            }
+        });
+        submitBulk.on('click', function () {
+            if (jQuery('#bulkActions').val() === '-1') {
+                alert('Morate izabrati grupnu akciju');
+                return;
+            }
+            let checkedInputs = [];
+            jQuery('.individualCheckbox').each(function () {
+                if (jQuery(this).is(':checked')) {
+                    checkedInputs.push(jQuery(this).data('id'));
+                }
+            });
+            if (checkedInputs.length > 0) {
+                jQuery.ajax({
+                    url: '<?=admin_url('admin-ajax.php?action=bulkActionRemoveMeta')?>',
+                    type: 'POST',
+                    data: {
+                        productIds: checkedInputs,
+                        bulkAction: jQuery('#bulkActions').val()
+                    },
+                }).done(function (response) {
+                    table.draw()
+                    jQuery('#bulkActions').val('-1');
+                });
+            }
+        })
     })
 </script>
 <style>
@@ -86,7 +143,14 @@
     #productTable {
         text-align: left;
     }
+
     .tableWrapper {
         width: 50%;
+    }
+
+    .bulkActionsWrapper {
+        display: flex;
+        align-items: baseline;
+        gap: 5px;
     }
 </style>
