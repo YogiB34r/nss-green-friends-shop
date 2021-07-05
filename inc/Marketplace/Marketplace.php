@@ -122,16 +122,21 @@ class Marketplace
                     </thead>
                     <tbody>
                     <?php
-                    for ($i = 0; $i < 8; $i++): ?>
+                    for ($i = 0; $i < 8; $i++):
+                        $weightValue = '';
+                        $priceValue = '';
+                        if (isset($shippingPrices[$i])) {
+                            $weightValue = $shippingPrices[$i]['weight'];
+                            $priceValue = $shippingPrices[$i]['price'];
+                        }
+                        ?>
                         <tr>
                             <td>
-                                <input type="number" step="any" value="
-                                <?php if (isset($shippingPrices[$i])){echo $shippingPrices[$i]['weight'];}?>"
+                                <input type="number" step="any" value="<?=$weightValue ?? ''?>"
                                        name="<?='shippingPriceTable[' . $i . '][weight]'?>">
                             </td>
                             <td>
-                                <input type="number" step="any" value="
-                                <?php if (isset($shippingPrices[$i])){echo $shippingPrices[$i]['price'];}?>"
+                                <input type="number" step="any" value="<?=$priceValue ?? ''?>"
                                        name="<?='shippingPriceTable[' . $i . '][price]'?>">
                             </td>
                         </tr>
