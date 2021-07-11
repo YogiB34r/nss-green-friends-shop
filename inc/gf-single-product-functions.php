@@ -1,4 +1,5 @@
 <?php
+
 function gf_wc_breadcrumbs_single_product()
 {
     woocommerce_breadcrumb();
@@ -9,7 +10,8 @@ remove_action('woocommerce_single_product_summary', 'woocommerce_template_single
 remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_meta', 40);
 
 add_filter('woocommerce_get_stock_html', 'my_wc_hide_in_stock_message', 10, 2);
-function my_wc_hide_in_stock_message($html, $product) {
+function my_wc_hide_in_stock_message($html, $product)
+{
     if ($product->is_in_stock()) {
         return '';
     }
@@ -18,7 +20,8 @@ function my_wc_hide_in_stock_message($html, $product) {
 }
 
 add_action('woocommerce_single_product_summary', 'gf_add_vileda_view_pixel');
-function gf_add_vileda_view_pixel() {
+function gf_add_vileda_view_pixel()
+{
     global $product;
     if ($product->get_meta('supplier') == 407) {
         ?>
@@ -35,45 +38,55 @@ function gf_add_vileda_view_pixel() {
             document.write('<img src="https://ad.doubleclick.net/ddm/activity/src=10317862;type=invmedia;cat=viled0;dc_lat=;dc_rdid=;tag_for_child_directed_treatment=;tfua=;npa=;gdpr=${GDPR};gdpr_consent=${GDPR_CONSENT_755};ord=' + a + '?" width="1" height="1" alt=""/>');
         </script>
         <noscript>
-            <img src="https://ad.doubleclick.net/ddm/activity/src=10317862;type=invmedia;cat=viled0;dc_lat=;dc_rdid=;tag_for_child_directed_treatment=;tfua=;npa=;gdpr=${GDPR};gdpr_consent=${GDPR_CONSENT_755};ord=1?" width="1" height="1" alt=""/>
-        </noscript>
-        <!-- End of Floodlight Tag: Please do not remove -->
+            <img src="https://ad.doubleclick.net/ddm/activity/src=10317862;type=invmedia;cat=viled0;dc_lat=;dc_rdid=;tag_for_child_directed_treatment=;tfua=;npa=;gdpr=${GDPR};gdpr_consent=${GDPR_CONSENT_755};ord=1?"
+                 width="1" height="1" alt=""/>
+        </noscript><!-- End of Floodlight Tag: Please do not remove -->
         <?php
     }
 }
 
 add_action('woocommerce_single_product_summary', 'gf_get_single_product_meta', 9);
 add_action('woocommerce_single_product_summary', 'gf_display_tax_notice', 11);
-function gf_get_single_product_meta() {
+function gf_get_single_product_meta()
+{
     global $product;
     ?>
     <div class="product_meta">
-        <?php do_action('woocommerce_product_meta_start'); ?>
-        <?php if (wc_product_sku_enabled() && ($product->get_sku() || $product->is_type('variable'))) : ?>
-            <span class="sku_wrapper">Kataloški broj proizvoda:<?php esc_html__('SKU:', 'woocommerce'); ?> <span
-                        class="sku"><?php echo ($sku = $product->get_sku()) ? $sku : esc_html__('N/A', 'woocommerce'); ?></span></span>
-        <?php endif; ?>
-        <?php do_action('woocommerce_product_meta_end'); ?>
+        <?php
+        do_action('woocommerce_product_meta_start'); ?>
+        <?php
+        if (wc_product_sku_enabled() && ($product->get_sku() || $product->is_type('variable'))) : ?>
+            <span class="sku_wrapper">Kataloški broj proizvoda:<?php
+                esc_html__('SKU:', 'woocommerce'); ?> <span class="sku"><?php
+                    echo ($sku = $product->get_sku()) ? $sku : esc_html__('N/A', 'woocommerce'); ?></span></span>
+        <?php
+        endif; ?>
+        <?php
+        do_action('woocommerce_product_meta_end'); ?>
     </div>
     <?php
 }
-function gf_display_tax_notice() {
+
+function gf_display_tax_notice()
+{
     echo '<p>' . __('Prikazana cena je sa uračunatim PDV-om.', 'green-fiends') . '</p>';
 }
 
 add_action('woocommerce_single_product_summary', 'gf_display_offer_notice', 12);
-function gf_display_offer_notice() {
+function gf_display_offer_notice()
+{
     global $product;
     echo '<p>' . __('Ponuda važi dok traju zalihe', 'green-fiends') . '</p>';
 
     if (current_user_can('administrator')) {
         $src = wp_get_attachment_image_url($product->get_image_id(), 'full');
-        echo '<br /><a href="'.$src.'" target="_blank">Preuzmi sliku proizvoda (novi tab)</a>';
+        echo '<br /><a href="' . $src . '" target="_blank">Preuzmi sliku proizvoda (novi tab)</a>';
     }
 }
 
 add_filter('woocommerce_get_price_html', 'change_displayed_sale_price_html', 10, 2);
-function change_displayed_sale_price_html($price, WC_Product $product) {
+function change_displayed_sale_price_html($price, WC_Product $product)
+{
     // Only on sale products on frontend
     // Get product prices
     if ($product->is_on_sale() && !is_admin()) {
@@ -92,7 +105,8 @@ function change_displayed_sale_price_html($price, WC_Product $product) {
         $saving_percentage = round(100 - ($sale_price / $regular_price * 100), 1) . '%';
 
         // Append to the formated html price
-        $price .= sprintf(__('<p class="saved-sale">Ušteda: %s <em>(%s)</em></p>', 'woocommerce'), $saving_price, $saving_percentage);
+        $price .= sprintf(__('<p class="saved-sale">Ušteda: %s <em>(%s)</em></p>', 'woocommerce'), $saving_price,
+            $saving_percentage);
     }
     return $price;
 }
@@ -107,7 +121,8 @@ function woo_new_product_tab_content()
     echo "
 	<h3 class='reset footerTitle2'>" . __('Naručivanje telefonom', 'green-fiends') . "</h3>
 	<p class='cartText3'>
-		Za <strong>naručivanje telefonom</strong> " . __(' neophodno je da imate email adresu i da proizvod nije rasprodat:', 'green-fiends') . "
+		Za <strong>naručivanje telefonom</strong> " . __(' neophodno je da imate email adresu i da proizvod nije rasprodat:',
+            'green-fiends') . "
 	</p>
 	<ul class='cartText3'>
 		<li>" . __('Pozovete broj') . " <strong>011/7450-380</strong> (radnim danima od <strong>08-17h</strong>)</li>
@@ -146,21 +161,34 @@ add_action('woocommerce_before_single_product', 'woocommerce_template_single_tit
 /**
  * Customize product data tabs
  */
-add_filter('woocommerce_product_tabs', 'woo_new_product_tab');
-function woo_new_product_tab($tabs)
+add_filter('woocommerce_product_tabs', 'woo_new_product_tabs');
+function woo_new_product_tabs($tabs)
 {
-    $tabs['narucivanje_tab'] = array(
+    $tabs['narucivanje_tab'] = [
         'title' => __('Naručivanje i plaćanje', 'woocommerce'),
         'priority' => 50,
         'callback' => 'woo_new_product_tab_content'
-    );
+    ];
     $tabs['description']['callback'] = 'woo_custom_description_tab_content';
     $tabs['description']['priority'] = 10;
     $tabs['description']['title'] = 'Opis';
+    $tabs['declaration'] = [
+        'title' => __('Deklaracija', 'woocommerce'),
+        'priority' => 21,
+        'callback' => 'declarationTabContent'
+    ];
 
     return $tabs;
 }
-
+function declarationTabContent(){
+    $declarationField = get_post_meta(get_queried_object_id(),'origin_country',true);
+    if ($declarationField !== ''){
+        echo "<p><b>Zemlja porekla:</b> $declarationField</p>";
+        return;
+    }
+    echo "<p>Tačan podatak o uvozniku će biti naveden na deklaraciji koju dobijate uz proizvod.</p>";
+    echo "<p>Tačan podatak o zemlji porekla će biti naveden na deklaraciji koju dobijate uz proizvod</p>";
+}
 function woo_custom_description_tab_content()
 {
     global $product;
@@ -186,10 +214,9 @@ function gf_display_social_media_share_button()
     $html .= '</div>';
 
     echo $html;
-
 }
 
-remove_action( 'woocommerce_before_single_product_summary', 'woocommerce_show_product_sale_flash', 10 );
+remove_action('woocommerce_before_single_product_summary', 'woocommerce_show_product_sale_flash', 10);
 
 add_action('woocommerce_single_product_summary', 'show_sale_date_from_to_single_product', 13);
 function show_sale_date_from_to_single_product()
@@ -216,16 +243,16 @@ function check_if_product_have_sale_dates_and_print_sticker()
     if ($sale_sticker_active === 'yes' && $sale_sticker_to > time()) {
         $sale_sticker_src = get_option('gf_product_stickers_options')['image_select_sale'];
         echo '<span class="gf-sticker gf-sticker--sale gf-sticker--left">
-                <img src="'.$sale_sticker_src.'" alt="" height="64" width="64">
+                <img src="' . $sale_sticker_src . '" alt="" height="64" width="64">
                 </span>';
     }
 }
 
 add_action('woocommerce_after_add_to_cart_form', 'gf_add_ordering_phone_number');
-function gf_add_ordering_phone_number() {
+function gf_add_ordering_phone_number()
+{
     echo '<p class="phone_ordering_label">Naručite telefonom</p>';
     echo '<p class="phone_ordering_text"><a href="tel:+381117450380">011/7450-380</a></p>
             <p class="phone_ordering_note">radnim danima od 8-17 subotom od 10-16</p>';
-
 //    return
 }
