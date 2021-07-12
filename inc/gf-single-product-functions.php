@@ -188,8 +188,8 @@ function declarationTabContent(){
     } else {
         echo "<p>Tačan podatak o zemlji porekla će biti naveden na deklaraciji koju dobijate uz proizvod</p>";
     }
-    if ($originCountry !== ''){
-        echo "<p><b>Zemlja porekla:</b> $originCountry</p>";
+    if ($importCountry !== ''){
+        echo "<p><b>Zemlja uvoza:</b> $importCountry</p>";
     } else {
         echo "<p>Tačan podatak o uvozniku će biti naveden na deklaraciji koju dobijate uz proizvod.</p>";
     }
