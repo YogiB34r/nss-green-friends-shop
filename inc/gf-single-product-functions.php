@@ -181,13 +181,20 @@ function woo_new_product_tabs($tabs)
     return $tabs;
 }
 function declarationTabContent(){
-    $declarationField = get_post_meta(get_queried_object_id(),'origin_country',true);
-    if ($declarationField !== ''){
-        echo "<p><b>Zemlja porekla:</b> $declarationField</p>";
-        return;
+    $originCountry = get_post_meta(get_queried_object_id(),'origin_country',true);
+    $importCountry = get_post_meta(get_queried_object_id(),'import_country',true);
+    if ($originCountry !== ''){
+        echo "<p><b>Zemlja porekla:</b> $originCountry</p>";
+    } else {
+        echo "<p>Tačan podatak o zemlji porekla će biti naveden na deklaraciji koju dobijate uz proizvod</p>";
     }
-    echo "<p>Tačan podatak o uvozniku će biti naveden na deklaraciji koju dobijate uz proizvod.</p>";
-    echo "<p>Tačan podatak o zemlji porekla će biti naveden na deklaraciji koju dobijate uz proizvod</p>";
+    if ($originCountry !== ''){
+        echo "<p><b>Zemlja porekla:</b> $originCountry</p>";
+    } else {
+        echo "<p>Tačan podatak o uvozniku će biti naveden na deklaraciji koju dobijate uz proizvod.</p>";
+    }
+
+
 }
 function woo_custom_description_tab_content()
 {
