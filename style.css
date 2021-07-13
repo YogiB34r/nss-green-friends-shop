@@ -3805,3 +3805,6 @@ button[name='update_cart'] {
     justify-content: space-between;
     align-items: center;
 }
+.titleContainer{
+    display: inline-block;
+}
