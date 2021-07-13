@@ -3799,3 +3799,9 @@ button[name='update_cart'] {
     }
 }
 /* Newsletter on homepage end */
+
+.gf-product-slider .headerContainer{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
