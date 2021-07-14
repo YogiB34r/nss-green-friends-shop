@@ -7,6 +7,7 @@ use Laminas\Mail\Transport\FileOptions;
 // @TODO move this to class
 if (defined('WP_CLI') && WP_CLI) {
     ini_set('max_execution_time', 1200);
+    ini_set('display_errors', 1);
     $cli = new \GF\Cli();
 
     \WP_CLI::add_command('fixCategoryTree', [$cli, 'fixCategoryTree']);
@@ -44,12 +45,17 @@ if (defined('WP_CLI') && WP_CLI) {
 //    \WP_CLI::add_command('createOglasiFeed', 'createOglasiFeed');
 
     \WP_CLI::add_command('createSexyFeed', 'createSexyFeed');
+    \WP_CLI::add_command('createCtcFeed', 'createCtcFeed');
 }
 
 function sendNlTest() {
-    ini_set('display_errors', 1);
-    do_action('gfNewsletterSend', 15);
+    do_action('gfNewsletterSend', 19);
     exit();
+}
+
+function createCtcFeed() {
+    $cli = new \GF\Cli();
+    $cli->createCtcFeed();
 }
 
 function createSexyFeed() {
@@ -134,11 +140,11 @@ function daily() {
 
 add_action('syncMis', 'mis');
 function mis() {
-//    $item = wc_get_product(560186);  //
+//    $item = wc_get_product(421166);  //
 //    new NSS_MIS_Item($item);
 //    die();
 
-//    $orderIds = [609969];
+//    $orderIds = [616780];
 //    foreach ($orderIds as $orderId) {
 //        $order = wc_get_order($orderId);
 //        new NSS_MIS_Order($order);

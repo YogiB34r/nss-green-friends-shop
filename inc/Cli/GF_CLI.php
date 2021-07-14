@@ -21,6 +21,59 @@ class Cli
         }
     }
 
+    public function createCtcFeed()
+    {
+        ini_set('display_errors', '1');
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        try {
+            $sheet = $writer->getSpreadsheet()->getActiveSheet();
+        } catch (\Exception $e) {
+            echo $e->getMessage();
+            die();
+        }
+
+        $items = [];
+        $i=1;
+        /* @var \WC_Product $product */
+        foreach (wc_get_products([
+            'limit' => -1,
+//            'status' => 'publish',
+            'meta_key' => 'supplier',
+            'meta_value' => 27,
+//            'paged' => 1
+        ]) as $key => $product) {
+            $status = 1;
+            if ($product->get_status() !== 'publish') {
+                $status = 2;
+            }
+            if ($product->get_stock_status() !== 'instock') {
+                $status = 3;
+            }
+            $sheet->setCellValue('A' . $i, $product->get_id());
+            $sheet->setCellValue('B' . $i, $product->get_sku());
+            $sheet->setCellValue('C' . $i, $product->get_meta('vendor_code'));
+            $sheet->setCellValue('D' . $i, $product->get_price() / 1.3);
+            $sheet->setCellValue('E' . $i, $product->get_sale_price());
+            $sheet->setCellValue('F' . $i, $status);
+            $sheet->setCellValue('G' . $i, $product->get_title());
+            $i++;
+
+//            $item = [
+//                "productId" => $product->get_id(),
+//                "sku" => $product->get_sku(),
+//                "title" => trim($product->get_title()),
+//                "price" => $product->get_price(),
+//                "salePrice" => $product->get_sale_price(),
+//                "status" => ($product->get_stock_status() === 'instock') ? 1:0,
+//            ];
+//            $items[] = $item;
+        }
+        $writer->save(WP_CONTENT_DIR . '/uploads/ctc.xlsx');
+//        $writer->output(WP_CONTENT_DIR . '/uploads/ctc.csv');
+//        file_put_contents(WP_CONTENT_DIR . '/uploads/ctc.csv', json_encode($items));
+    }
+
     public function createSexyFeed()
     {
         ini_set('display_errors', '1');
@@ -28,7 +81,7 @@ class Cli
         /* @var \WC_Product $product */
         foreach (wc_get_products([
             'limit' => -1,
-            'status' => 'published',
+            'status' => 'publish',
             'tax_query' => [[
                 'taxonomy'      => 'product_cat',
                 'terms'         => 2690,
@@ -53,7 +106,6 @@ class Cli
             foreach ($product->get_gallery_image_ids() as $imageId) {
                 $images[] = wp_get_attachment_url($imageId);
             }
-
             $items[] = [
                 "title" => trim($product->get_title()),
                 "description" => trim($product->get_description()),
