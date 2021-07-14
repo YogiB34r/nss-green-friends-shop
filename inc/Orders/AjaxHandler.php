@@ -253,7 +253,7 @@ class AjaxHandler
                         'orderTitle' => $this->orderPage->formatOrderName($order),
                         'paymentMethod' => $order->get_payment_method_title(),
                         'createdVia' =>$this->changeCreatedViaTitle($order->get_created_via()),
-                        'date' => $order->get_date_created()->format('d/m/y'),
+                        'date' => $order->get_date_created()->format('d/m/y h:i:s'),
                         'shippingMethod' => $order->get_shipping_method(),
                         'total' => $order->get_total().get_woocommerce_currency_symbol(),
                         'status' => $this->getStatusMarkup($order->get_status(), wc_get_order_notes(['order_id' => $order->get_id(),
@@ -305,7 +305,7 @@ class AjaxHandler
 
     private function predracunAction($order)
     {
-        return sprintf('<a class="button" href="/back-ajax/?action=exportJitexOrder&id=%s" target="_blank">%s</a>',
+        return sprintf('<a class="button" href="/back-ajax/?action=printPreorder&id=%s" target="_blank">%s</a>',
              $order->get_id(), 'Predracun');
     }
 
