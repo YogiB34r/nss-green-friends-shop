@@ -209,7 +209,6 @@ class AjaxHandler
             $pageOrdersTotal = 0;
             $orders = $result->orders;
             $totalOrdersCount = $result->total;
-
         } else {
             global $wpdb;
             if(!preg_match("/[a-z]/i", $searchValue)){
@@ -218,17 +217,33 @@ class AjaxHandler
                 $countSql = "SELECT COUNT(ID) FROM wp_posts WHERE ID LIKE '{$searchValue}%' AND post_type = 'shop_order'";
             } else {
                 //Display name search
-                $sql = "SELECT * FROM wp_posts WHERE ID IN 
-                (SELECT post_id FROM wp_postmeta WHERE meta_key = '_customer_user' AND 
-                meta_value IN (SELECT ID FROM wp_users WHERE display_name LIKE '%{$searchValue}%'))";
+                $sql = "SELECT * FROM wp_posts WHERE ID IN (SELECT t1.post_id
+                FROM (SELECT meta_value as 'firstName', post_id
+                FROM wp_postmeta
+                WHERE meta_key = '_billing_first_name'
+                    and meta_value != '') as t1
+                INNER JOIN (SELECT meta_value as 'lastName', post_id
+                     FROM wp_postmeta t2
+                     WHERE meta_key = '_billing_last_name' and meta_value != '') as t2
+                    ON t1.post_id = t2.post_id
+                WHERE concat(firstName, ' ', lastName) LIKE '%{$searchValue}%'
+                OR concat(lastName, ' ', firstName) LIKE '%{$searchValue}%')";
 
-                $countSql = "SELECT COUNT(ID) FROM wp_posts WHERE ID IN 
-                (SELECT post_id FROM wp_postmeta WHERE meta_key = '_customer_user' AND 
-                meta_value IN (SELECT ID FROM wp_users WHERE display_name LIKE '%{$searchValue}%'))";
+                $countSql = "SELECT COUNT(ID) FROM wp_posts WHERE ID IN (SELECT t1.post_id
+                FROM (SELECT meta_value as 'firstName', post_id
+                FROM wp_postmeta
+                WHERE meta_key = '_billing_first_name'
+                and meta_value != '') as t1
+                INNER JOIN (SELECT meta_value as 'lastName', post_id
+                     FROM wp_postmeta t2
+                     WHERE meta_key = '_billing_last_name' and meta_value != '') as t2
+                    ON t1.post_id = t2.post_id
+                WHERE concat(firstName, ' ', lastName) LIKE '%{$searchValue}%'
+                OR concat(lastName, ' ', firstName) LIKE '%{$searchValue}%')";
             }
 
             $sql .= " AND post_status NOT LIKE 'trash'
-             AND post_status NOT LIKE 'auto-draft' LIMIT {$_GET['length']} OFFSET {$_GET['start']}";
+             AND post_status NOT LIKE 'auto-draft' ORDER BY ID DESC LIMIT {$_GET['length']} OFFSET {$_GET['start']}";
             $totalOrdersCount = $wpdb->get_results($countSql, ARRAY_N)[0][0];
             $posts = $wpdb->get_results($sql);
 
