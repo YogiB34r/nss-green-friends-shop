@@ -150,8 +150,7 @@ class AjaxHandler
         $paymentMethod = '';
         $vendorId = null;
         $orders = [];
-        $orderIdSearch = false;
-        $orderNameSearch = false;
+
         if (isset($_GET['orderType'])) {
             $orderType = $_GET['orderType'] !== '-1' ? $_GET['orderType'] : '';
         }
@@ -181,19 +180,19 @@ class AjaxHandler
         if ($searchValue === '') {
             $mpOrderIds = [];
             if ($marketplaceOrder !== '-1') {
-               $mpOrderIds = $mpOrders;
+                $mpOrderIds = $mpOrders;
             }
             $args = [
-                    'paginate' => true,
-                    'offset' => $_GET['start'],
-                    'limit' => $_GET['length'],
-                    'orderby' => 'date',
-                    'order' => 'DESC',
-                    'created_via' => $orderType,
-                    'payment_method' => $paymentMethod,
-                    'status' => $orderStatus,
-                    'date_created' => $dateFrom . '...' . $dateTo
-                ];
+                'paginate' => true,
+                'offset' => $_GET['start'],
+                'limit' => $_GET['length'],
+                'orderby' => 'date',
+                'order' => 'DESC',
+                'created_via' => $orderType,
+                'payment_method' => $paymentMethod,
+                'status' => $orderStatus,
+                'date_created' => $dateFrom . '...' . $dateTo
+            ];
 
             if ($marketplaceOrder === '1') {
                 $args['post__in'] = $mpOrderIds;
@@ -210,44 +209,34 @@ class AjaxHandler
             $pageOrdersTotal = 0;
             $orders = $result->orders;
             $totalOrdersCount = $result->total;
+
         } else {
             global $wpdb;
-            if(is_numeric($searchValue)) {
+            if(!preg_match("/[a-z]/i", $searchValue)){
                 //Order id search
                 $sql = "SELECT * FROM wp_posts WHERE ID LIKE '{$searchValue}%' AND post_type = 'shop_order'";
                 $countSql = "SELECT COUNT(ID) FROM wp_posts WHERE ID LIKE '{$searchValue}%' AND post_type = 'shop_order'";
-                $sql .= " AND post_status NOT LIKE 'trash'
-                AND post_status NOT LIKE 'auto-draft' ORDER BY ID DESC LIMIT {$_GET['length']} OFFSET {$_GET['start']}";
-                $orderIdSearch = true;
             } else {
-                //Name search
-                $sql = "SELECT DISTINCT p1.post_id
-                FROM wp_postmeta p1
-                WHERE p1.meta_value LIKE '%{$searchValue}%'
-                AND p1.meta_key IN ('_billing_address_index','_shipping_address_index')";
+                //Display name search
+                $sql = "SELECT * FROM wp_posts WHERE ID IN 
+                (SELECT post_id FROM wp_postmeta WHERE meta_key = '_customer_user' AND 
+                meta_value IN (SELECT ID FROM wp_users WHERE display_name LIKE '%{$searchValue}%'))";
 
-                $countSql = "SELECT COUNT(DISTINCT p1.post_id)
-                FROM wp_postmeta p1
-                WHERE p1.meta_value LIKE '%{$searchValue}%'
-                AND p1.meta_key IN ('_billing_address_index','_shipping_address_index')";
-                $sql .= " ORDER BY post_id DESC LIMIT {$_GET['length']} OFFSET {$_GET['start']}";
-                $orderNameSearch = true;
+                $countSql = "SELECT COUNT(ID) FROM wp_posts WHERE ID IN 
+                (SELECT post_id FROM wp_postmeta WHERE meta_key = '_customer_user' AND 
+                meta_value IN (SELECT ID FROM wp_users WHERE display_name LIKE '%{$searchValue}%'))";
             }
 
-
+            $sql .= " AND post_status NOT LIKE 'trash'
+             AND post_status NOT LIKE 'auto-draft' LIMIT {$_GET['length']} OFFSET {$_GET['start']}";
             $totalOrdersCount = $wpdb->get_results($countSql, ARRAY_N)[0][0];
             $posts = $wpdb->get_results($sql);
-            $orderIds = [];
+
             foreach ($posts as $post) {
-                if ($orderIdSearch && $post->post_type === 'shop_order') {
-                    $orderIds[] = $post->ID;
-                } else {
-                    $orderIds[] = $post->post_id;
+                if ($post->post_type === 'shop_order'){
+                    $orders[] = wc_get_order($post->ID);
                 }
             }
-            $orders = wc_get_orders([
-                'post__in' => $orderIds
-            ]);
             $pageOrdersTotal = 0;
             $pageShippingTotal = 0;
             $pageOrdersSubtotal = 0;
@@ -255,27 +244,27 @@ class AjaxHandler
         $formattedOrders = [];
         foreach ($orders as $order) {
             if (($order instanceof OrderRefund ||  $order instanceof AdminOverride) &&  !$order instanceof \WC_Order) {
-                    continue;
+                continue;
             }
-                    $pageOrdersSubtotal += $order->get_subtotal();
-                    $pageShippingTotal += (int)$order->get_shipping_total();
-                    $pageOrdersTotal += (int)$order->get_total();
-                    $formattedOrders[] = [
-                        'orderTitle' => $this->orderPage->formatOrderName($order),
-                        'paymentMethod' => $order->get_payment_method_title(),
-                        'createdVia' =>$this->changeCreatedViaTitle($order->get_created_via()),
-                        'date' => $order->get_date_created()->format('d/m/y h:i:s'),
-                        'shippingMethod' => $order->get_shipping_method(),
-                        'total' => $order->get_total().get_woocommerce_currency_symbol(),
-                        'status' => $this->getStatusMarkup($order->get_status(), wc_get_order_notes(['order_id' => $order->get_id(),
-                        'customer_note' => 'false','added_by' => 'system'])),
-                        'shippingTotal' => $order->get_shipping_total().get_woocommerce_currency_symbol(),
-                        'itemsTotal' => $order->get_subtotal().get_woocommerce_currency_symbol(),
-                        'orderId' => sprintf('<input class="individualCheckbox" type="checkbox" data-id="%s">',
-                            $order->get_id()),
-                        'actions' => $this->getActionsForOrder($order),
-                        'mpOrder' => in_array($order->get_id(), $mpOrders, false)
-                    ];
+            $pageOrdersSubtotal += $order->get_subtotal();
+            $pageShippingTotal += (int)$order->get_shipping_total();
+            $pageOrdersTotal += (int)$order->get_total();
+            $formattedOrders[] = [
+                'orderTitle' => $this->orderPage->formatOrderName($order),
+                'paymentMethod' => $order->get_payment_method_title(),
+                'createdVia' =>$this->changeCreatedViaTitle($order->get_created_via()),
+                'date' => $order->get_date_created()->format('d/m/y'),
+                'shippingMethod' => $order->get_shipping_method(),
+                'total' => $order->get_total().get_woocommerce_currency_symbol(),
+                'status' => $this->getStatusMarkup($order->get_status(), wc_get_order_notes(['order_id' => $order->get_id(),
+                    'customer_note' => 'false','added_by' => 'system'])),
+                'shippingTotal' => $order->get_shipping_total().get_woocommerce_currency_symbol(),
+                'itemsTotal' => $order->get_subtotal().get_woocommerce_currency_symbol(),
+                'orderId' => sprintf('<input class="individualCheckbox" type="checkbox" data-id="%s">',
+                    $order->get_id()),
+                'actions' => $this->getActionsForOrder($order),
+                'mpOrder' => in_array($order->get_id(), $mpOrders, false)
+            ];
         }
 
         $data = [
@@ -287,7 +276,7 @@ class AjaxHandler
             'pageShippingTotal' => number_format($pageShippingTotal,2,',','.').get_woocommerce_currency_symbol(),
             'pageOrderSubtotals' => number_format($pageOrdersSubtotal,2,',','.').get_woocommerce_currency_symbol(),
         ];
-           wp_send_json($data);
+        wp_send_json($data);
     }
 
     private function getActionsForOrder($order)
@@ -316,8 +305,8 @@ class AjaxHandler
 
     private function predracunAction($order)
     {
-        return sprintf('<a class="button" href="/back-ajax/?action=printPreorder&id=%s" target="_blank">%s</a>',
-             $order->get_id(), 'Predracun');
+        return sprintf('<a class="button" href="/back-ajax/?action=exportJitexOrder&id=%s" target="_blank">%s</a>',
+            $order->get_id(), 'Predracun');
     }
 
     private function syncToMisAction($order)
