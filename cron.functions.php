@@ -49,13 +49,13 @@ if (defined('WP_CLI') && WP_CLI) {
 }
 
 function sendNlTest() {
-    do_action('gfNewsletterSend', 19);
+    do_action('gfNewsletterSend', 27);
     exit();
 }
 
 function createCtcFeed() {
     $cli = new \GF\Cli();
-    $cli->createCtcFeed();
+    $cli->reParseCtc();
 }
 
 function createSexyFeed() {
@@ -140,11 +140,11 @@ function daily() {
 
 add_action('syncMis', 'mis');
 function mis() {
-//    $item = wc_get_product(421166);  //
+//    $item = wc_get_product(623085);  //
 //    new NSS_MIS_Item($item);
 //    die();
 
-//    $orderIds = [616780];
+//    $orderIds = [622768];
 //    foreach ($orderIds as $orderId) {
 //        $order = wc_get_order($orderId);
 //        new NSS_MIS_Order($order);

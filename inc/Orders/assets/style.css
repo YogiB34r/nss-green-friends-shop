@@ -189,3 +189,11 @@
     color: #0073aa;
     cursor:pointer;
 }
+.dataTables_wrapper .dataTables_processing {
+    top:10%;
+}
+#searchInputButton {
+    margin: 0 0.5rem;
+    padding: 5px 15px;
+    line-height: 2;
+}

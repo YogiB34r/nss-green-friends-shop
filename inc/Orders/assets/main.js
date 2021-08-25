@@ -11,7 +11,6 @@ jQuery(document).ready(function (){
             'serverSide': true,
             'searching': true,
             'pageLength': 25,
-            'searchDelay': 1,
             'lengthMenu': [ 10, 25, 50, 75, 100,250,500, 1000 ],
             'ajax': ajaxUrlWithFilters,
             'dataSrc': function (data) {
@@ -256,6 +255,17 @@ jQuery(document).ready(function (){
                     });
                 })
             }, 500)
+            let searchInput = jQuery('input[type="search"]');
+            searchInput.unbind();
+            searchInput.after('<button id="searchInputButton">Pretraži</button>');
+            jQuery('#searchInputButton').on('click',function(){
+                table.search(jQuery('input[type="search"]').val()).draw();
+            })
+            jQuery(document).on('keypress',function(e){
+                if(e.which === 13) {
+                    table.search(jQuery('input[type="search"]').val()).draw();
+                }
+            });
         })
     }
 })

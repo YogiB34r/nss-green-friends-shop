@@ -150,7 +150,8 @@ class AjaxHandler
         $paymentMethod = '';
         $vendorId = null;
         $orders = [];
-
+        $orderIdSearch = false;
+        $orderNameSearch = false;
         if (isset($_GET['orderType'])) {
             $orderType = $_GET['orderType'] !== '-1' ? $_GET['orderType'] : '';
         }
@@ -209,34 +210,44 @@ class AjaxHandler
             $pageOrdersTotal = 0;
             $orders = $result->orders;
             $totalOrdersCount = $result->total;
-
         } else {
             global $wpdb;
-            if(!preg_match("/[a-z]/i", $searchValue)){
+            if(is_numeric($searchValue)) {
                 //Order id search
                 $sql = "SELECT * FROM wp_posts WHERE ID LIKE '{$searchValue}%' AND post_type = 'shop_order'";
                 $countSql = "SELECT COUNT(ID) FROM wp_posts WHERE ID LIKE '{$searchValue}%' AND post_type = 'shop_order'";
+                $sql .= " AND post_status NOT LIKE 'trash'
+                AND post_status NOT LIKE 'auto-draft' ORDER BY ID DESC LIMIT {$_GET['length']} OFFSET {$_GET['start']}";
+                $orderIdSearch = true;
             } else {
-                //Display name search
-                $sql = "SELECT * FROM wp_posts WHERE ID IN 
-                (SELECT post_id FROM wp_postmeta WHERE meta_key = '_customer_user' AND 
-                meta_value IN (SELECT ID FROM wp_users WHERE display_name LIKE '%{$searchValue}%'))";
+                //Name search
+                $sql = "SELECT DISTINCT p1.post_id
+                FROM wp_postmeta p1
+                WHERE p1.meta_value LIKE '%{$searchValue}%'
+                AND p1.meta_key IN ('_billing_address_index','_shipping_address_index')";
 
-                $countSql = "SELECT COUNT(ID) FROM wp_posts WHERE ID IN 
-                (SELECT post_id FROM wp_postmeta WHERE meta_key = '_customer_user' AND 
-                meta_value IN (SELECT ID FROM wp_users WHERE display_name LIKE '%{$searchValue}%'))";
+                $countSql = "SELECT COUNT(DISTINCT p1.post_id)
+                FROM wp_postmeta p1
+                WHERE p1.meta_value LIKE '%{$searchValue}%'
+                AND p1.meta_key IN ('_billing_address_index','_shipping_address_index')";
+                $sql .= " ORDER BY post_id DESC LIMIT {$_GET['length']} OFFSET {$_GET['start']}";
+                $orderNameSearch = true;
             }
 
-            $sql .= " AND post_status NOT LIKE 'trash'
-             AND post_status NOT LIKE 'auto-draft' LIMIT {$_GET['length']} OFFSET {$_GET['start']}";
+
             $totalOrdersCount = $wpdb->get_results($countSql, ARRAY_N)[0][0];
             $posts = $wpdb->get_results($sql);
-
+            $orderIds = [];
             foreach ($posts as $post) {
-                if ($post->post_type === 'shop_order'){
-                    $orders[] = wc_get_order($post->ID);
+                if ($orderIdSearch && $post->post_type === 'shop_order') {
+                    $orderIds[] = $post->ID;
+                } else {
+                    $orderIds[] = $post->post_id;
                 }
             }
+            $orders = wc_get_orders([
+                'post__in' => $orderIds
+            ]);
             $pageOrdersTotal = 0;
             $pageShippingTotal = 0;
             $pageOrdersSubtotal = 0;

@@ -89,10 +89,15 @@ class Cli
             'paged' => 1
         ]) as $key => $product) {
 
+            if ($product->get_id() === 488461) {
+                continue;
+            }
+
             foreach ($product->get_category_ids() as $catId) {
                 if ($catId === 2690) {
                     continue;
                 }
+
                 $subCat = '';
                 $cat = get_term($catId, 'product_cat');
                 if ($cat->parent === 2690) {
@@ -117,6 +122,7 @@ class Cli
                 "status" => $product->get_stock_status(),
                 "productId" => $product->get_id(),
                 "images" => $images,
+//                "url" => $product->get_permalink(),
                 "sku" => $product->get_sku()
             ];
         }
@@ -229,6 +235,53 @@ class Cli
         }
 
         return $ids;
+    }
+
+    public function reParseCtc()
+    {
+        $target = __DIR__ . '/ctc.csv';
+        try {
+            $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx;
+//            $reader->setReadDataOnly(true);
+            $file = @$reader->load(__DIR__ . '/ctc.xlsx');
+            /** @var \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $worksheet */
+            $worksheet = @$file->getSheet(1);
+        } catch (\Exception $e) {
+            echo $e->getMessage();
+            die();
+        }
+
+
+//            ->rangeToArray(
+//                'A1:G' . $file->getActiveSheet()->getHighestRow(),
+//                null,
+//                true,
+//                true,
+//                false
+//            );
+//        var_dump($worksheet->toArray());
+//        die();
+        $string = '';
+        foreach ($worksheet->toArray() as $key => $item) {
+//            if ($key == 0) {
+//                continue;
+//            }
+            $id = $item[0];
+            if (!$id) {
+                continue;
+            }
+            $product = wc_get_product($id);
+            $string .= sprintf('%s,%s,%s,%s,%s,%s%s',
+                $product->get_sku(),
+                $item[1],
+                $item[2],
+                $item[3],
+                $item[4],
+                $item[5],
+                PHP_EOL
+            );
+        }
+        file_put_contents($target, $string);
     }
 
     public function createFromExcell()
