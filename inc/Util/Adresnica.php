@@ -51,6 +51,9 @@ class Adresnica
         $uploadsDir .= '/';
         $filePath = $uploadsDir . $name;
 
+//        echo $html;
+//        die();
+
         $dompdf = new \Dompdf\Dompdf();
         $dompdf->loadHtml($html);
         $dompdf->render();

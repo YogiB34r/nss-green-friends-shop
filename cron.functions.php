@@ -140,11 +140,11 @@ function daily() {
 
 add_action('syncMis', 'mis');
 function mis() {
-//    $item = wc_get_product(623085);  //
+//    $item = wc_get_product(410416);  //
 //    new NSS_MIS_Item($item);
 //    die();
 
-//    $orderIds = [622768];
+//    $orderIds = [625309];
 //    foreach ($orderIds as $orderId) {
 //        $order = wc_get_order($orderId);
 //        new NSS_MIS_Order($order);

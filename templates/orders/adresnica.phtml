@@ -11,9 +11,44 @@ $generator = new \Picqer\Barcode\BarcodeGeneratorJPG();
 $barCodeAbsPath = ABSPATH . '../wp-content/uploads/barkodovi/';
 $barCodePath = '/wp-content/uploads/barkodovi/';
 $dailyExpressFormat = 'SS' . $order->get_date_created()->format('dm') . $order->get_id();
+//die();
 
-//$img = $generator->getBarcode($dailyExpressFormat, $generator::TYPE_CODE_128, 1.2, 50);
-$img = base64_encode($generator->getBarcode($dailyExpressFormat, $generator::TYPE_CODE_128, 1, 40));
+//$img = $generator->getBarcode($dailyExpressFormat, $generator::TYPE_CODE_128, 1, 40);
+//$img = base64_encode($generator->getBarcode($dailyExpressFormat, $generator::TYPE_CODE_128, 1, 40));
+
+use \Laminas\Barcode\Barcode;
+
+$barcodeOptions = [
+    'text' => $dailyExpressFormat,
+    'fontSize' => 10,
+    'barHeight' => 30,
+    'factor' => 2,
+//    'barThinWidth' => 1,
+//    'barThickWidth' => 3,
+];
+$rendererOptions = [];
+$renderer = Barcode::factory(
+    'code128',
+    'image',
+    $barcodeOptions,
+    $rendererOptions
+);
+
+
+//$img = '';
+//ob_start();
+$img = $renderer->draw();
+ob_start();
+imagejpeg($img);
+$img = ob_get_clean();
+
+$img = base64_encode($img);
+//var_dump($img);
+//$img = ob_get_clean();
+
+//echo $img;
+//die();
+
 
 $companyInfo = false;
 //if ($order->get_meta('_billing_pib') != '') {
@@ -72,6 +107,8 @@ $html .= '<div class="gf-print-bill-wrapper" id="content-print">
 //    $html .= $generator->getBarcode($dailyExpressFormat, $generator::TYPE_CODE_128, 1, 50);
     // jpeg/png
     $html .= '<div><img src="data:image/jpg;base64,' . $img . '" /></div>';
+//    $html .= '<div><img src="https://rutiranje.wecare.rs/gimmeBC.php?valueBC=' . $dailyExpressFormat . '" /></div>';
+//    $html .= '<div>'.$img.'</div>';
     $html .= '<div><span style="width: 123px;">'.$dailyExpressFormat . '</span></div>';
 
 $html .= '</div>

@@ -305,7 +305,7 @@ class AjaxHandler
 
     private function predracunAction($order)
     {
-        return sprintf('<a class="button" href="/back-ajax/?action=exportJitexOrder&id=%s" target="_blank">%s</a>',
+        return sprintf('<a class="button" href="/back-ajax/?action=printPreorder&id=%s" target="_blank">%s</a>',
             $order->get_id(), 'Predracun');
     }
 
