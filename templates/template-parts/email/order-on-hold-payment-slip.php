@@ -2,11 +2,18 @@
 /*
  * Template Name: uplatnica
  */
-$marketPlaceField = (int)get_post_meta($order->get_id(), 'marketplaceVendor', true);
+
+use GF\Marketplace\Marketplace;
+use GF\Util\Log;
+
+$marketPlaceField = (int)$order->get_meta( 'marketplaceVendor', true);
 $dateCreated = date('dmY', strtotime($order->get_date_created()));
 if ($marketPlaceField !== '') {
-    $marketPLace = new \GF\Marketplace\Marketplace();
+    $marketPLace = new Marketplace();
     $vendor = $marketPLace->getByVendorId($marketPlaceField);
+    if (count($vendor) === 0){
+        Log::log(sprintf('Mp vendor with id:%s in order with id:%s not found', $marketPlaceField, $order->get_id()));
+    }
 }
 $svrhaUplate ='Kupovina na NonStopShop-u';
 $companyName = $vendor['companyName'] ?? 'NON STOP SHOP d.o.o';
