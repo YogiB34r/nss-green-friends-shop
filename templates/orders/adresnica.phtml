@@ -60,6 +60,7 @@ $html = '<html>
 <header>
 <title>Adresnica-'.$order->get_order_number().'.pdf</title>
 <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+ <meta charset="UTF-8">
 <script>
     function printDiv() {
         var w = window.open();
@@ -109,7 +110,7 @@ $html .= '<div class="gf-print-bill-wrapper" id="content-print">
     $html .= '<div><img src="data:image/jpg;base64,' . $img . '" /></div>';
 //    $html .= '<div><img src="https://rutiranje.wecare.rs/gimmeBC.php?valueBC=' . $dailyExpressFormat . '" /></div>';
 //    $html .= '<div>'.$img.'</div>';
-    $html .= '<div><span style="width: 123px;">'.$dailyExpressFormat . '</span></div>';
+//    $html .= '<div><span style="width: 123px;">'.$dailyExpressFormat . '</span></div>';
 
 $html .= '</div>
     <div class="gf-print-bill-info-wrapper">
@@ -118,9 +119,8 @@ $html .= '</div>
             <td width="300"><div class="gf-print-bill__customer-info">
             <h4>Pošiljalac:</h4>
             <p>Non Stop Shop d.o.o.</p>
-            <p>Gvozdićeva 4</p>
-            <p>11000 Beograd</p>
-            <p>(Stari Grad)</p>
+            <p>Gvozdiceva 4</p>
+            <p>11050 Zvezdara</p>
         </div></td>
             <td width="300"><div class="gf-print-bill__shipping-info">
             <h4>Primalac:</h4>';
