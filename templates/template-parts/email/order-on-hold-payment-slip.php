@@ -6,7 +6,7 @@
 use GF\Marketplace\Marketplace;
 use GF\Util\Log;
 
-$marketPlaceField = (int)$order->get_meta( 'marketplaceVendor', true);
+$marketPlaceField = $order->get_meta( 'marketplaceVendor', true);
 $dateCreated = date('dmY', strtotime($order->get_date_created()));
 if ($marketPlaceField !== '') {
     $marketPLace = new Marketplace();
