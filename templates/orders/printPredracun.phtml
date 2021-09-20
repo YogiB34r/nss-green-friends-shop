@@ -1,5 +1,26 @@
 <?php
 /* @var WC_Order $order */
+
+use GF\Marketplace\Marketplace;
+use GF\Util\Log;
+
+$marketPlaceField = $order->get_meta( 'marketplaceVendor', true);
+$dateCreated = date('dmY', strtotime($order->get_date_created()));
+if ($marketPlaceField !== '') {
+    $marketPLace = new Marketplace();
+    $vendor = $marketPLace->getByVendorId($marketPlaceField);
+    if (count($vendor) === 0){
+        Log::log(sprintf('Mp vendor with id:%s in order with id:%s not found', $marketPlaceField, $order->get_id()));
+    }
+}
+$svrhaUplate ='Kupovina na NonStopShop-u';
+$companyName = $vendor['companyName'] ?? 'NON STOP SHOP d.o.o';
+$companyAddress = $vendor['companyAddress'] ?? 'Beograd, Gvozdićeva 4';
+$primalac = $companyName.'<br>'.$companyAddress;
+$racunPrimaoca = $vendor['bankAccountNumber'] ?? '160-487203-63';
+$pib = $vendor['pib'] ?? '109837860';
+$mb = $vendor['mb'] ?? '21251712'
+
 ?>
 <html>
 <head>
@@ -112,10 +133,11 @@
     <div class="gf-print-bill-info-wrapper">
         <div class="gf-print-bill__customer-info">
             <h4>PODACI O PRODAVCU</h4>
-            <p>NonStopShop DOO</p>
-            <p>PIB: 109837860</p>
-            <p>MB: 21251712</p>
-            <p>Tekući račun: 160-487203-63</p>
+            <p>Naziv:<?=$companyName?></p>
+            <p>Adresa:<?=$companyAddress?></p>
+            <p>Pib:<?=$pib?></p>
+            <p>Matični broj:<?=$mb?></p>
+            <p>Račun za uplatu:<?=$racunPrimaoca?></p>
             <p>Poziv na broj: <?=$order->get_order_number()?></p>
             <p>Datum naručivanja: <?=$order->get_date_created()->format('d/m/Y')?></p>
             <p>Način plaćanja: <?=$order->get_payment_method_title()?></p>

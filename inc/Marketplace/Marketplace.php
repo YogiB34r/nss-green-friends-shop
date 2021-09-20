@@ -57,6 +57,8 @@ class Marketplace
         'email' varchar (64) NOT NULL,
         `isActive` INT(1) DEFAULT 1,
         `shippingPrices` BLOB, 
+        `pib` VARCHAR(32),
+        `mb` VARCHAR(32),
         PRIMARY KEY (`vendorId`)){$charset};";
         require_once(ABSPATH . "wp-admin/includes/upgrade.php");
         dbDelta($sql);
@@ -78,6 +80,8 @@ class Marketplace
         $shippingPrices = unserialize($vendorData['shippingPrices'], ['allowedClasses' => false]) ?? [];
         $email = $vendorData['email'] ?? '';
         $isActive = $vendorData['isActive'] ?? '0';
+        $pib = $vendorData['pib'] ?? '';
+        $mb = $vendorData['mb'] ?? '';
         $checked = '';
         if ($isActive === '1') {
             $checked = 'checked';
@@ -106,6 +110,14 @@ class Marketplace
                 <div>
                     <label for="companyEmail">Email za dostavu porudžbenica</label>
                     <input value="<?=$email?>" type="email" id="companyEmail" name="companyEmail">
+                </div>
+                <div>
+                    <label for="companyEmail">Pib</label>
+                    <input value="<?=$pib?>" type="text" id="companyPib" name="companyPib">
+                </div>
+                <div>
+                    <label for="companyEmail">Mb</label>
+                    <input value="<?=$mb?>" type="text" id="companyMb" name="companyMb">
                 </div>
                 <h4>Dostava</h4>
                 <div>
@@ -182,6 +194,15 @@ class Marketplace
             if ($_POST['marketPlaceActive']) {
                 $data['isActive'] = 1;
             }
+            if ($_POST['companyPib']) {
+                $data['pib'] = $_POST['companyPib'];
+            }
+            if ($_POST['companyMb']) {
+                $data['mb'] = $_POST['companyMb'];
+            }
+            if ($_POST['marketPlaceActive']) {
+                $data['isActive'] = 1;
+            }
             if (count($_POST['shippingPriceTable']) > 0) {
                 foreach ($_POST['shippingPriceTable'] as $key => $value) {
                     if ($value['price'] !== '' && $value['weight'] !== '') {
@@ -212,6 +233,8 @@ class Marketplace
                 'minFreeShippingCost' => $data['minShippingPrice'],
                 'email' => $data['companyEmail'],
                 'isActive' => $data['isActive'],
+                'pib' => $data['pib'],
+                'mb' => $data['mb'],
                 'shippingPrices' => $data['shippingPrices']
             ], ['%d', '%s', '%s', '%s', '%d', '%s', '%d', '%s']);
     }
@@ -227,6 +250,8 @@ class Marketplace
                 'minFreeShippingCost' => $data['minShippingPrice'],
                 'email' => $data['companyEmail'],
                 'isActive' => $data['isActive'],
+                'pib' => $data['pib'],
+                'mb' => $data['mb'],
                 'shippingPrices' => $data['shippingPrices']
             ], ['vendorId' => $data['vendorId']], ['%d', '%s', '%s', '%s', '%d', '%s', '%d', '%s']);
     }
