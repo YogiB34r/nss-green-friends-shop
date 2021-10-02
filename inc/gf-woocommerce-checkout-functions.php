@@ -145,7 +145,7 @@ function my_custom_checkout_field_update_order_meta($order_id) {
     if (isset($_POST['gf_newsletter_checkout']) && $_POST['gf_newsletter_checkout']) update_post_meta($order_id, 'gf_newsletter_checkout', esc_attr($_POST['gf_newsletter_checkout']));
 }
 
-add_action('woocommerce_thankyou', 'gf_newsletter_on_checkout_page', 10, 1);
+//add_action('woocommerce_thankyou', 'gf_newsletter_on_checkout_page', 10, 1);
 function gf_newsletter_on_checkout_page($orderid) {
     $order = wc_get_order($orderid);
     $email = $order->get_billing_email();
