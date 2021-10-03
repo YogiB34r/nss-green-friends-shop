@@ -140,7 +140,7 @@ function gf_add_newsletter_checkbox_on_checkout($checkout) {
     ), true);
 }
 
-//add_action('woocommerce_checkout_update_order_meta', 'my_custom_checkout_field_update_order_meta');
+add_action('woocommerce_checkout_update_order_meta', 'my_custom_checkout_field_update_order_meta');
 function my_custom_checkout_field_update_order_meta($order_id) {
     if (isset($_POST['gf_newsletter_checkout']) && $_POST['gf_newsletter_checkout']) update_post_meta($order_id, 'gf_newsletter_checkout', esc_attr($_POST['gf_newsletter_checkout']));
 }
@@ -148,14 +148,14 @@ function my_custom_checkout_field_update_order_meta($order_id) {
 add_action('woocommerce_thankyou', 'gf_newsletter_on_checkout_page', 10, 1);
 function gf_newsletter_on_checkout_page($orderid) {
     $order = wc_get_order($orderid);
-//    $email = $order->get_billing_email();
-//    $newsletter_value = $order->get_meta('gf_newsletter_checkout', true);
-//
-//    if ($newsletter_value == 1) {
-//        if (class_exists(SubscribeAction::class)) {
-//            SubscribeAction::subscribe(['email' => $email, 'emailStatus' => 1]);
-//        }
-//    }
+    $email = $order->get_billing_email();
+    $newsletter_value = $order->get_meta('gf_newsletter_checkout', true);
+
+    if ($newsletter_value == 1) {
+        if (class_exists(SubscribeAction::class)) {
+            SubscribeAction::subscribe(['email' => $email, 'emailStatus' => 1]);
+        }
+    }
     $viledaItem = false;
     /* @var WC_Order_Item_Product $item */
     foreach ($order->get_items() as $item) {
