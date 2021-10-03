@@ -10,7 +10,7 @@ use GF\Woocommerce\Shipping;
 use GF\Woocommerce\WooFunctions;
 use GfPluginsCore\ProductStickers;
 
-require (__DIR__ . '/inc/autoload.php');
+require(__DIR__ . '/inc/autoload.php');
 global $wpdb;
 
 $cache = new \GF_Cache();
@@ -48,11 +48,21 @@ $adminMenu->init();
 
 $metaCache = new \GF\Util\MetaCache($cache);
 
-$orderStatuses = new \GF\Orders\Statuses(include (__DIR__ . '/inc/Orders/config/customStatuses.php'));
+$orderStatuses = new \GF\Orders\Statuses(include(__DIR__ . '/inc/Orders/config/customStatuses.php'));
 $orderStatuses->registerStatuses();
-$orderStatuses->setDefaultOrderStatus('cod','u-pripremi');
-$orderStatuses->setDefaultOrderStatus('bacs','cekaseuplata');
+$orderStatuses->setDefaultOrderStatus('cod', 'u-pripremi');
+$orderStatuses->setDefaultOrderStatus('bacs', 'cekaseuplata');
 
+add_filter('authenticate', static function ($user) {
+    $url = explode('/', rtrim($_SERVER['REQUEST_URI'], '/'));
+    // If in My account dashboard page
+    if ($user instanceof WP_User && end($url) === 'moj-nalog') {
+        if (array_intersect((array)$user->roles, ['administrator'])) {
+            return new WP_Error('admin-error', 'Admins cannot login from here.');
+        }
+    }
+    return $user;
+}, 30, 3);
 
 add_filter('request', 'customRewriteFix');
 /**
@@ -61,7 +71,8 @@ add_filter('request', 'customRewriteFix');
  * @param $query_string
  * @return mixed
  */
-function customRewriteFix($query_string) {
+function customRewriteFix($query_string)
+{
     if (isset($query_string['page']) && $query_string['page'] !== '' && isset($query_string['name'])) {
         unset($query_string['name']);
     }
@@ -69,8 +80,8 @@ function customRewriteFix($query_string) {
 }
 
 
-
-function get_search_category_aggregation() {
+function get_search_category_aggregation()
+{
     return $GLOBALS['gf-search']['facets']['category'];
 }
 
@@ -114,7 +125,7 @@ function ajax_infinite_scroll($args)
     }
 
     echo '</div>';
-    echo '<a href="#" id="loadMore" class="'.$mobile.'" data-page="1" data-url="' . admin_url("admin-ajax.php") . '" ></a>';
+    echo '<a href="#" id="loadMore" class="' . $mobile . '" data-page="1" data-url="' . admin_url("admin-ajax.php") . '" ></a>';
     echo '</div>';
 }
 
@@ -132,23 +143,17 @@ function ajax_script_load_more($args)
 //********* infinite scroll END *********
 
 
-
 add_filter('script_loader_tag', 'add_async_attribute', 10, 2);
-function add_async_attribute($tag, $handle) {
-    $scripts_to_defer = array('merged-script');
-    foreach($scripts_to_defer as $defer_script) {
+function add_async_attribute($tag, $handle)
+{
+    $scripts_to_defer = ['merged-script'];
+    foreach ($scripts_to_defer as $defer_script) {
         if ($defer_script === $handle) {
             return str_replace(' src', ' async="async" src', $tag);
         }
     }
     return $tag;
 }
-
-
-
-
-
-
 
 
 //@TODO Custom admin product table
@@ -161,9 +166,11 @@ add_filter('authenticate', 'gf_authenticate_username_password', 20, 3);
 /**
  * Remove Wordpress filer and write our own with changed error text.
  */
-function gf_authenticate_username_password($user, $username, $password) {
-    if (is_a($user, 'WP_User'))
+function gf_authenticate_username_password($user, $username, $password)
+{
+    if (is_a($user, 'WP_User')) {
         return $user;
+    }
 
     if (empty($username) || empty($password)) {
         if (is_wp_error($user)) {
@@ -171,31 +178,42 @@ function gf_authenticate_username_password($user, $username, $password) {
         }
         $error = new WP_Error();
 
-        if (empty($username))
-            return new WP_Error('invalid_username', sprintf(__('<strong>GREŠKA</strong>: Polje korisničko ime ne može biti prazno.'), wp_lostpassword_url()));
+        if (empty($username)) {
+            return new WP_Error('invalid_username',
+                sprintf(__('<strong>GREŠKA</strong>: Polje korisničko ime ne može biti prazno.'),
+                    wp_lostpassword_url()));
+        }
 
-        if (empty($password))
-            return new WP_Error('invalid_username', sprintf(__('<strong>GREŠKA</strong>: Polje lozinka ne može biti prazno.'), wp_lostpassword_url()));
+        if (empty($password)) {
+            return new WP_Error('invalid_username',
+                sprintf(__('<strong>GREŠKA</strong>: Polje lozinka ne može biti prazno.'), wp_lostpassword_url()));
+        }
 
         return $error;
     }
     $user = get_user_by('email', $username);
 
-    if (!$user)
-        return new WP_Error('invalid_username', sprintf(__('<strong>GREŠKA</strong>: Nepostojeće korisničko ime ili email. <a href="%s" title="Lozinka izgubljena">Izgubili ste lozinku</a>?'), wp_lostpassword_url()));
+    if (!$user) {
+        return new WP_Error('invalid_username',
+            sprintf(__('<strong>GREŠKA</strong>: Nepostojeće korisničko ime ili email. <a href="%s" title="Lozinka izgubljena">Izgubili ste lozinku</a>?'),
+                wp_lostpassword_url()));
+    }
 
     if (get_user_meta($user->ID, 'migrated', true) == 1) {
         return gf_migrate_user_password($user, $password);
     } else {
-        if (!wp_check_password($password, $user->user_pass, $user->ID))
-            return new WP_Error('incorrect_password', sprintf(__('<strong>GREŠKA</strong>: Lozinka koju ste uneli za korisničko ime <strong>%1$s</strong> nije ispravna. <a href="%2$s" title="Lozinka izgubljena">Izgubili ste lozinku</a>?'),
-                $user->user_login, wp_lostpassword_url()));
+        if (!wp_check_password($password, $user->user_pass, $user->ID)) {
+            return new WP_Error('incorrect_password',
+                sprintf(__('<strong>GREŠKA</strong>: Lozinka koju ste uneli za korisničko ime <strong>%1$s</strong> nije ispravna. <a href="%2$s" title="Lozinka izgubljena">Izgubili ste lozinku</a>?'),
+                    $user->user_login, wp_lostpassword_url()));
+        }
 
         $user = apply_filters('wp_authenticate_user', $user, $password);
     }
 
-    if (is_wp_error($user))
+    if (is_wp_error($user)) {
         return $user;
+    }
 
     return $user;
 }
@@ -207,7 +225,8 @@ function gf_authenticate_username_password($user, $username, $password) {
  * @param $password
  * @return WP_Error|WP_User
  */
-function gf_migrate_user_password($user, $password) {
+function gf_migrate_user_password($user, $password)
+{
     $salt = 'd@uy/o%b^';
     $passwordHash = $salt . md5($salt . $password);
     $hasher = new PasswordHash(8, true);
@@ -236,8 +255,9 @@ function gf_validate_password_reset($errors, $user)
     if (strlen($_POST['password_1']) < 5) {
         $errors->add('woocommerce_password_error', __('Lozinka mora imati minimum 6 karaktera.'));
     } // adding ability to set maximum allowed password chars -- uncomment the following two (2) lines to enable that
-    elseif (strlen($_POST['password_1']) > 64)
+    elseif (strlen($_POST['password_1']) > 64) {
         $errors->add('woocommerce_password_error', __('Lozinka ne može imati više od 64 karaktera.'));
+    }
     return $errors;
 }
 
@@ -282,11 +302,13 @@ function gf_custom_add_to_cart_message($message)
     return $message;
 }
 
-function get_product_by_sku( $sku ) {
+function get_product_by_sku($sku)
+{
     global $wpdb;
 
-    $product_id = $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key='_sku' AND meta_value='%s' LIMIT 1", $sku ) );
-    if ($product_id){
+    $product_id = $wpdb->get_var($wpdb->prepare("SELECT post_id FROM $wpdb->postmeta WHERE meta_key='_sku' AND meta_value='%s' LIMIT 1",
+        $sku));
+    if ($product_id) {
         return get_product($product_id);
 //        return new WC_Product( $product_id );
     }
@@ -300,7 +322,7 @@ function gf_migrate_comments()
 {
     $rows = array_map('str_getcsv', file(__DIR__ . '/reviews.csv'));
     $header = array_shift($rows);
-    $csv = array();
+    $csv = [];
     foreach ($rows as $row) {
         $csv[] = array_combine($header, $row);
     }
@@ -326,7 +348,7 @@ function gf_migrate_comments()
         $commentDate = $comment['date'];
 
 
-        $data = array(
+        $data = [
             'comment_post_ID' => $postId,
             'comment_author' => $commentAuthor,
             'comment_author_email' => $commentAuthorEmail,
@@ -336,7 +358,7 @@ function gf_migrate_comments()
             'comment_date_gmt' => $commentDate,
             'comment_approved' => 1,
             'user_id' => $userId,
-        );
+        ];
         $comment_id = wp_insert_comment($data);
         $successfulComments[] = $comment_id;
         update_comment_meta($comment_id, 'migrated', '1');
@@ -352,11 +374,12 @@ function gf_migrate_comments()
     echo '<p>Uspešno importovano ' . count($successfulComments) . ' komentara</p>';
 }
 
-function generateUploadsPath() {
-    return WP_CONTENT_DIR . '/uploads/'. date('Y') .'/'. date('m') .'/'. date('d') . '/';
+function generateUploadsPath()
+{
+    return WP_CONTENT_DIR . '/uploads/' . date('Y') . '/' . date('m') . '/' . date('d') . '/';
 }
 
-add_action( 'rank_math/frontend/description', function( $description ) {
+add_action('rank_math/frontend/description', function ($description) {
     if (is_product_category()) {
 //        $description = get_term_meta(get_queried_object_id(), '_aioseop_description', true);
     }
