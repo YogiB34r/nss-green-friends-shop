@@ -129,7 +129,7 @@ function woo_custom_order_formatted_billing_address($address, $order) {
     );
 }
 
-//add_action('woocommerce_review_order_before_submit', 'gf_add_newsletter_checkbox_on_checkout');
+add_action('woocommerce_review_order_before_submit', 'gf_add_newsletter_checkbox_on_checkout');
 function gf_add_newsletter_checkbox_on_checkout($checkout) {
     woocommerce_form_field('gf_newsletter_checkout', array(
         'type' => 'checkbox',
