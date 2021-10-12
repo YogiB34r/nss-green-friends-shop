@@ -488,15 +488,15 @@ class Cli
         $specCatToIgnore = array_merge($specCatToIgnore, get_term_children($specCatId,'product_cat'));
 
         $progress = make_progress_bar('Progress', count($products));
-        $i = 0;
+//        $i = 0;
         /** @var \WC_Product $product */
         foreach ($products as $product) {
             $setProductCats = $catsToSet;
             //prevents db from dying
-            if ($i === 500) {
-                sleep(1);
-                $i = 0;
-            }
+//            if ($i === 500) {
+//                sleep(1);
+//                $i = 0;
+//            }
             $cats = $product->get_category_ids();
             $level3Found = false;
             foreach ($cats as $catId){
@@ -519,7 +519,7 @@ class Cli
             $product->set_category_ids($setProductCats);
             $product->save();
             $progress->tick();
-            $i++;
+//            $i++;
 
         }
         $progress->finish();
