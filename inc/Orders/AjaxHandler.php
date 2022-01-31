@@ -629,7 +629,7 @@ class AjaxHandler
     {
         global $wpdb;
         $formattedArray = [];
-        $sql = "SELECT `post_id` FROM {$wpdb->postmeta} WHERE `meta_key` = 'marketplaceVendor'";
+        $sql = "SELECT `post_id` FROM {$wpdb->postmeta} WHERE `meta_key` = 'marketplaceVendor' AND `meta_value` != ''";
         if (isset($vendorId) && $vendorId !== '-1') {
             $sql .= ' AND `meta_value` = ' . $_GET['vendorIdSelect'];
         }

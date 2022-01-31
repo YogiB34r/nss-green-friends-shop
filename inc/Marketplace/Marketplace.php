@@ -366,8 +366,10 @@ class Marketplace
                 if (isset($vendor['isActive']) && $vendor['isActive'] === '1') {
                     $order->update_meta_data('marketplaceVendor', $suppliers[0]);
                     $order->save();
-
                 }
+            } else {
+                $order->update_meta_data('marketplaceVendor', '');
+                $order->save();
             }
         }
     }
