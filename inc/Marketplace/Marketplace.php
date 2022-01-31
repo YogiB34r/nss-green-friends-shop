@@ -30,9 +30,11 @@ class Marketplace
         add_action('edit_user_profile_update', [$this, 'saveMarketplaceExtraFields']);
         add_filter('woocommerce_package_rates', [$this, 'handleMarketplaceShipping'], 11, 2);
         add_action('init', function () {
-            add_action('save_post', [$this, 'markOrderAsMarketplace'], 10, 2);
+            add_action('save_post', [$this, 'markOrderAsMarketplace'], 99, 2);
             add_action('woocommerce_new_order',[$this, 'sendVendorEmailOnManualOrder'], 10, 1);
+            add_action('post_updated',[$this, 'markOrderAsMarketplace'], 10, 2);
         });
+
         add_action('manage_shop_order_posts_custom_column', [$this, 'marketplaceColumnPopulate']);
         add_action('admin_footer-edit.php', [$this, 'marketplaceCustomScript']);
         add_filter('woocommerce_email_recipient_new_order', [$this,'changeEmailRecipient'], 10, 2);
@@ -348,6 +350,9 @@ class Marketplace
 
     public function markOrderAsMarketplace($postId, \WP_Post $post)
     {
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE){
+            return;
+        }
         if ($post->post_type === 'shop_order') {
             $suppliers = [];
             $order = wc_get_order($postId);
