@@ -7,6 +7,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
     <link rel="profile" href="http://gmpg.org/xfn/11">
     <link rel="pingback" href="<?php bloginfo('pingback_url'); ?>">
+    <?php if(is_single()):
+    $product = wc_get_product(get_queried_object_id());
+        if (has_post_thumbnail($product->get_id())):
+            $imageUrl = get_the_post_thumbnail_url($product->get_id(), 'shop_catalog');
+            $title = $product->get_title(); ?>
+            <meta property="og:title" content="<?=$title?>" />
+            <meta property="og:type" content="product" />
+            <meta property="og:url" content="<?=$imageUrl?>"/>
+            <meta property="og:image" content="<?=$imageUrl?>" />
+            <meta name="twitter:title" content="<?=$title?>" />
+            <meta name="twitter:image" content="<?=$imageUrl?>" />
+            <meta name="twitter:card" content="summary_large_image" />
+        <?php endif;?>
+    <?php endif;?>
     <?php wp_head(); ?>
     <!-- Facebook Pixel Code -->
     <script>
