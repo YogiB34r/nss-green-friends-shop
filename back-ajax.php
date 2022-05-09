@@ -1,13 +1,9 @@
 <?php
 /* Template Name: back ajax */
-
-
-//ini_set('display_errors', 1);
+//require_once __DIR__ .'../../vendor/autoload.php';
 global $wpdb;
-
 //$sw = new \Symfony\Component\Stopwatch\Stopwatch();
 //$sw->start('gfmain');
-
 if (isset($_GET['action'])) {
     ini_set('max_execution_time', 1200);
     error_reporting(E_ALL);
@@ -143,6 +139,50 @@ if (isset($_GET['action'])) {
         case 'backendProductSearch':
             backendProductSearch();
 
+            break;
+
+        case 'dropboxAuth':
+            error_reporting(E_ALL);
+            ini_set('display_errors', 1);
+            try {
+                $dropboxApi = new \GF\DropBox\DropboxApi();
+                $dropboxApi->dropBoxAuthConsent();
+            } catch (\Exception $e) {
+                var_dump($e->getMessage());
+                die();
+            }
+
+            break;
+        case 'dropboxAuthComplete':
+            error_reporting(E_ALL);
+            ini_set('display_errors', 1);
+            try {
+                $dropboxApi = new \GF\DropBox\DropboxApi();
+                $dropboxApi->saveRefreshToken();
+                wp_redirect(get_home_url() . '/wp-admin/admin.php?page=order-analytics');
+            } catch (\Exception $e) {
+                var_dump($e->getMessage());
+                die();
+            }
+
+            break;
+        case 'fiskalniRacun':
+            error_reporting(E_ALL);
+            ini_set('display_errors', 1);
+            try {
+                $dropbox = new \GF\DropBox\DropboxApi();
+                $order = wc_get_order($_GET['id']);
+                $orderNumber = $order->get_order_number();
+                $dropbox = new \GF\DropBox\DropboxApi();
+                $dropbox->setupFileSystem();
+                var_dump($dropbox->getOrderFileContents($orderNumber));
+            } catch (\Exception $e) {
+                var_dump($e->getMessage());
+                die();
+            } catch (\League\Flysystem\FilesystemException $e) {
+                var_dump($e->getMessage());
+                die();
+            }
             break;
     }
 }
