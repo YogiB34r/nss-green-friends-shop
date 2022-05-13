@@ -73,7 +73,7 @@ class DropboxApi
     /**
      * @throws FilesystemException
      */
-    public function getOrderFileContents(int $orderId): string
+    public function getOrderFileContents(string $orderId): string
     {
         return ($this->fileSystem->read($orderId . '.json'));
     }
