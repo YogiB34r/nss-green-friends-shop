@@ -217,7 +217,6 @@ if (isset($_GET['action'])) {
  * @throws JsonException
  */
 function getEsirFileContentsFromDropbox($orderId) {
-    $orderId = 636829;
     $order = wc_get_order($orderId);
     $orderNumber = $order->get_order_number();
     $dropbox = new \GF\DropBox\DropboxApi();
