@@ -15,15 +15,15 @@ class EsirIntegration
     {
         $orders = json_decode($json);
         foreach ($orders as $order) {
-            $wcOrder = wc_get_order($order->orderID);
-//            $wcOrder = wc_get_order(636829);
-            $wcOrder->add_meta_data('fiskalniRacunCreated', true);
-            $wcOrder->save();
             \GF\Esir\EsirIntegrationLogHandler::saveEsirResponse(
                 (int) explode('-', $order->orderID)[1],
                 json_encode($order),
                 1
             );
+            $wcOrder = wc_get_order($order->orderID);
+//            $wcOrder = wc_get_order(636829);
+            $wcOrder->add_meta_data('fiskalniRacunCreated', true);
+            $wcOrder->save();
             try {
                 $msg = '<pre>' . $order->journal .'</pre>' . PHP_EOL . PHP_EOL;
                 $msg .= '<img src="'. static::saveQrImage($order).'" alt="Pregled racuna" />';
