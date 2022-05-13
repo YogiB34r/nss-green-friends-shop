@@ -156,7 +156,7 @@ class EsirIntegration
         <td valign="middle" align="center">
             <a style="width: max-content; color: white; background-color: rebeccapurple; padding: 10px;
              border-radius: 5px; display: block; text-decoration: none"
-               href="'.$downloadLink.'"><b>PREUZMITE eRačun / DOWNLOAD eInvoice<br/>LINK</b></a>
+               href="'.$downloadLink.'"><b>PREUZMITE Račun / DOWNLOAD Invoice<br/>LINK</b></a>
         </td>
     </tr>
     <tr>
