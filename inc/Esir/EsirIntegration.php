@@ -7,7 +7,7 @@ class EsirIntegration
     const TEST_USER = 'nssVwduqkqMHts7LQe2';
     const TEST_PASS = 'nss56a32e50a63a97548881213989245c72';
 
-    const PROD_URL = 'https://cube.cornerstone.rs :3005';
+    const PROD_URL = 'https://cube.cornerstone.rs:3005';
     const PROD_USER = 'nssaPAuqkqMTts9LQf3';
     const PROD_PASS = 'nsA2a32e512363a973456k121398924Cc7a';
 
