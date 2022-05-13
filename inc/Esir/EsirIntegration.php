@@ -7,9 +7,9 @@ class EsirIntegration
     const TEST_USER = 'nssVwduqkqMHts7LQe2';
     const TEST_PASS = 'nss56a32e50a63a97548881213989245c72';
 
-    const PROD_URL = 'https://abfiskal.rs:3005';
-    const PROD_USER = '';
-    const PROD_PASS = '';
+    const PROD_URL = 'https://cube.cornerstone.rs :3005';
+    const PROD_USER = 'nssaPAuqkqMTts9LQf3';
+    const PROD_PASS = 'nsA2a32e512363a973456k121398924Cc7a';
 
     public static function processEsirResponse($json)
     {
@@ -17,23 +17,28 @@ class EsirIntegration
         foreach ($orders as $order) {
             $wcOrder = wc_get_order($order->orderID);
 //            $wcOrder = wc_get_order(636829);
-            // @TODO add for prod
-//            $wcOrder->add_meta_data('fiskalniRacunCreated', true);
-//            $wcOrder->save();
+            $wcOrder->add_meta_data('fiskalniRacunCreated', true);
+            $wcOrder->save();
             \GF\Esir\EsirIntegrationLogHandler::saveEsirResponse(
                 (int) explode('-', $order->orderID)[1],
                 json_encode($order),
                 1
             );
-            $msg = '<pre>' . $order->journal .'</pre>' . PHP_EOL . PHP_EOL;
-            $msg .= '<img src="'. static::saveQrImage($order).'" alt="Pregled racuna" />';
-            $subject = 'Vas racun';
-            $body = static::compileMail($order->verificationUrl, $msg);
-            $to = get_user_by('ID', $wcOrder->get_customer_id())->user_email;
-            $to = 'djavolak@mail.ru';
-            add_filter( 'wp_mail_content_type', function( $content_type ) { return 'text/html'; } );
+            try {
+                $msg = '<pre>' . $order->journal .'</pre>' . PHP_EOL . PHP_EOL;
+                $msg .= '<img src="'. static::saveQrImage($order).'" alt="Pregled racuna" />';
+                $subject = 'Vas racun';
+                $body = static::compileMail($order->verificationUrl, $msg);
+                $to = get_user_by('ID', $wcOrder->get_customer_id())->user_email;
+                add_filter( 'wp_mail_content_type', function( $content_type ) { return 'text/html'; } );
 
-            \wp_mail($to, $subject, $body);
+                \wp_mail($to, $subject, $body);
+                $to = '';
+                \wp_mail($to, $subject, $body);
+            } catch (\Exception $e) {
+                static::errorLog($e->getMessage());
+            }
+
         }
     }
 
@@ -48,9 +53,14 @@ class EsirIntegration
     }
 
     public static function sendJsonToEsir($json) {
-        $user = static::TEST_USER;
-        $pass = static::TEST_PASS;
-        $url = static::TEST_URL . '/csfiskal/apiOrdersReceiver';
+//        $user = static::TEST_USER;
+//        $pass = static::TEST_PASS;
+//        $url = static::TEST_URL . '/csfiskal/apiOrdersReceiver';
+
+        $user = static::PROD_USER;
+        $pass = static::PROD_PASS;
+        $url = static::PROD_URL . '/csfiskal/apiOrdersReceiver';
+
         $headers = [
             'Content-Type' => 'application/json',
         ];
@@ -93,9 +103,13 @@ class EsirIntegration
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public static function getPdvValues($stopa) {
-        $user = static::TEST_USER;
-        $pass = static::TEST_PASS;
-        $url = static::TEST_URL . '/csfiskal/apiGetTaxes';
+//        $user = static::TEST_USER;
+//        $pass = static::TEST_PASS;
+//        $url = static::TEST_URL . '/csfiskal/apiGetTaxes';
+
+        $user = static::PROD_USER;
+        $pass = static::PROD_PASS;
+        $url = static::PROD_URL . '/csfiskal/apiOrdersReceiver';
         $request = new \GuzzleHttp\Psr7\Request('POST', $url);
         $client = new \GuzzleHttp\Client(['auth' => [$user, $pass]]);
         $response = $client->send($request);
@@ -104,8 +118,8 @@ class EsirIntegration
                 return $item->Label;
             }
         }
-        // @TODO debug REMOVE FOR PRODUCTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        return $item->Label;
+//         @TODO debug REMOVE FOR PRODUCTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//        return $item->Label;
         throw new \Exception('could not get value');
     }
 
