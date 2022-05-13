@@ -1,39 +1,56 @@
 <?php
-
 namespace GF\Esir;
 
 class EsirIntegration
 {
+    const TEST_URL = 'https://cstest.abfiskal.rs:3005';
+    const TEST_USER = 'nssVwduqkqMHts7LQe2';
+    const TEST_PASS = 'nss56a32e50a63a97548881213989245c72';
+
+    const PROD_URL = 'https://abfiskal.rs:3005';
+    const PROD_USER = '';
+    const PROD_PASS = '';
+
     public static function processEsirResponse($json)
     {
         $orders = json_decode($json);
         foreach ($orders as $order) {
-//                $order = wc_get_order($order->orderID);
-            $wcOrder = wc_get_order(636829);
-            $to = get_user_by('ID', $wcOrder->get_customer_id())->user_email;
-//                \GF\Esir\EsirIntegrationLogHandler::saveEsirResponse(
-//                    (int) explode('-', $order->orderID)[1],
-//                    json_encode($order),
-//                    1
-//                );
-            $qrLib = new \chillerlan\QRCode\QRCode();
-            $to = 'djavolak@mail.ru';
-//                $msg = 'izvolte racun : ' . PHP_EOL . PHP_EOL;
+            $wcOrder = wc_get_order($order->orderID);
+//            $wcOrder = wc_get_order(636829);
+            // @TODO add for prod
+//            $wcOrder->add_meta_data('fiskalniRacunCreated', true);
+//            $wcOrder->save();
+            \GF\Esir\EsirIntegrationLogHandler::saveEsirResponse(
+                (int) explode('-', $order->orderID)[1],
+                json_encode($order),
+                1
+            );
             $msg = '<pre>' . $order->journal .'</pre>' . PHP_EOL . PHP_EOL;
-            $msg .= '<img src="'. $qrLib->render($order->verificationUrl).'" alt="Pregled racuna" />';
+            $msg .= '<img src="'. static::saveQrImage($order).'" alt="Pregled racuna" />';
             $subject = 'Vas racun';
+            $body = static::compileMail($order->verificationUrl, $msg);
+            $to = get_user_by('ID', $wcOrder->get_customer_id())->user_email;
+            $to = 'djavolak@mail.ru';
+            add_filter( 'wp_mail_content_type', function( $content_type ) { return 'text/html'; } );
 
-            echo $msg;
-            die();
-
-            \wp_mail($to, $subject, $msg);
+            \wp_mail($to, $subject, $body);
         }
     }
 
-    public static function sendJsonToEsir($json, $logTitle) {
-        $user = 'nssVwduqkqMHts7LQe2';
-        $pass = 'nss56a32e50a63a97548881213989245c72';
-        $url = 'https://cstest.abfiskal.rs:3005/csfiskal/apiOrdersReceiver';
+    public static function saveQrImage($order)
+    {
+        $qrLib = new \chillerlan\QRCode\QRCode();
+        $qrFileName = $order->orderID . '.jpg';
+        $qrPath = WP_CONTENT_DIR . '/uploads/qrinvoices/' . $qrFileName;
+        $qrLib->render($order->verificationUrl, $qrPath);
+
+        return home_url() . '/wp-content/uploads/qrinvoices/' . $qrFileName;
+    }
+
+    public static function sendJsonToEsir($json) {
+        $user = static::TEST_USER;
+        $pass = static::TEST_PASS;
+        $url = static::TEST_URL . '/csfiskal/apiOrdersReceiver';
         $headers = [
             'Content-Type' => 'application/json',
         ];
@@ -44,8 +61,6 @@ class EsirIntegration
             $item->name = $item->Name;
             unset($item->Name);
         }
-//    var_dump($json);
-//    die();
         $json = json_encode($json);
 
         $request = new \GuzzleHttp\Psr7\Request('POST', $url, $headers, $json);
@@ -55,44 +70,36 @@ class EsirIntegration
         } catch (\Exception $e) {
             $msg = $e->getMessage() . PHP_EOL . $e->getResponse()->getBody()->getContents() . PHP_EOL;
             $msg .= 'Tried to send : ' . $json;
-//        \WP_Logging::add($logTitle . ' has FAILED', $msg);
-
-            //debug
-            var_dump('request error, tried to send: ');
-            var_dump($json);
-            echo $e->getMessage();
-            echo $e->getResponse()->getBody()->getContents();
-            die();
+            static::errorLog($msg);
             return false;
         }
 
         if ($response->getStatusCode() !== 200) {
             $msg = 'Status code: ' . $response->getStatusCode() . PHP_EOL;
             $msg .= $response->getBody()->getContents();
-//        \WP_Logging::add($logTitle . ' has FAILED', $msg);
-            // debug
-            var_dump($response->getStatusCode());
-            echo $response->getBody()->getContents();
-            die();
+            static::errorLog($msg);
             return false;
         }
         if ($response->getBody()->getContents() === '{"status":"OK"}') {
-//        \WP_Logging::add($logTitle . ' has SUCCEDED', 'ok');
             return true;
         }
-//    \WP_Logging::add($logTitle . ' has FAILED - general error. should not be after debugged.', 'damn');
+        static::errorLog('Process has FAILED !!! - general error. should not be after debugged!!!');
         return false;
     }
 
+    /**
+     * @param $stopa
+     * @return mixed
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
     public static function getPdvValues($stopa) {
-        $user = 'nssVwduqkqMHts7LQe2';
-        $pass = 'nss56a32e50a63a97548881213989245c72';
-        $url = 'https://cstest.abfiskal.rs:3005/csfiskal/apiGetTaxes';
+        $user = static::TEST_USER;
+        $pass = static::TEST_PASS;
+        $url = static::TEST_URL . '/csfiskal/apiGetTaxes';
         $request = new \GuzzleHttp\Psr7\Request('POST', $url);
         $client = new \GuzzleHttp\Client(['auth' => [$user, $pass]]);
         $response = $client->send($request);
         foreach (json_decode($response->getBody()->getContents())->data as $item) {
-//        var_dump($item);
             if ($item->Stopa == $stopa) {
                 return $item->Label;
             }
@@ -100,5 +107,59 @@ class EsirIntegration
         // @TODO debug REMOVE FOR PRODUCTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         return $item->Label;
         throw new \Exception('could not get value');
+    }
+
+    public static function errorLog($msg)
+    {
+        $path = WP_CONTENT_DIR . '/uploads/fiskalizacija.log';
+        $msg = date('Y-m-d H:i:s') . ' | ' . $msg;
+        file_put_contents($path, $msg, FILE_APPEND);
+    }
+
+    public static function compileMail($downloadLink, $fiskalniIsecak)
+    {
+        return '
+        <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Fiskalni Račun</title>
+</head>
+<body>
+<table align="center" width="600px" style="width:600px;">
+    <tbody style="width:600px;">
+    <tr>
+        <td><p>Kompanija <b>NON STOP SHOP DOO BEOGRAD</b> poslala Vam je fiskalizovan račun, preuzmite ga <b>bez naknade</b>
+               klikom na sledeći link.</p></td>
+    </tr>
+    <tr>
+        <td valign="middle" align="center">
+            <a style="width: max-content; color: white; background-color: rebeccapurple; padding: 10px;
+             border-radius: 5px; display: block; text-decoration: none"
+               href="'.$downloadLink.'"><b>PREUZMITE eRačun / DOWNLOAD eInvoice<br/>LINK</b></a>
+        </td>
+    </tr>
+    <tr>
+        <td align="center">
+           '.$fiskalniIsecak.'
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p style="width:600px;word-break: break-all;">
+                Ukoliko ne možete preuzeti fiskalni račun, kopirajte i zalepite URL koji se nalazi ispod u svoj Internet pretraživač ili
+                pozovite tehničku podršku na telefon <b>011/7450-380</b>
+            </p>
+            <p style="width:600px;word-break: break-all;">'.$downloadLink.'</p>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
+        ';
     }
 }

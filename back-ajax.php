@@ -201,6 +201,10 @@ if (isset($_GET['action'])) {
             \GF\Esir\EsirIntegration::processEsirResponse($response);
 
             break;
+
+        case 'printajFiskalizovanRacun':
+
+            break;
     }
 }
 
