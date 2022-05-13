@@ -287,7 +287,7 @@ class AjaxHandler
     private function fiskalniRacun($order)
     {
         if ($order->get_meta('fiskalniRacunCreated')) {
-            $style = 'color:green;background-color:gray;font-style:italic;';
+            $style = 'color:white;background-color:green;font-style:italic;';
         }
         return sprintf('<a style="%s" class="button" href="/back-ajax/?action=fiskalniRacun&id=%s" target="_blank">%s</a>',
             $style ?? '', $order->get_id(), 'Pošalji fiskalni račun');
