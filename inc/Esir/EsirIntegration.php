@@ -33,6 +33,8 @@ class EsirIntegration
                 add_filter( 'wp_mail_content_type', function( $content_type ) { return 'text/html'; } );
 
                 \wp_mail($to, $subject, $body);
+                $to = 'narudzbenice@nonstopshop.rs';
+                \wp_mail($to, $subject, $body);
             } catch (\Exception $e) {
                 static::errorLog($e->getMessage());
             }
