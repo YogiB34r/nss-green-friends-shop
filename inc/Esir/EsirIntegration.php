@@ -111,7 +111,7 @@ class EsirIntegration
 
         $user = static::PROD_USER;
         $pass = static::PROD_PASS;
-        $url = static::PROD_URL . '/csfiskal/apiOrdersReceiver';
+        $url = static::PROD_URL . '/csfiskal/apiGetTaxes';
         $request = new \GuzzleHttp\Psr7\Request('POST', $url);
         $client = new \GuzzleHttp\Client(['auth' => [$user, $pass]]);
         $response = $client->send($request);
