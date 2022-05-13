@@ -1,6 +1,6 @@
 <?php
 
-namespace GF\DropBox;
+namespace GF\Esir;
 
 class EsirIntegration
 {
@@ -40,7 +40,7 @@ class EsirIntegration
         $json = substr($json, 3);
         $json = json_decode($json);
         foreach ($json->items as $item) {
-            $item->label = \GF\DropBox\EsirIntegration::getPdvValues($item->label);
+            $item->label = static::getPdvValues($item->label);
             $item->name = $item->Name;
             unset($item->Name);
         }

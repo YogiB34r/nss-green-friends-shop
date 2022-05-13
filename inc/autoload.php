@@ -48,6 +48,7 @@ require_once(__DIR__ . '/gf-single-product-functions.php');
 require_once(__DIR__ . '/gf-woocommerce-checkout-functions.php');
 require_once(__DIR__ . '/Esir/DropboxApi.php');
 require_once(__DIR__ . '/Esir/EsirIntegrationLogHandler.php');
+require_once(__DIR__ . '/Esir/EsirIntegration.php');
 
 foreach (glob(__DIR__ . "/Woocommerce/*.php") as $file) {
     require_once $file;
