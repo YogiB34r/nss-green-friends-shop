@@ -281,7 +281,7 @@ class AjaxHandler
 
     private function getActionsForOrder($order)
     {
-        return $this->predracunAction($order) . $this->fiskalniRacun($order) . $this->exportAction($order) . $this->adresnicaAction($order) .
+        return $this->predracunAction($order) . $this->fiskalniRacun($order). $this->printFiskalniRacun($order) . $this->exportAction($order) . $this->adresnicaAction($order) .
             $this->noteAction($order) . $this->syncToMisAction($order);
     }
     private function fiskalniRacun($order)
@@ -291,6 +291,11 @@ class AjaxHandler
         }
         return sprintf('<a style="%s" class="button" href="/back-ajax/?action=fiskalniRacun&id=%s" target="_blank">%s</a>',
             $style ?? '', $order->get_id(), 'Pošalji fiskalni račun');
+    }
+    private function printFiskalniRacun($order)
+    {
+        return sprintf('<a class="button" href="/back-ajax/?action=printajFiskalizovanRacun&id=%s" target="_blank">%s</a>',
+            $order->get_id(), 'Štampaj fiskalni račun');
     }
     private function adresnicaAction($order)
     {
