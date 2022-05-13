@@ -15,12 +15,13 @@ class EsirIntegration
     {
         $orders = json_decode($json);
         foreach ($orders as $order) {
+            $wcOrderId = (int) explode('-', $order->orderID)[1];
             \GF\Esir\EsirIntegrationLogHandler::saveEsirResponse(
-                (int) explode('-', $order->orderID)[1],
+                $wcOrderId,
                 json_encode($order),
                 1
             );
-            $wcOrder = wc_get_order($order->orderID);
+            $wcOrder = wc_get_order($wcOrderId);
 //            $wcOrder = wc_get_order(636829);
             $wcOrder->add_meta_data('fiskalniRacunCreated', true);
             $wcOrder->save();
