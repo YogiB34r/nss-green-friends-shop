@@ -221,7 +221,6 @@ function getEsirFileContentsFromDropbox($orderId) {
     $orderNumber = $order->get_order_number();
     $dropbox = new \GF\DropBox\DropboxApi();
     $dropbox->setupFileSystem();
-    $orderNumber = '05052022-663073'; // 04052022-662935
 
     return $dropbox->getOrderFileContents($orderNumber);
 }
