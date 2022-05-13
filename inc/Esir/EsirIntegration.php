@@ -71,7 +71,7 @@ class EsirIntegration
             $item->label = static::getPdvValues($item->label);
             $item->name = $item->Name;
             // debug for production
-            $item->transactionType = 'Training';
+//            $item->transactionType = 'Training';
             unset($item->Name);
         }
         $json = json_encode($json);
