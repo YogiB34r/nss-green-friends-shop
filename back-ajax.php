@@ -197,6 +197,7 @@ if (isset($_GET['action'])) {
             ini_set('display_errors', '1');
             error_reporting(E_ALL);
             $response = file_get_contents('php://input');
+            \GF\Esir\EsirIntegration::errorLog($response);
             \GF\Esir\EsirIntegration::processEsirResponse($response);
 
             break;
