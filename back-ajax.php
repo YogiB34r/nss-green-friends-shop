@@ -209,6 +209,11 @@ if (isset($_GET['action'])) {
             echo '<img width="300px" src="'.home_url() . '/wp-content/uploads/qrinvoices/' . $wcOrder->get_order_number() .'.jpg" />';
 
             break;
+
+        case 'voidFiskalizovanRacun':
+            $json = getEsirFileContentsFromDropbox($_GET['id']);
+
+            break;
     }
 }
 

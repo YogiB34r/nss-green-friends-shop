@@ -4,10 +4,18 @@ namespace GF\Esir;
 
 class EsirIntegrationLogHandler
 {
+    const STATUS_WAITING = 0;
+    const STATUS_FISCALIZED = 1;
+    const STATUS_FAILED = 2;
+    const STATUS_REFUNDED = 3;
+    const STATUS_VOIDED = 4;
+
     public static $statusCode = [
         0 => 'waitingFiskalization',
         1 => 'fiskalizationSuccess',
         2 => 'fiskalizationFailed',
+        3 => 'refund',
+        4 => 'void',
     ];
 
     /**

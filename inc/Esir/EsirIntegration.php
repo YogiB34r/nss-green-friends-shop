@@ -19,10 +19,9 @@ class EsirIntegration
             \GF\Esir\EsirIntegrationLogHandler::saveEsirResponse(
                 $wcOrderId,
                 json_encode($order),
-                1
+                EsirIntegrationLogHandler::STATUS_FISCALIZED
             );
             $wcOrder = wc_get_order($wcOrderId);
-//            $wcOrder = wc_get_order(636829);
             $wcOrder->add_meta_data('fiskalniRacunCreated', true);
             $wcOrder->save();
             try {
@@ -39,7 +38,6 @@ class EsirIntegration
             } catch (\Exception $e) {
                 static::errorLog($e->getMessage());
             }
-
         }
     }
 
@@ -63,9 +61,6 @@ class EsirIntegration
             $pass = static::TEST_PASS;
             $url = static::TEST_URL . '/csfiskal/apiOrdersReceiver';
         }
-        var_dump($url);
-
-        die();
         $headers = [
             'Content-Type' => 'application/json',
         ];
@@ -124,9 +119,18 @@ class EsirIntegration
                 return $item->Label;
             }
         }
-//         @TODO debug REMOVE FOR PRODUCTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//        return $item->Label;
+        if (ENVIRONMENT !== 'production') {
+            return $item->Label;
+        }
+
         throw new \Exception('could not get value');
+    }
+
+    public static function void($json)
+    {
+        var_dump($json);
+
+        die();
     }
 
     public static function errorLog($msg)
