@@ -281,8 +281,13 @@ class AjaxHandler
 
     private function getActionsForOrder($order)
     {
-        return $this->predracunAction($order) . $this->fiskalniRacun($order). $this->printFiskalniRacun($order) . $this->exportAction($order) . $this->adresnicaAction($order) .
-            $this->noteAction($order) . $this->syncToMisAction($order);
+        $html = $this->predracunAction($order) . $this->fiskalniRacun($order);
+        if ($order->get_meta('fiskalniRacunCreated')) {
+            $html .= $this->printFiskalniRacun($order) . $this->voidFiskalniRacun($order);
+        }
+        $html .= $this->exportAction($order) . $this->adresnicaAction($order) . $this->noteAction($order) . $this->syncToMisAction($order);
+
+        return $html;
     }
     private function fiskalniRacun($order)
     {
@@ -290,12 +295,17 @@ class AjaxHandler
             $style = 'color:white;background-color:green;font-style:italic;';
         }
         return sprintf('<a style="%s" class="button" href="/back-ajax/?action=fiskalniRacun&id=%s" target="_blank">%s</a>',
-            $style ?? '', $order->get_id(), 'Pošalji fiskalni račun');
+            $style ?? '', $order->get_id(), 'Pošalji račun');
     }
     private function printFiskalniRacun($order)
     {
         return sprintf('<a class="button" href="/back-ajax/?action=printajFiskalizovanRacun&id=%s" target="_blank">%s</a>',
-            $order->get_id(), 'Štampaj fiskalni račun');
+            $order->get_id(), 'Štampaj račun');
+    }
+    private function voidFiskalniRacun($order)
+    {
+        return sprintf('<a class="button" href="/back-ajax/?action=voidFiskalizovanRacun&id=%s" target="_blank">%s</a>',
+            $order->get_id(), 'Refundiraj račun');
     }
     private function adresnicaAction($order)
     {

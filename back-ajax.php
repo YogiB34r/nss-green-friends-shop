@@ -212,6 +212,12 @@ if (isset($_GET['action'])) {
 
         case 'voidFiskalizovanRacun':
             $json = getEsirFileContentsFromDropbox($_GET['id']);
+            $send = \GF\Esir\EsirIntegration::void($json, $_GET['id']);
+            if ($send) {
+                echo 'ok';
+            } else {
+                echo 'FAILED';
+            }
 
             break;
     }

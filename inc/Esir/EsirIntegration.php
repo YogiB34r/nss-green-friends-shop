@@ -126,11 +126,19 @@ class EsirIntegration
         throw new \Exception('could not get value');
     }
 
-    public static function void($json)
+    public static function void($json, $orderId)
     {
-        var_dump($json);
+        $json = substr($json, 3);
+        $wcOrder = wc_get_order($orderId);
+        $orderData = EsirIntegrationLogHandler::getEsirResponse($orderId);
+        $orderData = json_decode($orderData->esirResponse);
+        $json = json_decode($json);
+        $json->referentDocumentNumber = $orderData->invoiceNumber;
+        $json->transactionType = 'Refund';
+        // hack cause of jitex strange chars...
+        $json = '123' . json_encode($json);
 
-        die();
+        return static::sendJsonToEsir($json);
     }
 
     public static function errorLog($msg)
