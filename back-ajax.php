@@ -204,8 +204,9 @@ if (isset($_GET['action'])) {
 
         case 'printajFiskalizovanRacun':
             $data = \GF\Esir\EsirIntegrationLogHandler::getEsirResponse($_GET['id']);
-            var_dump($data);
-            var_dump(json_decode($data->journal));
+            $wcOrder = wc_get_order($_GET['id']);
+            echo '<pre>' . json_decode($data->esirResponse)->journal . '</pre>';
+            echo '<img width="300px" src="'.home_url() . '/wp-content/uploads/qrinvoices/' . $wcOrder->get_order_number() .'.jpg" />';
 
             break;
     }
