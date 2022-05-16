@@ -203,6 +203,9 @@ if (isset($_GET['action'])) {
             break;
 
         case 'printajFiskalizovanRacun':
+            $data = \GF\Esir\EsirIntegrationLogHandler::getEsirResponse($_GET['id']);
+            var_dump($data);
+            var_dump(json_decode($data->journal));
 
             break;
     }

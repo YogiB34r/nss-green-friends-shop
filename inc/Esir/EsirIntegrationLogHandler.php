@@ -27,4 +27,10 @@ class EsirIntegrationLogHandler
         global $wpdb;
         $wpdb->update('esir_log', ['esirResponse' => $response, 'status' => $status], ['orderId' => $orderId]);
     }
+
+    public static function getEsirResponse(int $orderId)
+    {
+        global $wpdb;
+        return $wpdb->get_row("SELECT * FROM esir_log WHERE orderId = {$orderId}");
+    }
 }
