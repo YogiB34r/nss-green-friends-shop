@@ -54,14 +54,18 @@ class EsirIntegration
     }
 
     public static function sendJsonToEsir($json) {
-//        $user = static::TEST_USER;
-//        $pass = static::TEST_PASS;
-//        $url = static::TEST_URL . '/csfiskal/apiOrdersReceiver';
+        if (ENVIRONMENT === 'production') {
+            $user = static::PROD_USER;
+            $pass = static::PROD_PASS;
+            $url = static::PROD_URL . '/csfiskal/apiOrdersReceiver';
+        } else {
+            $user = static::TEST_USER;
+            $pass = static::TEST_PASS;
+            $url = static::TEST_URL . '/csfiskal/apiOrdersReceiver';
+        }
+        var_dump($url);
 
-        $user = static::PROD_USER;
-        $pass = static::PROD_PASS;
-        $url = static::PROD_URL . '/csfiskal/apiOrdersReceiver';
-
+        die();
         $headers = [
             'Content-Type' => 'application/json',
         ];
@@ -70,16 +74,12 @@ class EsirIntegration
         foreach ($json->items as $item) {
             $item->label = static::getPdvValues($item->label);
             $item->name = $item->Name;
-            // debug for production
-//            $item->transactionType = 'Training';
             unset($item->Name);
         }
         $json = json_encode($json);
-
-        $request = new \GuzzleHttp\Psr7\Request('POST', $url, $headers, $json);
         $client = new \GuzzleHttp\Client(['auth' => [$user, $pass]]);
         try {
-            $response = $client->send($request);
+            $response = $client->send(new \GuzzleHttp\Psr7\Request('POST', $url, $headers, $json));
         } catch (\Exception $e) {
             $msg = $e->getMessage() . PHP_EOL . $e->getResponse()->getBody()->getContents() . PHP_EOL;
             $msg .= 'Tried to send : ' . $json;
@@ -106,13 +106,16 @@ class EsirIntegration
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public static function getPdvValues($stopa) {
-//        $user = static::TEST_USER;
-//        $pass = static::TEST_PASS;
-//        $url = static::TEST_URL . '/csfiskal/apiGetTaxes';
+        if (ENVIRONMENT === 'production') {
+            $user = static::PROD_USER;
+            $pass = static::PROD_PASS;
+            $url = static::PROD_URL . '/csfiskal/apiGetTaxes';
+        } else {
+            $user = static::TEST_USER;
+            $pass = static::TEST_PASS;
+            $url = static::TEST_URL . '/csfiskal/apiGetTaxes';
+        }
 
-        $user = static::PROD_USER;
-        $pass = static::PROD_PASS;
-        $url = static::PROD_URL . '/csfiskal/apiGetTaxes';
         $request = new \GuzzleHttp\Psr7\Request('POST', $url);
         $client = new \GuzzleHttp\Client(['auth' => [$user, $pass]]);
         $response = $client->send($request);
