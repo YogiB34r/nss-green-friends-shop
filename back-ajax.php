@@ -187,9 +187,19 @@ if (isset($_GET['action'])) {
                 die();
             }
             if ($sent) {
-                echo 'Racun poslat na fiskalizaciju.';
+                echo 'Racun poslat na fiskalizaciju, bićete preusmereni nazad za 5 sekundi.';
+                echo '<script>
+                     setTimeout(function(){
+                         history.back();
+                     }, 5000);
+                    </script>';
             } else {
-                echo 'Doslo je do greske prilikom slanja racuna na fiskalizaciju.';
+                echo 'Doslo je do greske prilikom slanja racuna na fiskalizaciju, bićete preusmereni nazad za 5 sekundi';
+                echo '<script>
+                     setTimeout(function(){
+                        history.back();
+                     }, 5000);
+                    </script>';
             }
             break;
 
