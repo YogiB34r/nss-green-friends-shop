@@ -14,33 +14,47 @@ class EsirIntegration
     public static function processEsirResponse($json)
     {
         $orders = json_decode($json);
-        foreach ($orders as $order) {
-            $wcOrderId = (int) explode('-', $order->orderID)[1];
-            \GF\Esir\EsirIntegrationLogHandler::saveEsirResponse(
-                $wcOrderId,
-                json_encode($order),
-                EsirIntegrationLogHandler::STATUS_FISCALIZED
-            );
-            $wcOrder = wc_get_order($wcOrderId);
-            $wcOrder->add_meta_data('fiskalniRacunCreated', true);
-            $wcOrder->save();
-            try {
-                $msg = '<pre>' . $order->journal .'</pre>' . PHP_EOL . PHP_EOL;
-                $msg .= '<img src="'. static::saveQrImage($order).'" alt="Pregled racuna" />';
-                $subject = 'Vas racun';
-                $body = static::compileMail($order->verificationUrl, $msg);
-                $to = get_user_by('ID', $wcOrder->get_customer_id())->user_email;
-                add_filter( 'wp_mail_content_type', function( $content_type ) { return 'text/html'; } );
-
-                \wp_mail($to, $subject, $body);
-                $to = 'narudzbenice@nonstopshop.rs';
-                \wp_mail($to, $subject, $body);
-            } catch (\Exception $e) {
-                static::errorLog($e->getMessage());
+        if (is_array($orders)){
+            foreach ($orders as $order) {
+                self::processOrderAndSendEmail($order);
             }
+        } else {
+            self::processOrderAndSendEmail($orders);
         }
+
     }
 
+    private static function processOrderAndSendEmail($order)
+    {
+        $wcOrderId = (int) explode('-', $order->orderID)[1];
+        \GF\Esir\EsirIntegrationLogHandler::saveEsirResponse(
+            $wcOrderId,
+            json_encode($order),
+            EsirIntegrationLogHandler::STATUS_FISCALIZED
+        );
+        $wcOrder = wc_get_order($wcOrderId);
+        $wcOrder->add_meta_data('fiskalniRacunCreated', true);
+        if ($order->transactionType !== 'REFUND') {
+            $wcOrder->add_order_note('Fiskalni račun je kreiran, broj racuna je: ' . $order->invoiceNumber);
+        } else {
+            $wcOrder->add_order_note('Uspesno storniran fiskalni racun, broj racuna je: ' . $order->invoiceNumber);
+        }
+        $wcOrder->save();
+        try {
+            $msg = '<pre>' . $order->journal .'</pre>' . PHP_EOL . PHP_EOL;
+            $msg .= '<img src="'. static::saveQrImage($order).'" alt="Pregled racuna" />';
+            $subject = 'Vas racun';
+            $body = static::compileMail($order->verificationUrl, $msg);
+            $to = get_user_by('ID', $wcOrder->get_customer_id())->user_email;
+            add_filter( 'wp_mail_content_type', function( $content_type ) { return 'text/html'; } );
+
+            \wp_mail($to, $subject, $body);
+            $to = 'narudzbenice@nonstopshop.rs';
+            \wp_mail($to, $subject, $body);
+        } catch (\Exception $e) {
+            static::errorLog($e->getMessage());
+        }
+    }
     public static function saveQrImage($order)
     {
         $qrLib = new \chillerlan\QRCode\QRCode();
@@ -66,6 +80,7 @@ class EsirIntegration
         ];
         $json = substr($json, 3);
         $json = json_decode($json);
+        $orderId = $json->orderID;
         foreach ($json->items as $item) {
             $item->label = static::getPdvValues($item->label);
             $item->name = $item->Name;
@@ -88,7 +103,8 @@ class EsirIntegration
             static::errorLog($msg);
             return false;
         }
-        if ($response->getBody()->getContents() === '{"status":"OK"}') {
+        $response = $response->getBody()->getContents();
+        if ($response === '{"status":"OK"}') {
             return true;
         }
         static::errorLog('Process has FAILED !!! - general error. should not be after debugged!!!');
@@ -138,7 +154,7 @@ class EsirIntegration
         // hack cause of jitex strange chars...
         $json = '123' . json_encode($json);
 
-        return static::sendJsonToEsir($json);
+        return static::sendJsonToEsir($json, true);
     }
 
     public static function errorLog($msg)

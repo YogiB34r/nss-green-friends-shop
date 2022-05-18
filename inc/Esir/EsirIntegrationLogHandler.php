@@ -33,9 +33,14 @@ class EsirIntegrationLogHandler
     public static function saveEsirResponse(int $orderId, string $response, int $status = 2)
     {
         global $wpdb;
+        $sql = "SELECT * FROM `esir_log` WHERE orderId = {$orderId} and status = 1";
+        $result = $wpdb->get_results($sql);
+        if (count($result) > 0) {
+            $wpdb->insert('esir_log', ['orderId' => $orderId, 'esirResponse' => $response, 'status' => 4]);
+            return;
+        }
         $wpdb->update('esir_log', ['esirResponse' => $response, 'status' => $status], ['orderId' => $orderId]);
     }
-
     public static function getEsirResponse(int $orderId)
     {
         global $wpdb;
