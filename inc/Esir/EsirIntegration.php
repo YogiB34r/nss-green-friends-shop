@@ -42,10 +42,10 @@ class EsirIntegration
         }
         $wcOrder->save();
         try {
-            $msg = '<pre>' . $order->journal .'</pre>' . PHP_EOL . PHP_EOL;
+            $msg = '<pre><p>Broj narudžbenice #<b>'.$wcOrder->get_order_number().'</b></p>' . $order->journal .'</pre>' . PHP_EOL . PHP_EOL;
             $msg .= '<img src="'. static::saveQrImage($order).'" alt="Pregled racuna" />';
             $subject = 'Vas racun';
-            $body = static::compileMail($order->verificationUrl, $msg);
+            $body = static::compileMail($order->verificationUrl, $msg, $wcOrder);
             $to = get_user_by('ID', $wcOrder->get_customer_id())->user_email;
             add_filter( 'wp_mail_content_type', function( $content_type ) { return 'text/html'; } );
 
@@ -163,7 +163,7 @@ class EsirIntegration
         file_put_contents($path, $msg, FILE_APPEND);
     }
 
-    public static function compileMail($downloadLink, $fiskalniIsecak)
+    public static function compileMail($downloadLink, $fiskalniIsecak, $order)
     {
         return '
         <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -179,7 +179,7 @@ class EsirIntegration
 <table align="center" width="600px" style="width:600px;">
     <tbody style="width:600px;">
     <tr>
-        <td><p>Kompanija <b>NON STOP SHOP DOO BEOGRAD</b> poslala Vam je fiskalizovan račun, preuzmite ga <b>bez naknade</b>
+        <td><p>Kompanija <b>NON STOP SHOP DOO BEOGRAD</b> poslala Vam je fiskalizovan račun za narudžbenicu <b>#'.$order->get_order_number().', </b>preuzmite ga <b>bez naknade</b>
                klikom na sledeći link.</p></td>
     </tr>
     <tr>
