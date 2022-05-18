@@ -81,7 +81,6 @@ class EsirIntegration
         ];
         $json = substr($json, 3);
         $json = json_decode($json);
-        $orderId = $json->orderID;
         foreach ($json->items as $item) {
             $item->label = static::getPdvValues($item->label);
             $item->name = $item->Name;
@@ -97,7 +96,6 @@ class EsirIntegration
             static::errorLog($msg);
             return false;
         }
-
         if ($response->getStatusCode() !== 200) {
             $msg = 'Status code: ' . $response->getStatusCode() . PHP_EOL;
             $msg .= $response->getBody()->getContents();

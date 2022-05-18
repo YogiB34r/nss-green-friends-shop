@@ -286,7 +286,6 @@ class AjaxHandler
             $html .= $this->printFiskalniRacun($order) . $this->voidFiskalniRacun($order);
         }
         $html .= $this->exportAction($order) . $this->adresnicaAction($order) . $this->noteAction($order) . $this->syncToMisAction($order);
-
         return $html;
     }
     private function fiskalniRacun($order)
@@ -294,7 +293,7 @@ class AjaxHandler
         if ($order->get_meta('fiskalniRacunCreated')) {
             $style = 'color:white;background-color:green;font-style:italic;';
         }
-        return sprintf('<a style="%s" class="button" href="/back-ajax/?action=fiskalniRacun&id=%s">%s</a>',
+        return sprintf('<a style="%s" class="button fiskalniRacunButton" href="/back-ajax/?action=fiskalniRacun&id=%s">%s</a>',
             $style ?? '', $order->get_id(), 'Pošalji račun');
     }
     private function printFiskalniRacun($order)
@@ -307,7 +306,7 @@ class AjaxHandler
         if ($order->get_meta('fiskalniRacunVoided')) {
             $style = 'color:white;background-color:red;font-style:italic;';
         }
-        return sprintf('<a class="button" style="%s" href="/back-ajax/?action=voidFiskalizovanRacun&id=%s">%s</a>',
+        return sprintf('<a class="button fiskalniRacunVoidButton" style="%s" href="/back-ajax/?action=voidFiskalizovanRacun&id=%s">%s</a>',
             $style ?? '', $order->get_id(), 'Refundiraj račun');
     }
     private function adresnicaAction($order)

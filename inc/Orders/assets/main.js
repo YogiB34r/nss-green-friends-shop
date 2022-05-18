@@ -259,3 +259,31 @@ jQuery(document).ready(function (){
         })
     }
 })
+
+let customInterval = setInterval(() => {
+    if (document.querySelectorAll(".fiskalniRacunButton").length > 0 && document.querySelectorAll(".fiskalniRacunVoidButton").length > 0) {
+        let fiskalniRacunButtons = document.querySelectorAll(".fiskalniRacunButton");
+        let voidFiskalniRacunButtons = document.querySelectorAll(".fiskalniRacunVoidButton");
+        fiskalniRacunButtons.forEach(function (button) {
+            if (button.style.backgroundColor === "green") {
+                button.addEventListener("click", function (e) {
+                    if (!confirm("Da li ste sigurni da želite da izdajete fiskalni račun posto je već izdat?")) {
+                        e.preventDefault();
+                    }
+                });
+            }
+        });
+        voidFiskalniRacunButtons.forEach(function (button) {
+            if (button.style.backgroundColor === "red") {
+                button.addEventListener("click", function (e) {
+                    if (!confirm("Da li ste sigurni da želite da refundirate fiskalni račun posto je već refundiran?")) {
+                        e.preventDefault();
+                    }
+                });
+            }
+        })
+        clearInterval(customInterval);
+    }
+},200);
+
+
