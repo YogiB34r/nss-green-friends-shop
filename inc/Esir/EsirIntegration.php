@@ -38,6 +38,7 @@ class EsirIntegration
             $wcOrder->add_order_note('Fiskalni račun je kreiran, broj racuna je: ' . $order->invoiceNumber);
         } else {
             $wcOrder->add_order_note('Uspesno storniran fiskalni racun, broj racuna je: ' . $order->invoiceNumber);
+            $wcOrder->add_meta_data('fiskalniRacunVoided', true);
         }
         $wcOrder->save();
         try {

@@ -224,9 +224,19 @@ if (isset($_GET['action'])) {
             $json = getEsirFileContentsFromDropbox($_GET['id']);;
             $send = \GF\Esir\EsirIntegration::void($json, $_GET['id']);
             if ($send) {
-                echo 'ok';
+                echo 'Racun poslat na refundaciju, bićete preusmereni nazad za 5 sekundi.';
+                echo '<script>
+                     setTimeout(function(){
+                         history.back();
+                     }, 5000);
+                    </script>';
             } else {
-                echo 'FAILED';
+                echo 'Doslo je do greske prilikom slanja racuna na refundaciju, bićete preusmereni nazad za 5 sekundi';
+                echo '<script>
+                     setTimeout(function(){
+                        history.back();
+                     }, 5000);
+                    </script>';
             }
             break;
     }

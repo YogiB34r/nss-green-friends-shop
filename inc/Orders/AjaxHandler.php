@@ -304,8 +304,11 @@ class AjaxHandler
     }
     private function voidFiskalniRacun($order)
     {
-        return sprintf('<a class="button" href="/back-ajax/?action=voidFiskalizovanRacun&id=%s" target="_blank">%s</a>',
-            $order->get_id(), 'Refundiraj račun');
+        if ($order->get_meta('fiskalniRacunVoided')) {
+            $style = 'color:white;background-color:red;font-style:italic;';
+        }
+        return sprintf('<a class="button" style="%s" href="/back-ajax/?action=voidFiskalizovanRacun&id=%s">%s</a>',
+            $style ?? '', $order->get_id(), 'Refundiraj račun');
     }
     private function adresnicaAction($order)
     {
