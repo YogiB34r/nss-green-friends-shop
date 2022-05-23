@@ -56,7 +56,7 @@ class Jitex
             $priceNoPdv = number_format($itemPrice / $modifier, 2, ',', '.');
             $priceFormated = number_format($itemPrice, 2, ',', '.');
             $paymentType = $order->get_payment_method_title();
-            if ($paymentType === 'Pouzecem') {
+            if ($paymentType === 'Pouzećem') {
                 $paymentType = 'Uplatnicom';
             }
             $string .= $name."\t".$order->get_billing_address_1()."\t".$order->get_billing_postcode()."\t".$order->get_billing_city()."\t"."Srbija"."\t".
@@ -67,7 +67,7 @@ class Jitex
         $order->save();
         $shippingNoPdv = number_format($order->get_shipping_total() / 1.2, 2, ',', '.');
         $paymentType = $order->get_payment_method_title();
-        if ($paymentType === 'Pouzecem') {
+        if ($paymentType === 'Pouzećem') {
             $paymentType = 'Uplatnicom';
         }
         $string .= $name."\t".$order->get_billing_address_1()."\t".$order->get_billing_postcode()."\t".$order->get_billing_city()."\t"."Srbija"."\t".
