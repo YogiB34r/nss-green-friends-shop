@@ -4,6 +4,15 @@
 global $wpdb;
 //$sw = new \Symfony\Component\Stopwatch\Stopwatch();
 //$sw->start('gfmain');
+use GF\Esir\Actions\FiskalAdvanceInvoice;
+use GF\Esir\Actions\SendAdvanceInvoice;
+use GF\Esir\Actions\SendAdvanceRefund;
+use GF\Esir\Actions\SendNormalInvoice;
+use GF\Esir\Actions\SendNormalRefund;
+use GF\Esir\EsirIntegrationLogHandler;
+use GuzzleHttp\Exception\GuzzleException;
+use League\Flysystem\FilesystemException;
+
 if (isset($_GET['action'])) {
     ini_set('max_execution_time', 1200);
     error_reporting(E_ALL);
@@ -12,7 +21,6 @@ if (isset($_GET['action'])) {
             $printMenu = false;
             $order = wc_get_order($_GET['id']);
             echo printPreorder($order);
-
             break;
 
         case 'printOrder':
@@ -166,79 +174,131 @@ if (isset($_GET['action'])) {
             }
 
             break;
-        case 'fiskalniRacun':
+        case 'sendNormalInvoice':
             error_reporting(E_ALL);
             ini_set('display_errors', 1);
-            $logTitle = 'Sending JSON to ESIR for orderid ' . $_GET['id'];
             $sent = 0;
             try {
                 $json = getEsirFileContentsFromDropbox($_GET['id']);
-                \GF\Esir\EsirIntegrationLogHandler::saveDropoxResponse($_GET['id'], $json);
-                if (\GF\Esir\EsirIntegration::sendJsonToEsir($json, $logTitle)) {
-                    $sent = 1;
-                }
-            } catch (\League\Flysystem\FilesystemException $e) {
-//                \WP_Logging::add($logTitle . ' has FAILED', $e->getMessage());
+                EsirIntegrationLogHandler::saveResponse($_GET['id'], $json, 'getFile', EsirIntegrationLogHandler::STATUS_WAITING);
+                $json = json_decode($json, false, 512, JSON_THROW_ON_ERROR);
+                $sendNormalInvoice = new SendNormalInvoice($json, $_GET['id']);
+                $sendNormalInvoice();
+            } catch (\Exception|FilesystemException|GuzzleException $e) {
                 echo $e->getMessage();
-                die();
-            } catch (\Exception $e) {
-//                \WP_Logging::add($logTitle . ' has FAILED', $e->getMessage());
-                echo $e->getMessage();
-                die();
+                return;
             }
-            if ($sent) {
-                echo 'Racun poslat na fiskalizaciju, bićete preusmereni nazad za 5 sekundi.';
-                echo '<script>
+            echo 'Racun poslat na fiskalizaciju, bićete preusmereni nazad za 5 sekundi.';
+            echo '<script>
                      setTimeout(function(){
                          history.back();
                      }, 5000);
                     </script>';
-            } else {
-                echo 'Doslo je do greske prilikom slanja racuna na fiskalizaciju, bićete preusmereni nazad za 5 sekundi';
-                echo '<script>
+            break;
+        case 'sendNormalInvoiceFromAdvance':
+            error_reporting(E_ALL);
+            ini_set('display_errors', 1);
+            $sent = 0;
+            try {
+                $json = getEsirFileContentsFromDropbox($_GET['id']);
+                EsirIntegrationLogHandler::saveResponse($_GET['id'], $json, 'getFile', EsirIntegrationLogHandler::STATUS_WAITING);
+                $json = json_decode($json, false, 512, JSON_THROW_ON_ERROR);
+                $sendNormalInvoiceFromAdvance = new FiskalAdvanceInvoice($json, $_GET['id']);
+                $sendNormalInvoiceFromAdvance();
+            } catch (\Exception|FilesystemException|GuzzleException $e) {
+                echo $e->getMessage();
+                return;
+            }
+            echo 'Racun poslat na fiskalizaciju, bićete preusmereni nazad za 5 sekundi.';
+            echo '<script>
                      setTimeout(function(){
-                        history.back();
+                         history.back();
                      }, 5000);
                     </script>';
-            }
             break;
-
+        case 'sendAdvanceInvoice':
+            error_reporting(E_ALL);
+            ini_set('display_errors', 1);
+            $sent = 0;
+            try {
+                $json = getEsirFileContentsFromDropbox($_GET['id']);
+                EsirIntegrationLogHandler::saveResponse($_GET['id'], $json, 'getFile', EsirIntegrationLogHandler::STATUS_WAITING);
+                $json = json_decode($json, false, 512, JSON_THROW_ON_ERROR);
+                $sendAdvanceInvoice = new SendAdvanceInvoice($json, $_GET['id']);
+                $sendAdvanceInvoice();
+            } catch (\Exception|FilesystemException|GuzzleException $e) {
+                echo $e->getMessage();
+                return;
+            }
+            echo 'Anavnsni racun poslat na fiskalizaciju, bićete preusmereni nazad za 5 sekundi.';
+            echo '<script>
+                     setTimeout(function(){
+                         history.back();
+                     }, 5000);
+                    </script>';
+            break;
+        case 'sendNormalRefund':
+            error_reporting(E_ALL);
+            ini_set('display_errors', 1);
+            $sent = 0;
+            try {
+                $json = getEsirFileContentsFromDropbox($_GET['id']);
+                EsirIntegrationLogHandler::saveResponse($_GET['id'], $json, 'getFile', EsirIntegrationLogHandler::STATUS_WAITING);
+                $json = json_decode($json, false, 512, JSON_THROW_ON_ERROR);
+                $sendNormalRefund = new SendNormalRefund($json, $_GET['id']);
+                $sendNormalRefund();
+            } catch (\Exception|FilesystemException|GuzzleException $e) {
+                echo $e->getMessage();
+                return;
+            }
+            echo 'Racun poslat na refundaciju, bićete preusmereni nazad za 5 sekundi.';
+            echo '<script>
+                     setTimeout(function(){
+                         history.back();
+                     }, 5000);
+                    </script>';
+            break;
+        case 'sendAdvanceRefund':
+            error_reporting(E_ALL);
+            ini_set('display_errors', 1);
+            $sent = 0;
+            try {
+                $json = getEsirFileContentsFromDropbox($_GET['id']);
+                EsirIntegrationLogHandler::saveResponse($_GET['id'], $json, 'getFile', EsirIntegrationLogHandler::STATUS_WAITING);
+                $json = json_decode($json, false, 512, JSON_THROW_ON_ERROR);
+                $sendAdvanceRefund = new SendAdvanceRefund($json, $_GET['id']);
+                $sendAdvanceRefund();
+            } catch (\Exception|FilesystemException|GuzzleException $e) {
+                echo $e->getMessage();
+                return;
+            }
+            echo 'Avansni racun poslat na refundaciju, bićete preusmereni nazad za 5 sekundi.';
+            echo '<script>
+                     setTimeout(function(){
+                         history.back();
+                     }, 5000);
+                    </script>';
+            break;
         case 'prihvatiFiskalizovanRacun':
             ini_set('display_errors', '1');
             error_reporting(E_ALL);
             $response = file_get_contents('php://input');
             \GF\Esir\EsirIntegration::errorLog($response);
-            \GF\Esir\EsirIntegration::processEsirResponse($response);
-
+            try {
+                \GF\Esir\EsirIntegration::processEsirResponse($response);
+            } catch (\Exception $e) {
+                \GF\Esir\EsirIntegration::errorLog($e->getMessage());
+            }
             break;
 
         case 'printajFiskalizovanRacun':
-            $data = \GF\Esir\EsirIntegrationLogHandler::getEsirResponse($_GET['id']);
-            $wcOrder = wc_get_order($_GET['id']);
-            echo '<pre>' . json_decode($data->esirResponse)->journal . '</pre>';
-            echo '<img width="300px" src="'.home_url() . '/wp-content/uploads/qrinvoices/' . $wcOrder->get_order_number() .'.jpg" />';
-
-            break;
-
-        case 'voidFiskalizovanRacun':
-            $json = getEsirFileContentsFromDropbox($_GET['id']);;
-            $send = \GF\Esir\EsirIntegration::void($json, $_GET['id']);
-            if ($send) {
-                echo 'Racun poslat na refundaciju, bićete preusmereni nazad za 5 sekundi.';
-                echo '<script>
-                     setTimeout(function(){
-                         history.back();
-                     }, 5000);
-                    </script>';
-            } else {
-                echo 'Doslo je do greske prilikom slanja racuna na refundaciju, bićete preusmereni nazad za 5 sekundi';
-                echo '<script>
-                     setTimeout(function(){
-                        history.back();
-                     }, 5000);
-                    </script>';
+            $data = EsirIntegrationLogHandler::getEsirResponse($_GET['id']);
+            if ($data !== []) {
+                $wcOrder = wc_get_order($_GET['id']);
+                echo '<pre><p>Broj narudžbenice #<b>'.$wcOrder->get_order_number().'</b></p>' . json_decode($data[0]->response)->journal . '</pre>';
+                echo '<img width="300px" src="'.home_url() . '/wp-content/uploads/qrinvoices/' . $wcOrder->get_order_number() .'.jpg" />';
+                break;
             }
-            break;
     }
 }
 
@@ -249,13 +309,14 @@ if (isset($_GET['action'])) {
  * @param $orderId
  * @return string
  * @throws JsonException
+ * @throws FilesystemException
  */
-function getEsirFileContentsFromDropbox($orderId) {
+function getEsirFileContentsFromDropbox($orderId): string
+{
     $order = wc_get_order($orderId);
     $orderNumber = $order->get_order_number();
     $dropbox = new \GF\DropBox\DropboxApi();
     $dropbox->setupFileSystem();
-
     return $dropbox->getOrderFileContents($orderNumber);
 }
 

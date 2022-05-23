@@ -50,6 +50,10 @@ require_once(__DIR__ . '/Esir/DropboxApi.php');
 require_once(__DIR__ . '/Esir/EsirIntegrationLogHandler.php');
 require_once(__DIR__ . '/Esir/EsirIntegration.php');
 
+foreach (glob(__DIR__ . "/Esir/Actions/*.php") as $file) {
+    require_once $file;
+}
+
 foreach (glob(__DIR__ . "/Woocommerce/*.php") as $file) {
     require_once $file;
 }

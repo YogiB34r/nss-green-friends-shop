@@ -5,6 +5,8 @@ namespace GF\Orders;
 
 use Automattic\WooCommerce\Admin\Overrides\Order as AdminOverride;
 use Automattic\WooCommerce\Admin\Overrides\OrderRefund;
+use GF\DropBox\DropboxApi;
+use League\Flysystem\FilesystemException;
 use ZipArchive;
 
 class AjaxHandler
@@ -279,36 +281,83 @@ class AjaxHandler
         wp_send_json($data);
     }
 
-    private function getActionsForOrder($order)
+    private function getActionsForOrder($order): string
     {
-        $html = $this->predracunAction($order) . $this->fiskalniRacun($order);
-        if ($order->get_meta('fiskalniRacunCreated')) {
-            $html .= $this->printFiskalniRacun($order) . $this->voidFiskalniRacun($order);
+        $html = $this->predracunAction($order) . $this->sendNormalInvoice($order) . $this->sendAdvanceInvoice($order) .
+            $this->sendNormalInvoiceFromAdvance($order);
+        if ($order->get_meta('fiskalizationStatus') !== '') {
+            $html .= $this->printFiskalniRacun($order) . $this->sendRefund($order);
         }
         $html .= $this->exportAction($order) . $this->adresnicaAction($order) . $this->noteAction($order) . $this->syncToMisAction($order);
         return $html;
     }
-    private function fiskalniRacun($order)
+    private function sendNormalInvoice($order): string
     {
-        if ($order->get_meta('fiskalniRacunCreated')) {
-            $style = 'color:white;background-color:green;font-style:italic;';
+        $orderFiskalizationStatus = $order->get_meta('fiskalizationStatus');
+        if ($orderFiskalizationStatus !== '') {
+           return '';
         }
-        return sprintf('<a style="%s" class="button fiskalniRacunButton" href="/back-ajax/?action=fiskalniRacun&id=%s">%s</a>',
-            $style ?? '', $order->get_id(), 'Pošalji račun');
+        return sprintf('<a class="button fiskalniRacunButton" href="/back-ajax/?action=sendNormalInvoice&id=%s">%s</a>', $order->get_id(), 'Pošalji račun na fiskalizaciju');
     }
+
+    private function sendNormalInvoiceFromAdvance($order)
+    {
+        if ($order->get_meta('fiskalizationStatus', true) !== 'refundiran-advance') {
+            return '';
+        }
+        return sprintf('<a class="button fiskalniRacunButton" href="/back-ajax/?action=sendNormalInvoiceFromAdvance&id=%s">%s</a>', $order->get_id(), 'Fiskalizuj avansni račun');
+    }
+
+    private function sendAdvanceInvoice($order): string
+    {
+        $orderFiskalizationStatus = $order->get_meta('fiskalizationStatus', true);
+        //If order is already fiskalized do not show button
+        if ($orderFiskalizationStatus !== '') {
+            return '';
+        }
+        return sprintf('<a class="button fiskalniRacunButton" href="/back-ajax/?action=sendAdvanceInvoice&id=%s">%s</a>', $order->get_id(), 'Pošalji avansni račun na fiskalizaciju');
+    }
+
+    private function sendRefund($order): string
+    {
+        $orderFiskalizationStatus = $order->get_meta('fiskalizationStatus', true);
+        if ($orderFiskalizationStatus !== '') {
+            if ($orderFiskalizationStatus === 'fiskalizovan' || $orderFiskalizationStatus === 'refundiran') {
+                return sprintf('<a class="button fiskalniRacunVoidButton" href="/back-ajax/?action=sendNormalRefund&id=%s">%s</a>',
+                    $order->get_id(), 'Refundiraj fiskalni račun');
+            }
+            if ($orderFiskalizationStatus === 'fiskalizovan-advance') {
+                return sprintf('<a class="button fiskalniRacunVoidButton" href="/back-ajax/?action=sendAdvanceRefund&id=%s">%s</a>',
+                    $order->get_id(), 'Refundiraj avansni račun');
+            }
+        }
+        return  '';
+    }
+
     private function printFiskalniRacun($order)
     {
-        return sprintf('<a class="button" href="/back-ajax/?action=printajFiskalizovanRacun&id=%s" target="_blank">%s</a>',
-            $order->get_id(), 'Štampaj račun');
-    }
-    private function voidFiskalniRacun($order)
-    {
-        if ($order->get_meta('fiskalniRacunVoided')) {
-            $style = 'color:white;background-color:red;font-style:italic;';
+        $orderFiskalizationStatus = $order->get_meta('fiskalizationStatus', true);
+        if ($orderFiskalizationStatus !== '') {
+            switch ($orderFiskalizationStatus){
+                case 'fiskalizovan-advance':
+                    $txt = 'Štampaj fiskalizovani avansni račun';
+                    break;
+                case 'refundiran':
+                    $txt = 'Štampaj refundaciju';
+                    break;
+                case 'refundiran-advance':
+                    $txt = 'Štampaj refundaciju avansnog računa';
+                    break;
+                default:
+                    $txt = 'Štampaj fiskalni račun';
+                    break;
+            }
+            return sprintf('<a class="button" href="/back-ajax/?action=printajFiskalizovanRacun&id=%s" target="_blank">%s</a>',
+                $order->get_id(), $txt);
         }
-        return sprintf('<a class="button fiskalniRacunVoidButton" style="%s" href="/back-ajax/?action=voidFiskalizovanRacun&id=%s">%s</a>',
-            $style ?? '', $order->get_id(), 'Refundiraj račun');
+        return  '';
     }
+
     private function adresnicaAction($order)
     {
         if ($order->get_meta('adresnicaCreated')) {
@@ -329,8 +378,13 @@ class AjaxHandler
 
     private function predracunAction($order)
     {
-        return sprintf('<a class="button" href="/back-ajax/?action=printPreorder&id=%s" target="_blank">%s</a>',
-            $order->get_id(), 'Predracun');
+        $orderFiskalizationStatus = $order->get_meta('fiskalizationStatus', true);
+        //If order is already fiskalized do not show button
+        if ($orderFiskalizationStatus === 'fiskalizovan-advance' || $orderFiskalizationStatus === 'refundiran-advance') {
+            return sprintf('<a class="button" href="/back-ajax/?action=printPreorder&id=%s" target="_blank">%s</a>',
+                $order->get_id(), 'Predracun');
+        }
+       return '';
     }
 
     private function syncToMisAction($order)

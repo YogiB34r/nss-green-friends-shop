@@ -1,6 +1,11 @@
 <?php
 namespace GF\Esir;
 
+use GF\Esir\Actions\SendAdvanceInvoice;
+use GF\Esir\Actions\SendAdvanceRefund;
+use GF\Esir\Actions\SendNormalInvoice;
+use GF\Esir\Actions\SendNormalRefund;
+
 class EsirIntegration
 {
     const TEST_URL = 'https://cstest.abfiskal.rs:3005';
@@ -11,7 +16,12 @@ class EsirIntegration
     const PROD_USER = 'nssaPAuqkqMTts9LQf3';
     const PROD_PASS = 'nsA2a32e512363a973456k121398924Cc7a';
 
-    public static function processEsirResponse($json)
+    /**
+     * @param $json
+     * @return void
+     * @throws \JsonException
+     */
+    public static function processEsirResponse($json): void
     {
         $orders = json_decode($json);
         if (is_array($orders)){
@@ -24,39 +34,79 @@ class EsirIntegration
 
     }
 
-    private static function processOrderAndSendEmail($order)
+    /**
+     * @param $order
+     * @return void
+     * @throws \JsonException
+     * @throws \Exception
+     */
+    private static function processOrderAndSendEmail($order): void
     {
         $wcOrderId = (int) explode('-', $order->orderID)[1];
-        \GF\Esir\EsirIntegrationLogHandler::saveEsirResponse(
-            $wcOrderId,
-            json_encode($order),
-            EsirIntegrationLogHandler::STATUS_FISCALIZED
-        );
+        $action = $order->invoiceType . '-' . $order->transactionType;
         $wcOrder = wc_get_order($wcOrderId);
-        $wcOrder->add_meta_data('fiskalniRacunCreated', true);
-        if ($order->transactionType !== 'REFUND') {
-            $wcOrder->add_order_note('Fiskalni račun je kreiran, broj racuna je: ' . $order->invoiceNumber);
-        } else {
-            $wcOrder->add_order_note('Uspesno storniran fiskalni racun, broj racuna je: ' . $order->invoiceNumber);
-            $wcOrder->add_meta_data('fiskalniRacunVoided', true);
+        switch ($order->invoiceType) {
+            case 'NORMAL':
+                if ($order->transactionType === 'SALE') {
+                    $wcOrder->add_order_note('Fiskalni račun je kreiran, broj racuna je: ' . $order->invoiceNumber);
+                    $wcOrder->update_meta_data('fiskalizationStatus', 'fiskalizovan');
+                    \GF\Esir\EsirIntegrationLogHandler::saveResponse(
+                        $wcOrderId,
+                        json_encode($order, JSON_THROW_ON_ERROR),
+                        $action,
+                        EsirIntegrationLogHandler::STATUS_FISCALIZED
+                    );
+                } elseif ($order->transactionType === 'REFUND') {
+                    $wcOrder->add_order_note('Uspesno storniran fiskalni racun, broj racuna je: ' . $order->invoiceNumber);
+                    $wcOrder->update_meta_data('fiskalizationStatus', 'refundiran');
+                    \GF\Esir\EsirIntegrationLogHandler::saveResponse(
+                        $wcOrderId,
+                        json_encode($order, JSON_THROW_ON_ERROR),
+                        $action,
+                        EsirIntegrationLogHandler::STATUS_REFUNDED
+                    );
+
+                }
+                break;
+            case 'ADVANCE':
+                if ($order->transactionType === 'SALE') {
+                    $wcOrder->add_order_note('Fiskalni avansni račun je kreiran, broj racuna je: ' . $order->invoiceNumber);
+                    $wcOrder->update_meta_data('fiskalizationStatus', 'fiskalizovan-advance');
+                    \GF\Esir\EsirIntegrationLogHandler::saveResponse(
+                        $wcOrderId,
+                        json_encode($order, JSON_THROW_ON_ERROR),
+                        $action,
+                        EsirIntegrationLogHandler::STATUS_FISCALIZED
+                    );
+                } elseif ($order->transactionType === 'REFUND') {
+                    $wcOrder->add_order_note('Uspesno storniran avansni fiskalni racun, broj racuna je: ' . $order->invoiceNumber);
+                    $wcOrder->update_meta_data('fiskalizationStatus', 'refundiran-advance');
+                    \GF\Esir\EsirIntegrationLogHandler::saveResponse(
+                        $wcOrderId,
+                        json_encode($order, JSON_THROW_ON_ERROR),
+                        $action,
+                        EsirIntegrationLogHandler::STATUS_REFUNDED
+                    );
+                }
+                break;
         }
         $wcOrder->save();
-        try {
-            $msg = '<pre><p>Broj narudžbenice #<b>'.$wcOrder->get_order_number().'</b></p>' . $order->journal .'</pre>' . PHP_EOL . PHP_EOL;
-            $msg .= '<img src="'. static::saveQrImage($order).'" alt="Pregled racuna" />';
-            $subject = 'Vas racun';
-            $body = static::compileMail($order->verificationUrl, $msg, $wcOrder);
-            $to = get_user_by('ID', $wcOrder->get_customer_id())->user_email;
-            add_filter( 'wp_mail_content_type', function( $content_type ) { return 'text/html'; } );
-
-            \wp_mail($to, $subject, $body);
-            $to = 'narudzbenice@nonstopshop.rs';
-            \wp_mail($to, $subject, $body);
-        } catch (\Exception $e) {
-            static::errorLog($e->getMessage());
-        }
+        $msg = '<pre><p>Broj narudžbenice #<b>'.$wcOrder->get_order_number().'</b></p>' . $order->journal .'</pre>' . PHP_EOL . PHP_EOL;
+        $msg .= '<img src="'. static::saveQrImage($order).'" alt="Pregled racuna" />';
+        $subject = 'Vas racun';
+        $body = static::compileMail($order->verificationUrl, $msg, $wcOrder);
+        $to = get_user_by('ID', $wcOrder->get_customer_id())->user_email;
+        add_filter( 'wp_mail_content_type', function( $content_type ) { return 'text/html'; } );
+        \wp_mail($to, $subject, $body);
+        $to = 'narudzbenice@nonstopshop.rs';
+        \wp_mail($to, $subject, $body);
     }
-    public static function saveQrImage($order)
+
+    /**
+     * @param $order
+     * @return string
+     */
+    public static function saveQrImage($order): string
     {
         $qrLib = new \chillerlan\QRCode\QRCode();
         $qrFileName = $order->orderID . '.jpg';
@@ -66,7 +116,14 @@ class EsirIntegration
         return home_url() . '/wp-content/uploads/qrinvoices/' . $qrFileName;
     }
 
-    public static function sendJsonToEsir($json) {
+    /**
+     * @param $json
+     * @return bool
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \JsonException
+     */
+    public static function sendJsonToEsir($json): bool
+    {
         if (ENVIRONMENT === 'production') {
             $user = static::PROD_USER;
             $pass = static::PROD_PASS;
@@ -79,16 +136,14 @@ class EsirIntegration
         $headers = [
             'Content-Type' => 'application/json',
         ];
-        $json = substr($json, 3);
-        $json = json_decode($json);
         foreach ($json->items as $item) {
             $item->label = static::getPdvValues($item->label);
-            $item->name = $item->Name;
-            unset($item->Name);
         }
-        $json = json_encode($json);
+        $json = json_encode($json, JSON_THROW_ON_ERROR);
         $client = new \GuzzleHttp\Client(['auth' => [$user, $pass]]);
         try {
+            $msg = "Sending json to esir: " . $json;
+            static::errorLog($msg);
             $response = $client->send(new \GuzzleHttp\Psr7\Request('POST', $url, $headers, $json));
         } catch (\Exception $e) {
             $msg = $e->getMessage() . PHP_EOL . $e->getResponse()->getBody()->getContents() . PHP_EOL;
@@ -98,7 +153,7 @@ class EsirIntegration
         }
         if ($response->getStatusCode() !== 200) {
             $msg = 'Status code: ' . $response->getStatusCode() . PHP_EOL;
-            $msg .= $response->getBody()->getContents();
+            $msg .= $response->getBody()->getContents() . PHP_EOL;
             static::errorLog($msg);
             return false;
         }
@@ -141,29 +196,24 @@ class EsirIntegration
         throw new \Exception('could not get value');
     }
 
-    public static function void($json, $orderId)
-    {
-        $json = substr($json, 3);
-        $wcOrder = wc_get_order($orderId);
-        $orderData = EsirIntegrationLogHandler::getEsirResponse($orderId);
-        $orderData = json_decode($orderData->esirResponse);
-        $json = json_decode($json);
-        $json->referentDocumentNumber = $orderData->invoiceNumber;
-        $json->transactionType = 'Refund';
-        // hack cause of jitex strange chars...
-        $json = '123' . json_encode($json);
-
-        return static::sendJsonToEsir($json, true);
-    }
-
-    public static function errorLog($msg)
+    /**
+     * @param $msg
+     * @return void
+     */
+    public static function errorLog($msg): void
     {
         $path = WP_CONTENT_DIR . '/uploads/fiskalizacija.log';
         $msg = date('Y-m-d H:i:s') . ' | ' . $msg;
         file_put_contents($path, $msg, FILE_APPEND);
     }
 
-    public static function compileMail($downloadLink, $fiskalniIsecak, $order)
+    /**
+     * @param $downloadLink
+     * @param $fiskalniIsecak
+     * @param $order
+     * @return string
+     */
+    public static function compileMail($downloadLink, $fiskalniIsecak, $order): string
     {
         return '
         <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
