@@ -55,16 +55,23 @@ class Jitex
             $modifier = (float) '1' .'.'. (int) number_format($p->get_meta('pdv'));
             $priceNoPdv = number_format($itemPrice / $modifier, 2, ',', '.');
             $priceFormated = number_format($itemPrice, 2, ',', '.');
+            $paymentType = $order->get_payment_method_title();
+            if ($paymentType === 'Pouzecem') {
+                $paymentType = 'Uplatnicom';
+            }
             $string .= $name."\t".$order->get_billing_address_1()."\t".$order->get_billing_postcode()."\t".$order->get_billing_city()."\t"."Srbija"."\t".
-                $order->get_billing_phone()."\t".$order->get_order_number()."\t".$date."\t".$order->get_payment_method_title()."\t".$variantId."\t".$variantName."\t".
+                $order->get_billing_phone()."\t".$order->get_order_number()."\t".$date."\t".$paymentType."\t".$variantId."\t".$variantName."\t".
                 $item->get_quantity()."\t".$priceNoPdv."\t".$priceFormated."\t".$order->get_billing_company()."\t".$order->get_meta('_billing_pib')."\r\n";
         }
         $order->update_meta_data('jitexExportCreated', 1);
         $order->save();
         $shippingNoPdv = number_format($order->get_shipping_total() / 1.2, 2, ',', '.');
-
+        $paymentType = $order->get_payment_method_title();
+        if ($paymentType === 'Pouzecem') {
+            $paymentType = 'Uplatnicom';
+        }
         $string .= $name."\t".$order->get_billing_address_1()."\t".$order->get_billing_postcode()."\t".$order->get_billing_city()."\t"."Srbija"."\t".
-            $order->get_billing_phone()."\t".$order->get_order_number()."\t".$date."\t".$order->get_payment_method_title()."\t9999\tDostava\t1\t".
+            $order->get_billing_phone()."\t".$order->get_order_number()."\t".$date."\t".$paymentType."\t9999\tDostava\t1\t".
             $shippingNoPdv."\t".number_format($order->get_shipping_total(), 2, ',', '.')."\t".$order->get_billing_company();
 
         return $string;
