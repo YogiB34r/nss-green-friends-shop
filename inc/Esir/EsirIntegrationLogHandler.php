@@ -20,20 +20,33 @@ class EsirIntegrationLogHandler
      */
     public static function saveResponse(int $orderId, string $response, string $action, int $status): void
     {
+        global $wpdb;
         if ($action === 'getFile') {
             $response = substr($response, 3);
+            $wpdb->insert('esir_log', [
+                'orderId' => $orderId,
+                'response' => $response,
+                'status' => $status,
+                'action' => $action
+            ]);
+            return;
         }
-        //Get file is our action for sanity check message param is not defined in our json
-        if ($action !== 'getFile') {
-            $responseJson = json_decode($response, false, 512, JSON_THROW_ON_ERROR);
-            if (!isset($responseJson->messages)) {
-                $status = self::STATUS_ERROR;
-            }
-            if (isset($responseJson->messages) && $responseJson->messages !== 'Success'){
-                $status = self::STATUS_ERROR;
-            }
+        if ($action === 'createAdvanceFile') {
+            $wpdb->insert('esir_log', [
+                'orderId' => $orderId,
+                'response' => $response,
+                'status' => $status,
+                'action' => $action
+            ]);
+            return;
         }
-        global $wpdb;
+        $responseJson = json_decode($response, false, 512, JSON_THROW_ON_ERROR);
+        if (!isset($responseJson->messages)) {
+            $status = self::STATUS_ERROR;
+        }
+        if (isset($responseJson->messages) && $responseJson->messages !== 'Success') {
+            $status = self::STATUS_ERROR;
+        }
         $wpdb->insert('esir_log', [
             'orderId' => $orderId,
             'response' => $response,

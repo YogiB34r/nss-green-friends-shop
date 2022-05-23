@@ -10,9 +10,6 @@ class SendAdvanceInvoice
     private $json;
     private $orderId;
 
-    //@todo proveriti da li vec postoji izdati avans i spreciti izdavanje novog pre nego sto se stronira stari
-    //@todo refrerenece number za fiskalizovanje necega za sta je pre izdat avans koristi refund number(znaci mora se refundirati avans pre fiskalizacije)
-    //@todo avans refundiranje nece ici preko jitexa vec mi treba da sredimo to
     public function __construct($json, $orderId)
     {
         $this->json = $json;

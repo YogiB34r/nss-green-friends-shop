@@ -259,4 +259,43 @@ class EsirIntegration
 </html>
         ';
     }
+
+    /**
+     * @throws \JsonException
+     */
+    public static function createJsonForAdvanceInvoice($orderId)
+    {
+        $order = wc_get_order($orderId);
+        $obj = new \stdClass();
+        $obj->orderID = $order->get_order_number();
+        $obj->merchantTin = "109837860";
+        $obj->invoiceType = "Advance";
+        $obj->transactionType = "Sale";
+        $obj->referentDocumentNumber = "";
+        foreach ($order->get_items() as $orderItem) {
+            $product = wc_get_product($orderItem->get_product_id());
+            $obj->items[] = [
+                'GTIN' => $product->get_sku(),
+                'name' => strtoupper($orderItem->get_name()),
+                'quantity' => $orderItem->get_quantity(),
+                'unitPrice' => number_format($orderItem->get_total() / $orderItem->get_quantity(), 2, '.', ''),
+                'label' => (int)$product->get_meta('pdv'),
+                'totalAmount' => number_format($orderItem->get_total(), 2, '.', ''),
+            ];
+        }
+        if ((float)$order->get_shipping_total() > 0) {
+            $obj->items[] = [
+                'GTIN' => '9999',
+                'name' => 'TROŠKOVI DOSTAVE',
+                'quantity' => 1,
+                'unitPrice' => number_format($order->get_shipping_total(), 2, '.', ''),
+                'label' => 20,
+                'totalAmount' => number_format($order->get_shipping_total(), 2, '.', ''),
+            ];
+        }
+        $total = number_format($order->get_total(), 2, '.', '');
+        $obj->totalAmount = $total;
+        $obj->payment[] = ['amount' => $total, 'paymentType' => 4];
+        return json_encode($obj, JSON_THROW_ON_ERROR);
+    }
 }

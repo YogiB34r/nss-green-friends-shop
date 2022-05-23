@@ -221,8 +221,8 @@ if (isset($_GET['action'])) {
             ini_set('display_errors', 1);
             $sent = 0;
             try {
-                $json = getEsirFileContentsFromDropbox($_GET['id']);
-                EsirIntegrationLogHandler::saveResponse($_GET['id'], $json, 'getFile', EsirIntegrationLogHandler::STATUS_WAITING);
+                $json = \GF\Esir\EsirIntegration::createJsonForAdvanceInvoice($_GET['id']);
+                EsirIntegrationLogHandler::saveResponse($_GET['id'], $json, 'createAdvanceInvoice', EsirIntegrationLogHandler::STATUS_WAITING);
                 $json = json_decode($json, false, 512, JSON_THROW_ON_ERROR);
                 $sendAdvanceInvoice = new SendAdvanceInvoice($json, $_GET['id']);
                 $sendAdvanceInvoice();
