@@ -303,7 +303,7 @@ if (isset($_GET['action'])) {
             try {
                 $referentDocumentNumber = $_GET['refDocNumber'];
                 $json = \GF\Esir\EsirIntegration::createJsonForNormalRefund($_GET['id'], $referentDocumentNumber);
-                EsirIntegration::sendJsonToEsir($this->json);
+                EsirIntegration::sendJsonToEsir($json);
             } catch (GuzzleException|JsonException $e) {
                 var_dump($e->getMessage());
                 die();
