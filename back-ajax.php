@@ -9,6 +9,7 @@ use GF\Esir\Actions\SendAdvanceInvoice;
 use GF\Esir\Actions\SendAdvanceRefund;
 use GF\Esir\Actions\SendNormalInvoice;
 use GF\Esir\Actions\SendNormalRefund;
+use GF\Esir\EsirIntegration;
 use GF\Esir\EsirIntegrationLogHandler;
 use GuzzleHttp\Exception\GuzzleException;
 use League\Flysystem\FilesystemException;
@@ -290,7 +291,6 @@ if (isset($_GET['action'])) {
                 \GF\Esir\EsirIntegration::errorLog($e->getMessage());
             }
             break;
-
         case 'printajFiskalizovanRacun':
             $data = EsirIntegrationLogHandler::getEsirResponse($_GET['id']);
             if ($data !== []) {
@@ -299,6 +299,16 @@ if (isset($_GET['action'])) {
                 echo '<img width="300px" src="'.home_url() . '/wp-content/uploads/qrinvoices/' . $wcOrder->get_order_number() .'.jpg" />';
                 break;
             }
+        case 'manualRefund':
+            try {
+                $referentDocumentNumber = $_GET['refDocNumber'];
+                $json = \GF\Esir\EsirIntegration::createJsonForNormalRefund($_GET['id'], $referentDocumentNumber);
+                EsirIntegration::sendJsonToEsir($this->json);
+            } catch (GuzzleException|JsonException $e) {
+                var_dump($e->getMessage());
+                die();
+            }
+            break;
     }
 }
 
