@@ -30,7 +30,7 @@ if (isset($_POST) && count($_POST) > 0){
                 $json = json_decode($json, false, 512, JSON_THROW_ON_ERROR);
                 $json->referentDocumentNumber = $referentDocumentNumber;
                 EsirIntegration::sendJsonToEsir($json);
-                $notice = '<div class="notice notice-success is-dismissible">
+                echo '<div class="notice notice-success is-dismissible">
                             <p>Poslato refundiranje na fiskalizaciju</p>
                           </div>';
             } else {
