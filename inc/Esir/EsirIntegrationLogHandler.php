@@ -22,12 +22,13 @@ class EsirIntegrationLogHandler
     {
         global $wpdb;
         if ($action === 'getFile') {
-            $response = substr($response, 3);
+            $decodedResponse = json_decode($response, false, 512, JSON_THROW_ON_ERROR);
             $wpdb->insert('esir_log', [
                 'orderId' => $orderId,
                 'response' => $response,
                 'status' => $status,
-                'action' => $action
+                'action' => $action,
+                'jitexId' => $decodedResponse->orderID
             ]);
             return;
         }
@@ -51,7 +52,8 @@ class EsirIntegrationLogHandler
             'orderId' => $orderId,
             'response' => $response,
             'status' => $status,
-            'action' => $action
+            'action' => $action,
+            'jitexId' => $responseJson->orderID
         ]);
     }
 
@@ -67,5 +69,26 @@ class EsirIntegrationLogHandler
         }
         $sql .= " ORDER BY id DESC";
         return  $wpdb->get_results($sql);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public static function getOrderIdByJitexId(int $jitexId, string $action = null, int $status = null)
+    {
+        global $wpdb;
+        $sql = "SELECT * FROM esir_log WHERE jitexId = {$jitexId}";
+        if ($action) {
+            $sql .= " AND action = '{$action}'";
+        }
+        if ($status) {
+            $sql .= " AND status = {$status}";
+        }
+        $sql .= " ORDER BY id DESC";
+        $data = $wpdb->get_row($sql);
+        if ($data) {
+            return $data->orderId;
+        }
+        throw new \RuntimeException('No order found');
     }
 }

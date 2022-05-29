@@ -307,7 +307,7 @@ class AjaxHandler
         }
         return sprintf('<a class="button fiskalniRacunButton" href="/back-ajax/?action=sendNormalInvoiceFromAdvance&id=%s">%s</a>', $order->get_id(), 'Fiskalizuj avansni račun');
     }
-
+    //@todo avansni racun
     private function sendAdvanceInvoice($order): string
     {
         $orderFiskalizationStatus = $order->get_meta('fiskalizationStatus', true);
@@ -315,6 +315,7 @@ class AjaxHandler
         if ($orderFiskalizationStatus !== '') {
             return '';
         }
+        return '';
         return sprintf('<a class="button fiskalniRacunButton" href="/back-ajax/?action=sendAdvanceInvoice&id=%s">%s</a>', $order->get_id(), 'Pošalji avansni račun na fiskalizaciju');
     }
 
@@ -326,9 +327,10 @@ class AjaxHandler
                 return sprintf('<a class="button fiskalniRacunVoidButton" href="/back-ajax/?action=sendNormalRefund&id=%s">%s</a>',
                     $order->get_id(), 'Refundiraj fiskalni račun');
             }
+            //@todo avansni racun
             if ($orderFiskalizationStatus === 'fiskalizovan-advance') {
-                return sprintf('<a class="button fiskalniRacunVoidButton" href="/back-ajax/?action=sendAdvanceRefund&id=%s">%s</a>',
-                    $order->get_id(), 'Refundiraj avansni račun');
+//                return sprintf('<a class="button fiskalniRacunVoidButton" href="/back-ajax/?action=sendAdvanceRefund&id=%s">%s</a>',
+//                    $order->get_id(), 'Refundiraj avansni račun');
             }
         }
         return  '';
@@ -378,12 +380,13 @@ class AjaxHandler
 
     private function predracunAction($order)
     {
+        //@todo avansni racun
         $orderFiskalizationStatus = $order->get_meta('fiskalizationStatus', true);
         //If order is already fiskalized do not show button
-        if ($orderFiskalizationStatus === 'fiskalizovan-advance' || $orderFiskalizationStatus === 'refundiran-advance') {
+//        if ($orderFiskalizationStatus === 'fiskalizovan-advance' || $orderFiskalizationStatus === 'refundiran-advance') {
             return sprintf('<a class="button" href="/back-ajax/?action=printPreorder&id=%s" target="_blank">%s</a>',
                 $order->get_id(), 'Predracun');
-        }
+//        }
        return '';
     }
 

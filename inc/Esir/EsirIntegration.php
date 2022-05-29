@@ -42,7 +42,7 @@ class EsirIntegration
      */
     private static function processOrderAndSendEmail($order): void
     {
-        $wcOrderId = (int) explode('-', $order->orderID)[1];
+        $wcOrderId =EsirIntegrationLogHandler::getOrderIdByJitexId($order->orderID);
         $action = $order->invoiceType . '-' . $order->transactionType;
         $wcOrder = wc_get_order($wcOrderId);
         switch ($order->invoiceType) {

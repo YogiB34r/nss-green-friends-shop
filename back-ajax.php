@@ -231,7 +231,7 @@ if (isset($_GET['action'])) {
                 echo $e->getMessage();
                 return;
             }
-            echo 'Anavnsni racun poslat na fiskalizaciju, bićete preusmereni nazad za 5 sekundi.';
+            echo 'Avansni racun poslat na fiskalizaciju, bićete preusmereni nazad za 5 sekundi.';
             echo '<script>
                      setTimeout(function(){
                          history.back();
@@ -301,10 +301,14 @@ if (isset($_GET['action'])) {
             }
         case 'manualRefund':
             try {
+                //@todo test this
                 $referentDocumentNumber = $_GET['refDocNumber'];
-                $json = \GF\Esir\EsirIntegration::createJsonForNormalRefund($_GET['id'], $referentDocumentNumber);
-                EsirIntegration::sendJsonToEsir(json_decode($json, false, 512, JSON_THROW_ON_ERROR));
-            } catch (GuzzleException|JsonException $e) {
+                $json = getEsirFileContentsFromDropbox($_GET['id']);
+                EsirIntegrationLogHandler::saveResponse($_GET['id'], $json, 'getFile', EsirIntegrationLogHandler::STATUS_WAITING);
+                $json = json_decode($json, false, 512, JSON_THROW_ON_ERROR);
+                $json->referentDocumentNumber = $referentDocumentNumber;
+                EsirIntegration::sendJsonToEsir($json);
+            } catch (GuzzleException|JsonException|FilesystemException $e) {
                 var_dump($e->getMessage());
                 die();
             }
