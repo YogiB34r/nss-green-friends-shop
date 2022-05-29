@@ -36,6 +36,8 @@ $orderListFilters = new AdminListFilters();
 $orderListFilters->init();
 $orderAnalytics = new OrderAnalytics();
 $orderAnalytics->init();
+$manualRefund = new \GF\Esir\ManualRefundAdmin();
+$manualRefund->init();
 
 //used only once
 //$marketplace->activate();
