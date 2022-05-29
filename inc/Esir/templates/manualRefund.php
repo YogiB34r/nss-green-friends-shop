@@ -33,6 +33,7 @@ if (isset($_POST) && count($_POST) > 0){
                 echo '<div class="notice notice-success is-dismissible">
                             <p>Poslato refundiranje na fiskalizaciju</p>
                           </div>';
+                $_POST = [];
             } else {
                     echo '<div class="notice notice-error is-dismissible">
                             <p>Nije pronađena narudžbenica sa unetim brojem</p>
