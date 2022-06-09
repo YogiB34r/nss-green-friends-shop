@@ -37,6 +37,8 @@ class SendAdvanceRefund
         $this->json->referentDocumentNumber = $referentDocumentNumber;
         $this->json->invoiceType = 'Advance';
         $this->json->transactionType = 'Refund';
-        EsirIntegration::sendJsonToEsir($this->json);
+        if (!EsirIntegration::sendJsonToEsir($this->json, $this->orderId)) {
+            throw new \RuntimeException('Došlo je do greške prilikom slanja');
+        }
     }
 }

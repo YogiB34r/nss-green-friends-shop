@@ -35,6 +35,8 @@ class SendNormalInvoice
         if ($this->json->transactionType !== 'Sale' && $this->json->invoiceType !== 'Normal') {
             throw new \RuntimeException('Spremljeni fajl iz jitexa nije tip prodaje, generišite fajl za prodaju pa pokušajte ponovo');
         }
-       EsirIntegration::sendJsonToEsir($this->json);
+       if (!EsirIntegration::sendJsonToEsir($this->json, $this->orderId)) {
+           throw new \RuntimeException('Došlo je do greške prilikom slanja');
+       }
     }
 }

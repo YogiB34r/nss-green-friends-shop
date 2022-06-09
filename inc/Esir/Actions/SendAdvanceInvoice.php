@@ -25,6 +25,8 @@ class SendAdvanceInvoice
         if ($this->json->transactionType !== 'Sale' || $this->json->invoiceType !== 'Advance') {
             throw new \RuntimeException('Spremljeni fajl iz jitexa nije tip avansa, generišite fajl za avans pa pokušajte ponovo');
         }
-        EsirIntegration::sendJsonToEsir($this->json);
+        if (!EsirIntegration::sendJsonToEsir($this->json, $this->orderId)) {
+            throw new \RuntimeException('Došlo je do greške prilikom slanja');
+        }
     }
 }

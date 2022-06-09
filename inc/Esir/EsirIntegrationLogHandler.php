@@ -8,6 +8,7 @@ class EsirIntegrationLogHandler
     const STATUS_FISCALIZED = 1;
     const STATUS_REFUNDED = 2;
     const STATUS_ERROR = 3;
+    const STATUS_SENT = 4;
 
     /**
      *
@@ -21,6 +22,15 @@ class EsirIntegrationLogHandler
     public static function saveResponse(int $orderId, string $response, string $action, int $status): void
     {
         global $wpdb;
+        if ($action === 'send') {
+            $wpdb->insert('esir_log', [
+                'orderId' => $orderId,
+                'response' => $response,
+                'status' => $status,
+                'action' => $action,
+            ]);
+            return;
+        }
         if ($action === 'getFile') {
             $decodedResponse = json_decode($response, false, 512, JSON_THROW_ON_ERROR);
             $wpdb->insert('esir_log', [

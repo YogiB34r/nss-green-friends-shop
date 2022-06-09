@@ -31,7 +31,9 @@ class FiskalAdvanceInvoice
             $orderDataResponse = json_decode($orderData[0]->response, false, 512, JSON_THROW_ON_ERROR);
             $referentDocumentNumber = $orderDataResponse->invoiceNumber;
             $this->json->referentDocumentNumber = $referentDocumentNumber;
-            EsirIntegration::sendJsonToEsir($this->json);
+            if (!EsirIntegration::sendJsonToEsir($this->json, $this->orderId)) {
+                throw new \RuntimeException('Došlo je do greške prilikom slanja');
+            }
             return;
         }
         throw new \RuntimeException('Da bi se fiskalizovao avans potrebno je prvo odraditi refundaciju i 

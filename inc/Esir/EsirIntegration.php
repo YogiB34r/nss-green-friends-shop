@@ -118,11 +118,12 @@ class EsirIntegration
 
     /**
      * @param $json
+     * @param $orderId
      * @return bool
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException
      */
-    public static function sendJsonToEsir($json): bool
+    public static function sendJsonToEsir($json, $orderId): bool
     {
         if (ENVIRONMENT === 'production') {
             $user = static::PROD_USER;
@@ -142,27 +143,26 @@ class EsirIntegration
         $json = json_encode($json, JSON_THROW_ON_ERROR);
         $client = new \GuzzleHttp\Client(['auth' => [$user, $pass]]);
         try {
-            $msg = "Sending json to esir: " . $json;
-            static::errorLog($msg);
             $response = $client->send(new \GuzzleHttp\Psr7\Request('POST', $url, $headers, $json));
-        } catch (\Exception $e) {
-            $msg = $e->getMessage() . PHP_EOL . $e->getResponse()->getBody()->getContents() . PHP_EOL;
-            $msg .= 'Tried to send : ' . $json;
-            static::errorLog($msg);
-            return false;
-        }
-        if ($response->getStatusCode() !== 200) {
-            $msg = 'Status code: ' . $response->getStatusCode() . PHP_EOL;
-            $msg .= $response->getBody()->getContents() . PHP_EOL;
-            static::errorLog($msg);
-            return false;
-        }
-        $response = $response->getBody()->getContents();
-        if ($response === '{"status":"OK"}') {
+            if ($response->getStatusCode() !== 200) {
+                EsirIntegrationLogHandler::saveResponse($orderId, 'status code: '.$response->getStatusCode(),
+                    'send', EsirIntegrationLogHandler::STATUS_ERROR);
+                return false;
+            }
+            $response = json_decode($response->getBody()->getContents(), false, 512, JSON_THROW_ON_ERROR);
+            if ($response->status === 'ERROR') {
+                EsirIntegrationLogHandler::saveResponse($orderId, $response->message,
+                    'send', EsirIntegrationLogHandler::STATUS_ERROR);
+                return false;
+            }
+            EsirIntegrationLogHandler::saveResponse($orderId, $response->status,
+                'send', EsirIntegrationLogHandler::STATUS_SENT);
             return true;
+        } catch (\Exception $e) {
+            EsirIntegrationLogHandler::saveResponse($orderId, $e->getMessage(),
+                'send', EsirIntegrationLogHandler::STATUS_ERROR);
+            return false;
         }
-        static::errorLog('Process has FAILED !!! - general error. should not be after debugged!!!');
-        return false;
     }
 
     /**
