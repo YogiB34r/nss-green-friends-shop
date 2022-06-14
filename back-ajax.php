@@ -301,13 +301,12 @@ if (isset($_GET['action'])) {
             }
         case 'manualRefund':
             try {
-                //@todo test this
                 $referentDocumentNumber = $_GET['refDocNumber'];
                 $json = getEsirFileContentsFromDropbox($_GET['id']);
                 EsirIntegrationLogHandler::saveResponse($_GET['id'], $json, 'getFile', EsirIntegrationLogHandler::STATUS_WAITING);
                 $json = json_decode($json, false, 512, JSON_THROW_ON_ERROR);
                 $json->referentDocumentNumber = $referentDocumentNumber;
-                EsirIntegration::sendJsonToEsir($json);
+                EsirIntegration::sendJsonToEsir($json, $_GET['id']);
             } catch (GuzzleException|JsonException|FilesystemException $e) {
                 var_dump($e->getMessage());
                 die();
