@@ -294,9 +294,6 @@ class AjaxHandler
     private function sendNormalInvoice($order): string
     {
         $orderFiskalizationStatus = $order->get_meta('fiskalizationStatus');
-        if ($orderFiskalizationStatus !== '') {
-           return '';
-        }
         return sprintf('<a class="button fiskalniRacunButton" href="/back-ajax/?action=sendNormalInvoice&id=%s">%s</a>', $order->get_id(), 'Pošalji račun na fiskalizaciju');
     }
 

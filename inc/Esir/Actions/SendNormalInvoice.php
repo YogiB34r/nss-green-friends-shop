@@ -28,8 +28,11 @@ class SendNormalInvoice
         if (count($orderData) !== 0) {
             $refundData = EsirIntegrationLogHandler::getEsirResponse($this->orderId, 'NORMAL-REFUND',
                 EsirIntegrationLogHandler::STATUS_REFUNDED);
-            if ((count($refundData) !== 0) && $orderData[0]->id > $refundData[0]->id) {
-                throw new \RuntimeException('Ovaj račun je već fiskalizovan a nema refundacije nakon poslednje fisklaizacije');
+            if (count($refundData) === 0) {
+                throw new \RuntimeException('Ovaj račun je već fiskalizovan a nema refundacije nakon poslednje fiskalizacije');
+            }
+            if (count($refundData) > 0 && $orderData[0]->id > $refundData[0]->id) {
+                throw new \RuntimeException('Ovaj račun je već fiskalizovan a nema refundacije nakon poslednje fiskalizacije');
             }
         }
         if ($this->json->transactionType !== 'Sale' && $this->json->invoiceType !== 'Normal') {
