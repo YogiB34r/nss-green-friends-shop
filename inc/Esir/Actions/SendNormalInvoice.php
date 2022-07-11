@@ -35,7 +35,7 @@ class SendNormalInvoice
                 throw new \RuntimeException('Ovaj račun je već fiskalizovan a nema refundacije nakon poslednje fiskalizacije');
             }
         }
-        if ($this->json->transactionType !== 'Sale' && $this->json->invoiceType !== 'Normal') {
+        if ($this->json->transactionType !== 'Sale' || $this->json->invoiceType !== 'Normal') {
             throw new \RuntimeException('Spremljeni fajl iz jitexa nije tip prodaje, generišite fajl za prodaju pa pokušajte ponovo');
         }
        if (!EsirIntegration::sendJsonToEsir($this->json, $this->orderId)) {
