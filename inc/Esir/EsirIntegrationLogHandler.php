@@ -65,6 +65,9 @@ class EsirIntegrationLogHandler
             'action' => $action,
             'jitexId' => $responseJson->orderID
         ]);
+        if ($status === self::STATUS_ERROR) {
+            throw new \Exception('Došlo je do greške prilikom slanja');
+        }
     }
 
     public static function getEsirResponse(int $orderId, string $action = null, int $status = null)

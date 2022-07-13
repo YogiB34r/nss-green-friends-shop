@@ -1,6 +1,7 @@
 <?php
 namespace GF\Esir;
 
+use Dompdf\Exception;
 use GF\Esir\Actions\SendAdvanceInvoice;
 use GF\Esir\Actions\SendAdvanceRefund;
 use GF\Esir\Actions\SendNormalInvoice;
@@ -45,51 +46,55 @@ class EsirIntegration
         $wcOrderId =EsirIntegrationLogHandler::getOrderIdByJitexId($order->orderID);
         $action = $order->invoiceType . '-' . $order->transactionType;
         $wcOrder = wc_get_order($wcOrderId);
-        switch ($order->invoiceType) {
-            case 'NORMAL':
-                if ($order->transactionType === 'SALE') {
-                    $wcOrder->add_order_note('Fiskalni račun je kreiran, broj racuna je: ' . $order->invoiceNumber);
-                    $wcOrder->update_meta_data('fiskalizationStatus', 'fiskalizovan');
-                    \GF\Esir\EsirIntegrationLogHandler::saveResponse(
-                        $wcOrderId,
-                        json_encode($order, JSON_THROW_ON_ERROR),
-                        $action,
-                        EsirIntegrationLogHandler::STATUS_FISCALIZED
-                    );
-                } elseif ($order->transactionType === 'REFUND') {
-                    $wcOrder->add_order_note('Uspesno storniran fiskalni racun, broj racuna je: ' . $order->invoiceNumber);
-                    $wcOrder->update_meta_data('fiskalizationStatus', 'refundiran');
-                    \GF\Esir\EsirIntegrationLogHandler::saveResponse(
-                        $wcOrderId,
-                        json_encode($order, JSON_THROW_ON_ERROR),
-                        $action,
-                        EsirIntegrationLogHandler::STATUS_REFUNDED
-                    );
-
-                }
-                break;
-            case 'ADVANCE':
-                if ($order->transactionType === 'SALE') {
-                    $wcOrder->add_order_note('Fiskalni avansni račun je kreiran, broj racuna je: ' . $order->invoiceNumber);
-                    $wcOrder->update_meta_data('fiskalizationStatus', 'fiskalizovan-advance');
-                    \GF\Esir\EsirIntegrationLogHandler::saveResponse(
-                        $wcOrderId,
-                        json_encode($order, JSON_THROW_ON_ERROR),
-                        $action,
-                        EsirIntegrationLogHandler::STATUS_FISCALIZED
-                    );
-                } elseif ($order->transactionType === 'REFUND') {
+        try {
+            switch ($order->invoiceType) {
+                case 'NORMAL':
+                    if ($order->transactionType === 'SALE') {
+                        \GF\Esir\EsirIntegrationLogHandler::saveResponse(
+                            $wcOrderId,
+                            json_encode($order, JSON_THROW_ON_ERROR),
+                            $action,
+                            EsirIntegrationLogHandler::STATUS_FISCALIZED
+                        );
+                        $wcOrder->add_order_note('Fiskalni račun je kreiran, broj racuna je: ' . $order->invoiceNumber);
+                        $wcOrder->update_meta_data('fiskalizationStatus', 'fiskalizovan');
+                    } elseif ($order->transactionType === 'REFUND') {
+                        \GF\Esir\EsirIntegrationLogHandler::saveResponse(
+                            $wcOrderId,
+                            json_encode($order, JSON_THROW_ON_ERROR),
+                            $action,
+                            EsirIntegrationLogHandler::STATUS_REFUNDED
+                        );
+                        $wcOrder->add_order_note('Uspesno storniran fiskalni racun, broj racuna je: ' . $order->invoiceNumber);
+                        $wcOrder->update_meta_data('fiskalizationStatus', 'refundiran');
+                    }
+                    break;
+                case 'ADVANCE':
+                    if ($order->transactionType === 'SALE') {
+                        \GF\Esir\EsirIntegrationLogHandler::saveResponse(
+                            $wcOrderId,
+                            json_encode($order, JSON_THROW_ON_ERROR),
+                            $action,
+                            EsirIntegrationLogHandler::STATUS_FISCALIZED
+                        );
+                        $wcOrder->add_order_note('Fiskalni avansni račun je kreiran, broj racuna je: ' . $order->invoiceNumber);
+                        $wcOrder->update_meta_data('fiskalizationStatus', 'fiskalizovan-advance');
+                    } elseif ($order->transactionType === 'REFUND') {
+                        \GF\Esir\EsirIntegrationLogHandler::saveResponse(
+                            $wcOrderId,
+                            json_encode($order, JSON_THROW_ON_ERROR),
+                            $action,
+                            EsirIntegrationLogHandler::STATUS_REFUNDED
+                        );
+                    }
                     $wcOrder->add_order_note('Uspesno storniran avansni fiskalni racun, broj racuna je: ' . $order->invoiceNumber);
                     $wcOrder->update_meta_data('fiskalizationStatus', 'refundiran-advance');
-                    \GF\Esir\EsirIntegrationLogHandler::saveResponse(
-                        $wcOrderId,
-                        json_encode($order, JSON_THROW_ON_ERROR),
-                        $action,
-                        EsirIntegrationLogHandler::STATUS_REFUNDED
-                    );
-                }
-                break;
+                    break;
+            }
+        } catch (\Exception $e) {
+            $wcOrder->add_order_note('Greska pri fiskalizaciji: ' . $e->getMessage());
         }
+
         $wcOrder->save();
         $msg = '<pre><p>Broj narudžbenice #<b>'.$wcOrder->get_order_number().'</b></p>' . $order->journal .'</pre>' . PHP_EOL . PHP_EOL;
         $msg .= '<img src="'. static::saveQrImage($order).'" alt="Pregled racuna" />';
